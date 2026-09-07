@@ -26,9 +26,9 @@
             color: #1c1917;
             padding-bottom: 0;
         }
-        body.on-studio {
-            background-color: #0f172a;
-            color: #f1f5f9;
+        #home-view[hidden],
+        #studio-view[hidden] {
+            display: none !important;
         }
 
         .home-view {
@@ -1809,6 +1809,7 @@
             updateCV();
             QCDraft.save();
             closeExamplesModal();
+            showStudio();
             markStep(1);
         }
 

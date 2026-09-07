@@ -97,7 +97,9 @@ function prepareCaptureClone() {
     left: "0",
     top: "0",
     width: A4_CSS_PX + "px",
-    padding: "24px 36px 32px",
+    minWidth: A4_CSS_PX + "px",
+    maxWidth: A4_CSS_PX + "px",
+    padding: "28px 44px 36px",
     margin: "0",
     background: "#ffffff",
     color: "#0f172a",
@@ -106,6 +108,7 @@ function prepareCaptureClone() {
     pointerEvents: "none",
     boxSizing: "border-box",
     transform: "none",
+    direction: "rtl",
   });
 
   Object.assign(clone.style, {
@@ -218,45 +221,62 @@ async function captureToCanvas(el) {
     throw new Error("html2canvas missing");
   }
 
-  const width = Math.ceil(Math.max(el.scrollWidth, el.offsetWidth, A4_CSS_PX));
-  const height = Math.ceil(Math.max(el.scrollHeight, el.offsetHeight, 1));
-  const scale = Math.min(2, MAX_CANVAS / width, MAX_CANVAS / height);
+  const html = document.documentElement;
+  const prevDir = html.getAttribute("dir");
+  const prevDirStyle = html.style.direction;
+  html.setAttribute("dir", "ltr");
+  html.style.direction = "ltr";
 
-  return html2canvas(el, {
-    scale,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-    logging: false,
-    width,
-    height,
-    windowWidth: width,
-    windowHeight: height,
-    scrollX: 0,
-    scrollY: 0,
-    x: 0,
-    y: 0,
-    imageTimeout: 8000,
-    onclone: (doc) => {
-      copyCssVars(document.documentElement, doc.documentElement);
-      const host = doc.getElementById("qc-print-host");
-      if (host instanceof HTMLElement) {
-        host.classList.add("qc-capturing");
-        Object.assign(host.style, {
-          display: "block",
-          position: "static",
-          left: "auto",
-          top: "auto",
-          width: A4_CSS_PX + "px",
-          padding: "24px 36px 32px",
-          margin: "0",
-          background: "#ffffff",
-          overflow: "visible",
-          transform: "none",
-        });
-        prepareCaptureRoot(host, doc.defaultView);
-      }
-    },
-  });
+  try {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
+    const height = Math.max(1, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
+    const scale = Math.min(2, MAX_CANVAS / width, MAX_CANVAS / height);
+
+    return await html2canvas(el, {
+      scale,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+      width,
+      height,
+      windowWidth: Math.max(width, A4_CSS_PX),
+      windowHeight: Math.max(height, 400),
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      imageTimeout: 8000,
+      onclone: (doc) => {
+        doc.documentElement.setAttribute("dir", "ltr");
+        doc.documentElement.style.direction = "ltr";
+        copyCssVars(document.documentElement, doc.documentElement);
+        const host = doc.getElementById("qc-print-host");
+        if (host instanceof HTMLElement) {
+          host.classList.add("qc-capturing");
+          host.setAttribute("dir", "rtl");
+          Object.assign(host.style, {
+            display: "block",
+            position: "static",
+            left: "auto",
+            top: "auto",
+            width: A4_CSS_PX + "px",
+            minWidth: A4_CSS_PX + "px",
+            maxWidth: A4_CSS_PX + "px",
+            padding: "28px 44px 36px",
+            margin: "0",
+            background: "#ffffff",
+            overflow: "visible",
+            transform: "none",
+            direction: "rtl",
+          });
+          prepareCaptureRoot(host, doc.defaultView);
+        }
+      },
+    });
+  } finally {
+    if (prevDir == null) html.removeAttribute("dir");
+    else html.setAttribute("dir", prevDir);
+    html.style.direction = prevDirStyle;
+  }
 }
 
 export async function exportHighResPdf() {

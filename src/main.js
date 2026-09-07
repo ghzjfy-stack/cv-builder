@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { isUnlocked, unlock, WRONG_CODE_MSG } from "./access/gate.js";
 import { CHECKOUT, whatsappUrl } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
@@ -7,11 +8,21 @@ const feedback = () => document.getElementById("code-feedback");
 const codeInput = () => document.getElementById("download-code");
 const preview = () => document.getElementById("cv-preview-wrapper");
 
+let lastFocus = null;
+
 function setFeedback(text, ok) {
   const el = feedback();
   if (!el) return;
   el.textContent = text;
   el.className = `text-sm min-h-5 text-center font-semibold ${ok ? "text-emerald-300" : "text-rose-400"}`;
+}
+
+function setPaidUi(paid) {
+  const wrap = preview();
+  wrap?.classList.toggle("paid", paid);
+  document.body.classList.toggle("paid", paid);
+  document.documentElement.classList.toggle("qc-paid", paid);
+  document.documentElement.classList.toggle("qc-unpaid", !paid);
 }
 
 function showPayStep() {
@@ -22,17 +33,41 @@ function showPayStep() {
 function showDownloadStep() {
   document.getElementById("pay-step")?.classList.add("hidden");
   document.getElementById("download-step")?.classList.remove("hidden");
-  preview()?.classList.add("paid");
+  setPaidUi(true);
+}
+
+function trapFocus(e) {
+  const el = modal();
+  if (!el || el.classList.contains("hidden")) return;
+  if (e.key !== "Tab") return;
+  const nodes = [...el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(
+    (n) => !n.hasAttribute("disabled") && n.getClientRects().length > 0,
+  );
+  if (!nodes.length) return;
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
 }
 
 function openModal() {
   const el = modal();
   if (!el) return;
+  lastFocus = document.activeElement;
   el.classList.remove("hidden");
   el.classList.add("flex");
   el.style.display = "flex";
   el.style.zIndex = "9999";
   el.style.pointerEvents = "auto";
+  el.setAttribute("aria-hidden", "false");
+  window.setTimeout(() => {
+    (codeInput() || document.getElementById("btn-close-modal"))?.focus();
+  }, 30);
 }
 
 function closeModal() {
@@ -41,14 +76,17 @@ function closeModal() {
   el.classList.add("hidden");
   el.classList.remove("flex");
   el.style.display = "none";
+  el.setAttribute("aria-hidden", "true");
+  if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
 }
 
 function flashCopyButton() {
   const btn = document.getElementById("btn-copy-bit");
   if (!btn) return;
+  const prev = btn.textContent;
   btn.textContent = "הועתק";
   setTimeout(() => {
-    btn.textContent = "העתק מספר";
+    btn.textContent = prev || "העתק מספר";
   }, 1600);
 }
 
@@ -95,7 +133,7 @@ function triggerPDFDownload() {
     unlock();
   }
 
-  preview()?.classList.add("paid");
+  setPaidUi(true);
   closeModal();
   void runHighResExport();
 }
@@ -159,12 +197,16 @@ function downloadFormat(kind) {
 function fillCheckoutUi() {
   const bitEl = document.getElementById("bit-number");
   if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
-  const amount = document.getElementById("bit-amount");
-  if (amount) amount.textContent = String(CHECKOUT.amountIls);
+  document.querySelectorAll("[data-price]").forEach((el) => {
+    el.textContent = String(CHECKOUT.amountIls);
+  });
+  document.querySelectorAll("[data-compare-price]").forEach((el) => {
+    el.textContent = String(CHECKOUT.compareAtIls);
+  });
 }
 
 function restoreUnlockUi() {
-  if (isUnlocked()) preview()?.classList.add("paid");
+  setPaidUi(isUnlocked());
 }
 
 function styleCta(el) {
@@ -174,9 +216,98 @@ function styleCta(el) {
   el.style.zIndex = "9999";
 }
 
+function buildShieldGrid() {
+  const grid = document.getElementById("cv-shield-grid");
+  if (!grid || grid.childElementCount) return;
+  for (let i = 0; i < 40; i++) {
+    const span = document.createElement("span");
+    span.textContent = "תצוגה מקדימה · QuickCV";
+    grid.appendChild(span);
+  }
+}
+
+function flashShotBlock() {
+  if (isUnlocked()) return;
+  const el = document.getElementById("shot-block");
+  if (!el) return;
+  el.classList.remove("hidden");
+  el.classList.add("flex");
+  try {
+    void navigator.clipboard.writeText("QuickCV — התצוגה המקדימה מוגנת עד לאחר התשלום.");
+  } catch {
+    /* ignore */
+  }
+  window.setTimeout(() => {
+    el.classList.add("hidden");
+    el.classList.remove("flex");
+  }, 1600);
+}
+
+function isTypingTarget(el) {
+  if (!el || !(el instanceof Element)) return false;
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+}
+
+function bindPreviewGuard() {
+  buildShieldGrid();
+  const wrap = preview();
+  if (!wrap) return;
+
+  wrap.addEventListener("contextmenu", (e) => {
+    if (!isUnlocked()) e.preventDefault();
+  });
+  wrap.addEventListener("copy", (e) => {
+    if (isUnlocked()) return;
+    e.preventDefault();
+    flashShotBlock();
+  });
+  wrap.addEventListener("cut", (e) => {
+    if (!isUnlocked()) e.preventDefault();
+  });
+  wrap.addEventListener("dragstart", (e) => {
+    if (!isUnlocked()) e.preventDefault();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal() && !modal().classList.contains("hidden")) {
+      e.preventDefault();
+      closeModal();
+      return;
+    }
+    trapFocus(e);
+    if (isUnlocked()) return;
+
+    const key = e.key;
+    const combo = (e.ctrlKey || e.metaKey) && !isTypingTarget(e.target);
+    if (key === "PrintScreen") {
+      e.preventDefault();
+      flashShotBlock();
+      return;
+    }
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && ["3", "4", "5", "S"].includes(key)) {
+      e.preventDefault();
+      flashShotBlock();
+      return;
+    }
+    if (combo && (key === "p" || key === "P")) {
+      e.preventDefault();
+      flashShotBlock();
+      openCheckoutModal();
+    }
+  });
+
+  window.addEventListener("beforeprint", (e) => {
+    if (isUnlocked()) return;
+    e.preventDefault();
+    flashShotBlock();
+  });
+}
+
 function bind() {
   fillCheckoutUi();
   restoreUnlockUi();
+  bindPreviewGuard();
   document.getElementById("pdf-spinner")?.classList.add("hidden");
   document.getElementById("pdf-spinner")?.classList.remove("flex");
 

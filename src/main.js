@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { isUnlocked, unlock, WRONG_CODE_MSG } from "./access/gate.js";
+import { clearPersistedUnlock, isUnlocked, unlock, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
 import { CHECKOUT, whatsappUrl } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
 
@@ -124,13 +124,18 @@ function readAccessCode() {
 function triggerPDFDownload() {
   if (!isUnlocked()) {
     const userCode = readAccessCode();
-    if (userCode !== "1009") {
+    if (!validateCode(userCode)) {
       setFeedback(WRONG_CODE_MSG, false);
       return;
     }
     window.QCRateLimit?.reset();
     window.QCLog?.add("auth_ok", "verified");
     unlock();
+  }
+
+  if (!isUnlocked()) {
+    openCheckoutModal();
+    return;
   }
 
   setPaidUi(true);
@@ -305,6 +310,7 @@ function bindPreviewGuard() {
 }
 
 function bind() {
+  clearPersistedUnlock();
   fillCheckoutUi();
   restoreUnlockUi();
   bindPreviewGuard();

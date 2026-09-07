@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { isUnlocked } from "../access/gate.js";
+
 const A4_CSS_PX = 794;
 const PAGE_W_MM = 210;
 const PAGE_H_MM = 297;
@@ -186,7 +188,7 @@ function collectLinkBoxes(host) {
   if (!view || hostRect.width < 1 || hostRect.height < 1) return [];
 
   return [...host.querySelectorAll("a[href]")].flatMap((node) => {
-    if (!(node instanceof HTMLAnchorElement)) return [];
+    if (node.tagName !== "A") return [];
     const href = String(node.getAttribute("href") || "").trim();
     if (!isSafePdfUri(href)) return [];
     const cs = view.getComputedStyle(node);
@@ -276,15 +278,18 @@ async function captureToCanvas(el) {
   html.setAttribute("dir", "ltr");
   html.style.direction = "ltr";
 
-  const liveRect = el.getBoundingClientRect();
-  let linkMeta = {
-    links: collectLinkBoxes(el),
-    width: liveRect.width || el.offsetWidth || A4_CSS_PX,
-    height: liveRect.height || el.offsetHeight || 1,
-  };
+  function measureLinks(host) {
+    const rect = host.getBoundingClientRect();
+    return {
+      links: collectLinkBoxes(host),
+      width: rect.width || host.offsetWidth || A4_CSS_PX,
+      height: rect.height || host.offsetHeight || 1,
+    };
+  }
 
   try {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    let linkMeta = measureLinks(el);
     const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
     const height = Math.max(1, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
     const scale = Math.min(2, MAX_CANVAS / width, MAX_CANVAS / height);
@@ -325,12 +330,8 @@ async function captureToCanvas(el) {
             direction: "rtl",
           });
           prepareCaptureRoot(host, doc.defaultView);
-          const rect = host.getBoundingClientRect();
-          linkMeta = {
-            links: collectLinkBoxes(host),
-            width: rect.width || host.offsetWidth || A4_CSS_PX,
-            height: rect.height || host.offsetHeight || 1,
-          };
+          const cloned = measureLinks(host);
+          if (cloned.links.length) linkMeta = cloned;
         }
       },
     });
@@ -343,6 +344,10 @@ async function captureToCanvas(el) {
 }
 
 export async function exportHighResPdf() {
+  if (!isUnlocked()) {
+    throw new Error("payment required");
+  }
+
   const modal = document.getElementById("payment-modal");
   if (modal) {
     modal.classList.add("hidden");
@@ -388,4 +393,7 @@ export async function exportHighResPdf() {
   }
 }
 
-window.QCHighResPdf = exportHighResPdf;
+window.QCHighResPdf = async function gatedHighResPdf() {
+  if (!isUnlocked()) throw new Error("payment required");
+  return exportHighResPdf();
+};

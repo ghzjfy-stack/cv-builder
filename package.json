@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start:api": "node server/index.js"
   },
   "devDependencies": {
     "typescript": "^5.9.2",

@@ -20,6 +20,9 @@ function attach(middlewares) {
 
 export function paymentApiPlugin() {
   loadEnv();
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn("[quickcv] OPENAI_API_KEY is missing. /api/verify-payment will return 500 until it is set in .env");
+  }
   return {
     name: "quickcv-payment-api",
     configureServer(server) {

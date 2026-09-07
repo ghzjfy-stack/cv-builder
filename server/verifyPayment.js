@@ -306,7 +306,9 @@ export async function handleVerifyPaymentRequest(req, res) {
     return;
   }
 
-  const isValid = verdict && verdict.is_valid === true;
+  const isValid = Boolean(
+    verdict && (verdict.is_valid === true || verdict.is_valid === "true"),
+  );
   const reason = typeof verdict?.reason === "string" ? verdict.reason.trim() : "";
   const transactionId =
     verdict && verdict.transaction_id != null && String(verdict.transaction_id).trim()

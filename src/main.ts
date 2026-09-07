@@ -1,7 +1,8 @@
 // @ts-nocheck
-import { clearPersistedUnlock, isUnlocked, unlock, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
+import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
 import { CHECKOUT, whatsappUrl } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
+import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
 const modal = () => document.getElementById("payment-modal");
 const feedback = () => document.getElementById("code-feedback");
@@ -9,6 +10,60 @@ const codeInput = () => document.getElementById("download-code");
 const preview = () => document.getElementById("cv-preview-wrapper");
 
 let lastFocus = null;
+
+function setScreenshotFeedback(text, ok) {
+  const el = document.getElementById("screenshot-feedback");
+  if (!el) return;
+  el.textContent = text;
+  el.className = `text-sm min-h-5 text-center font-semibold ${ok ? "text-emerald-300" : "text-rose-400"}`;
+}
+
+function setVerifyOverlay(on) {
+  const el = document.getElementById("payment-verify-overlay");
+  if (!el) return;
+  el.classList.toggle("hidden", !on);
+  el.classList.toggle("flex", on);
+  const input = document.getElementById("payment-screenshot");
+  if (input) {
+    if (on) input.setAttribute("disabled", "true");
+    else input.removeAttribute("disabled");
+  }
+}
+
+async function onPaymentScreenshotChange(e) {
+  const input = e?.target;
+  const file = input && "files" in input ? input.files?.[0] : null;
+  if (!file) return;
+
+  const nameEl = document.getElementById("payment-screenshot-name");
+  if (nameEl) nameEl.textContent = file.name;
+
+  setScreenshotFeedback("", false);
+  setVerifyOverlay(true);
+  try {
+    const result = await verifyPaymentScreenshot(file);
+    if (result && result.is_valid === true) {
+      window.QCRateLimit?.reset();
+      window.QCLog?.add("auth_ok", "screenshot verified");
+      if (result.token) unlockWithPaymentToken(result.token);
+      else unlock();
+      setPaidUi(true);
+      setScreenshotFeedback("התשלום אומת בהצלחה. מוריד את ה-PDF...", true);
+      setFeedback("התשלום אומת בהצלחה.", true);
+      showDownloadStep();
+      void runHighResExport();
+      return;
+    }
+    window.QCLog?.add("auth_fail", "screenshot rejected");
+    window.QCRateLimit?.fail();
+    setScreenshotFeedback(result?.error || VERIFY_FAIL_MSG, false);
+  } catch {
+    setScreenshotFeedback(VERIFY_FAIL_MSG, false);
+  } finally {
+    setVerifyOverlay(false);
+    if (input && "value" in input) input.value = "";
+  }
+}
 
 function setFeedback(text, ok) {
   const el = feedback();
@@ -146,6 +201,12 @@ function triggerPDFDownload() {
 function openCheckoutModal() {
   openModal();
   showPayStep();
+  setVerifyOverlay(false);
+  setScreenshotFeedback("", false);
+  const shot = document.getElementById("payment-screenshot");
+  if (shot && "value" in shot) shot.value = "";
+  const nameEl = document.getElementById("payment-screenshot-name");
+  if (nameEl) nameEl.textContent = "קובץ תמונה עד 4MB · אימות מיידי";
   const input = codeInput();
   if (input) {
     input.value = "";
@@ -346,6 +407,7 @@ function bind() {
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
   document.getElementById("btn-whatsapp")?.addEventListener("click", openWhatsApp);
   document.getElementById("verify-btn")?.addEventListener("click", verifyAndUnlock);
+  document.getElementById("payment-screenshot")?.addEventListener("change", onPaymentScreenshotChange);
 
   codeInput()?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {

@@ -694,6 +694,7 @@
         .cv-sec-ico,
         .cv-contact-ico,
         #sec-education-side { display: none; }
+        .cv-sidebar-inner { display: contents; }
 
         #cv-preview-wrapper:has(.layout-charcoal) {
             padding: 0;
@@ -959,15 +960,16 @@
         }
         .layout-charcoal .cv-job {
             display: grid;
-            grid-template-columns: 5.4rem 12px 1fr;
+            grid-template-columns: 5.6rem 12px 1fr;
             column-gap: 0.15rem;
             margin-bottom: 0.85rem;
+            direction: ltr;
         }
         .layout-charcoal .cv-job-date {
             font-size: calc(0.62rem * var(--cv-scale));
             color: #555;
             padding-top: 0.15rem;
-            text-align: left;
+            text-align: right;
             direction: ltr;
             white-space: nowrap;
         }
@@ -976,7 +978,11 @@
             background: #cfcfcf;
             justify-self: center;
         }
-        .layout-charcoal .cv-job-body { padding-inline-start: 0.55rem; }
+        .layout-charcoal .cv-job-body {
+            padding-inline-start: 0.55rem;
+            direction: rtl;
+            text-align: right;
+        }
         .layout-charcoal .cv-job-title {
             font-weight: 700;
             color: #2f2f2f;
@@ -1349,7 +1355,7 @@
         <div class="home-band">
             <div class="home-inner home-band-row">
                 <p><strong>עברית מהשורש</strong>טיפוגרפיה ופריסה מותאמות לימין-לשמאל</p>
-                <p><strong>שבעה סגנונות</strong>קלאסי, ניהולי, מינימלי ועוד</p>
+                <p><strong>שמונה סגנונות</strong>קלאסי, ניהולי, מינימלי ועוד</p>
                 <p><strong>הורדה מאובטחת</strong>Bit · קוד בוואטסאפ · PDF נקי</p>
             </div>
         </div>
@@ -1969,7 +1975,7 @@
             'bg-preview-mint', 'bg-preview-blush', 'bg-preview-pearl', 'bg-preview-dots',
             'bg-preview-grid', 'bg-preview-lines'
         ];
-        const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split'];
+        const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal'];
 
         const EXAMPLES = {
             sales: {
@@ -2065,7 +2071,7 @@
             target.classList.add('layout-' + layout);
             const header = document.getElementById('cv-header');
             if (layout === 'minimal' || layout === 'compact') header.className = 'border-b dynamic-border pb-3 mb-6';
-            else if (layout === 'executive' || layout === 'modern') header.className = 'pb-4 mb-5';
+            else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal') header.className = 'pb-4 mb-5';
             else header.className = 'border-b-2 dynamic-border pb-4 mb-5';
             const select = document.getElementById('layout-select');
             if (select) select.value = layout;
@@ -2074,6 +2080,7 @@
             });
             if (btn) btn.setAttribute('aria-pressed', 'true');
             markStep(2);
+            updateCV();
         }
 
         function setFontScale(val) {
@@ -2155,14 +2162,198 @@
             setField('out-email-side', emailVal, '✉️ ', emailHref);
             setField('out-location-side', getVal('in-location'), '📍 ');
             setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
+            document.querySelectorAll('.cv-contact-row').forEach((row) => {
+                const slot = row.querySelector('span[id]');
+                row.style.display = slot && slot.style.display === 'none' ? 'none' : '';
+            });
 
             setSec('sec-summary', 'out-summary', getVal('in-summary'));
-            setSec('sec-experience', 'out-experience', getVal('in-experience'));
-            setSec('sec-education', 'out-education', getVal('in-education'));
             setSec('sec-military', 'out-military', getVal('in-military'));
-            setSec('sec-skills', 'out-skills', getVal('in-skills'));
-            setSec('sec-languages', 'out-languages', getVal('in-languages'));
+            renderCharcoalFields();
             if (window.QCDraft) QCDraft.saveSoon();
+        }
+
+        function isCharcoalLayout() {
+            return document.getElementById('cv-target')?.classList.contains('layout-charcoal');
+        }
+
+        function parseDatedBlocks(text) {
+            const lines = String(text || '').split('\n');
+            const blocks = [];
+            let current = null;
+            const headerRe = /^(\d{4}(?:\s*[-–—]\s*[^\|]+)?)\s*\|\s*(.+)$/;
+            lines.forEach((raw) => {
+                const line = raw.trim();
+                if (!line) return;
+                const header = line.match(headerRe);
+                if (header) {
+                    if (current) blocks.push(current);
+                    current = { date: header[1].trim(), title: header[2].trim(), role: '', bullets: [] };
+                    return;
+                }
+                if (/^[•\-*]/.test(line)) {
+                    if (!current) current = { date: '', title: '', role: '', bullets: [] };
+                    current.bullets.push(line.replace(/^[•\-*]\s*/, ''));
+                    return;
+                }
+                if (current && current.title && !current.role) {
+                    current.role = line;
+                    return;
+                }
+                if (!current) current = { date: '', title: line, role: '', bullets: [] };
+                else current.bullets.push(line);
+            });
+            if (current) blocks.push(current);
+            return blocks;
+        }
+
+        function languageLevel(label) {
+            const t = String(label || '').toLowerCase();
+            if (/אם|native|fluent|שוטפת|מלאה/.test(t)) return 100;
+            if (/גבוה|high|professional|very good/.test(t)) return 82;
+            if (/טוב|good/.test(t)) return 68;
+            if (/בינונ|intermediate/.test(t)) return 52;
+            if (/בסיס|basic/.test(t)) return 34;
+            return 70;
+        }
+
+        function renderCharcoalFields() {
+            const charcoal = isCharcoalLayout();
+            const expVal = getVal('in-experience');
+            const eduVal = getVal('in-education');
+            const skillVal = getVal('in-skills');
+            const langVal = getVal('in-languages');
+            const expOut = document.getElementById('out-experience');
+            const eduOut = document.getElementById('out-education');
+            const eduSide = document.getElementById('out-education-side');
+            const skillOut = document.getElementById('out-skills');
+            const langOut = document.getElementById('out-languages');
+            const expSec = document.getElementById('sec-experience');
+            const eduSec = document.getElementById('sec-education');
+            const eduSideSec = document.getElementById('sec-education-side');
+            const skillSec = document.getElementById('sec-skills');
+            const langSec = document.getElementById('sec-languages');
+
+            function showSec(sec, on) {
+                if (sec) sec.style.display = on ? 'block' : 'none';
+            }
+
+            if (!charcoal) {
+                if (expOut) {
+                    expOut.classList.add('whitespace-pre-line');
+                    expOut.innerText = expVal;
+                }
+                if (eduOut) {
+                    eduOut.classList.add('whitespace-pre-line');
+                    eduOut.innerText = eduVal;
+                }
+                if (eduSide) eduSide.replaceChildren();
+                if (skillOut) skillOut.innerText = skillVal;
+                if (langOut) langOut.innerText = langVal;
+                showSec(expSec, !!expVal);
+                showSec(eduSec, !!eduVal);
+                showSec(eduSideSec, false);
+                showSec(skillSec, !!skillVal);
+                showSec(langSec, !!langVal);
+                return;
+            }
+
+            expOut.classList.remove('whitespace-pre-line');
+            expOut.replaceChildren();
+            parseDatedBlocks(expVal).forEach((job) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'cv-job';
+                const date = document.createElement('div');
+                date.className = 'cv-job-date';
+                date.textContent = job.date;
+                const rule = document.createElement('div');
+                rule.className = 'cv-job-rule';
+                const body = document.createElement('div');
+                body.className = 'cv-job-body';
+                const title = document.createElement('p');
+                title.className = 'cv-job-title';
+                title.textContent = job.title;
+                body.appendChild(title);
+                if (job.role) {
+                    const role = document.createElement('p');
+                    role.className = 'cv-job-role';
+                    role.textContent = job.role;
+                    body.appendChild(role);
+                }
+                if (job.bullets.length) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'cv-job-list';
+                    job.bullets.forEach((b) => {
+                        const li = document.createElement('li');
+                        li.textContent = b;
+                        ul.appendChild(li);
+                    });
+                    body.appendChild(ul);
+                }
+                wrap.append(date, rule, body);
+                expOut.appendChild(wrap);
+            });
+            showSec(expSec, !!expVal);
+
+            function fillEdu(el) {
+                if (!el) return;
+                el.replaceChildren();
+                parseDatedBlocks(eduVal).forEach((item) => {
+                    const box = document.createElement('div');
+                    box.className = 'cv-edu-item';
+                    const school = document.createElement('p');
+                    school.className = 'cv-edu-school';
+                    school.textContent = item.title || item.date;
+                    const meta = document.createElement('p');
+                    meta.className = 'cv-edu-meta';
+                    meta.textContent = [item.role, item.date].filter(Boolean).join(' · ');
+                    box.appendChild(school);
+                    if (meta.textContent) box.appendChild(meta);
+                    el.appendChild(box);
+                });
+                if (!eduVal) return;
+                if (!el.childElementCount) {
+                    const fallback = document.createElement('p');
+                    fallback.className = 'cv-edu-meta';
+                    fallback.textContent = eduVal;
+                    el.appendChild(fallback);
+                }
+            }
+            fillEdu(eduSide);
+            if (eduOut) eduOut.innerText = '';
+            showSec(eduSec, false);
+            showSec(eduSideSec, !!eduVal);
+
+            skillOut.replaceChildren();
+            const ul = document.createElement('ul');
+            ul.className = 'cv-skill-list';
+            skillVal.split(/[,،]+/).map((s) => s.trim()).filter(Boolean).forEach((s) => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                ul.appendChild(li);
+            });
+            skillOut.appendChild(ul);
+            showSec(skillSec, !!skillVal);
+
+            langOut.replaceChildren();
+            langVal.split(/[,،]+/).map((s) => s.trim()).filter(Boolean).forEach((entry) => {
+                const m = entry.match(/^(.*?)(?:\((.*)\))?$/);
+                const name = (m && m[1] ? m[1] : entry).trim();
+                const level = languageLevel(m && m[2] ? m[2] : entry);
+                const row = document.createElement('div');
+                row.className = 'cv-lang-row';
+                const label = document.createElement('span');
+                label.textContent = name;
+                const track = document.createElement('span');
+                track.className = 'cv-lang-track';
+                const fill = document.createElement('span');
+                fill.className = 'cv-lang-fill';
+                fill.style.width = level + '%';
+                track.appendChild(fill);
+                row.append(label, track);
+                langOut.appendChild(row);
+            });
+            showSec(langSec, !!langVal);
         }
 
         function clearCvForm() {

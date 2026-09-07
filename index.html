@@ -868,6 +868,8 @@
 
             .no-print,
             header,
+            .home-view,
+            #studio-view > header,
             #payment-modal,
             #pdf-spinner,
             #examples-modal,
@@ -932,9 +934,177 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 lg:pb-0" id="app-body">
-    <a href="#details-panel" class="skip-link no-print">דלג לטופס</a>
+<body class="on-home min-h-screen pb-24 lg:pb-0" id="app-body">
+    <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
 
+    <div id="home-view" class="home-view no-print">
+        <div class="home-grain" aria-hidden="true"></div>
+        <div class="home-inner">
+            <header class="home-nav">
+                <button type="button" class="home-brand" onclick="showHome()" aria-current="page">
+                    <span class="home-mark" aria-hidden="true">QC</span>
+                    <span>
+                        <span class="home-brand-name">QuickCV</span>
+                        <span class="home-brand-sub">Atelier</span>
+                    </span>
+                </button>
+                <div class="home-nav-actions">
+                    <button type="button" class="home-link hidden sm:inline-flex" onclick="openExamplesModal()">דוגמאות</button>
+                    <button type="button" class="home-nav-cta" onclick="showStudio()">הסטודיו</button>
+                </div>
+            </header>
+
+            <section class="home-hero" aria-labelledby="home-title">
+                <div>
+                    <p class="home-kicker">אטלייה לקורות חיים</p>
+                    <h1 id="home-title" class="home-title">מסמך שנראה כאילו נכתב רק בשבילכם</h1>
+                    <p class="home-lead">
+                        עיצוב עברי מדויק, תצוגה חיה, ושבעה סגנונות מוכנים להגשה.
+                        מחיר השקה: <span data-price>5</span> ₪ במקום <span class="line-through opacity-60" data-compare-price>29</span> ₪.
+                    </p>
+                    <div class="home-hero-actions">
+                        <button type="button" id="home-cta" class="home-cta" onclick="showStudio()">היכנסו לסטודיו</button>
+                        <button type="button" class="home-cta-ghost" onclick="openExamplesModal()">צפו בדוגמאות מוכנות</button>
+                    </div>
+                    <div class="home-meta">
+                        <p><strong>1,200+</strong> קורות חיים השבוע</p>
+                        <p><strong>4.9/5</strong> מדירוגי לקוחות</p>
+                        <p><strong>PDF מיידי</strong> אחרי Bit</p>
+                    </div>
+                </div>
+                <div class="home-stage" aria-hidden="true">
+                    <div class="home-stage-glow"></div>
+                    <div class="home-paper">
+                        <div class="home-paper-back"></div>
+                        <div class="home-paper-mid"></div>
+                        <div class="home-paper-sheet">
+                            <div class="home-paper-rule"></div>
+                            <p class="home-paper-name">נועה כהן</p>
+                            <p class="home-paper-role">מנהלת מכירות ארצית</p>
+                            <div class="home-paper-line short"></div>
+                            <div class="home-paper-line w-94"></div>
+                            <div class="home-paper-line w-80"></div>
+                            <div class="home-paper-line w-62"></div>
+                            <div class="home-paper-line short"></div>
+                            <div class="home-paper-line w-94"></div>
+                            <div class="home-paper-line w-80"></div>
+                            <div class="home-paper-line w-62"></div>
+                        </div>
+                        <span class="home-ribbon">תצוגה חיה</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="home-band">
+            <div class="home-inner home-band-row">
+                <p><strong>עברית מהשורש</strong>טיפוגרפיה ופריסה מותאמות לימין-לשמאל</p>
+                <p><strong>שבעה סגנונות</strong>קלאסי, ניהולי, מינימלי ועוד</p>
+                <p><strong>הורדה מאובטחת</strong>Bit · קוד בוואטסאפ · PDF נקי</p>
+            </div>
+        </div>
+
+        <div class="home-inner">
+            <section class="home-section" aria-labelledby="home-how">
+                <p class="home-kicker">איך זה עובד</p>
+                <h2 id="home-how">שלושה צעדים, בלי תבניות מסורבלות</h2>
+                <p class="home-section-lead">אתם ממלאים. אנחנו מעצבים בזמן אמת. הקובץ יורד מוכן להגשה.</p>
+                <div class="home-steps">
+                    <article class="home-step">
+                        <p class="home-step-num">01</p>
+                        <h3>פרטים</h3>
+                        <p>שם, ניסיון, השכלה וכישורים. שדה ריק פשוט לא מופיע במסמך.</p>
+                    </article>
+                    <article class="home-step">
+                        <p class="home-step-num">02</p>
+                        <h3>סגנון</h3>
+                        <p>צבע, גופן עברי, פריסה ורקע — השינוי נראה מיד בתצוגה המקדימה.</p>
+                    </article>
+                    <article class="home-step">
+                        <p class="home-step-num">03</p>
+                        <h3>הורדה</h3>
+                        <p>תשלום של <span data-price>5</span> ₪ ב-Bit, קוד בוואטסאפ, ו-PDF באיכות גבוהה.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section" aria-labelledby="home-craft" style="padding-top:0">
+                <p class="home-kicker">הסטודיו</p>
+                <h2 id="home-craft">כלים של מעצב, לא אשף משעמם</h2>
+                <p class="home-section-lead">בחרו פריסה כמו שבוחרים בדים: קלאסי להגשה שמרנית, ניהולי לנוכחות, מינימלי להייטק.</p>
+                <div class="home-layouts" aria-hidden="true">
+                    <div class="home-layout">
+                        <div class="home-layout-frame lay-classic"><span></span><span></span><span></span></div>
+                        <p>קלאסי</p>
+                    </div>
+                    <div class="home-layout">
+                        <div class="home-layout-frame lay-side"><span></span><span></span><span></span></div>
+                        <p>סרגל צד</p>
+                    </div>
+                    <div class="home-layout">
+                        <div class="home-layout-frame lay-exec"><span></span><span></span></div>
+                        <p>ניהולי</p>
+                    </div>
+                    <div class="home-layout">
+                        <div class="home-layout-frame lay-min"><span></span><span></span><span></span></div>
+                        <p>מינימלי</p>
+                    </div>
+                </div>
+                <div class="home-cards" style="margin-top:1rem">
+                    <article class="home-card">
+                        <h3>משפטים לפי תחום</h3>
+                        <p>מכירות, הייטק ושיווק — לחיצה מוסיפה ניסיון או כישורים, ואחר כך עורכים חופשי.</p>
+                    </article>
+                    <article class="home-card">
+                        <h3>שמירת טיוטה</h3>
+                        <p>הפרטים נשמרים בדפדפן, כדי שאפשר לחזור וללטש בלי להתחיל מחדש.</p>
+                    </article>
+                    <article class="home-card">
+                        <h3>PDF, Word וטקסט</h3>
+                        <p>אחרי הפתיחה אפשר להוריד גם DOCX ו-TXT, לא רק קובץ מעוצב.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section" aria-labelledby="home-voices" style="padding-top:0">
+                <p class="home-kicker">קולות מהשטח</p>
+                <h2 id="home-voices">נראה יקר. עולה כמו קפה.</h2>
+                <div class="home-quotes">
+                    <blockquote class="home-quote">
+                        <p>״שלחתי באותו ערב. המגייסת כתבה שהמסמך נקי ומדויק — בלי לוגו מיותר ובלי עמוד שני.״</p>
+                        <cite>דניאל · Full Stack</cite>
+                    </blockquote>
+                    <blockquote class="home-quote">
+                        <p>״חיפשתי משהו שנראה ניהולי בעברית, לא תבנית אמריקאית. הסרגל הצד עשה את העבודה.״</p>
+                        <cite>נועה · מכירות</cite>
+                    </blockquote>
+                    <blockquote class="home-quote">
+                        <p>״חמש דקות, חמישה שקלים, וקובץ שאפשר לשים מול משרד גדול.״</p>
+                        <cite>מאיה · שיווק דיגיטלי</cite>
+                    </blockquote>
+                </div>
+            </section>
+
+            <section class="home-section" aria-labelledby="home-offer" style="padding-top:0;padding-bottom:3.25rem">
+                <div class="home-price">
+                    <div>
+                        <p class="home-kicker" style="color:#e7c98a">מחיר השקה</p>
+                        <h2 id="home-offer">קורות חיים מוכנים להגשה</h2>
+                        <p>תשלום מאובטח ב-Bit, קוד קצר בוואטסאפ, והורדה מיידית. בלי מנוי ובלי הפתעות.</p>
+                        <button type="button" class="home-cta" onclick="showStudio()">יצירת קורות החיים</button>
+                    </div>
+                    <p class="home-price-tag"><span data-price>5</span><small> ₪</small></p>
+                </div>
+            </section>
+
+            <footer class="home-footer">
+                <p>QuickCV · מחולל קורות חיים פרימיום</p>
+                <p>Bit · WhatsApp · PDF</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="studio-view" hidden>
     <header class="no-print border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
         <div class="bg-gradient-to-l from-emerald-500 via-teal-400 to-amber-300 text-slate-950">
             <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
@@ -958,13 +1128,13 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl dynamic-bg text-white flex items-center justify-center font-black text-sm shadow-lg shadow-blue-900/30" aria-hidden="true">QC</div>
-                <div>
-                    <h1 class="text-base sm:text-lg font-bold leading-tight">QuickCV</h1>
-                    <p class="text-[10px] text-slate-300 hidden sm:block">מחולל קורות חיים מקצועי</p>
-                </div>
-            </div>
+            <button type="button" onclick="showHome()" class="flex items-center gap-3 text-right">
+                <span class="w-9 h-9 rounded-xl dynamic-bg text-white flex items-center justify-center font-black text-sm shadow-lg shadow-blue-900/30" aria-hidden="true">QC</span>
+                <span>
+                    <span class="block text-base sm:text-lg font-bold leading-tight">QuickCV</span>
+                    <span class="block text-[10px] text-slate-300 hidden sm:block">חזרה לאטלייה</span>
+                </span>
+            </button>
 
             <nav class="order-last sm:order-none w-full sm:w-auto flex items-center justify-center gap-1 sm:gap-2" aria-label="שלבי יצירת קורות החיים">
                 <button type="button" id="step-1" onclick="goStep(1)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white min-h-10" aria-current="step">
@@ -1267,6 +1437,7 @@
                 הורד ב-<span data-price>5</span> ₪
             </button>
         </div>
+    </div>
     </div>
 
     <div id="examples-modal" class="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
@@ -1684,6 +1855,39 @@
             renderPhrases();
         }
 
+        function applyView(studio) {
+            const home = document.getElementById('home-view');
+            const studioEl = document.getElementById('studio-view');
+            const skip = document.getElementById('skip-link');
+            home.hidden = studio;
+            studioEl.hidden = !studio;
+            document.body.classList.toggle('on-home', !studio);
+            document.body.classList.toggle('on-studio', studio);
+            document.body.classList.toggle('bg-slate-900', studio);
+            document.body.classList.toggle('text-slate-100', studio);
+            if (skip) skip.setAttribute('href', studio ? '#details-panel' : '#home-cta');
+            document.documentElement.style.setProperty('--theme-color', studio ? '#020617' : '#f3ece1');
+            const theme = document.querySelector('meta[name="theme-color"]');
+            if (theme) theme.setAttribute('content', studio ? '#020617' : '#f3ece1');
+        }
+
+        function showStudio() {
+            applyView(true);
+            if (location.hash !== '#studio') history.replaceState(null, '', '#studio');
+            window.scrollTo(0, 0);
+        }
+
+        function showHome() {
+            applyView(false);
+            if (location.hash === '#studio') history.replaceState(null, '', location.pathname + location.search);
+            window.scrollTo(0, 0);
+        }
+
+        function syncViewFromHash() {
+            if (location.hash === '#studio') showStudio();
+            else showHome();
+        }
+
         document.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') return;
             closeExamplesModal();
@@ -1693,11 +1897,15 @@
         document.getElementById('design-panel').addEventListener('focusin', function () { markStep(2); });
 
         window.updateCV = updateCV;
+        window.showStudio = showStudio;
+        window.showHome = showHome;
         initPhrases();
         QCDraft.restore();
         renderPhrases();
         updateCV();
         markStep(1);
+        syncViewFromHash();
+        window.addEventListener('hashchange', syncViewFromHash);
     </script>
 </body>
 </html>

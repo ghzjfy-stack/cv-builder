@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
-import { CHECKOUT, whatsappUrl } from "./config/checkout.js";
+import { CHECKOUT, bitAppOpenUrl, whatsappUrl } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
 import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
@@ -152,7 +152,7 @@ function copyBitPhone(e) {
 
 function openBitApp(e) {
   e?.preventDefault?.();
-  window.open(CHECKOUT.bitAppUrl, "_blank", "noopener");
+  window.open(bitAppOpenUrl(), "_blank", "noopener");
 }
 
 function openWhatsApp(e) {

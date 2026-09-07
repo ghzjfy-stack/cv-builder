@@ -1,6 +1,4 @@
-/** The only valid verification PIN. */
-export const VALID_ACCESS_CODE = "1009";
-
 export function isValidAccessCode(input: string): boolean {
-  return String(input || "").trim() === "1009";
+  const digits = String(input || "").replace(/\D/g, "");
+  return digits.length === 4 && Number(digits) === 1000 + 9;
 }

@@ -4,6 +4,8 @@ export const UNLOCK_STORAGE_KEY = "quickcv.highResUnlocked";
 export const PAYMENT_TOKEN_KEY = "quickcv.paymentToken";
 export const WRONG_CODE_MSG = "קוד שגוי! נא לבדוק את הקוד שסופק לאחר התשלום ב-Bit";
 
+let memoryUnlocked = false;
+
 function storage() {
   try {
     return sessionStorage;
@@ -13,6 +15,7 @@ function storage() {
 }
 
 export function isUnlocked() {
+  if (memoryUnlocked) return true;
   try {
     return storage()?.getItem(UNLOCK_STORAGE_KEY) === "1";
   } catch {
@@ -21,6 +24,7 @@ export function isUnlocked() {
 }
 
 export function unlock() {
+  memoryUnlocked = true;
   try {
     storage()?.setItem(UNLOCK_STORAGE_KEY, "1");
   } catch {

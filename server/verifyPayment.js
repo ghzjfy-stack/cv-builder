@@ -67,20 +67,55 @@ function json(res, status, body) {
 
 function readBody(req, maxBytes) {
   return new Promise((resolve, reject) => {
+    if (req.body !== undefined) {
+      if (Buffer.isBuffer(req.body)) {
+        resolve(req.body);
+        return;
+      }
+      if (typeof req.body === "string") {
+        resolve(Buffer.from(req.body, "utf8"));
+        return;
+      }
+      resolve(null);
+      return;
+    }
+    if (req.readableEnded || req.complete) {
+      resolve(Buffer.alloc(0));
+      return;
+    }
     const chunks = [];
     let size = 0;
+    const timer = setTimeout(() => {
+      reject(Object.assign(new Error("body_timeout"), { code: "BODY_TIMEOUT" }));
+    }, 20000);
     req.on("data", (chunk) => {
       size += chunk.length;
       if (size > maxBytes) {
+        clearTimeout(timer);
         reject(Object.assign(new Error("payload_too_large"), { code: "PAYLOAD_TOO_LARGE" }));
         req.destroy();
         return;
       }
       chunks.push(chunk);
     });
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
+    req.on("end", () => {
+      clearTimeout(timer);
+      resolve(Buffer.concat(chunks));
+    });
+    req.on("error", (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
   });
+}
+
+async function readJsonPayload(req) {
+  if (req.body && typeof req.body === "object" && !Buffer.isBuffer(req.body)) {
+    return req.body;
+  }
+  const raw = await readBody(req, MAX_JSON_BYTES);
+  if (raw == null) return {};
+  return JSON.parse(raw.toString("utf8") || "{}");
 }
 
 function normalizeMime(mime) {
@@ -260,22 +295,14 @@ export async function handleVerifyPaymentRequest(req, res) {
     return;
   }
 
-  let raw;
+  let payload;
   try {
-    raw = await readBody(req, MAX_JSON_BYTES);
+    payload = await readJsonPayload(req);
   } catch (err) {
     if (err && err.code === "PAYLOAD_TOO_LARGE") {
       json(res, 413, { ok: false, is_valid: false, error: VERIFY_FAIL_MSG });
       return;
     }
-    json(res, 400, { ok: false, is_valid: false, error: VERIFY_FAIL_MSG });
-    return;
-  }
-
-  let payload;
-  try {
-    payload = JSON.parse(raw.toString("utf8") || "{}");
-  } catch {
     json(res, 400, { ok: false, is_valid: false, error: VERIFY_FAIL_MSG });
     return;
   }

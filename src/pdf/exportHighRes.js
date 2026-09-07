@@ -176,11 +176,59 @@ function findSplitY(canvas, idealY, minY) {
   return idealY;
 }
 
-function addCanvasPages(pdf, canvas) {
+function isSafePdfUri(href) {
+  return /^(mailto:|https?:\/\/)/i.test(String(href || "").trim());
+}
+
+function collectLinkBoxes(host) {
+  const view = host.ownerDocument?.defaultView;
+  const hostRect = host.getBoundingClientRect();
+  if (!view || hostRect.width < 1 || hostRect.height < 1) return [];
+
+  return [...host.querySelectorAll("a[href]")].flatMap((node) => {
+    if (!(node instanceof HTMLAnchorElement)) return [];
+    const href = String(node.getAttribute("href") || "").trim();
+    if (!isSafePdfUri(href)) return [];
+    const cs = view.getComputedStyle(node);
+    if (cs.display === "none" || cs.visibility === "hidden") return [];
+    const r = node.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return [];
+    return [{
+      href,
+      x: r.left - hostRect.left,
+      y: r.top - hostRect.top,
+      w: r.width,
+      h: r.height,
+    }];
+  });
+}
+
+function overlayPdfLinks(pdf, links, pageTopPx, pageBottomPx, sx, sy, pxPerMm) {
+  for (const box of links) {
+    const x = box.x * sx;
+    const y = box.y * sy;
+    const w = box.w * sx;
+    const h = box.h * sy;
+    const top = Math.max(y, pageTopPx);
+    const bottom = Math.min(y + h, pageBottomPx);
+    if (bottom - top < 0.5 || w < 0.5) continue;
+    pdf.link(
+      MARGIN_MM + x / pxPerMm,
+      MARGIN_MM + (top - pageTopPx) / pxPerMm,
+      w / pxPerMm,
+      (bottom - top) / pxPerMm,
+      { url: box.href },
+    );
+  }
+}
+
+function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight) {
   const usableW = PAGE_W_MM - MARGIN_MM * 2;
   const usableH = PAGE_H_MM - MARGIN_MM * 2;
   const pxPerMm = canvas.width / usableW;
   const pagePxH = Math.floor(usableH * pxPerMm);
+  const sx = canvas.width / Math.max(1, hostWidth);
+  const sy = canvas.height / Math.max(1, hostHeight);
   let y = 0;
   let first = true;
 
@@ -211,6 +259,7 @@ function addCanvasPages(pdf, canvas) {
       undefined,
       "FAST",
     );
+    overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm);
     y += sliceH;
   }
 }
@@ -227,13 +276,20 @@ async function captureToCanvas(el) {
   html.setAttribute("dir", "ltr");
   html.style.direction = "ltr";
 
+  const liveRect = el.getBoundingClientRect();
+  let linkMeta = {
+    links: collectLinkBoxes(el),
+    width: liveRect.width || el.offsetWidth || A4_CSS_PX,
+    height: liveRect.height || el.offsetHeight || 1,
+  };
+
   try {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
     const height = Math.max(1, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
     const scale = Math.min(2, MAX_CANVAS / width, MAX_CANVAS / height);
 
-    return await html2canvas(el, {
+    const canvas = await html2canvas(el, {
       scale,
       useCORS: true,
       backgroundColor: "#ffffff",
@@ -269,9 +325,16 @@ async function captureToCanvas(el) {
             direction: "rtl",
           });
           prepareCaptureRoot(host, doc.defaultView);
+          const rect = host.getBoundingClientRect();
+          linkMeta = {
+            links: collectLinkBoxes(host),
+            width: rect.width || host.offsetWidth || A4_CSS_PX,
+            height: rect.height || host.offsetHeight || 1,
+          };
         }
       },
     });
+    return { canvas, ...linkMeta };
   } finally {
     if (prevDir == null) html.removeAttribute("dir");
     else html.setAttribute("dir", prevDir);
@@ -304,11 +367,12 @@ export async function exportHighResPdf() {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    const canvas = await captureToCanvas(host);
+    const captured = await captureToCanvas(host);
+    const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
     const pdf = new JsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
-    addCanvasPages(pdf, canvas);
+    addCanvasPages(pdf, canvas, captured.links, captured.width, captured.height);
 
     const filename = fileBase() + ".pdf";
     const blob = pdf.output("blob");

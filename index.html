@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickCV - מחולל קורות חיים פרימיום</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #1e3a8a;
+            --cv-font: 'Rubik', sans-serif;
+            --cv-scale: 1;
+            --cv-leading: 1.55;
+        }
+        body { font-family: 'Rubik', sans-serif; }
+        .dynamic-text { color: var(--accent); }
+        .dynamic-border { border-color: var(--accent); }
+        .dynamic-bg { background-color: var(--accent); }
+        .dynamic-icon { color: var(--accent); }
+
+        .bg-preview-white { background-color: #ffffff; }
+        .bg-preview-slate { background-color: #f8fafc; }
+        .bg-preview-cream { background-color: #fafaf9; }
+        .bg-preview-dots {
+            background-color: #ffffff;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+
+        #cv-target {
+            font-family: var(--cv-font);
+            font-size: calc(0.75rem * var(--cv-scale));
+            line-height: var(--cv-leading);
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+            overflow: visible;
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+        }
+        #cv-target #cv-header {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        #cv-target .whitespace-pre-line {
+            overflow: visible;
+            padding-inline-start: 0.15rem;
+            padding-inline-end: 0.35rem;
+        }
+        #cv-target #out-name {
+            font-size: calc(1.875rem * var(--cv-scale));
+            line-height: 1.2;
+        }
+        #cv-target #out-title {
+            font-size: calc(0.875rem * var(--cv-scale));
+        }
+        #cv-target .cv-section-title {
+            font-size: calc(0.75rem * var(--cv-scale));
+        }
+
+        .cv-columns { display: flex; flex-direction: column; gap: calc(1rem * var(--cv-scale)); }
+        .cv-sidebar, .cv-main { display: flex; flex-direction: column; gap: calc(0.9rem * var(--cv-scale)); }
+        .cv-contact-sidebar { display: none; }
+        .layout-classic .cv-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .layout-sidebar .cv-columns {
+            display: grid;
+            grid-template-columns: 0.34fr 1fr;
+            grid-template-areas: "side main";
+            gap: calc(1.25rem * var(--cv-scale));
+            align-items: start;
+        }
+        .layout-sidebar .cv-sidebar { grid-area: side; }
+        .layout-sidebar .cv-main { grid-area: main; }
+        .layout-sidebar .cv-contact-header { display: none; }
+        .layout-sidebar .cv-contact-sidebar { display: flex; }
+        .layout-sidebar .cv-sidebar {
+            background: #f1f5f9;
+            border-radius: 0.75rem;
+            padding: calc(0.9rem * var(--cv-scale));
+            border-right: 4px solid var(--accent);
+        }
+
+        .layout-minimal #cv-header {
+            border-bottom-width: 1px;
+            padding-bottom: calc(0.65rem * var(--cv-scale));
+            margin-bottom: calc(1.35rem * var(--cv-scale));
+        }
+        .layout-minimal #out-name { font-weight: 600; letter-spacing: -0.02em; }
+        .layout-minimal .cv-section-title {
+            text-transform: none;
+            letter-spacing: 0.04em;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .layout-minimal .cv-columns { gap: calc(1.35rem * var(--cv-scale)); }
+
+        .layout-classic #cv-header { text-align: center; }
+        .layout-classic .cv-contact-header { justify-content: center; }
+
+        .cv-watermark {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        .cv-watermark span {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-28deg);
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            color: rgba(15, 23, 42, 0.08);
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+        .paid .cv-watermark { display: none; }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+        }
+        .theme-swatch[aria-pressed="true"] {
+            outline: 2px solid white;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px var(--accent);
+        }
+
+        @media (max-width: 1023px) {
+            .preview-col.mobile-preview-open {
+                position: fixed;
+                inset: 0;
+                z-index: 40;
+                overflow: auto;
+                background: #020617;
+                padding: 1rem 1rem 6.5rem;
+            }
+            .preview-col.mobile-preview-open .preview-close {
+                display: flex;
+            }
+        }
+        .cta-download {
+            position: relative;
+            z-index: 9999;
+            pointer-events: auto !important;
+            animation: cta-pulse 2.2s ease-in-out infinite;
+        }
+        .cta-download:hover {
+            animation: none;
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+        @keyframes cta-pulse {
+            0%, 100% { box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35); }
+            50% { box-shadow: 0 8px 28px rgba(16, 185, 129, 0.7), 0 0 0 8px rgba(16, 185, 129, 0.12); }
+        }
+
+        #payment-modal {
+            z-index: 9999;
+            pointer-events: auto;
+        }
+        #payment-modal .pay-card {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.86));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        }
+        #download-code:focus {
+            border-color: #34d399;
+            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.25);
+            background: #fff;
+        }
+
+        #cv-preview-wrapper {
+            background: #ffffff;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        #qc-print-host {
+            display: none;
+        }
+
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+
+        @media print {
+            html, body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print,
+            header,
+            #payment-modal,
+            #pdf-spinner,
+            #examples-modal,
+            .cv-watermark {
+                display: none !important;
+            }
+
+            html.qc-print-mode body > *:not(#qc-print-host) {
+                display: none !important;
+            }
+
+            html.qc-print-mode #qc-print-host {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                max-width: 186mm !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                direction: rtl !important;
+                text-align: right !important;
+                overflow: visible !important;
+            }
+
+            html.qc-print-mode #qc-print-host .cv-print-sheet,
+            html.qc-print-mode #qc-print-host #cv-target {
+                display: block !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                direction: rtl !important;
+                text-align: right !important;
+                overflow: visible !important;
+                font-family: var(--cv-font), 'Rubik', sans-serif !important;
+            }
+
+            html.qc-print-mode #qc-print-host .cv-columns {
+                display: flex !important;
+            }
+
+            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns {
+                display: grid !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-24 lg:pb-0" id="app-body">
+
+    <header class="no-print border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl dynamic-bg text-white flex items-center justify-center font-black text-sm shadow-lg shadow-blue-900/30">QC</div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold leading-tight">QuickCV</h1>
+                    <p class="text-[10px] text-slate-400 hidden sm:block">מחולל קורות חיים מקצועי</p>
+                </div>
+            </div>
+
+            <nav class="order-last sm:order-none w-full sm:w-auto flex items-center justify-center gap-1 sm:gap-2" aria-label="התקדמות">
+                <button type="button" id="step-1" onclick="goStep(1)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white">
+                    <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</span>
+                    <span>פרטים</span>
+                </button>
+                <span class="text-slate-600 text-xs">→</span>
+                <button type="button" id="step-2" onclick="goStep(2)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-400 hover:text-slate-200">
+                    <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">2</span>
+                    <span>עיצוב</span>
+                </button>
+                <span class="text-slate-600 text-xs">→</span>
+                <button type="button" id="step-3" onclick="goStep(3)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-400 hover:text-slate-200">
+                    <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]">3</span>
+                    <span>הורדה</span>
+                </button>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="openExamplesModal()" class="text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-10">
+                    דוגמאות
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="no-print max-w-7xl mx-auto px-4 pt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3">
+            <p class="text-sm text-slate-200 font-medium">מעל 1,200 קורות חיים נוצרו השבוע</p>
+            <p class="text-amber-400 text-sm tracking-tight" aria-label="דירוג 5 כוכבים">★★★★★ <span class="text-slate-400 text-xs">4.9/5 מאנשים אמיתיים</span></p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <div class="no-print lg:col-span-6 space-y-6">
+
+            <div id="design-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-5 shadow-xl">
+                <div class="flex items-center justify-between gap-2">
+                    <h3 class="font-bold text-slate-200 text-sm">עיצוב וערכת נושא</h3>
+                    <span class="text-[10px] text-slate-400">השינויים מופיעים מיד בתצוגה</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-2">צבע הדגשה — כותרות ואייקונים</label>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" class="theme-swatch w-8 h-8 rounded-full bg-[#1e3a8a]" data-color="#1e3a8a" data-label="כחול נייבי" aria-label="כחול נייבי" aria-pressed="true" onclick="setAccent('#1e3a8a', this)"></button>
+                        <button type="button" class="theme-swatch w-8 h-8 rounded-full bg-[#374151]" data-color="#374151" data-label="אפור פחם" aria-label="אפור פחם" aria-pressed="false" onclick="setAccent('#374151', this)"></button>
+                        <button type="button" class="theme-swatch w-8 h-8 rounded-full bg-[#166534]" data-color="#166534" data-label="ירוק יער" aria-label="ירוק יער" aria-pressed="false" onclick="setAccent('#166534', this)"></button>
+                        <button type="button" class="theme-swatch w-8 h-8 rounded-full bg-[#9f1239]" data-color="#9f1239" data-label="בורדו ניהולי" aria-label="בורדו ניהולי" aria-pressed="false" onclick="setAccent('#9f1239', this)"></button>
+                        <button type="button" class="theme-swatch w-8 h-8 rounded-full bg-[#7c3aed]" data-color="#7c3aed" data-label="סגול מודרני" aria-label="סגול מודרני" aria-pressed="false" onclick="setAccent('#7c3aed', this)"></button>
+                        <label class="flex items-center gap-2 text-[11px] text-slate-300 mr-1">
+                            <span>מותאם</span>
+                            <input type="color" id="custom-accent" value="#1e3a8a" oninput="setCustomAccent(this.value)" class="w-8 h-8 rounded-lg border border-slate-600 bg-slate-900 cursor-pointer p-0">
+                        </label>
+                    </div>
+                    <p id="accent-label" class="text-[11px] text-slate-500 mt-2">כחול נייבי</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1" for="font-select">טיפוגרפיה עברית</label>
+                        <select id="font-select" onchange="setCvFont(this.value)" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg p-2.5 text-slate-200 outline-none">
+                            <option value="Rubik">Rubik — ברור ומודרני</option>
+                            <option value="Heebo">Heebo — חד ומקצועי</option>
+                            <option value="Assistant">Assistant — רך וקריא</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1" for="layout-select">פריסה</label>
+                        <select id="layout-select" onchange="setLayout(this.value)" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg p-2.5 text-slate-200 outline-none">
+                            <option value="classic">עמודה אחת קלאסית</option>
+                            <option value="sidebar">שתי עמודות עם סרגל צד</option>
+                            <option value="minimal">מינימליסטי</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <label for="font-scale">גודל גופן</label>
+                            <span id="font-scale-val">100%</span>
+                        </div>
+                        <input id="font-scale" type="range" min="85" max="118" value="100" oninput="setFontScale(this.value)" class="w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <label for="line-height">ריווח שורות</label>
+                            <span id="line-height-val">1.55</span>
+                        </div>
+                        <input id="line-height" type="range" min="125" max="185" value="155" oninput="setLineHeight(this.value)" class="w-full">
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500">כוונו גודל וריווח כדי להתאים את קורות החיים לעמוד אחד.</p>
+
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">רקע תצוגה</label>
+                    <select onchange="setPreviewBg(this.value)" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg p-2.5 text-slate-200 outline-none">
+                        <option value="bg-preview-white">לבן נקי</option>
+                        <option value="bg-preview-slate">אפור נייר</option>
+                        <option value="bg-preview-cream">שמנת אלגנטית</option>
+                        <option value="bg-preview-dots">נקודות עדינות</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-6 shadow-xl">
+                <div class="flex items-center justify-between gap-2">
+                    <h4 class="font-bold text-sm dynamic-text">פרטים אישיים (שדה ריק לא יופיע)</h4>
+                    <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">
+                        נקה טופס
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input type="text" id="in-name" value="ישראל ישראלי" placeholder="שם מלא *" oninput="updateCV()" class="bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                        <input type="text" id="in-title" value="מנהל פרויקטים ומכירות" placeholder="תפקיד / כותרת *" oninput="updateCV()" class="bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                        <input type="text" id="in-phone" value="050-1234567" placeholder="טלפון" oninput="updateCV()" class="bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                        <input type="email" id="in-email" value="israel@example.com" placeholder="אימייל" oninput="updateCV()" class="bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                        <input type="text" id="in-location" value="תל אביב" placeholder="עיר מגורים" oninput="updateCV()" class="bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                        <input type="text" id="in-linkedin" value="linkedin.com/in/israel" placeholder="קישור ל-LinkedIn / אתר" oninput="updateCV()" class="bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-bold dynamic-text text-sm">תקציר מקצועי</h4>
+                    <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
+                </div>
+
+                <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <h4 class="font-bold text-slate-200 text-sm">משפטים מוכנים לפי תחום</h4>
+                        <select id="phrase-field" onchange="renderPhrases()" class="bg-slate-800 border border-slate-600 text-xs rounded-lg p-2 text-slate-200 outline-none">
+                        </select>
+                    </div>
+                    <p class="text-[11px] text-slate-400">לחיצה מוסיפה לניסיון או לכישורים. אפשר לערוך אחרי ההוספה.</p>
+                    <div id="phrase-bullets" class="flex flex-wrap gap-2"></div>
+                    <button type="button" onclick="insertSkills()" class="text-[11px] bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 px-3 py-2 rounded-lg font-semibold">+ הוסף כישורים מומלצים לתחום</button>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-bold dynamic-text text-sm">ניסיון תעסוקתי</h4>
+                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">2021 - נוכחי | מנהל מכירות ארצי
+• ניהול צוות עובדים והגדלת היעדים ב-35%.
+• הובלת הסכמים אסטרטגיים.
+
+2018 - 2021 | מנהל פרויקטים
+• ניהול תקציבים ומעקב אחר אבני דרך בארגון.</textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <h4 class="font-bold dynamic-text text-sm mb-2">השכלה</h4>
+                        <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">2015 - 2018 | BA במנהל עסקים
+2019 | קורס ניהול מוצר</textarea>
+                    </div>
+                    <div>
+                        <h4 class="font-bold dynamic-text text-sm mb-2">שירות צבאי / לאומי</h4>
+                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <h4 class="font-bold dynamic-text text-sm mb-2">כישורים</h4>
+                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                    </div>
+                    <div>
+                        <h4 class="font-bold dynamic-text text-sm mb-2">שפות</h4>
+                        <input type="text" id="in-languages" value="עברית (שפת אם), אנגלית (ברמה גבוהה)" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-xs rounded-lg text-slate-100 outline-none">
+                    </div>
+                </div>
+
+                <button type="button" id="btn-download-pdf" class="cta-download w-full bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
+                    הורד קורות חיים ב-PDF
+                </button>
+            </div>
+
+        </div>
+
+        <div id="preview-column" class="preview-col lg:col-span-6 space-y-3">
+            <div class="no-print flex items-center justify-between gap-2">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">תצוגה מקדימה בזמן אמת</h2>
+                <button type="button" onclick="closeMobilePreview()" class="preview-close items-center text-xs bg-slate-800 border border-slate-600 px-3 py-2 rounded-lg">סגור תצוגה</button>
+            </div>
+
+            <div id="cv-preview-wrapper" class="relative p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all min-h-[750px] bg-preview-white">
+                <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
+                <div id="cv-target" class="layout-classic" dir="rtl">
+                    <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
+                        <h1 id="out-name" class="text-3xl font-bold dynamic-text">ישראל ישראלי</h1>
+                        <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים ומכירות</p>
+
+                        <div class="cv-contact-header flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-slate-500">
+                            <span id="out-phone"></span>
+                            <span id="out-email"></span>
+                            <span id="out-location"></span>
+                            <span id="out-linkedin"></span>
+                        </div>
+                    </div>
+
+                    <div class="cv-columns">
+                        <div class="cv-main">
+                            <div id="sec-summary">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">תקציר מקצועי</h3>
+                                <p id="out-summary" class="whitespace-pre-line text-slate-700"></p>
+                            </div>
+                            <div id="sec-experience">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">ניסיון תעסוקתי</h3>
+                                <div id="out-experience" class="whitespace-pre-line text-slate-700"></div>
+                            </div>
+                            <div id="sec-education">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">השכלה וקורסים</h3>
+                                <div id="out-education" class="whitespace-pre-line text-slate-700"></div>
+                            </div>
+                            <div id="sec-military">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">שירות צבאי / לאומי</h3>
+                                <div id="out-military" class="whitespace-pre-line text-slate-700"></div>
+                            </div>
+                        </div>
+
+                        <aside class="cv-sidebar">
+                            <div class="cv-contact-sidebar flex-col gap-1.5 text-[11px] text-slate-600 mb-1">
+                                <p class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-2">יצירת קשר</p>
+                                <span id="out-phone-side"></span>
+                                <span id="out-email-side"></span>
+                                <span id="out-location-side"></span>
+                                <span id="out-linkedin-side"></span>
+                            </div>
+                            <div id="sec-skills">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">כישורים</h3>
+                                <div id="out-skills" class="text-slate-700"></div>
+                            </div>
+                            <div id="sec-languages">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">שפות</h3>
+                                <div id="out-languages" class="text-slate-700"></div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="no-print lg:hidden fixed bottom-0 inset-x-0 z-[9999] border-t border-slate-800 bg-slate-950/95 backdrop-blur px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
+        <div class="flex gap-2 max-w-7xl mx-auto">
+            <button type="button" onclick="openMobilePreview()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 rounded-xl text-sm min-h-12">
+                תצוגת קורות חיים
+            </button>
+            <button type="button" id="btn-download-pdf-mobile" class="cta-download flex-[1.3] bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 rounded-xl text-sm min-h-12">
+                הורד קורות חיים ב-PDF
+            </button>
+        </div>
+    </div>
+
+    <div id="examples-modal" class="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
+        <div class="bg-slate-900 text-slate-100 rounded-3xl max-w-lg w-full my-4 p-5 sm:p-6 space-y-4 shadow-2xl relative border border-slate-700">
+            <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-200 font-bold text-lg leading-none">✕</button>
+            <h3 class="text-lg font-extrabold">דוגמאות מוכנות</h3>
+            <p class="text-xs text-slate-400">בחרו דוגמה כדי למלא את הטופס. אפשר לערוך הכל אחר כך.</p>
+            <div class="grid gap-2">
+                <button type="button" onclick="loadExample('sales')" class="text-right rounded-2xl border border-slate-700 hover:border-blue-400 bg-slate-800 p-4">
+                    <p class="font-bold text-sm">מכירות וניהול</p>
+                    <p class="text-[11px] text-slate-400 mt-1">מנהלת מכירות ארצית עם דגש על יעדים וצוותים</p>
+                </button>
+                <button type="button" onclick="loadExample('tech')" class="text-right rounded-2xl border border-slate-700 hover:border-blue-400 bg-slate-800 p-4">
+                    <p class="font-bold text-sm">הייטק / פיתוח</p>
+                    <p class="text-[11px] text-slate-400 mt-1">מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל</p>
+                </button>
+                <button type="button" onclick="loadExample('marketing')" class="text-right rounded-2xl border border-slate-700 hover:border-blue-400 bg-slate-800 p-4">
+                    <p class="font-bold text-sm">שיווק דיגיטלי</p>
+                    <p class="text-[11px] text-slate-400 mt-1">מנהלת קמפיינים עם דגש על לידים וביצועים</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="payment-modal" class="no-print fixed inset-0 hidden items-center justify-center p-3 sm:p-4 overflow-y-auto" style="z-index:9999;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
+        <div class="pay-card text-slate-100 rounded-3xl max-w-md w-full my-4 p-6 sm:p-7 text-center space-y-5 relative" style="z-index:10000;pointer-events:auto;">
+            <button type="button" id="btn-close-modal" class="absolute top-3 left-3 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-lg leading-none">✕</button>
+
+            <div id="pay-step" class="space-y-5">
+                <div class="pt-1">
+                    <div class="mx-auto w-16 h-16 rounded-2xl bg-[#00C2C7] text-[#0B1F3A] flex items-center justify-center font-black text-2xl tracking-tight shadow-lg">bit</div>
+                    <h3 class="text-xl font-extrabold text-white mt-4">תשלום 10 ₪ ב-Bit</h3>
+                    <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                        שלמו <span id="bit-amount" class="font-bold text-emerald-300">10</span> ₪, שלחו צילום מסך בוואטסאפ, והזינו את הקוד.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
+                    <p class="text-xs text-slate-400">מספר Bit לתשלום</p>
+                    <p class="text-3xl font-black tracking-wide text-white" id="bit-number">054-3554888</p>
+                    <button type="button" id="btn-copy-bit" class="inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 font-extrabold text-sm border border-emerald-400/30">
+                        העתק מספר
+                    </button>
+                    <button type="button" id="btn-open-bit" class="w-full min-h-12 rounded-xl bg-[#0B1F3A] hover:bg-[#071525] text-white font-bold text-sm border border-white/10">
+                        פתח את אפליקציית Bit
+                    </button>
+                </div>
+
+                <button type="button" id="btn-whatsapp" class="w-full min-h-12 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold text-sm">
+                    שלח צילום מסך ב-WhatsApp
+                </button>
+
+                <div class="text-right space-y-2">
+                    <label for="download-code" class="block text-xs font-bold text-slate-300">קוד אימות (4 ספרות)</label>
+                    <input type="text" id="download-code" inputmode="numeric" maxlength="4" autocomplete="one-time-code" placeholder="1009" class="w-full bg-white text-slate-900 border-2 border-white/20 p-3.5 text-center font-black text-2xl tracking-[0.4em] rounded-xl outline-none">
+                    <p id="code-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
+                    <button type="button" id="verify-btn" class="w-full min-h-14 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 rounded-2xl text-base">
+                        אימות והורדת PDF
+                    </button>
+                </div>
+            </div>
+
+            <div id="download-step" class="hidden space-y-4">
+                <div class="w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl">✓</div>
+                <h3 class="text-xl font-extrabold text-white">הגישה נפתחה</h3>
+                <p class="text-xs text-slate-300">אפשר להוריד שוב או לבחור פורמט נוסף.</p>
+                <div class="grid grid-cols-1 gap-2 text-right">
+                    <button type="button" data-download="pdf" class="w-full min-h-12 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 px-4 rounded-xl text-sm">PDF</button>
+                    <button type="button" data-download="docx" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">Word (.docx)</button>
+                    <button type="button" data-download="txt" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">טקסט (.txt)</button>
+                </div>
+                <p id="download-status" class="text-xs text-emerald-300 min-h-4"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="qc-print-host" dir="rtl"></div>
+
+    <div id="pdf-spinner" class="fixed inset-0 hidden items-center justify-center bg-slate-950/60 no-print" style="z-index:2147483646" aria-live="polite" aria-busy="true">
+        <div class="bg-white text-slate-800 rounded-2xl px-6 py-5 text-center shadow-2xl max-w-xs w-[90%]">
+            <div class="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"></div>
+            <p class="text-sm font-semibold">מכין PDF...</p>
+            <p class="text-xs text-slate-500 mt-1">הקובץ יורד למחשב בעוד רגע</p>
+        </div>
+    </div>
+
+    <script src="lib/security/hash.js"></script>
+    <script src="lib/security/sanitize.js"></script>
+    <script src="lib/security/log.js"></script>
+    <script src="lib/security/rateLimit.js"></script>
+    <script src="lib/draft.js"></script>
+    <script src="lib/phrases.js"></script>
+    <script src="lib/export.js"></script>
+    <script type="module" src="./src/main.js"></script>
+    <script>
+        let previewBgClass = 'bg-preview-white';
+        const THEME_NAMES = {
+            '#1e3a8a': 'כחול נייבי',
+            '#374151': 'אפור פחם',
+            '#166534': 'ירוק יער',
+            '#9f1239': 'בורדו ניהולי',
+            '#7c3aed': 'סגול מודרני'
+        };
+
+        const EXAMPLES = {
+            sales: {
+                name: 'נועה כהן',
+                title: 'מנהלת מכירות ארצית',
+                phone: '052-5550188',
+                email: 'noa.cohen@example.com',
+                location: 'הרצליה',
+                linkedin: 'linkedin.com/in/noacohen',
+                summary: 'מנהלת מכירות עם 8 שנות ניסיון בהובלת צוותים, בניית משפך מכירות והגדלת מחזור.',
+                experience: '2021 - נוכחי | מנהלת מכירות ארצית\n• הגדלת מחזור שנתי ב-35% תוך בניית צוות של 12 נציגים.\n• הטמעת CRM ומעקב KPI שבועי.\n\n2018 - 2021 | מנהלת לקוחות עסקיים\n• סגירת עסקאות מורכבות ושימור לקוחות אסטרטגיים.',
+                education: '2014 - 2017 | BA במנהל עסקים',
+                military: '2011 - 2013 | קצינת הדרכה',
+                skills: 'ניהול צוותים, CRM, משא ומתן, Excel, יעדי מכירות',
+                languages: 'עברית (שפת אם), אנגלית (שוטפת)',
+                field: 'sales'
+            },
+            tech: {
+                name: 'דניאל לוי',
+                title: 'מפתח Full Stack',
+                phone: '054-2220199',
+                email: 'daniel.levy@example.com',
+                location: 'תל אביב',
+                linkedin: 'linkedin.com/in/daniellevy',
+                summary: 'מפתח עם ניסיון במוצרי SaaS, עבודה בצוות אג׳ייל ושיפור ביצועים בסביבת ייצור.',
+                experience: '2022 - נוכחי | מפתח Full Stack\n• פיתוח פיצ׳רים מקצה לקצה ב-React ו-Node.\n• שיפור זמני טעינה ב-40% והוספת בדיקות אוטומטיות.\n\n2019 - 2022 | מפתח Frontend\n• בניית ממשקים נגישים ועבודה מול עיצוב ו-QA.',
+                education: '2016 - 2019 | B.Sc מדעי המחשב',
+                military: '2013 - 2016 | ממר״ם',
+                skills: 'JavaScript, Git, APIs, SQL, עבודה בצוות אג׳ייל',
+                languages: 'עברית (שפת אם), אנגלית (טכנית גבוהה)',
+                field: 'tech'
+            },
+            marketing: {
+                name: 'מאיה ברק',
+                title: 'מנהלת שיווק דיגיטלי',
+                phone: '050-7770144',
+                email: 'maya.barak@example.com',
+                location: 'חיפה',
+                linkedin: 'linkedin.com/in/mayabarak',
+                summary: 'מנהלת שיווק דיגיטלי עם דגש על לידים איכותיים, תוכן ואופטימיזציית תקציב פרסום.',
+                experience: '2020 - נוכחי | מנהלת שיווק דיגיטלי\n• ניהול קמפיינים ב-Google ו-Meta והגדלת לידים ב-50%.\n• בניית מסרים למותג ותוכן לרשתות.\n\n2017 - 2020 | רכזת דיגיטל\n• ניתוח GA ואופטימיזציה שבועית של קריאייטיב.',
+                education: '2013 - 2016 | BA בתקשורת',
+                military: '2010 - 2012 | דוברת יחידה',
+                skills: 'Google Ads, Meta Ads, תוכן, GA4, קריאייטיב',
+                languages: 'עברית (שפת אם), אנגלית (גבוהה)',
+                field: 'marketing'
+            }
+        };
+
+        function getVal(id) {
+            return QCSanitize.text(document.getElementById(id).value);
+        }
+
+        function setAccent(color, btn) {
+            document.documentElement.style.setProperty('--accent', color);
+            document.getElementById('custom-accent').value = color;
+            document.getElementById('accent-label').textContent = THEME_NAMES[color.toLowerCase()] || 'צבע מותאם';
+            document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
+            if (btn) btn.setAttribute('aria-pressed', 'true');
+            markStep(2);
+        }
+
+        function setCustomAccent(color) {
+            document.documentElement.style.setProperty('--accent', color);
+            document.getElementById('accent-label').textContent = 'צבע מותאם';
+            document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
+            markStep(2);
+        }
+
+        function setCvFont(name) {
+            document.documentElement.style.setProperty('--cv-font', "'" + name + "', sans-serif");
+            markStep(2);
+        }
+
+        function setLayout(layout) {
+            const target = document.getElementById('cv-target');
+            target.classList.remove('layout-classic', 'layout-sidebar', 'layout-minimal');
+            target.classList.add('layout-' + layout);
+            const header = document.getElementById('cv-header');
+            if (layout === 'classic') header.className = 'border-b-2 dynamic-border pb-4 mb-5';
+            else if (layout === 'minimal') header.className = 'border-b dynamic-border pb-3 mb-6';
+            else header.className = 'border-b-2 dynamic-border pb-4 mb-5';
+            markStep(2);
+        }
+
+        function setFontScale(val) {
+            const scale = Number(val) / 100;
+            document.documentElement.style.setProperty('--cv-scale', String(scale));
+            document.getElementById('font-scale-val').textContent = val + '%';
+            markStep(2);
+        }
+
+        function setLineHeight(val) {
+            const lh = (Number(val) / 100).toFixed(2);
+            document.documentElement.style.setProperty('--cv-leading', lh);
+            document.getElementById('line-height-val').textContent = lh;
+            markStep(2);
+        }
+
+        function updateCV() {
+            const setField = (elemId, val, prefix) => {
+                const el = document.getElementById(elemId);
+                if (!el) return;
+                el.replaceChildren();
+                if (val) {
+                    el.style.display = 'inline';
+                    const icon = document.createElement('span');
+                    icon.className = 'dynamic-icon';
+                    icon.textContent = prefix;
+                    el.appendChild(icon);
+                    el.appendChild(document.createTextNode(val));
+                } else {
+                    el.style.display = 'none';
+                }
+            };
+
+            const setSec = (secId, outId, val) => {
+                const sec = document.getElementById(secId);
+                const out = document.getElementById(outId);
+                if (val) {
+                    sec.style.display = 'block';
+                    out.innerText = val;
+                } else {
+                    sec.style.display = 'none';
+                    out.innerText = '';
+                }
+            };
+
+            ['in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el && QCSanitize.looksSuspicious(el.value)) {
+                    QCLog.add('suspicious_input', id);
+                }
+            });
+
+            document.getElementById('out-name').innerText = getVal('in-name') || 'שם מלא';
+            document.getElementById('out-title').innerText = getVal('in-title') || 'תפקיד';
+
+            setField('out-phone', getVal('in-phone'), '📞 ');
+            setField('out-email', getVal('in-email'), '✉️ ');
+            setField('out-location', getVal('in-location'), '📍 ');
+            setField('out-linkedin', getVal('in-linkedin'), '🔗 ');
+            setField('out-phone-side', getVal('in-phone'), '📞 ');
+            setField('out-email-side', getVal('in-email'), '✉️ ');
+            setField('out-location-side', getVal('in-location'), '📍 ');
+            setField('out-linkedin-side', getVal('in-linkedin'), '🔗 ');
+
+            setSec('sec-summary', 'out-summary', getVal('in-summary'));
+            setSec('sec-experience', 'out-experience', getVal('in-experience'));
+            setSec('sec-education', 'out-education', getVal('in-education'));
+            setSec('sec-military', 'out-military', getVal('in-military'));
+            setSec('sec-skills', 'out-skills', getVal('in-skills'));
+            setSec('sec-languages', 'out-languages', getVal('in-languages'));
+            if (window.QCDraft) QCDraft.saveSoon();
+        }
+
+        function clearCvForm() {
+            if (!confirm('למחוק את כל השדות ולשחזר טופס ריק?')) return;
+            QCDraft.clear();
+            updateCV();
+        }
+
+        function setPreviewBg(bgClass) {
+            previewBgClass = bgClass;
+            const paid = document.getElementById('cv-preview-wrapper').classList.contains('paid');
+            document.getElementById('cv-preview-wrapper').className =
+                'relative p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all min-h-[750px] ' + bgClass + (paid ? ' paid' : '');
+            markStep(2);
+        }
+
+        function markStep(n) {
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById('step-' + i);
+                const num = btn.querySelector('span');
+                if (i === n) {
+                    btn.className = 'step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white';
+                    num.className = 'w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]';
+                } else {
+                    btn.className = 'step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-400 hover:text-slate-200';
+                    num.className = 'w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]';
+                }
+            }
+        }
+
+        function goStep(n) {
+            markStep(n);
+            if (n === 1) document.getElementById('details-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (n === 2) document.getElementById('design-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (n === 3) openPaymentModal();
+        }
+
+        function openMobilePreview() {
+            document.getElementById('preview-column').classList.add('mobile-preview-open');
+        }
+
+        function closeMobilePreview() {
+            document.getElementById('preview-column').classList.remove('mobile-preview-open');
+        }
+
+        function openExamplesModal() {
+            const modal = document.getElementById('examples-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeExamplesModal() {
+            document.getElementById('examples-modal').classList.add('hidden');
+            document.getElementById('examples-modal').classList.remove('flex');
+        }
+
+        function loadExample(key) {
+            const ex = EXAMPLES[key];
+            const map = {
+                'in-name': ex.name,
+                'in-title': ex.title,
+                'in-phone': ex.phone,
+                'in-email': ex.email,
+                'in-location': ex.location,
+                'in-linkedin': ex.linkedin,
+                'in-summary': ex.summary,
+                'in-experience': ex.experience,
+                'in-education': ex.education,
+                'in-military': ex.military,
+                'in-skills': ex.skills,
+                'in-languages': ex.languages
+            };
+            Object.keys(map).forEach((id) => { document.getElementById(id).value = map[id]; });
+            document.getElementById('phrase-field').value = ex.field;
+            renderPhrases();
+            updateCV();
+            QCDraft.save();
+            closeExamplesModal();
+            markStep(1);
+        }
+
+        function renderPhrases() {
+            const field = document.getElementById('phrase-field').value;
+            const wrap = document.getElementById('phrase-bullets');
+            wrap.innerHTML = '';
+            QCPhrases.bullets[field].forEach((text) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'text-[11px] bg-slate-800 border border-slate-600 text-slate-200 hover:border-blue-400 rounded-lg px-2.5 py-2 text-right leading-snug';
+                btn.innerText = text;
+                btn.onclick = () => insertBullet(text);
+                wrap.appendChild(btn);
+            });
+        }
+
+        function insertBullet(text) {
+            const el = document.getElementById('in-experience');
+            const prefix = el.value.trim() ? '\n• ' : '• ';
+            el.value = el.value + prefix + text;
+            updateCV();
+            QCDraft.save();
+        }
+
+        function insertSkills() {
+            const field = document.getElementById('phrase-field').value;
+            const el = document.getElementById('in-skills');
+            const extra = QCPhrases.skills[field];
+            el.value = el.value.trim() ? el.value.trim() + ', ' + extra : extra;
+            updateCV();
+            QCDraft.save();
+        }
+
+        function initPhrases() {
+            const select = document.getElementById('phrase-field');
+            QCPhrases.fields.forEach((f, i) => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.innerText = f.label;
+                if (i === 0) opt.selected = true;
+                select.appendChild(opt);
+            });
+            renderPhrases();
+        }
+
+        document.getElementById('details-panel').addEventListener('focusin', function () { markStep(1); });
+        document.getElementById('design-panel').addEventListener('focusin', function () { markStep(2); });
+
+        window.updateCV = updateCV;
+        initPhrases();
+        QCDraft.restore();
+        renderPhrases();
+        updateCV();
+        markStep(1);
+    </script>
+</body>
+</html>

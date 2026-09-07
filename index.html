@@ -637,11 +637,18 @@
             margin-bottom: calc(1.25rem * var(--cv-scale));
             text-align: right;
         }
+        #cv-target .cv-contact-link,
+        #qc-print-host .cv-contact-link {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 0.14em;
+        }
         .layout-executive #out-name,
         .layout-executive #out-title,
         .layout-executive .cv-contact-header,
         .layout-executive #cv-header .dynamic-text,
-        .layout-executive #cv-header .dynamic-icon {
+        .layout-executive #cv-header .dynamic-icon,
+        .layout-executive #cv-header .cv-contact-link {
             color: #fff !important;
         }
         .layout-executive #out-title { opacity: 0.92; }
@@ -1611,6 +1618,21 @@
             return QCSanitize.text(document.getElementById(id).value);
         }
 
+        function toMailto(value) {
+            const email = String(value || '').replace(/^mailto:/i, '').trim();
+            if (!email || email.indexOf('@') < 1 || /[\s<>"]/.test(email)) return '';
+            if (/^(javascript|data|vbscript):/i.test(email)) return '';
+            return 'mailto:' + email;
+        }
+
+        function toWebUrl(value) {
+            const url = String(value || '').trim();
+            if (!url || /^(javascript|data|vbscript):/i.test(url)) return '';
+            if (/^https?:\/\//i.test(url)) return url;
+            if (/^\/\//.test(url)) return 'https:' + url;
+            return 'https://' + url.replace(/^\/+/, '');
+        }
+
         function setAccent(color, btn) {
             document.documentElement.style.setProperty('--accent', color);
             document.getElementById('custom-accent').value = color;
@@ -1666,7 +1688,7 @@
         }
 
         function updateCV() {
-            const setField = (elemId, val, prefix) => {
+            const setField = (elemId, val, prefix, href) => {
                 const el = document.getElementById(elemId);
                 if (!el) return;
                 el.replaceChildren();
@@ -1675,8 +1697,19 @@
                     const icon = document.createElement('span');
                     icon.className = 'dynamic-icon';
                     icon.textContent = prefix;
-                    el.appendChild(icon);
-                    el.appendChild(document.createTextNode(val));
+                    if (href) {
+                        const a = document.createElement('a');
+                        a.className = 'cv-contact-link';
+                        a.href = href;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.appendChild(icon);
+                        a.appendChild(document.createTextNode(val));
+                        el.appendChild(a);
+                    } else {
+                        el.appendChild(icon);
+                        el.appendChild(document.createTextNode(val));
+                    }
                 } else {
                     el.style.display = 'none';
                 }
@@ -1704,14 +1737,19 @@
             document.getElementById('out-name').innerText = getVal('in-name') || 'שם מלא';
             document.getElementById('out-title').innerText = getVal('in-title') || 'תפקיד';
 
+            const emailVal = getVal('in-email');
+            const linkedinVal = getVal('in-linkedin');
+            const emailHref = toMailto(emailVal);
+            const linkedinHref = toWebUrl(linkedinVal);
+
             setField('out-phone', getVal('in-phone'), '📞 ');
-            setField('out-email', getVal('in-email'), '✉️ ');
+            setField('out-email', emailVal, '✉️ ', emailHref);
             setField('out-location', getVal('in-location'), '📍 ');
-            setField('out-linkedin', getVal('in-linkedin'), '🔗 ');
+            setField('out-linkedin', linkedinVal, '🔗 ', linkedinHref);
             setField('out-phone-side', getVal('in-phone'), '📞 ');
-            setField('out-email-side', getVal('in-email'), '✉️ ');
+            setField('out-email-side', emailVal, '✉️ ', emailHref);
             setField('out-location-side', getVal('in-location'), '📍 ');
-            setField('out-linkedin-side', getVal('in-linkedin'), '🔗 ');
+            setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
 
             setSec('sec-summary', 'out-summary', getVal('in-summary'));
             setSec('sec-experience', 'out-experience', getVal('in-experience'));
@@ -1862,6 +1900,10 @@
             const skip = document.getElementById('skip-link');
             home.hidden = studio;
             studioEl.hidden = !studio;
+            home.inert = studio;
+            studioEl.inert = !studio;
+            home.setAttribute('aria-hidden', studio ? 'true' : 'false');
+            studioEl.setAttribute('aria-hidden', studio ? 'false' : 'true');
             document.body.classList.toggle('on-home', !studio);
             document.body.classList.toggle('on-studio', studio);
             document.body.classList.toggle('bg-slate-900', studio);

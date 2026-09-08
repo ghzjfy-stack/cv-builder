@@ -1,0 +1,230 @@
+#cv-preview-wrapper:has(.layout-azure) {
+    padding: 0;
+    overflow: hidden;
+    background: #fff;
+}
+
+#cv-target.layout-azure,
+#qc-print-host .cv-print-sheet.layout-azure {
+    --azure-ink: #1a1a1a;
+    --azure-muted: #3f3f3f;
+    --azure-line: #d4d8dd;
+    --azure-head: #dce8f0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(10.5rem, 0.4fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "head head head"
+        "main rule side";
+    min-height: 1040px;
+    background: #fff;
+    color: var(--azure-ink);
+    font-family: 'Heebo', 'Rubik', sans-serif;
+    font-size: calc(0.78rem * var(--cv-scale));
+    line-height: 1.5;
+    overflow: hidden;
+}
+.layout-azure .cv-columns { display: contents; }
+.layout-azure #cv-header {
+    grid-area: head;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "name contact"
+        "title contact";
+    column-gap: 1.5rem;
+    row-gap: 0.2rem;
+    align-items: start;
+    background: var(--azure-head);
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    padding: 1.55rem 1.7rem 1.35rem;
+    color: var(--azure-ink);
+}
+.layout-azure #out-name { grid-area: name; }
+.layout-azure #out-title { grid-area: title; }
+.layout-azure .cv-contact-header { grid-area: contact; }
+.layout-azure #out-name,
+.layout-azure #out-title,
+.layout-azure .cv-section-title,
+.layout-azure .dynamic-text {
+    color: var(--azure-ink) !important;
+}
+.layout-azure #out-name {
+    font-weight: 700;
+    font-size: calc(1.85rem * var(--cv-scale));
+    letter-spacing: 0;
+    line-height: 1.15;
+}
+.layout-azure #out-title {
+    margin: 0.15rem 0 0;
+    font-weight: 400;
+    font-size: calc(0.95rem * var(--cv-scale));
+    color: var(--azure-muted) !important;
+    opacity: 1;
+}
+.layout-azure .cv-contact-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.32rem;
+    margin: 0.15rem 0 0;
+    min-width: 11.5rem;
+    color: var(--azure-ink);
+    font-size: calc(0.72rem * var(--cv-scale));
+}
+.layout-azure .cv-contact-header .cv-contact-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    order: 4;
+}
+.layout-azure .cv-contact-header .cv-contact-row[data-contact="location"] { order: 1; }
+.layout-azure .cv-contact-header .cv-contact-row[data-contact="phone"] { order: 2; }
+.layout-azure .cv-contact-header .cv-contact-row[data-contact="email"] { order: 3; }
+.layout-azure .cv-contact-header .cv-contact-ico {
+    display: inline-flex;
+    width: 0.82rem;
+    height: 0.82rem;
+    margin-top: 0.12rem;
+    flex: none;
+    color: var(--azure-ink);
+}
+.layout-azure .cv-contact-header .cv-contact-ico svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.7;
+}
+.layout-azure .cv-contact-header .dynamic-icon { display: none; }
+.layout-azure .cv-contact-link { text-decoration: none; color: inherit; }
+.layout-azure .cv-main {
+    grid-area: main;
+    padding: 1.35rem 1.55rem 1.7rem 1.25rem;
+    gap: 1.15rem;
+    color: var(--azure-muted);
+}
+.layout-azure .cv-col-rule {
+    grid-area: rule;
+    display: block;
+    width: 1px;
+    background: var(--azure-line);
+    align-self: stretch;
+    margin: 1.25rem 0 2.4rem;
+}
+.layout-azure .cv-sidebar {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    gap: 1.05rem;
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    padding: 1.35rem 1.35rem 1.7rem 1.15rem;
+    color: var(--azure-muted);
+}
+.layout-azure .cv-sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.05rem;
+}
+.layout-azure .cv-contact-sidebar,
+.layout-azure .cv-photo-block,
+.layout-azure .cv-sec-ico { display: none !important; }
+.layout-azure .cv-section-title {
+    font-weight: 700;
+    font-size: calc(0.92rem * var(--cv-scale));
+    letter-spacing: 0;
+    text-transform: none;
+    border-bottom: 0;
+    padding-bottom: 0;
+    margin-bottom: 0.45rem;
+}
+.layout-azure #sec-education { display: none !important; }
+.layout-azure #sec-education-side,
+.layout-azure #sec-extras-side { display: block; }
+.layout-azure #sec-military,
+.layout-azure #sec-references { display: none !important; }
+.layout-azure .cv-edu-item { margin-bottom: 0.7rem; }
+.layout-azure .cv-edu-item .cv-edu-school {
+    font-weight: 700;
+    color: var(--azure-ink);
+    font-size: calc(0.78rem * var(--cv-scale));
+}
+.layout-azure .cv-edu-item .cv-edu-meta {
+    color: var(--azure-muted);
+    font-size: calc(0.7rem * var(--cv-scale));
+    margin-top: 0.12rem;
+}
+.layout-azure #out-skills,
+.layout-azure #out-languages,
+.layout-azure #out-extras-side {
+    color: var(--azure-muted);
+    padding: 0;
+}
+.layout-azure .cv-skill-list,
+.layout-azure .cv-extra-list,
+.layout-azure .cv-job-list {
+    list-style: disc;
+    padding-inline-start: 1.1rem;
+    margin: 0;
+    font-size: calc(0.74rem * var(--cv-scale));
+}
+.layout-azure .cv-skill-list li,
+.layout-azure .cv-extra-list li,
+.layout-azure .cv-job-list li { margin-bottom: 0.18rem; }
+.layout-azure .cv-lang-line {
+    margin: 0 0 0.22rem;
+    font-size: calc(0.74rem * var(--cv-scale));
+}
+.layout-azure #out-summary,
+.layout-azure #out-experience {
+    color: var(--azure-muted);
+    font-size: calc(0.76rem * var(--cv-scale));
+    line-height: 1.55;
+    padding: 0;
+}
+.layout-azure .cv-job { margin-bottom: 0.95rem; }
+.layout-azure .cv-job-title {
+    font-weight: 700;
+    color: var(--azure-ink);
+    font-size: calc(0.8rem * var(--cv-scale));
+    margin: 0;
+}
+.layout-azure .cv-job-date {
+    font-size: calc(0.7rem * var(--cv-scale));
+    color: #5a5a5a;
+    margin: 0.12rem 0 0.28rem;
+}
+.layout-azure .cv-job-role {
+    color: #5a5a5a;
+    font-size: calc(0.7rem * var(--cv-scale));
+    margin-bottom: 0.2rem;
+}
+
+@media print {
+    html.qc-print-mode #qc-print-host .layout-azure {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 1px minmax(10.5rem, 0.4fr) !important;
+        grid-template-rows: auto 1fr !important;
+        grid-template-areas:
+            "head head head"
+            "main rule side" !important;
+        background: #fff !important;
+        min-height: 277mm !important;
+        color: #1a1a1a !important;
+    }
+    html.qc-print-mode #qc-print-host .layout-azure .cv-columns {
+        display: contents !important;
+    }
+    html.qc-print-mode #qc-print-host .layout-azure #cv-header {
+        background: #dce8f0 !important;
+        color: #1a1a1a !important;
+    }
+    html.qc-print-mode #qc-print-host .layout-azure .cv-col-rule {
+        display: block !important;
+        background: #d4d8dd !important;
+    }
+}

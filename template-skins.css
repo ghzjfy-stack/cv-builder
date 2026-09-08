@@ -1,0 +1,169 @@
+/* Canva-style editorial skins for charcoal / azure layouts */
+
+#cv-target.layout-charcoal,
+#qc-print-host .cv-print-sheet.layout-charcoal {
+    --charcoal: #4c4c4c;
+    --charcoal-deep: #3f3f3f;
+    --charcoal-paper: #ffffff;
+    --charcoal-ink: #333333;
+    --charcoal-muted: #4a4a4a;
+    --charcoal-photo: #d8d8d8;
+    --charcoal-photo-2: #cfcfcf;
+    --charcoal-lang-track: #2e2e2e;
+    --charcoal-lang-fill: #c8c8c8;
+    --charcoal-title: #3f3f3f;
+    background: var(--charcoal-paper);
+}
+
+#cv-target.layout-charcoal.skin-espresso,
+#qc-print-host .cv-print-sheet.layout-charcoal.skin-espresso {
+    --charcoal: #3e342c;
+    --charcoal-deep: #2f2822;
+    --charcoal-paper: #f7f3ec;
+    --charcoal-ink: #2c2622;
+    --charcoal-muted: #5a5148;
+    --charcoal-photo: #d9cfc3;
+    --charcoal-photo-2: #cbbfb0;
+    --charcoal-lang-track: #2a221c;
+    --charcoal-lang-fill: #d4c4b0;
+    --charcoal-title: #3e342c;
+}
+
+#cv-target.layout-charcoal.skin-sage,
+#qc-print-host .cv-print-sheet.layout-charcoal.skin-sage {
+    --charcoal: #4d5d52;
+    --charcoal-deep: #3c4a41;
+    --charcoal-paper: #f4f1ea;
+    --charcoal-ink: #2c332f;
+    --charcoal-muted: #4f5a54;
+    --charcoal-photo: #d5d8d0;
+    --charcoal-photo-2: #c5cbbf;
+    --charcoal-lang-track: #2e382f;
+    --charcoal-lang-fill: #c9d2c6;
+    --charcoal-title: #3d4a42;
+}
+
+#cv-target.layout-charcoal.skin-slate,
+#qc-print-host .cv-print-sheet.layout-charcoal.skin-slate {
+    --charcoal: #3e4c58;
+    --charcoal-deep: #2f3b45;
+    --charcoal-paper: #f7f8f9;
+    --charcoal-ink: #2a3138;
+    --charcoal-muted: #4d5860;
+    --charcoal-photo: #d4dae0;
+    --charcoal-photo-2: #c4ccd3;
+    --charcoal-lang-track: #2a343c;
+    --charcoal-lang-fill: #c5d0d8;
+    --charcoal-title: #3e4c58;
+}
+
+#cv-target.layout-charcoal.skin-wine,
+#qc-print-host .cv-print-sheet.layout-charcoal.skin-wine {
+    --charcoal: #5a3640;
+    --charcoal-deep: #472b33;
+    --charcoal-paper: #f8f3ef;
+    --charcoal-ink: #322428;
+    --charcoal-muted: #5c4a4e;
+    --charcoal-photo: #e2d4d2;
+    --charcoal-photo-2: #d3c2c0;
+    --charcoal-lang-track: #3a242a;
+    --charcoal-lang-fill: #e0c9c6;
+    --charcoal-title: #5a3640;
+}
+
+#cv-target.layout-charcoal.skin-forest,
+#qc-print-host .cv-print-sheet.layout-charcoal.skin-forest {
+    --charcoal: #31443b;
+    --charcoal-deep: #24332c;
+    --charcoal-paper: #f3f0e8;
+    --charcoal-ink: #24302a;
+    --charcoal-muted: #4a564f;
+    --charcoal-photo: #d2d6cc;
+    --charcoal-photo-2: #c2c8bb;
+    --charcoal-lang-track: #1e2c26;
+    --charcoal-lang-fill: #c5d0c4;
+    --charcoal-title: #31443b;
+}
+
+#cv-target.layout-azure.skin-blush,
+#qc-print-host .cv-print-sheet.layout-azure.skin-blush {
+    --azure-ink: #2c2426;
+    --azure-muted: #5c4e50;
+    --azure-line: #e3d6d4;
+    --azure-head: #ead9d4;
+}
+
+.template-grid.canva-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    max-height: min(32rem, 58vh);
+    overflow-y: auto;
+    padding-bottom: 0.15rem;
+}
+@media (min-width: 640px) {
+    .template-grid.canva-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+.template-thumb {
+    height: 6.6rem;
+}
+.lay-espresso { background: #f7f3ec; }
+.lay-espresso span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #3e342c; border-radius: 0; }
+.lay-espresso span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #3e342c; border-radius: 0; }
+.lay-espresso span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #e8dfd0; }
+
+.lay-sage { background: #f4f1ea; }
+.lay-sage span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #4d5d52; border-radius: 0; }
+.lay-sage span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #4d5d52; border-radius: 0; }
+.lay-sage span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #e4e0d4; }
+
+.lay-slate { background: #f7f8f9; }
+.lay-slate span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #3e4c58; border-radius: 0; }
+.lay-slate span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #3e4c58; border-radius: 0; }
+.lay-slate span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #e2e6ea; }
+
+.lay-wine { background: #f8f3ef; }
+.lay-wine span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #5a3640; border-radius: 0; }
+.lay-wine span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #5a3640; border-radius: 0; }
+.lay-wine span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #eadfd8; }
+
+.lay-forest { background: #f3f0e8; }
+.lay-forest span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #31443b; border-radius: 0; }
+.lay-forest span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #31443b; border-radius: 0; }
+.lay-forest span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #dde3d8; }
+
+.lay-blush { background: #fff; }
+.lay-blush span:nth-child(1) { top: 0; right: 0; left: 0; height: 22px; background: #ead9d4; border-radius: 0; }
+.lay-blush span:nth-child(2) { top: 30px; right: 10px; width: 46%; height: 6px; background: #6b4a4e; }
+.lay-blush span:nth-child(3) { bottom: 10px; right: 10px; left: 10px; height: 16px; background: #f3eae7; }
+
+.lay-ivory { background: #f7f3ec; }
+.lay-ivory span:nth-child(1) { top: 0; right: 0; left: 0; height: 22px; background: #3e342c; border-radius: 0; }
+.lay-ivory span:nth-child(2) { top: 30px; right: 10px; left: 10px; height: 22px; background: #e8dfd0; }
+
+.lay-ink { background: #fff; }
+.lay-ink span:nth-child(1) { top: 12px; right: 18px; left: 18px; height: 5px; background: #1c1917; }
+.lay-ink span:nth-child(2) { top: 24px; right: 28px; left: 28px; height: 4px; background: #1c1917; opacity: 0.45; }
+.lay-ink span:nth-child(3) { bottom: 12px; right: 18px; left: 18px; height: 14px; background: #eee; }
+
+.lay-sand { background: #f4eee4; }
+.lay-sand span:nth-child(1) { inset: 8px auto 8px 8px; width: 28%; background: #6b5344; border-radius: 2px; }
+.lay-sand span:nth-child(2) { top: 10px; right: 10px; width: 52%; height: 6px; background: #6b5344; }
+.lay-sand span:nth-child(3) { top: 22px; right: 10px; width: 40%; height: 22px; background: #e8dfd0; }
+
+.lay-pearl { background: #f4f1ec; }
+.lay-pearl span:nth-child(1) { top: 8px; right: 10px; left: 10px; height: 10px; background: #3e4c58; border-radius: 2px; }
+.lay-pearl span:nth-child(2) { top: 26px; right: 10px; width: 55%; height: 5px; background: #c5ccd3; }
+.lay-pearl span:nth-child(3) { bottom: 10px; right: 10px; left: 10px; height: 18px; background: #e8eaed; }
+
+.lay-compact { background: #eef1f4; }
+.lay-compact span:nth-child(1) { top: 8px; right: 8px; left: 8px; height: 6px; background: #4c4c4c; }
+.lay-compact span:nth-child(2) { top: 20px; right: 8px; left: 8px; height: 28px; background: #dde2e8; }
+.lay-compact span:nth-child(3) { bottom: 8px; right: 8px; left: 8px; height: 10px; background: #cfd6de; }
+
+.lay-split-sand { background: #f7f3ec; }
+.lay-split-sand span:nth-child(1) { inset: 8px 8px 8px auto; width: 28%; background: #3e342c; border-radius: 2px; }
+.lay-split-sand span:nth-child(2) { top: 10px; left: 10px; width: 52%; height: 6px; background: #3e342c; }
+.lay-split-sand span:nth-child(3) { top: 22px; left: 10px; width: 40%; height: 22px; background: #e8dfd0; }

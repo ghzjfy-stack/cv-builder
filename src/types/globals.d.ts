@@ -3,6 +3,7 @@ export {};
 declare global {
   interface Window {
     openPaymentModal?: () => void;
+    goStep?: (n: number) => void;
     triggerPDFDownload?: () => void;
     onDownloadPdfClick?: (e?: Event) => void;
     QCRateLimit?: {

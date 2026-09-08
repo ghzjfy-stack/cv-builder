@@ -10,10 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./azure-layout.css">
+    <link rel="stylesheet" href="./template-skins.css">
     <style>
         :root {
-            --accent: #1e3a8a;
+            --accent: #4c4c4c;
             --cv-font: 'Rubik', sans-serif;
             --cv-scale: 1;
             --cv-leading: 1.55;
@@ -29,6 +31,66 @@
         #home-view[hidden],
         #studio-view[hidden] {
             display: none !important;
+        }
+        #studio-view {
+            display: flex;
+            flex-direction: column;
+            min-height: 100dvh;
+        }
+        body.on-studio {
+            overflow: hidden;
+            height: 100dvh;
+            height: 100svh;
+        }
+        body.on-studio #studio-view:not([hidden]) {
+            height: 100dvh;
+            height: 100svh;
+            max-height: 100dvh;
+            max-height: 100svh;
+            overflow: hidden;
+        }
+        body.on-studio #studio-view > header {
+            position: relative;
+            top: auto;
+            flex-shrink: 0;
+            z-index: 40;
+        }
+        .studio-social {
+            flex-shrink: 0;
+        }
+        .studio-workspace {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            max-width: 80rem;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: minmax(0, 1fr) minmax(210px, 42svh);
+            gap: 0.75rem;
+            padding: 0.75rem 1rem calc(5.35rem + env(safe-area-inset-bottom));
+        }
+        #studio-form-column,
+        #preview-column {
+            min-width: 0;
+            min-height: 0;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        #preview-column {
+            display: flex;
+            flex-direction: column;
+            background: #020617;
+            border: 1px solid rgb(51 65 85);
+            border-radius: 1rem;
+            padding: 0.65rem 0.75rem 0.85rem;
+        }
+        #preview-column > .preview-toolbar {
+            flex-shrink: 0;
+        }
+        #cv-preview-wrapper {
+            flex: 1 1 auto;
         }
 
         .home-view {
@@ -395,6 +457,14 @@
         .lay-charcoal span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #4c4c4c; border-radius: 0; }
         .lay-charcoal span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #4c4c4c; border-radius: 0; }
         .lay-charcoal span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #e8dfd0; }
+        .lay-azure { background: #fff; }
+        .lay-azure span:nth-child(1) { top: 0; right: 0; left: 0; height: 16px; background: #dce8f0; border-radius: 0; }
+        .lay-azure span:nth-child(2) { top: 22px; right: 36%; bottom: 8px; width: 1px; background: #d4d8dd; border-radius: 0; }
+        .lay-azure span:nth-child(3) { top: 24px; right: 8px; width: 34%; height: 6px; background: #c5d0d8; }
+        .lay-navy { background: #fff; }
+        .lay-navy span:nth-child(1) { inset: 0 auto 0 0; width: 34%; background: #12192b; border-radius: 0; }
+        .lay-navy span:nth-child(2) { top: 10px; left: 8px; width: 18px; height: 18px; border-radius: 999px; background: #c9cdd6; }
+        .lay-navy span:nth-child(3) { top: 12px; right: 10px; width: 48%; height: 22px; background: #e8e9ee; }
         .home-quote cite {
             display: block;
             margin-top: 0.85rem;
@@ -463,7 +533,7 @@
         @media (min-width: 900px) {
             .home-hero { grid-template-columns: 1.08fr 0.92fr; padding-top: 3rem; }
             .home-cards { grid-template-columns: repeat(3, 1fr); }
-            .home-layouts { grid-template-columns: repeat(4, 1fr); }
+            .home-layouts { grid-template-columns: repeat(5, 1fr); }
             .home-price { grid-template-columns: 1.2fr 0.8fr; padding: 2.25rem 2.4rem; }
             .home-quotes { grid-template-columns: repeat(3, 1fr); }
         }
@@ -549,6 +619,16 @@
             overflow-wrap: break-word;
             word-break: normal;
         }
+        #cv-target.cv-lang-en,
+        #qc-print-host .cv-print-sheet.cv-lang-en {
+            direction: ltr;
+            text-align: left;
+        }
+        #details-panel.cv-form-en input,
+        #details-panel.cv-form-en textarea {
+            direction: ltr;
+            text-align: left;
+        }
         #cv-target #cv-header,
         #qc-print-host .cv-print-sheet #cv-header {
             break-inside: avoid;
@@ -594,7 +674,7 @@
             background: #f1f5f9;
             border-radius: 0.75rem;
             padding: calc(0.9rem * var(--cv-scale));
-            border-right: 4px solid var(--accent);
+            border-inline-start: 4px solid var(--accent);
         }
 
         .layout-minimal #cv-header {
@@ -629,7 +709,7 @@
             background: #fff7ed;
             border-radius: 0.75rem;
             padding: calc(0.9rem * var(--cv-scale));
-            border-left: 4px solid var(--accent);
+            border-inline-end: 4px solid var(--accent);
         }
 
         .layout-executive #cv-header {
@@ -639,7 +719,7 @@
             border: none;
             border-radius: 0.85rem;
             margin-bottom: calc(1.25rem * var(--cv-scale));
-            text-align: right;
+            text-align: start;
         }
         #cv-target .cv-contact-link,
         #qc-print-host .cv-contact-link {
@@ -693,7 +773,10 @@
         .cv-photo-block,
         .cv-sec-ico,
         .cv-contact-ico,
-        #sec-education-side { display: none; }
+        .cv-col-rule,
+        #sec-education-side,
+        #sec-extras-side { display: none; }
+        .layout-charcoal #sec-extras-side { display: none !important; }
         .cv-sidebar-inner { display: contents; }
 
         #cv-preview-wrapper:has(.layout-charcoal) {
@@ -712,7 +795,7 @@
             grid-template-rows: auto 1fr;
             grid-template-areas: "side head" "side main";
             min-height: 1040px;
-            background: #fff;
+            background: var(--charcoal-paper, #fff);
             direction: ltr;
             text-align: start;
             font-family: 'Lato', 'Rubik', sans-serif;
@@ -746,7 +829,7 @@
             display: block;
             position: relative;
             height: 168px;
-            background: #d8d8d8;
+            background: var(--charcoal-photo, #d8d8d8);
             border-bottom-left-radius: 90px;
             border-bottom-right-radius: 90px;
             margin-bottom: 1.35rem;
@@ -759,7 +842,7 @@
             width: 78%;
             height: 54%;
             transform: translateX(-50%);
-            background: #cfcfcf;
+            background: var(--charcoal-photo-2, #cfcfcf);
             border-radius: 0 0 80px 80px;
         }
         .layout-charcoal .cv-photo {
@@ -826,12 +909,12 @@
         }
         .layout-charcoal .cv-main {
             grid-area: main;
-            background: #fff;
+            background: var(--charcoal-paper, #fff);
             padding: 1.35rem 1.85rem 1.6rem;
             gap: 1.15rem;
             direction: rtl;
             text-align: right;
-            color: #333;
+            color: var(--charcoal-ink, #333);
         }
         .layout-charcoal .cv-section-title,
         .layout-charcoal .cv-sidebar .cv-section-title {
@@ -845,7 +928,7 @@
             border-bottom: 0;
             padding-bottom: 0.35rem;
             margin-bottom: 0.65rem;
-            color: #3f3f3f !important;
+            color: var(--charcoal-title, #3f3f3f) !important;
             position: relative;
         }
         .layout-charcoal .cv-section-title::after,
@@ -871,7 +954,7 @@
             display: inline-flex;
             width: 1.05rem;
             height: 1.05rem;
-            color: #4c4c4c;
+            color: var(--charcoal, #4c4c4c);
             flex: none;
         }
         .layout-charcoal .cv-sec-ico svg {
@@ -942,18 +1025,18 @@
         }
         .layout-charcoal .cv-lang-track {
             height: 7px;
-            background: #2e2e2e;
+            background: var(--charcoal-lang-track, #2e2e2e);
             overflow: hidden;
         }
         .layout-charcoal .cv-lang-fill {
             display: block;
             height: 100%;
-            background: #c8c8c8;
+            background: var(--charcoal-lang-fill, #c8c8c8);
         }
         .layout-charcoal #out-summary,
         .layout-charcoal #out-experience,
         .layout-charcoal #out-military {
-            color: #4a4a4a;
+            color: var(--charcoal-muted, #4a4a4a);
             font-size: calc(0.68rem * var(--cv-scale));
             line-height: 1.55;
             padding: 0;
@@ -999,6 +1082,389 @@
             list-style: disc;
         }
         .layout-charcoal .cv-job-list li { margin-bottom: 0.12rem; }
+        .layout-charcoal .cv-ref-item { margin-bottom: 0.75rem; }
+        .layout-charcoal .cv-ref-name {
+            font-weight: 700;
+            color: #2f2f2f;
+            font-size: calc(0.78rem * var(--cv-scale));
+        }
+        .layout-charcoal .cv-ref-role {
+            color: #5a5a5a;
+            font-size: calc(0.64rem * var(--cv-scale));
+            margin-bottom: 0.2rem;
+        }
+        .layout-charcoal .cv-ref-line {
+            color: #4a4a4a;
+            font-size: calc(0.62rem * var(--cv-scale));
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.65rem;
+        }
+        .template-card {
+            text-align: right;
+            border-radius: 1.1rem;
+            border: 1px solid #334155;
+            background: #0f172a;
+            padding: 0.7rem;
+            color: inherit;
+        }
+        .template-card:hover { border-color: #60a5fa; }
+        .template-card[aria-pressed="true"] {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 1px #93c5fd inset;
+        }
+        .template-thumb {
+            height: 6.6rem;
+            border-radius: 0.45rem;
+            background: #f4eee4;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .template-thumb span {
+            position: absolute;
+            background: #d6c7ae;
+            border-radius: 2px;
+        }
+        .template-card-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #e2e8f0;
+        }
+        .template-card-sub {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-top: 0.15rem;
+            line-height: 1.35;
+        }
+        .home-layout {
+            width: 100%;
+            text-align: right;
+            cursor: pointer;
+        }
+        .home-layout:hover { border-color: rgba(28, 25, 23, 0.22); }
+        .cv-photo-file { display: none; }
+
+        #cv-target.cv-lang-en.layout-charcoal .cv-sidebar,
+        #cv-target.cv-lang-en.layout-charcoal .cv-main,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-sidebar,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-main,
+        #cv-target.cv-lang-en.layout-charcoal .cv-job-body,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-body {
+            direction: ltr;
+            text-align: left;
+        }
+        #cv-target.cv-lang-en.layout-charcoal .cv-job-date,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-date {
+            text-align: left;
+        }
+
+        #cv-preview-wrapper:has(.layout-navy) {
+            padding: 0;
+            overflow: hidden;
+            background: #fff;
+        }
+        #cv-target.layout-navy,
+        #qc-print-host .cv-print-sheet.layout-navy {
+            --navy: #12192b;
+            --navy-muted: #333333;
+            --navy-line: rgba(255, 255, 255, 0.62);
+            display: grid;
+            grid-template-columns: 0.36fr 0.64fr;
+            grid-template-rows: auto auto 1fr;
+            grid-template-areas:
+                "photo main"
+                "head main"
+                "side main";
+            min-height: 1040px;
+            background: #fff;
+            direction: ltr;
+            text-align: start;
+            font-family: 'Montserrat', 'Heebo', 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
+            font-size: calc(0.72rem * var(--cv-scale));
+            line-height: 1.5;
+            overflow: hidden;
+        }
+        .layout-navy .cv-columns,
+        .layout-navy .cv-sidebar {
+            display: contents;
+        }
+        .layout-navy .cv-contact-header { display: none; }
+        .layout-navy .cv-photo-block {
+            grid-area: photo;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            background: var(--navy);
+            padding: 1.55rem 1rem 0.35rem;
+            z-index: 1;
+        }
+        .layout-navy .cv-photo {
+            position: relative;
+            left: auto;
+            bottom: auto;
+            transform: none;
+            width: 118px;
+            height: 118px;
+            border-radius: 999px;
+            border: 3px solid rgba(255, 255, 255, 0.92);
+            overflow: hidden;
+            background: #8d93a3;
+            box-shadow: none;
+        }
+        .layout-navy .cv-photo svg,
+        .layout-navy .cv-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .layout-navy #cv-header {
+            grid-area: head;
+            background: var(--navy);
+            color: #fff;
+            border: 0;
+            border-radius: 0;
+            margin: 0;
+            padding: 0.65rem 1.15rem 1.15rem;
+            text-align: center;
+            z-index: 1;
+        }
+        .layout-navy #out-name,
+        .layout-navy #out-title,
+        .layout-navy #cv-header .dynamic-text {
+            color: #fff !important;
+            unicode-bidi: plaintext;
+        }
+        .layout-navy #out-name {
+            font-weight: 700;
+            font-size: calc(1.05rem * var(--cv-scale));
+            letter-spacing: 0.14em;
+            line-height: 1.25;
+            text-transform: uppercase;
+        }
+        .layout-navy #out-title {
+            margin-top: 0.28rem;
+            font-weight: 500;
+            font-size: calc(0.62rem * var(--cv-scale));
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            opacity: 0.88;
+        }
+        .layout-navy .cv-sidebar-inner {
+            grid-area: side;
+            display: flex;
+            flex-direction: column;
+            gap: 1.15rem;
+            background: var(--navy);
+            color: #fff;
+            padding: 0.35rem 1.25rem 1.7rem;
+            min-height: 100%;
+            z-index: 1;
+            direction: rtl;
+            text-align: right;
+        }
+        .layout-navy .cv-contact-sidebar {
+            display: flex;
+            color: #fff;
+            margin: 0;
+            gap: 0.55rem;
+        }
+        .layout-navy .cv-main {
+            grid-area: main;
+            background: #fff;
+            padding: 1.55rem 1.7rem 1.7rem 1.45rem;
+            gap: 1.15rem;
+            direction: rtl;
+            text-align: right;
+            color: var(--navy-muted);
+            z-index: 1;
+        }
+        .layout-navy .cv-section-title,
+        .layout-navy .cv-sidebar .cv-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            border-bottom: 0;
+            padding-bottom: 0.42rem;
+            margin-bottom: 0.7rem;
+            color: var(--navy) !important;
+            position: relative;
+        }
+        .layout-navy .cv-section-title::after,
+        .layout-navy .cv-sidebar .cv-section-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-bottom: 1px dashed #12192b;
+        }
+        .layout-navy .cv-sidebar .cv-section-title {
+            color: #fff !important;
+            letter-spacing: 0.18em;
+            font-size: calc(0.68rem * var(--cv-scale));
+            justify-content: flex-start;
+        }
+        .layout-navy .cv-sidebar .cv-section-title::after {
+            border-bottom-color: var(--navy-line);
+        }
+        .layout-navy .cv-sec-ico { display: none; }
+        .layout-navy .cv-contact-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            color: #fff;
+            font-size: calc(0.66rem * var(--cv-scale));
+            line-height: 1.35;
+            unicode-bidi: plaintext;
+        }
+        .layout-navy .cv-contact-ico {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.28rem;
+            height: 1.28rem;
+            margin-top: 0;
+            flex: none;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.88);
+        }
+        .layout-navy .cv-contact-ico svg {
+            width: 0.62rem;
+            height: 0.62rem;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        .layout-navy .cv-contact-row .dynamic-icon { display: none; }
+        .layout-navy .cv-contact-link { text-decoration: none; color: inherit; }
+        .layout-navy #sec-education { display: block; }
+        .layout-navy #sec-education-side { display: none !important; }
+        .layout-navy #out-skills {
+            color: #fff;
+            padding: 0;
+        }
+        .layout-navy .cv-skill-list {
+            list-style: disc;
+            padding-inline-start: 1.05rem;
+            margin: 0;
+            color: #fff;
+            font-size: calc(0.66rem * var(--cv-scale));
+        }
+        .layout-navy .cv-skill-list li { margin-bottom: 0.22rem; unicode-bidi: plaintext; }
+        .layout-navy .cv-lang-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.6rem;
+            margin-bottom: 0.35rem;
+            color: #fff;
+            font-size: calc(0.66rem * var(--cv-scale));
+        }
+        .layout-navy .cv-lang-name,
+        .layout-navy .cv-lang-level {
+            unicode-bidi: plaintext;
+        }
+        .layout-navy .cv-lang-level {
+            opacity: 0.88;
+            font-weight: 500;
+        }
+        .layout-navy #out-summary,
+        .layout-navy #out-experience,
+        .layout-navy #out-education,
+        .layout-navy #out-military {
+            color: var(--navy-muted);
+            font-size: calc(0.68rem * var(--cv-scale));
+            line-height: 1.55;
+            padding: 0;
+            unicode-bidi: plaintext;
+        }
+        .layout-navy #out-experience,
+        .layout-navy #out-education {
+            position: relative;
+            padding-inline-start: 1.55rem;
+            unicode-bidi: isolate;
+        }
+        .layout-navy #out-experience::before,
+        .layout-navy #out-education::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: 0.46rem;
+            top: 0.55rem;
+            bottom: 0.35rem;
+            border-inline-start: 1px dashed #c5c9d4;
+        }
+        .layout-navy .cv-job {
+            position: relative;
+            display: block;
+            margin-bottom: 0.95rem;
+            direction: inherit;
+        }
+        .layout-navy .cv-job-mark {
+            position: absolute;
+            inset-inline-start: -1.42rem;
+            top: 0.05rem;
+            width: 1.18rem;
+            height: 1.18rem;
+            border-radius: 999px;
+            background: var(--navy);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .layout-navy .cv-job-mark svg {
+            width: 0.62rem;
+            height: 0.62rem;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1.8;
+        }
+        .layout-navy .cv-job-body {
+            padding: 0;
+            direction: inherit;
+            text-align: inherit;
+        }
+        .layout-navy .cv-job-title {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: calc(0.78rem * var(--cv-scale));
+            unicode-bidi: plaintext;
+        }
+        .layout-navy .cv-job-role,
+        .layout-navy .cv-job-date {
+            color: var(--navy);
+            font-size: calc(0.66rem * var(--cv-scale));
+            unicode-bidi: plaintext;
+        }
+        .layout-navy .cv-job-date {
+            margin: 0.08rem 0 0.28rem;
+            white-space: normal;
+            text-align: inherit;
+        }
+        .layout-navy .cv-job-list {
+            margin: 0;
+            padding-inline-start: 1rem;
+            list-style: disc;
+            color: var(--navy-muted);
+        }
+        .layout-navy .cv-job-list li { margin-bottom: 0.12rem; unicode-bidi: plaintext; }
+
+        #cv-target.cv-lang-en.layout-navy .cv-sidebar-inner,
+        #cv-target.cv-lang-en.layout-navy .cv-main,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-main {
+            direction: ltr;
+            text-align: left;
+        }
 
         .cv-watermark {
             position: absolute;
@@ -1066,6 +1532,7 @@
         }
         .theme-swatch[aria-pressed="true"],
         .layout-chip[aria-pressed="true"],
+        .lang-chip[aria-pressed="true"],
         .bg-swatch[aria-pressed="true"] {
             outline: 2px solid white;
             outline-offset: 2px;
@@ -1084,10 +1551,12 @@
             .preview-col.mobile-preview-open {
                 position: fixed;
                 inset: 0;
-                z-index: 40;
+                z-index: 45;
                 overflow: auto;
                 background: #020617;
                 padding: 1rem 1rem 6.5rem;
+                border-radius: 0;
+                max-height: none;
             }
             .preview-col.mobile-preview-open .preview-close {
                 display: inline-flex;
@@ -1105,10 +1574,16 @@
         }
 
         @media (min-width: 1024px) {
+            .studio-workspace {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                grid-template-rows: minmax(0, 1fr);
+                padding: 1rem 1.5rem 1.25rem;
+                gap: 1.5rem;
+            }
             #preview-column {
-                position: sticky;
-                top: 5.5rem;
-                align-self: start;
+                position: relative;
+                top: auto;
+                align-self: stretch;
             }
         }
 
@@ -1120,7 +1595,7 @@
 
         .cta-download {
             position: relative;
-            z-index: 9999;
+            z-index: 20;
             pointer-events: auto !important;
             animation: cta-pulse 2.2s ease-in-out infinite;
         }
@@ -1135,8 +1610,34 @@
         }
 
         #payment-modal {
-            z-index: 9999;
+            z-index: 10050;
             pointer-events: auto;
+        }
+        #payment-modal .pay-close-btn {
+            position: sticky;
+            top: 0;
+            z-index: 10060;
+            pointer-events: auto !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 2.75rem;
+            padding: 0 1rem;
+            margin: 0 auto 0.75rem;
+            border-radius: 9999px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.875rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        body.qc-checkout-open #studio-mobile-dock {
+            visibility: hidden;
+            pointer-events: none;
         }
         #payment-modal .pay-card {
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.86));
@@ -1268,23 +1769,69 @@
                 grid-template-areas: "side head" "side main" !important;
                 direction: ltr !important;
                 text-align: start !important;
-                background: #fff !important;
+                background: var(--charcoal-paper, #fff) !important;
                 min-height: 277mm !important;
             }
             html.qc-print-mode #qc-print-host .layout-charcoal .cv-columns {
                 display: contents !important;
             }
+            html.qc-print-mode #qc-print-host[dir="ltr"],
+            html.qc-print-mode #qc-print-host[dir="ltr"] .cv-print-sheet,
+            html.qc-print-mode #qc-print-host[dir="ltr"] #cv-target {
+                direction: ltr !important;
+                text-align: left !important;
+            }
+
             html.qc-print-mode #qc-print-host .layout-charcoal .cv-sidebar,
             html.qc-print-mode #qc-print-host .layout-charcoal .cv-main {
                 direction: rtl !important;
                 text-align: right !important;
             }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-sidebar,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-main {
+                direction: ltr !important;
+                text-align: left !important;
+            }
             html.qc-print-mode #qc-print-host .layout-charcoal #cv-header {
-                background: #4c4c4c !important;
+                background: var(--charcoal, #4c4c4c) !important;
                 color: #fff !important;
             }
             html.qc-print-mode #qc-print-host .layout-charcoal .cv-sidebar {
-                background: #4c4c4c !important;
+                background: var(--charcoal, #4c4c4c) !important;
+                color: #fff !important;
+            }
+
+            html.qc-print-mode #qc-print-host .layout-navy {
+                display: grid !important;
+                grid-template-columns: 0.36fr 0.64fr !important;
+                grid-template-rows: auto auto 1fr !important;
+                grid-template-areas:
+                    "photo main"
+                    "head main"
+                    "side main" !important;
+                direction: ltr !important;
+                text-align: start !important;
+                background: #fff !important;
+                min-height: 277mm !important;
+            }
+            html.qc-print-mode #qc-print-host .layout-navy .cv-columns,
+            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar {
+                display: contents !important;
+            }
+            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner,
+            html.qc-print-mode #qc-print-host .layout-navy .cv-main {
+                direction: rtl !important;
+                text-align: right !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-sidebar-inner,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-main {
+                direction: ltr !important;
+                text-align: left !important;
+            }
+            html.qc-print-mode #qc-print-host .layout-navy #cv-header,
+            html.qc-print-mode #qc-print-host .layout-navy .cv-photo-block,
+            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner {
+                background: #12192b !important;
                 color: #fff !important;
             }
         }
@@ -1354,7 +1901,7 @@
 
         <div class="home-band">
             <div class="home-inner home-band-row">
-                <p><strong>עברית מהשורש</strong>טיפוגרפיה ופריסה מותאמות לימין-לשמאל</p>
+                <p><strong>עברית ואנגלית</strong>פריסה מיושרת לימין או לשמאל לפי שפת הקורות חיים</p>
                 <p><strong>שמונה סגנונות</strong>קלאסי, ניהולי, מינימלי ועוד</p>
                 <p><strong>הורדה מאובטחת</strong>Bit · קוד בוואטסאפ · PDF נקי</p>
             </div>
@@ -1387,29 +1934,8 @@
             <section class="home-section" aria-labelledby="home-craft" style="padding-top:0">
                 <p class="home-kicker">הסטודיו</p>
                 <h2 id="home-craft">כלים של מעצב, לא אשף משעמם</h2>
-                <p class="home-section-lead">בחרו פריסה כמו שבוחרים בדים: קלאסי להגשה שמרנית, ניהולי לנוכחות, מינימלי להייטק.</p>
-                <div class="home-layouts" aria-hidden="true">
-                    <div class="home-layout">
-                        <div class="home-layout-frame lay-classic"><span></span><span></span><span></span></div>
-                        <p>קלאסי</p>
-                    </div>
-                    <div class="home-layout">
-                        <div class="home-layout-frame lay-side"><span></span><span></span><span></span></div>
-                        <p>סרגל צד</p>
-                    </div>
-                    <div class="home-layout">
-                        <div class="home-layout-frame lay-exec"><span></span><span></span></div>
-                        <p>ניהולי</p>
-                    </div>
-                    <div class="home-layout">
-                        <div class="home-layout-frame lay-min"><span></span><span></span><span></span></div>
-                        <p>מינימלי</p>
-                    </div>
-                    <div class="home-layout">
-                        <div class="home-layout-frame lay-charcoal"><span></span><span></span><span></span></div>
-                        <p>פחם</p>
-                    </div>
-                </div>
+                <p class="home-section-lead">15 תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.</p>
+                <div class="home-layouts" data-home-templates></div>
                 <div class="home-cards" style="margin-top:1rem">
                     <article class="home-card">
                         <h3>משפטים לפי תחום</h3>
@@ -1514,6 +2040,10 @@
             </nav>
 
             <div class="flex items-center gap-2">
+                <div class="flex items-center rounded-xl border border-slate-700 p-0.5 bg-slate-900" role="group" aria-label="שפת קורות החיים">
+                    <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip min-h-10 px-3 rounded-lg text-xs font-semibold" aria-pressed="true">עברית</button>
+                    <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip min-h-10 px-3 rounded-lg text-xs font-semibold text-slate-300" aria-pressed="false">English</button>
+                </div>
                 <button type="button" onclick="openExamplesModal()" class="text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11">
                     דוגמאות
                 </button>
@@ -1521,16 +2051,24 @@
         </div>
     </header>
 
-    <div class="no-print max-w-7xl mx-auto px-4 pt-4">
+    <div class="studio-social no-print max-w-7xl mx-auto w-full px-4 pt-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3">
             <p class="text-sm text-slate-100 font-medium">מעל 1,200 קורות חיים נוצרו השבוע</p>
             <p class="text-amber-300 text-sm tracking-tight"><span class="sr-only">דירוג 4.9 מתוך 5. </span><span aria-hidden="true">★★★★★</span> <span class="text-slate-300 text-xs">4.9/5 מאנשים אמיתיים</span></p>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div class="studio-workspace">
 
-        <div class="no-print lg:col-span-6 space-y-6">
+        <div id="studio-form-column" class="no-print space-y-6">
+
+            <div id="templates-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-xl">
+                <div class="flex items-center justify-between gap-2">
+                    <h3 class="font-bold text-slate-200 text-sm">תבניות מוכנות</h3>
+                    <span class="text-[10px] text-slate-400">15 עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת</span>
+                </div>
+                <div class="template-grid canva-grid" data-template-gallery role="group" aria-label="תבניות קורות חיים"></div>
+            </div>
 
             <div id="design-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-5 shadow-xl">
                 <div class="flex items-center justify-between gap-2">
@@ -1539,29 +2077,40 @@
                 </div>
 
                 <div>
-                    <p class="block text-xs text-slate-300 mb-2" id="accent-legend">צבע הדגשה — כותרות ואייקונים</p>
-                    <div class="flex flex-wrap items-center gap-2" role="group" aria-labelledby="accent-legend">
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#1e3a8a]" data-color="#1e3a8a" aria-label="כחול נייבי" aria-pressed="true" onclick="setAccent('#1e3a8a', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#374151]" data-color="#374151" aria-label="אפור פחם" aria-pressed="false" onclick="setAccent('#374151', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#166534]" data-color="#166534" aria-label="ירוק יער" aria-pressed="false" onclick="setAccent('#166534', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#9f1239]" data-color="#9f1239" aria-label="בורדו ניהולי" aria-pressed="false" onclick="setAccent('#9f1239', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#7c3aed]" data-color="#7c3aed" aria-label="סגול מודרני" aria-pressed="false" onclick="setAccent('#7c3aed', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#0f766e]" data-color="#0f766e" aria-label="טורקיז" aria-pressed="false" onclick="setAccent('#0f766e', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#9a3412]" data-color="#9a3412" aria-label="נחושת" aria-pressed="false" onclick="setAccent('#9a3412', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#1e293b]" data-color="#1e293b" aria-label="כחול פחם" aria-pressed="false" onclick="setAccent('#1e293b', this)"></button>
-                        <label class="flex items-center gap-2 text-[11px] text-slate-200 mr-1">
-                            <span>מותאם</span>
-                            <input type="color" id="custom-accent" value="#1e3a8a" oninput="setCustomAccent(this.value)" class="w-11 h-11 rounded-lg border border-slate-600 bg-slate-900 cursor-pointer p-0" aria-label="בחירת צבע מותאם">
-                        </label>
+                    <p class="block text-xs text-slate-300 mb-2" id="cv-lang-legend">שפת קורות החיים</p>
+                    <div class="flex flex-wrap gap-2" role="group" aria-labelledby="cv-lang-legend">
+                        <button type="button" class="lang-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-lang="he" aria-pressed="true" onclick="setCvLang('he')">עברית — יישור לימין</button>
+                        <button type="button" class="lang-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-lang="en" aria-pressed="false" onclick="setCvLang('en')">English — left aligned</button>
                     </div>
-                    <p id="accent-label" class="text-[11px] text-slate-400 mt-2">כחול נייבי</p>
+                    <p class="text-[11px] text-slate-400 mt-2">הכותרות, היישור והדוגמאות מתעדכנים לפי השפה. טקסט שערכתם נשמר.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs text-slate-300 mb-1" for="font-select">טיפוגרפיה עברית</label>
+                    <p class="block text-xs text-slate-300 mb-2" id="accent-legend">צבע הדגשה — כותרות ואייקונים</p>
+                    <div class="flex flex-wrap items-center gap-2" role="group" aria-labelledby="accent-legend">
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#4c4c4c]" data-color="#4c4c4c" aria-label="פחם" aria-pressed="true" onclick="setAccent('#4c4c4c', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#12192b]" data-color="#12192b" aria-label="נייבי" aria-pressed="false" onclick="setAccent('#12192b', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#3e342c]" data-color="#3e342c" aria-label="אספרסו" aria-pressed="false" onclick="setAccent('#3e342c', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#4d5d52]" data-color="#4d5d52" aria-label="מרווה" aria-pressed="false" onclick="setAccent('#4d5d52', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#3e4c58]" data-color="#3e4c58" aria-label="צפחה" aria-pressed="false" onclick="setAccent('#3e4c58', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#5a3640]" data-color="#5a3640" aria-label="יין" aria-pressed="false" onclick="setAccent('#5a3640', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#31443b]" data-color="#31443b" aria-label="יער" aria-pressed="false" onclick="setAccent('#31443b', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#6b5344]" data-color="#6b5344" aria-label="חול" aria-pressed="false" onclick="setAccent('#6b5344', this)"></button>
+                        <label class="flex items-center gap-2 text-[11px] text-slate-200 mr-1">
+                            <span>מותאם</span>
+                            <input type="color" id="custom-accent" value="#4c4c4c" oninput="setCustomAccent(this.value)" class="w-11 h-11 rounded-lg border border-slate-600 bg-slate-900 cursor-pointer p-0" aria-label="בחירת צבע מותאם">
+                        </label>
+                    </div>
+                    <p id="accent-label" class="text-[11px] text-slate-400 mt-2">פחם</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1" for="font-select" id="font-select-label">טיפוגרפיה</label>
                     <select id="font-select" onchange="setCvFont(this.value)" class="w-full bg-slate-900 border border-slate-700 text-sm rounded-lg p-2.5 text-slate-100 outline-none min-h-11">
                         <option value="Rubik">Rubik — ברור ומודרני</option>
                         <option value="Heebo">Heebo — חד ומקצועי</option>
+                        <option value="Inter">Inter — English / Latin</option>
+                        <option value="Lato">Lato — English classic</option>
                         <option value="Assistant">Assistant — רך וקריא</option>
                         <option value="Noto Sans Hebrew">Noto Sans Hebrew — ניטרלי ונקי</option>
                         <option value="Alef">Alef — קלאסי ישראלי</option>
@@ -1583,6 +2132,8 @@
                         <button type="button" class="layout-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-layout="modern" aria-pressed="false" onclick="setLayout('modern', this)">מודרני</button>
                         <button type="button" class="layout-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-layout="compact" aria-pressed="false" onclick="setLayout('compact', this)">קומפקטי</button>
                         <button type="button" class="layout-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-layout="charcoal" aria-pressed="false" onclick="setLayout('charcoal', this)">פחם</button>
+                        <button type="button" class="layout-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-layout="azure" aria-pressed="false" onclick="setLayout('azure', this)">תכלת</button>
+                        <button type="button" class="layout-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-layout="navy" aria-pressed="false" onclick="setLayout('navy', this)">נייבי</button>
                     </div>
                     <select id="layout-select" onchange="setLayout(this.value)" class="sr-only" aria-hidden="true" tabindex="-1">
                         <option value="classic">קלאסי</option>
@@ -1593,6 +2144,8 @@
                         <option value="modern">מודרני</option>
                         <option value="compact">קומפקטי</option>
                         <option value="charcoal">פחם</option>
+                        <option value="azure">תכלת</option>
+                        <option value="navy">נייבי</option>
                     </select>
                 </div>
 
@@ -1633,7 +2186,7 @@
 
             <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-6 shadow-xl">
                 <div class="flex items-center justify-between gap-2">
-                    <h4 class="font-bold text-sm dynamic-text">פרטים אישיים (שדה ריק לא יופיע)</h4>
+                    <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
                     <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">
                         נקה טופס
                     </button>
@@ -1641,34 +2194,38 @@
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-name">שם מלא</label>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-name" id="label-name">שם מלא</label>
                             <input type="text" id="in-name" name="name" autocomplete="name" value="ישראל ישראלי" placeholder="ישראל ישראלי" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-title">תפקיד / כותרת</label>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
                             <input type="text" id="in-title" name="title" value="מנהל פרויקטים ומכירות" placeholder="מנהל פרויקטים" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-phone">טלפון</label>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-phone" id="label-phone">טלפון</label>
                             <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="050-1234567" placeholder="050-1234567" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-email">אימייל</label>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-email" id="label-email">אימייל</label>
                             <input type="email" id="in-email" name="email" autocomplete="email" value="israel@example.com" placeholder="israel@example.com" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-location">עיר מגורים</label>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-location" id="label-location">עיר מגורים</label>
                             <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="תל אביב" placeholder="תל אביב" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-linkedin">קישור ל-LinkedIn / אתר</label>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-linkedin" id="label-linkedin">קישור ל-LinkedIn / אתר</label>
                             <input type="text" id="in-linkedin" name="url" inputmode="url" value="linkedin.com/in/israel" placeholder="linkedin.com/in/..." oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-photo">תמונת פרופיל</label>
+                            <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm rounded-lg text-slate-100 outline-none min-h-11 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700 file:px-3 file:py-1.5 file:text-xs file:text-slate-100">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="font-bold dynamic-text text-sm" for="in-summary">תקציר מקצועי</label>
+                    <label class="font-bold dynamic-text text-sm" for="in-summary" id="label-summary">תקציר מקצועי</label>
                     <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
@@ -1685,7 +2242,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="font-bold dynamic-text text-sm" for="in-experience">ניסיון תעסוקתי</label>
+                    <label class="font-bold dynamic-text text-sm" for="in-experience" id="label-experience">ניסיון תעסוקתי</label>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2021 - נוכחי | מנהל מכירות ארצי
 • ניהול צוות עובדים והגדלת היעדים ב-35%.
 • הובלת הסכמים אסטרטגיים.
@@ -1696,25 +2253,30 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education">השכלה</label>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education" id="label-education">השכלה</label>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2015 - 2018 | BA במנהל עסקים
 2019 | קורס ניהול מוצר</textarea>
                     </div>
                     <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military">שירות צבאי / לאומי</label>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military" id="label-military">שירות צבאי / לאומי</label>
                         <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills">כישורים</label>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills" id="label-skills">כישורים</label>
                         <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                     </div>
                     <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-languages">שפות</label>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-languages" id="label-languages">שפות</label>
                         <input type="text" id="in-languages" value="עברית (שפת אם), אנגלית (ברמה גבוהה)" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                     </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="font-bold dynamic-text text-sm" for="in-references" id="label-references">המלצות / References</label>
+                    <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none"></textarea>
                 </div>
 
                 <button type="button" id="btn-download-pdf" class="cta-download w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
@@ -1724,8 +2286,8 @@
 
         </div>
 
-        <div id="preview-column" class="preview-col lg:col-span-6 space-y-3">
-            <div class="no-print flex items-center justify-between gap-2">
+        <div id="preview-column" class="preview-col space-y-3" role="region" aria-label="תצוגה מקדימה חיה של קורות החיים">
+            <div class="preview-toolbar no-print flex items-center justify-between gap-2">
                 <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">תצוגה מקדימה בזמן אמת</h2>
                 <button type="button" onclick="closeMobilePreview()" class="preview-close items-center text-xs bg-slate-800 border border-slate-600 px-3 py-2 rounded-lg min-h-11">סגור תצוגה</button>
             </div>
@@ -1739,10 +2301,22 @@
                         <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים ומכירות</p>
 
                         <div class="cv-contact-header flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-slate-500">
-                            <span id="out-phone"></span>
-                            <span id="out-email"></span>
-                            <span id="out-location"></span>
-                            <span id="out-linkedin"></span>
+                            <p class="cv-contact-row" data-contact="phone">
+                                <span class="cv-contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.2 4.8h2.3l1.2 3-1.5 1.5a12.5 12.5 0 0 0 5.5 5.5l1.5-1.5 3 1.2v2.3c0 .7-.6 1.3-1.3 1.3C10.6 18.1 5.9 13.4 5.9 6.1c0-.7.6-1.3 1.3-1.3z"/></svg></span>
+                                <span id="out-phone"></span>
+                            </p>
+                            <p class="cv-contact-row" data-contact="email">
+                                <span class="cv-contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1.5"/><path d="m5 7 7 6 7-6"/></svg></span>
+                                <span id="out-email"></span>
+                            </p>
+                            <p class="cv-contact-row" data-contact="location">
+                                <span class="cv-contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s6.5-5.2 6.5-10.2A6.5 6.5 0 0 0 5.5 10.8C5.5 15.8 12 21 12 21z"/><circle cx="12" cy="10.8" r="2.2"/></svg></span>
+                                <span id="out-location"></span>
+                            </p>
+                            <p class="cv-contact-row" data-contact="linkedin">
+                                <span class="cv-contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M8 12h8M12 8c1.8 2.2 1.8 5.8 0 8M12 8c-1.8 2.2-1.8 5.8 0 8"/></svg></span>
+                                <span id="out-linkedin"></span>
+                            </p>
                         </div>
                     </div>
 
@@ -1751,34 +2325,44 @@
                             <div id="sec-summary">
                                 <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">
                                     <span class="cv-sec-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19.2c.8-3.2 3.3-5 6.5-5s5.7 1.8 6.5 5"/></svg></span>
-                                    <span>תקציר מקצועי</span>
+                                    <span data-i18n="summary">תקציר מקצועי</span>
                                 </h3>
                                 <p id="out-summary" class="whitespace-pre-line text-slate-700"></p>
                             </div>
                             <div id="sec-experience">
                                 <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">
                                     <span class="cv-sec-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="11.5" rx="1.4"/><path d="M8 8V6.6A2.6 2.6 0 0 1 10.6 4h2.8A2.6 2.6 0 0 1 16 6.6V8"/><path d="M3.5 13h17"/></svg></span>
-                                    <span>ניסיון תעסוקתי</span>
+                                    <span data-i18n="experience">ניסיון תעסוקתי</span>
                                 </h3>
                                 <div id="out-experience" class="whitespace-pre-line text-slate-700"></div>
                             </div>
+                            <div id="sec-references" style="display:none">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">
+                                    <span class="cv-sec-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="2.6"/><path d="M4.6 18.4c.7-2.6 2.7-4 4.4-4s3.7 1.4 4.4 4"/><circle cx="16.2" cy="9.2" r="2.1"/><path d="M13.4 18.4c.5-2 1.9-3.1 3-3.1 1.2 0 2.4 1 3 3.1"/></svg></span>
+                                    <span data-i18n="references">המלצות</span>
+                                </h3>
+                                <div id="out-references" class="whitespace-pre-line text-slate-700"></div>
+                            </div>
                             <div id="sec-education">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">השכלה וקורסים</h3>
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="education">השכלה וקורסים</h3>
                                 <div id="out-education" class="whitespace-pre-line text-slate-700"></div>
                             </div>
                             <div id="sec-military">
                                 <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">
                                     <span class="cv-sec-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.5h11.5A2.5 2.5 0 0 1 19 9v10H7.5A2.5 2.5 0 0 1 5 16.5V6.5z"/><path d="M5 16.5A2.5 2.5 0 0 1 7.5 14H19"/><path d="M9 9h6M9 12h4"/></svg></span>
-                                    <span>שירות צבאי / לאומי</span>
+                                    <span data-i18n="military">שירות צבאי / לאומי</span>
                                 </h3>
                                 <div id="out-military" class="whitespace-pre-line text-slate-700"></div>
                             </div>
                         </div>
 
+                        <div class="cv-col-rule" aria-hidden="true"></div>
+
                         <aside class="cv-sidebar">
                             <div class="cv-photo-block" aria-hidden="true">
                                 <div class="cv-photo">
-                                    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                                    <img id="out-photo" alt="" hidden>
+                                    <svg id="out-photo-fallback" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
                                         <rect width="120" height="120" fill="#9a9a9a"/>
                                         <ellipse cx="60" cy="128" rx="46" ry="38" fill="#2f2f2f"/>
                                         <rect x="28" y="78" width="64" height="42" rx="8" fill="#353535"/>
@@ -1791,7 +2375,7 @@
                             </div>
                             <div class="cv-sidebar-inner">
                             <div class="cv-contact-sidebar flex-col gap-1.5 text-[11px] text-slate-600 mb-1">
-                                <p class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-2">יצירת קשר</p>
+                                <p class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-2" data-i18n="contact">יצירת קשר</p>
                                 <p class="cv-contact-row">
                                     <span class="cv-contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.2 4.8h2.3l1.2 3-1.5 1.5a12.5 12.5 0 0 0 5.5 5.5l1.5-1.5 3 1.2v2.3c0 .7-.6 1.3-1.3 1.3C10.6 18.1 5.9 13.4 5.9 6.1c0-.7.6-1.3 1.3-1.3z"/></svg></span>
                                     <span id="out-phone-side"></span>
@@ -1810,16 +2394,20 @@
                                 </p>
                             </div>
                             <div id="sec-education-side">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">השכלה</h3>
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="educationSide">השכלה</h3>
                                 <div id="out-education-side"></div>
                             </div>
                             <div id="sec-skills">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">כישורים</h3>
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="skills">כישורים</h3>
                                 <div id="out-skills" class="text-slate-700"></div>
                             </div>
                             <div id="sec-languages">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">שפות</h3>
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="languages">שפות</h3>
                                 <div id="out-languages" class="text-slate-700"></div>
+                            </div>
+                            <div id="sec-extras-side">
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">פרטים נוספים</h3>
+                                <div id="out-extras-side"></div>
                             </div>
                             </div>
                         </aside>
@@ -1830,7 +2418,7 @@
 
     </div>
 
-    <div class="no-print lg:hidden fixed bottom-0 inset-x-0 z-[9999] border-t border-slate-800 bg-slate-950/95 backdrop-blur px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
+    <div id="studio-mobile-dock" class="no-print lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-slate-800 bg-slate-950/95 backdrop-blur px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
         <div class="flex gap-2 max-w-7xl mx-auto">
             <button type="button" onclick="openMobilePreview()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 rounded-xl text-sm min-h-12">
                 תצוגת קורות חיים
@@ -1843,31 +2431,20 @@
     </div>
 
     <div id="examples-modal" class="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
-        <div class="bg-slate-900 text-slate-100 rounded-3xl max-w-lg w-full my-4 p-5 sm:p-6 space-y-4 shadow-2xl relative border border-slate-700">
+        <div class="bg-slate-900 text-slate-100 rounded-3xl max-w-4xl w-full my-4 p-5 sm:p-6 space-y-4 shadow-2xl relative border border-slate-700">
             <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגור דוגמאות">✕</button>
-            <h3 id="examples-title" class="text-lg font-extrabold">דוגמאות מוכנות</h3>
-            <p class="text-xs text-slate-400">בחרו דוגמה כדי למלא את הטופס. אפשר לערוך הכל אחר כך.</p>
-            <div class="grid gap-2">
-                <button type="button" onclick="loadExample('sales')" class="text-right rounded-2xl border border-slate-700 hover:border-blue-400 bg-slate-800 p-4">
-                    <p class="font-bold text-sm">מכירות וניהול</p>
-                    <p class="text-[11px] text-slate-400 mt-1">מנהלת מכירות ארצית עם דגש על יעדים וצוותים</p>
-                </button>
-                <button type="button" onclick="loadExample('tech')" class="text-right rounded-2xl border border-slate-700 hover:border-blue-400 bg-slate-800 p-4">
-                    <p class="font-bold text-sm">הייטק / פיתוח</p>
-                    <p class="text-[11px] text-slate-400 mt-1">מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל</p>
-                </button>
-                <button type="button" onclick="loadExample('marketing')" class="text-right rounded-2xl border border-slate-700 hover:border-blue-400 bg-slate-800 p-4">
-                    <p class="font-bold text-sm">שיווק דיגיטלי</p>
-                    <p class="text-[11px] text-slate-400 mt-1">מנהלת קמפיינים עם דגש על לידים וביצועים</p>
-                </button>
-            </div>
+            <h3 id="examples-title" class="text-lg font-extrabold">תבניות מוכנות</h3>
+            <p class="text-xs text-slate-400">15 תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.</p>
+            <div class="template-grid canva-grid" data-template-gallery></div>
         </div>
     </div>
 
-    <div id="payment-modal" class="no-print fixed inset-0 hidden items-center justify-center p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:9999;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
+    <div id="payment-modal" class="no-print fixed inset-0 hidden flex-col items-center justify-start p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:10050;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
+        <button type="button" id="btn-close-modal" class="pay-close-btn" aria-label="חזרה לקורות החיים" onclick="closePaymentModal(event)">
+            <span aria-hidden="true">✕</span>
+            חזרה לקורות החיים
+        </button>
         <div class="pay-card text-slate-100 rounded-3xl max-w-md w-full my-4 p-6 sm:p-7 text-center space-y-5 relative" style="z-index:10000;pointer-events:auto;">
-            <button type="button" id="btn-close-modal" class="absolute top-3 left-3 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-lg leading-none" aria-label="סגור תשלום">✕</button>
-
             <div id="pay-step" class="space-y-5">
                 <div class="pt-1">
                     <div class="mx-auto w-16 h-16 rounded-2xl bg-[#00C2C7] text-[#0B1F3A] flex items-center justify-center font-black text-2xl tracking-tight shadow-lg" aria-hidden="true">bit</div>
@@ -1911,6 +2488,9 @@
                         אימות והורדת PDF
                     </button>
                 </div>
+                <button type="button" class="btn-back-checkout w-full min-h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/15" onclick="closePaymentModal(event)">
+                    חזרה לקורות החיים
+                </button>
             </div>
 
             <div id="payment-verify-overlay" class="hidden absolute inset-0 z-10 rounded-3xl flex-col items-center justify-center px-6 text-center" aria-live="polite" aria-busy="true">
@@ -1929,6 +2509,9 @@
                     <button type="button" data-download="txt" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">טקסט (.txt)</button>
                 </div>
                 <p id="download-status" class="text-xs text-emerald-300 min-h-4"></p>
+                <button type="button" class="btn-back-checkout w-full min-h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/15" onclick="closePaymentModal(event)">
+                    חזרה לקורות החיים
+                </button>
             </div>
         </div>
     </div>
@@ -1956,77 +2539,103 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/phrases.js"></script>
+    <script src="lib/templates.js"></script>
     <script src="lib/export.js"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
         let previewBgClass = 'bg-preview-white';
         const THEME_NAMES = {
-            '#1e3a8a': 'כחול נייבי',
-            '#374151': 'אפור פחם',
-            '#166534': 'ירוק יער',
-            '#9f1239': 'בורדו ניהולי',
-            '#7c3aed': 'סגול מודרני',
-            '#0f766e': 'טורקיז',
-            '#9a3412': 'נחושת',
-            '#1e293b': 'כחול פחם'
+            '#4c4c4c': 'פחם',
+            '#12192b': 'נייבי',
+            '#3e342c': 'אספרסו',
+            '#4d5d52': 'מרווה',
+            '#3e4c58': 'צפחה',
+            '#5a3640': 'יין',
+            '#31443b': 'יער',
+            '#6b5344': 'חול',
+            '#1c1917': 'דיו',
+            '#3d5a6c': 'ערפל',
+            '#6b4a4e': 'אבק ורוד'
         };
+        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush'];
         const BG_CLASSES = [
             'bg-preview-white', 'bg-preview-slate', 'bg-preview-cream', 'bg-preview-linen',
             'bg-preview-mint', 'bg-preview-blush', 'bg-preview-pearl', 'bg-preview-dots',
             'bg-preview-grid', 'bg-preview-lines'
         ];
-        const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal'];
+        const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal', 'azure', 'navy'];
 
-        const EXAMPLES = {
-            sales: {
-                name: 'נועה כהן',
-                title: 'מנהלת מכירות ארצית',
-                phone: '052-5550188',
-                email: 'noa.cohen@example.com',
-                location: 'הרצליה',
-                linkedin: 'linkedin.com/in/noacohen',
-                summary: 'מנהלת מכירות עם 8 שנות ניסיון בהובלת צוותים, בניית משפך מכירות והגדלת מחזור.',
-                experience: '2021 - נוכחי | מנהלת מכירות ארצית\n• הגדלת מחזור שנתי ב-35% תוך בניית צוות של 12 נציגים.\n• הטמעת CRM ומעקב KPI שבועי.\n\n2018 - 2021 | מנהלת לקוחות עסקיים\n• סגירת עסקאות מורכבות ושימור לקוחות אסטרטגיים.',
-                education: '2014 - 2017 | BA במנהל עסקים',
-                military: '2011 - 2013 | קצינת הדרכה',
-                skills: 'ניהול צוותים, CRM, משא ומתן, Excel, יעדי מכירות',
-                languages: 'עברית (שפת אם), אנגלית (שוטפת)',
-                field: 'sales'
+        const TEMPLATE_ALIASES = { sales: 'sage', tech: 'slate', marketing: 'wine' };
+
+        const CV_SAMPLE_IDS = ['in-name', 'in-title', 'in-phone', 'in-email', 'in-location', 'in-linkedin', 'in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-languages'];
+        const CV_SAMPLES = {
+            he: {
+                'in-name': 'ישראל ישראלי',
+                'in-title': 'מנהל פרויקטים ומכירות',
+                'in-phone': '050-1234567',
+                'in-email': 'israel@example.com',
+                'in-location': 'תל אביב',
+                'in-linkedin': 'linkedin.com/in/israel',
+                'in-summary': 'מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.',
+                'in-experience': '2021 - נוכחי | מנהל מכירות ארצי\n• ניהול צוות עובדים והגדלת היעדים ב-35%.\n• הובלת הסכמים אסטרטגיים.\n\n2018 - 2021 | מנהל פרויקטים\n• ניהול תקציבים ומעקב אחר אבני דרך בארגון.',
+                'in-education': '2015 - 2018 | BA במנהל עסקים\n2019 | קורס ניהול מוצר',
+                'in-military': '2012 - 2015 | שירות פיקודי בחיל האוויר',
+                'in-skills': 'ניהול צוותים, CRM, Excel מתקדם',
+                'in-languages': 'עברית (שפת אם), אנגלית (ברמה גבוהה)'
             },
-            tech: {
-                name: 'דניאל לוי',
-                title: 'מפתח Full Stack',
-                phone: '054-2220199',
-                email: 'daniel.levy@example.com',
-                location: 'תל אביב',
-                linkedin: 'linkedin.com/in/daniellevy',
-                summary: 'מפתח עם ניסיון במוצרי SaaS, עבודה בצוות אג׳ייל ושיפור ביצועים בסביבת ייצור.',
-                experience: '2022 - נוכחי | מפתח Full Stack\n• פיתוח פיצ׳רים מקצה לקצה ב-React ו-Node.\n• שיפור זמני טעינה ב-40% והוספת בדיקות אוטומטיות.\n\n2019 - 2022 | מפתח Frontend\n• בניית ממשקים נגישים ועבודה מול עיצוב ו-QA.',
-                education: '2016 - 2019 | B.Sc מדעי המחשב',
-                military: '2013 - 2016 | ממר״ם',
-                skills: 'JavaScript, Git, APIs, SQL, עבודה בצוות אג׳ייל',
-                languages: 'עברית (שפת אם), אנגלית (טכנית גבוהה)',
-                field: 'tech'
+            en: {
+                'in-name': 'Israel Israeli',
+                'in-title': 'Project and Sales Manager',
+                'in-phone': '050-1234567',
+                'in-email': 'israel@example.com',
+                'in-location': 'Tel Aviv',
+                'in-linkedin': 'linkedin.com/in/israel',
+                'in-summary': 'Experienced project manager with a strong record of leading teams and growing sales.',
+                'in-experience': '2021 - Present | National Sales Manager\n• Led a team and grew targets by 35%.\n• Drove strategic agreements.\n\n2018 - 2021 | Project Manager\n• Managed budgets and tracked organizational milestones.',
+                'in-education': '2015 - 2018 | BA in Business Administration\n2019 | Product Management Course',
+                'in-military': '2012 - 2015 | Command role in the Israeli Air Force',
+                'in-skills': 'Team leadership, CRM, Advanced Excel',
+                'in-languages': 'Hebrew (native), English (professional)'
+            }
+        };
+        const CV_I18N = {
+            he: {
+                nameFallback: 'שם מלא',
+                titleFallback: 'תפקיד',
+                detailsHeading: 'פרטים אישיים (שדה ריק לא יופיע)',
+                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', references: 'המלצות / References' },
+                i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
+                examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] }
             },
-            marketing: {
-                name: 'מאיה ברק',
-                title: 'מנהלת שיווק דיגיטלי',
-                phone: '050-7770144',
-                email: 'maya.barak@example.com',
-                location: 'חיפה',
-                linkedin: 'linkedin.com/in/mayabarak',
-                summary: 'מנהלת שיווק דיגיטלי עם דגש על לידים איכותיים, תוכן ואופטימיזציית תקציב פרסום.',
-                experience: '2020 - נוכחי | מנהלת שיווק דיגיטלי\n• ניהול קמפיינים ב-Google ו-Meta והגדלת לידים ב-50%.\n• בניית מסרים למותג ותוכן לרשתות.\n\n2017 - 2020 | רכזת דיגיטל\n• ניתוח GA ואופטימיזציה שבועית של קריאייטיב.',
-                education: '2013 - 2016 | BA בתקשורת',
-                military: '2010 - 2012 | דוברת יחידה',
-                skills: 'Google Ads, Meta Ads, תוכן, GA4, קריאייטיב',
-                languages: 'עברית (שפת אם), אנגלית (גבוהה)',
-                field: 'marketing'
+            en: {
+                nameFallback: 'Full name',
+                titleFallback: 'Job title',
+                detailsHeading: 'Personal details (empty fields stay hidden)',
+                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', references: 'References' },
+                i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
+                examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] }
             }
         };
 
         function getVal(id) {
-            return QCSanitize.text(document.getElementById(id).value);
+            const el = document.getElementById(id);
+            if (!el || el.value == null) return '';
+            try {
+                return (window.QCSanitize && typeof QCSanitize.text === 'function')
+                    ? QCSanitize.text(el.value)
+                    : String(el.value);
+            } catch (err) {
+                return String(el.value);
+            }
+        }
+
+        function cvOut(id) {
+            const root = document.getElementById('cv-target');
+            if (root) {
+                const scoped = root.querySelector('#' + id);
+                if (scoped) return scoped;
+            }
+            return document.getElementById(id);
         }
 
         function toMailto(value) {
@@ -2062,16 +2671,123 @@
 
         function setCvFont(name) {
             document.documentElement.style.setProperty('--cv-font', "'" + name + "', sans-serif");
+            const select = document.getElementById('font-select');
+            if (select && name) select.value = name;
             markStep(2);
         }
 
-        function setLayout(layout, btn) {
+        function applyCvI18n(lang) {
+            const pack = CV_I18N[lang] || CV_I18N.he;
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                const key = el.getAttribute('data-i18n');
+                if (pack.i18n && pack.i18n[key]) el.textContent = pack.i18n[key];
+            });
+            const setLabel = (id, text) => {
+                const el = document.getElementById(id);
+                if (el && text) el.textContent = text;
+            };
+            setLabel('details-heading', pack.detailsHeading);
+            setLabel('label-name', pack.labels.name);
+            setLabel('label-title', pack.labels.title);
+            setLabel('label-phone', pack.labels.phone);
+            setLabel('label-email', pack.labels.email);
+            setLabel('label-location', pack.labels.location);
+            setLabel('label-linkedin', pack.labels.linkedin);
+            setLabel('label-summary', pack.labels.summary);
+            setLabel('label-experience', pack.labels.experience);
+            setLabel('label-education', pack.labels.education);
+            setLabel('label-military', pack.labels.military);
+            setLabel('label-skills', pack.labels.skills);
+            setLabel('label-languages', pack.labels.languages);
+            setLabel('label-references', pack.labels.references);
+            const nameEl = document.getElementById('in-name');
+            const titleEl = document.getElementById('in-title');
+            const locEl = document.getElementById('in-location');
+            if (nameEl) nameEl.placeholder = pack.labels.name;
+            if (titleEl) titleEl.placeholder = pack.labels.title;
+            if (locEl) locEl.placeholder = pack.labels.location;
+            if ((window.QCLayout || (typeof currentLayoutName === 'function' && currentLayoutName())) === 'charcoal' && lang === 'en') {
+                const short = { summary: 'Profile', experience: 'Experience', languages: 'Language', references: 'References', contact: 'Contact', skills: 'Skills', educationSide: 'Education', education: 'Education' };
+                document.querySelectorAll('[data-i18n]').forEach((el) => {
+                    const key = el.getAttribute('data-i18n');
+                    if (short[key]) el.textContent = short[key];
+                });
+            }
+        }
+
+        function snapshotCvFields() {
+            return CV_SAMPLE_IDS.map((id) => (document.getElementById(id)?.value || '').replace(/\r\n/g, '\n').trim()).join('\n---\n');
+        }
+
+        function snapshotCvSample(lang) {
+            const sample = CV_SAMPLES[lang];
+            return CV_SAMPLE_IDS.map((id) => String(sample[id] || '').replace(/\r\n/g, '\n').trim()).join('\n---\n');
+        }
+
+        function fillCvSample(lang) {
+            const sample = CV_SAMPLES[lang];
+            CV_SAMPLE_IDS.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.value = sample[id];
+            });
+        }
+
+        function phrasePack() {
+            return (window.QCPhrases && QCPhrases.forLang) ? QCPhrases.forLang(window.QCCvLang) : QCPhrases;
+        }
+
+        function setCvLang(lang, opts) {
+            const next = lang === 'en' ? 'en' : 'he';
+            const prev = window.QCCvLang === 'en' ? 'en' : 'he';
+            const restore = opts && opts.restore;
+            const matchesSample = !restore && snapshotCvFields() === snapshotCvSample(prev);
+            window.QCCvLang = next;
+            const target = document.getElementById('cv-target');
+            const details = document.getElementById('details-panel');
+            const printHost = document.getElementById('qc-print-host');
+            if (target) {
+                target.classList.toggle('cv-lang-en', next === 'en');
+                target.classList.toggle('cv-lang-he', next !== 'en');
+                target.setAttribute('dir', next === 'en' ? 'ltr' : 'rtl');
+            }
+            if (details) details.classList.toggle('cv-form-en', next === 'en');
+            if (printHost) printHost.setAttribute('dir', next === 'en' ? 'ltr' : 'rtl');
+            document.querySelectorAll('.lang-chip').forEach((el) => {
+                const value = el.getAttribute('data-lang') || (el.id === 'cv-lang-en' ? 'en' : 'he');
+                el.setAttribute('aria-pressed', value === next ? 'true' : 'false');
+                if (el.id) el.classList.toggle('text-slate-300', value !== next);
+            });
+            applyCvI18n(next);
+            if (matchesSample) fillCvSample(next);
+            if (!restore && next === 'en') {
+                const font = document.getElementById('font-select');
+                if (font && (font.value === 'Alef' || font.value === 'David Libre' || font.value === 'Secular One')) {
+                    setCvFont('Inter');
+                }
+            }
+            initPhrases();
+            if (typeof renderTemplateGalleries === 'function') renderTemplateGalleries();
+            markStep(2);
+            updateCV();
+            if (window.QCDraft && !restore) QCDraft.saveSoon();
+        }
+
+        function setCvSkin(skin) {
+            const target = document.getElementById('cv-target');
+            if (!target) return;
+            CV_SKINS.forEach((name) => target.classList.remove('skin-' + name));
+            if (skin && CV_SKINS.indexOf(skin) >= 0) target.classList.add('skin-' + skin);
+            window.QCSkin = skin && CV_SKINS.indexOf(skin) >= 0 ? skin : '';
+        }
+
+        function setLayout(layout, btn, opts) {
             const target = document.getElementById('cv-target');
             LAYOUTS.forEach((name) => target.classList.remove('layout-' + name));
             target.classList.add('layout-' + layout);
+            if (!(opts && opts.keepSkin)) setCvSkin('');
             const header = document.getElementById('cv-header');
             if (layout === 'minimal' || layout === 'compact') header.className = 'border-b dynamic-border pb-3 mb-6';
-            else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal') header.className = 'pb-4 mb-5';
+            else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal' || layout === 'navy' || layout === 'azure') header.className = 'pb-4 mb-5';
             else header.className = 'border-b-2 dynamic-border pb-4 mb-5';
             const select = document.getElementById('layout-select');
             if (select) select.value = layout;
@@ -2079,6 +2795,8 @@
                 el.setAttribute('aria-pressed', el.getAttribute('data-layout') === layout ? 'true' : 'false');
             });
             if (btn) btn.setAttribute('aria-pressed', 'true');
+            window.QCLayout = layout;
+            applyCvI18n(window.QCCvLang === 'en' ? 'en' : 'he');
             markStep(2);
             updateCV();
         }
@@ -2100,81 +2818,103 @@
         }
 
         function updateCV() {
-            const setField = (elemId, val, prefix, href) => {
-                const el = document.getElementById(elemId);
-                if (!el) return;
-                el.replaceChildren();
-                if (val) {
-                    el.style.display = 'inline';
-                    const icon = document.createElement('span');
-                    icon.className = 'dynamic-icon';
-                    icon.textContent = prefix;
-                    if (href) {
-                        const a = document.createElement('a');
-                        a.className = 'cv-contact-link';
-                        a.href = href;
-                        a.target = '_blank';
-                        a.rel = 'noopener noreferrer';
-                        a.appendChild(icon);
-                        a.appendChild(document.createTextNode(val));
-                        el.appendChild(a);
+            try {
+                const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'];
+                const setField = (elemId, val, prefix, href) => {
+                    const el = cvOut(elemId);
+                    if (!el) return;
+                    el.replaceChildren();
+                    if (val) {
+                        el.style.display = 'inline';
+                        const icon = document.createElement('span');
+                        icon.className = 'dynamic-icon';
+                        icon.textContent = prefix;
+                        if (href) {
+                            const a = document.createElement('a');
+                            a.className = 'cv-contact-link';
+                            a.href = href;
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            a.appendChild(icon);
+                            a.appendChild(document.createTextNode(val));
+                            el.appendChild(a);
+                        } else {
+                            el.appendChild(icon);
+                            el.appendChild(document.createTextNode(val));
+                        }
                     } else {
-                        el.appendChild(icon);
-                        el.appendChild(document.createTextNode(val));
+                        el.style.display = 'none';
                     }
-                } else {
-                    el.style.display = 'none';
-                }
-            };
+                };
 
-            const setSec = (secId, outId, val) => {
-                const sec = document.getElementById(secId);
-                const out = document.getElementById(outId);
-                if (val) {
-                    sec.style.display = 'block';
-                    out.innerText = val;
-                } else {
-                    sec.style.display = 'none';
-                    out.innerText = '';
-                }
-            };
+                const setSec = (secId, outId, val) => {
+                    const sec = document.getElementById(secId);
+                    const out = cvOut(outId);
+                    if (!sec || !out) return;
+                    if (val) {
+                        sec.style.display = 'block';
+                        out.innerText = val;
+                    } else {
+                        sec.style.display = 'none';
+                        out.innerText = '';
+                    }
+                };
 
-            ['in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills'].forEach((id) => {
-                const el = document.getElementById(id);
-                if (el && QCSanitize.looksSuspicious(el.value)) {
-                    QCLog.add('suspicious_input', id);
-                }
-            });
+                ['in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-references'].forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (el && window.QCSanitize && QCSanitize.looksSuspicious(el.value)) {
+                        window.QCLog?.add('suspicious_input', id);
+                    }
+                });
 
-            document.getElementById('out-name').innerText = getVal('in-name') || 'שם מלא';
-            document.getElementById('out-title').innerText = getVal('in-title') || 'תפקיד';
+                const nameOut = cvOut('out-name');
+                const titleOut = cvOut('out-title');
+                if (nameOut) nameOut.innerText = getVal('in-name') || pack.nameFallback;
+                if (titleOut) titleOut.innerText = getVal('in-title') || pack.titleFallback;
 
-            const emailVal = getVal('in-email');
-            const linkedinVal = getVal('in-linkedin');
-            const emailHref = toMailto(emailVal);
-            const linkedinHref = toWebUrl(linkedinVal);
+                const emailVal = getVal('in-email');
+                const linkedinVal = getVal('in-linkedin');
+                const emailHref = toMailto(emailVal);
+                const linkedinHref = toWebUrl(linkedinVal);
 
-            setField('out-phone', getVal('in-phone'), '📞 ');
-            setField('out-email', emailVal, '✉️ ', emailHref);
-            setField('out-location', getVal('in-location'), '📍 ');
-            setField('out-linkedin', linkedinVal, '🔗 ', linkedinHref);
-            setField('out-phone-side', getVal('in-phone'), '📞 ');
-            setField('out-email-side', emailVal, '✉️ ', emailHref);
-            setField('out-location-side', getVal('in-location'), '📍 ');
-            setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
-            document.querySelectorAll('.cv-contact-row').forEach((row) => {
-                const slot = row.querySelector('span[id]');
-                row.style.display = slot && slot.style.display === 'none' ? 'none' : '';
-            });
+                setField('out-phone', getVal('in-phone'), '📞 ');
+                setField('out-email', emailVal, '✉️ ', emailHref);
+                setField('out-location', getVal('in-location'), '📍 ');
+                setField('out-linkedin', linkedinVal, '🔗 ', linkedinHref);
+                setField('out-phone-side', getVal('in-phone'), '📞 ');
+                setField('out-email-side', emailVal, '✉️ ', emailHref);
+                setField('out-location-side', getVal('in-location'), '📍 ');
+                setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
+                document.querySelectorAll('#cv-target .cv-contact-row').forEach((row) => {
+                    const slot = row.querySelector('span[id]');
+                    row.style.display = slot && slot.style.display === 'none' ? 'none' : '';
+                });
 
-            setSec('sec-summary', 'out-summary', getVal('in-summary'));
-            setSec('sec-military', 'out-military', getVal('in-military'));
-            renderCharcoalFields();
-            if (window.QCDraft) QCDraft.saveSoon();
+                setSec('sec-summary', 'out-summary', getVal('in-summary'));
+                setSec('sec-military', 'out-military', getVal('in-military'));
+                renderCharcoalFields();
+                if (window.QCDraft) QCDraft.saveSoon();
+            } catch (err) {
+                console.error('updateCV failed', err);
+            }
+        }
+
+        function currentLayoutName() {
+            const target = document.getElementById('cv-target');
+            if (!target) return '';
+            return LAYOUTS.find((name) => target.classList.contains('layout-' + name)) || '';
         }
 
         function isCharcoalLayout() {
-            return document.getElementById('cv-target')?.classList.contains('layout-charcoal');
+            return currentLayoutName() === 'charcoal';
+        }
+
+        function isNavyLayout() {
+            return currentLayoutName() === 'navy';
+        }
+
+        function isAzureLayout() {
+            return currentLayoutName() === 'azure';
         }
 
         function parseDatedBlocks(text) {
@@ -2208,26 +2948,101 @@
         }
 
         function languageLevel(label) {
-            const t = String(label || '').toLowerCase();
-            if (/אם|native|fluent|שוטפת|מלאה/.test(t)) return 100;
-            if (/גבוה|high|professional|very good/.test(t)) return 82;
-            if (/טוב|good/.test(t)) return 68;
-            if (/בינונ|intermediate/.test(t)) return 52;
-            if (/בסיס|basic/.test(t)) return 34;
+            const t = String(label || '');
+            const pct = t.match(/(\d+)\s*%/);
+            if (pct) return Math.max(8, Math.min(100, Number(pct[1])));
+            const low = t.toLowerCase();
+            if (/אם|native|fluent|שוטפת|מלאה/.test(low)) return 100;
+            if (/גבוה|high|professional|very good/.test(low)) return 82;
+            if (/טוב|good/.test(low)) return 68;
+            if (/בינונ|intermediate/.test(low)) return 52;
+            if (/בסיס|basic/.test(low)) return 34;
             return 70;
+        }
+
+        function splitListItems(text) {
+            return String(text || '').split(/[\n,،;؛]+/).map((s) => s.trim()).filter(Boolean);
+        }
+
+        function parseLangEntry(entry) {
+            const m = String(entry || '').match(/^(.*?)(?:\((.*)\))?$/);
+            const name = (m && m[1] ? m[1] : entry).trim();
+            const levelLabel = (m && m[2] ? m[2] : '').trim();
+            return { name, levelLabel };
+        }
+
+        function timelineMark(kind) {
+            const mark = document.createElement('div');
+            mark.className = 'cv-job-mark';
+            mark.setAttribute('aria-hidden', 'true');
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            if (kind === 'edu') {
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', 'M3 10.5 12 6l9 4.5L12 15 3 10.5zM7 12.2v4.2c0 .6 2.2 2.1 5 2.1s5-1.5 5-2.1v-4.2');
+                svg.appendChild(path);
+            } else {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', '4');
+                rect.setAttribute('y', '8');
+                rect.setAttribute('width', '16');
+                rect.setAttribute('height', '11');
+                rect.setAttribute('rx', '1.4');
+                const handle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                handle.setAttribute('d', 'M9 8V6.7A2.7 2.7 0 0 1 11.7 4h.6A2.7 2.7 0 0 1 15 6.7V8');
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                line.setAttribute('d', 'M4 13h16');
+                svg.append(rect, handle, line);
+            }
+            mark.appendChild(svg);
+            return mark;
+        }
+
+        function fillJobBody(body, job, opts) {
+            const title = document.createElement('p');
+            title.className = 'cv-job-title';
+            title.textContent = job.title;
+            body.appendChild(title);
+            if (job.role) {
+                const role = document.createElement('p');
+                role.className = 'cv-job-role';
+                role.textContent = job.role;
+                body.appendChild(role);
+            }
+            if (opts && opts.dateInBody && job.date) {
+                const date = document.createElement('p');
+                date.className = 'cv-job-date';
+                date.textContent = job.date;
+                body.appendChild(date);
+            }
+            if (job.bullets.length) {
+                const ul = document.createElement('ul');
+                ul.className = 'cv-job-list';
+                job.bullets.forEach((b) => {
+                    const li = document.createElement('li');
+                    li.textContent = b;
+                    ul.appendChild(li);
+                });
+                body.appendChild(ul);
+            }
         }
 
         function renderCharcoalFields() {
             const charcoal = isCharcoalLayout();
+            const navy = isNavyLayout();
+            const azure = isAzureLayout();
+            const milVal = getVal('in-military');
+            const extrasOut = cvOut('out-extras-side');
+            const extrasSec = document.getElementById('sec-extras-side');
             const expVal = getVal('in-experience');
             const eduVal = getVal('in-education');
             const skillVal = getVal('in-skills');
             const langVal = getVal('in-languages');
-            const expOut = document.getElementById('out-experience');
-            const eduOut = document.getElementById('out-education');
-            const eduSide = document.getElementById('out-education-side');
-            const skillOut = document.getElementById('out-skills');
-            const langOut = document.getElementById('out-languages');
+            const expOut = cvOut('out-experience');
+            const eduOut = cvOut('out-education');
+            const eduSide = cvOut('out-education-side');
+            const skillOut = cvOut('out-skills');
+            const langOut = cvOut('out-languages');
             const expSec = document.getElementById('sec-experience');
             const eduSec = document.getElementById('sec-education');
             const eduSideSec = document.getElementById('sec-education-side');
@@ -2238,7 +3053,7 @@
                 if (sec) sec.style.display = on ? 'block' : 'none';
             }
 
-            if (!charcoal) {
+            if (!charcoal && !navy && !azure) {
                 if (expOut) {
                     expOut.classList.add('whitespace-pre-line');
                     expOut.innerText = expVal;
@@ -2255,105 +3070,270 @@
                 showSec(eduSideSec, false);
                 showSec(skillSec, !!skillVal);
                 showSec(langSec, !!langVal);
+                if (extrasOut) extrasOut.replaceChildren();
+                showSec(extrasSec, false);
+                renderReferences(false);
                 return;
             }
 
-            expOut.classList.remove('whitespace-pre-line');
-            expOut.replaceChildren();
-            parseDatedBlocks(expVal).forEach((job) => {
-                const wrap = document.createElement('div');
-                wrap.className = 'cv-job';
-                const date = document.createElement('div');
-                date.className = 'cv-job-date';
-                date.textContent = job.date;
-                const rule = document.createElement('div');
-                rule.className = 'cv-job-rule';
-                const body = document.createElement('div');
-                body.className = 'cv-job-body';
-                const title = document.createElement('p');
-                title.className = 'cv-job-title';
-                title.textContent = job.title;
-                body.appendChild(title);
-                if (job.role) {
-                    const role = document.createElement('p');
-                    role.className = 'cv-job-role';
-                    role.textContent = job.role;
-                    body.appendChild(role);
-                }
-                if (job.bullets.length) {
-                    const ul = document.createElement('ul');
-                    ul.className = 'cv-job-list';
-                    job.bullets.forEach((b) => {
-                        const li = document.createElement('li');
-                        li.textContent = b;
-                        ul.appendChild(li);
-                    });
-                    body.appendChild(ul);
-                }
-                wrap.append(date, rule, body);
-                expOut.appendChild(wrap);
-            });
-            showSec(expSec, !!expVal);
+            if (azure) {
+                const lang = window.QCCvLang || 'he';
+                const summaryLabel = document.querySelector('#cv-target [data-i18n="summary"]');
+                const expLabel = document.querySelector('#cv-target [data-i18n="experience"]');
+                const skillsLabel = document.querySelector('#cv-target [data-i18n="skills"]');
+                if (summaryLabel) summaryLabel.textContent = lang === 'en' ? 'Career Summary' : 'תקציר הקריירה';
+                if (expLabel) expLabel.textContent = lang === 'en' ? 'Professional Experience' : 'ניסיון מקצועי';
+                if (skillsLabel) skillsLabel.textContent = lang === 'en' ? 'Skills' : 'מיומנויות';
 
-            function fillEdu(el) {
-                if (!el) return;
-                el.replaceChildren();
-                parseDatedBlocks(eduVal).forEach((item) => {
-                    const box = document.createElement('div');
-                    box.className = 'cv-edu-item';
-                    const school = document.createElement('p');
-                    school.className = 'cv-edu-school';
-                    school.textContent = item.title || item.date;
-                    const meta = document.createElement('p');
-                    meta.className = 'cv-edu-meta';
-                    meta.textContent = [item.role, item.date].filter(Boolean).join(' · ');
-                    box.appendChild(school);
-                    if (meta.textContent) box.appendChild(meta);
-                    el.appendChild(box);
+                if (expOut) {
+                    expOut.classList.remove('whitespace-pre-line');
+                    expOut.replaceChildren();
+                    parseDatedBlocks(expVal).forEach((job) => {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'cv-job';
+                        fillJobBody(wrap, job, { dateInBody: true });
+                        expOut.appendChild(wrap);
+                    });
+                }
+                showSec(expSec, !!expVal);
+
+                if (eduSide) {
+                    eduSide.replaceChildren();
+                    parseDatedBlocks(eduVal).forEach((item) => {
+                        const box = document.createElement('div');
+                        box.className = 'cv-edu-item';
+                        const school = document.createElement('p');
+                        school.className = 'cv-edu-school';
+                        school.textContent = item.title || item.date;
+                        const meta = document.createElement('p');
+                        meta.className = 'cv-edu-meta';
+                        meta.textContent = [item.role, item.date].filter(Boolean).join(' · ');
+                        box.appendChild(school);
+                        if (meta.textContent) box.appendChild(meta);
+                        eduSide.appendChild(box);
+                    });
+                    if (eduVal && !eduSide.childElementCount) {
+                        const fallback = document.createElement('p');
+                        fallback.className = 'cv-edu-meta';
+                        fallback.textContent = eduVal;
+                        eduSide.appendChild(fallback);
+                    }
+                }
+                if (eduOut) eduOut.innerText = '';
+                showSec(eduSec, false);
+                showSec(eduSideSec, !!eduVal);
+
+                if (skillOut) {
+                    skillOut.replaceChildren();
+                    const sul = document.createElement('ul');
+                    sul.className = 'cv-skill-list';
+                    splitListItems(skillVal).forEach((s) => {
+                        const li = document.createElement('li');
+                        li.textContent = s;
+                        sul.appendChild(li);
+                    });
+                    skillOut.appendChild(sul);
+                }
+                showSec(skillSec, !!skillVal);
+
+                if (langOut) {
+                    langOut.replaceChildren();
+                    splitListItems(langVal).forEach((entry) => {
+                        const parsed = parseLangEntry(entry);
+                        const line = document.createElement('p');
+                        line.className = 'cv-lang-line';
+                        line.textContent = parsed.levelLabel ? (parsed.name + ' - ' + parsed.levelLabel) : parsed.name;
+                        langOut.appendChild(line);
+                    });
+                }
+                showSec(langSec, !!langVal);
+
+                if (extrasOut) {
+                    extrasOut.replaceChildren();
+                    const items = String(milVal || '').split('\n').map((s) => s.trim()).filter(Boolean);
+                    if (items.length) {
+                        const ul = document.createElement('ul');
+                        ul.className = 'cv-extra-list';
+                        items.forEach((item) => {
+                            const li = document.createElement('li');
+                            li.textContent = item.replace(/^[•\-*]\s*/, '');
+                            ul.appendChild(li);
+                        });
+                        extrasOut.appendChild(ul);
+                    }
+                }
+                showSec(extrasSec, !!milVal);
+                renderReferences(false);
+                return;
+            }
+
+            showSec(extrasSec, false);
+            applyCvI18n(window.QCCvLang || 'he');
+
+            function renderTimeline(container, text, kind) {
+                if (!container) return;
+                container.classList.remove('whitespace-pre-line');
+                container.replaceChildren();
+                parseDatedBlocks(text).forEach((job) => {
+                    const wrap = document.createElement('div');
+                    wrap.className = kind === 'edu' ? 'cv-job cv-edu-item' : 'cv-job';
+                    const body = document.createElement('div');
+                    body.className = 'cv-job-body';
+                    fillJobBody(body, job, { dateInBody: true });
+                    wrap.append(timelineMark(kind), body);
+                    container.appendChild(wrap);
                 });
-                if (!eduVal) return;
-                if (!el.childElementCount) {
-                    const fallback = document.createElement('p');
-                    fallback.className = 'cv-edu-meta';
-                    fallback.textContent = eduVal;
-                    el.appendChild(fallback);
+                if (text && !container.childElementCount) {
+                    container.innerText = text;
                 }
             }
-            fillEdu(eduSide);
-            if (eduOut) eduOut.innerText = '';
-            showSec(eduSec, false);
-            showSec(eduSideSec, !!eduVal);
 
-            skillOut.replaceChildren();
-            const ul = document.createElement('ul');
-            ul.className = 'cv-skill-list';
-            skillVal.split(/[,،]+/).map((s) => s.trim()).filter(Boolean).forEach((s) => {
-                const li = document.createElement('li');
-                li.textContent = s;
-                ul.appendChild(li);
-            });
-            skillOut.appendChild(ul);
+            if (navy) {
+                renderTimeline(expOut, expVal, 'job');
+                renderTimeline(eduOut, eduVal, 'edu');
+                if (eduSide) eduSide.replaceChildren();
+                showSec(expSec, !!expVal);
+                showSec(eduSec, !!eduVal);
+                showSec(eduSideSec, false);
+            } else if (expOut) {
+                expOut.classList.remove('whitespace-pre-line');
+                expOut.replaceChildren();
+                parseDatedBlocks(expVal).forEach((job) => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'cv-job';
+                    const date = document.createElement('div');
+                    date.className = 'cv-job-date';
+                    date.textContent = job.date;
+                    const rule = document.createElement('div');
+                    rule.className = 'cv-job-rule';
+                    const body = document.createElement('div');
+                    body.className = 'cv-job-body';
+                    fillJobBody(body, job, { dateInBody: false });
+                    wrap.append(date, rule, body);
+                    expOut.appendChild(wrap);
+                });
+                showSec(expSec, !!expVal);
+
+                function fillEdu(el) {
+                    if (!el) return;
+                    el.replaceChildren();
+                    parseDatedBlocks(eduVal).forEach((item) => {
+                        const box = document.createElement('div');
+                        box.className = 'cv-edu-item';
+                        const school = document.createElement('p');
+                        school.className = 'cv-edu-school';
+                        school.textContent = item.title || item.date;
+                        const meta = document.createElement('p');
+                        meta.className = 'cv-edu-meta';
+                        meta.textContent = [item.role, item.date].filter(Boolean).join(' · ');
+                        box.appendChild(school);
+                        if (meta.textContent) box.appendChild(meta);
+                        el.appendChild(box);
+                    });
+                    if (!eduVal) return;
+                    if (!el.childElementCount) {
+                        const fallback = document.createElement('p');
+                        fallback.className = 'cv-edu-meta';
+                        fallback.textContent = eduVal;
+                        el.appendChild(fallback);
+                    }
+                }
+                fillEdu(eduSide);
+                if (eduOut) eduOut.innerText = '';
+                showSec(eduSec, false);
+                showSec(eduSideSec, !!eduVal);
+            }
+
+            if (skillOut) {
+                skillOut.replaceChildren();
+                const ul = document.createElement('ul');
+                ul.className = 'cv-skill-list';
+                splitListItems(skillVal).forEach((s) => {
+                    const li = document.createElement('li');
+                    li.textContent = s;
+                    ul.appendChild(li);
+                });
+                skillOut.appendChild(ul);
+            }
             showSec(skillSec, !!skillVal);
 
-            langOut.replaceChildren();
-            langVal.split(/[,،]+/).map((s) => s.trim()).filter(Boolean).forEach((entry) => {
-                const m = entry.match(/^(.*?)(?:\((.*)\))?$/);
-                const name = (m && m[1] ? m[1] : entry).trim();
-                const level = languageLevel(m && m[2] ? m[2] : entry);
-                const row = document.createElement('div');
-                row.className = 'cv-lang-row';
-                const label = document.createElement('span');
-                label.textContent = name;
-                const track = document.createElement('span');
-                track.className = 'cv-lang-track';
-                const fill = document.createElement('span');
-                fill.className = 'cv-lang-fill';
-                fill.style.width = level + '%';
-                track.appendChild(fill);
-                row.append(label, track);
-                langOut.appendChild(row);
-            });
+            if (langOut) {
+                langOut.replaceChildren();
+                splitListItems(langVal).forEach((entry) => {
+                    const parsed = parseLangEntry(entry);
+                    const row = document.createElement('div');
+                    row.className = 'cv-lang-row';
+                    const label = document.createElement('span');
+                    label.className = 'cv-lang-name';
+                    label.textContent = parsed.name;
+                    if (navy) {
+                        const level = document.createElement('span');
+                        level.className = 'cv-lang-level';
+                        level.textContent = parsed.levelLabel;
+                        row.append(label, level);
+                    } else {
+                        const track = document.createElement('span');
+                        track.className = 'cv-lang-track';
+                        const fill = document.createElement('span');
+                        fill.className = 'cv-lang-fill';
+                        fill.style.width = languageLevel(parsed.levelLabel || entry) + '%';
+                        track.appendChild(fill);
+                        row.append(label, track);
+                    }
+                    langOut.appendChild(row);
+                });
+            }
             showSec(langSec, !!langVal);
+            renderReferences(true);
+        }
+
+        function parseReferenceBlocks(text) {
+            return String(text || '').split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).map((block) => {
+                const lines = block.split('\n').map((line) => line.trim()).filter(Boolean);
+                return { name: lines[0] || '', role: lines[1] || '', lines: lines.slice(2) };
+            });
+        }
+
+        function renderReferences(structured) {
+            const field = document.getElementById('in-references');
+            const val = field ? getVal('in-references') : '';
+            const sec = document.getElementById('sec-references');
+            const out = cvOut('out-references');
+            if (!sec || !out) return;
+            if (!val) {
+                sec.style.display = 'none';
+                out.replaceChildren();
+                return;
+            }
+            sec.style.display = 'block';
+            if (!structured) {
+                out.classList.add('whitespace-pre-line');
+                out.innerText = val;
+                return;
+            }
+            out.classList.remove('whitespace-pre-line');
+            out.replaceChildren();
+            parseReferenceBlocks(val).forEach((ref) => {
+                const box = document.createElement('div');
+                box.className = 'cv-ref-item';
+                const name = document.createElement('p');
+                name.className = 'cv-ref-name';
+                name.textContent = ref.name;
+                box.appendChild(name);
+                if (ref.role) {
+                    const role = document.createElement('p');
+                    role.className = 'cv-ref-role';
+                    role.textContent = ref.role;
+                    box.appendChild(role);
+                }
+                ref.lines.forEach((line) => {
+                    const p = document.createElement('p');
+                    p.className = 'cv-ref-line';
+                    p.textContent = line;
+                    box.appendChild(p);
+                });
+                out.appendChild(box);
+            });
         }
 
         function clearCvForm() {
@@ -2395,17 +3375,87 @@
 
         function goStep(n) {
             markStep(n);
-            if (n === 1) document.getElementById('details-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (n === 1) document.getElementById('templates-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
             if (n === 2) document.getElementById('design-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
             if (n === 3) openPaymentModal();
         }
 
+        function closePaymentModal(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            const el = document.getElementById('payment-modal');
+            if (!el) return;
+            document.body.classList.remove('qc-checkout-open');
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+            const overlay = document.getElementById('payment-verify-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }
+        }
+
+        function openPaymentModal() {
+            const el = document.getElementById('payment-modal');
+            if (!el) return;
+            document.body.classList.add('qc-checkout-open');
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            el.style.display = 'flex';
+            el.style.zIndex = '10050';
+            el.setAttribute('aria-hidden', 'false');
+            document.getElementById('pay-step')?.classList.remove('hidden');
+            document.getElementById('download-step')?.classList.add('hidden');
+            window.setTimeout(() => document.getElementById('btn-close-modal')?.focus(), 30);
+        }
+
         function openMobilePreview() {
-            document.getElementById('preview-column').classList.add('mobile-preview-open');
+            const col = document.getElementById('preview-column');
+            if (!col) return;
+            col.classList.add('mobile-preview-open');
+            col.setAttribute('aria-modal', 'true');
+            updateCV();
         }
 
         function closeMobilePreview() {
-            document.getElementById('preview-column').classList.remove('mobile-preview-open');
+            const col = document.getElementById('preview-column');
+            if (!col) return;
+            col.classList.remove('mobile-preview-open');
+            col.removeAttribute('aria-modal');
+        }
+
+        function isCvFormField(el) {
+            if (!el || !(el instanceof Element)) return false;
+            if (el.closest('#payment-modal, #examples-modal, #download-code')) return false;
+            return !!(el.closest('#studio-form-column, #details-panel') && el.matches('input, textarea, select'));
+        }
+
+        function bindLivePreview() {
+            if (window.__qcLiveBound) return;
+            window.__qcLiveBound = true;
+            let raf = 0;
+            const run = () => {
+                raf = 0;
+                updateCV();
+            };
+            const schedule = () => {
+                if (raf) cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(run);
+            };
+            const onFormEvent = (e) => {
+                if (isCvFormField(e.target)) schedule();
+            };
+            document.addEventListener('input', onFormEvent, true);
+            document.addEventListener('change', onFormEvent, true);
+            document.addEventListener('keyup', onFormEvent, true);
+            document.addEventListener('compositionend', onFormEvent, true);
+            document.addEventListener('paste', (e) => {
+                if (isCvFormField(e.target)) window.setTimeout(schedule, 0);
+            }, true);
         }
 
         function openExamplesModal() {
@@ -2421,40 +3471,125 @@
             document.getElementById('examples-modal').setAttribute('aria-hidden', 'true');
         }
 
-        function loadExample(key) {
-            const ex = EXAMPLES[key];
-            const map = {
-                'in-name': ex.name,
-                'in-title': ex.title,
-                'in-phone': ex.phone,
-                'in-email': ex.email,
-                'in-location': ex.location,
-                'in-linkedin': ex.linkedin,
-                'in-summary': ex.summary,
-                'in-experience': ex.experience,
-                'in-education': ex.education,
-                'in-military': ex.military,
-                'in-skills': ex.skills,
-                'in-languages': ex.languages
+        function markTemplateCards(key) {
+            window.QCExample = key || '';
+            document.querySelectorAll('.template-card[data-example]').forEach((el) => {
+                el.setAttribute('aria-pressed', el.getAttribute('data-example') === key ? 'true' : 'false');
+            });
+        }
+
+        function onPhotoChange(e) {
+            const file = e?.target && e.target.files ? e.target.files[0] : null;
+            const img = document.getElementById('out-photo');
+            const fallback = document.getElementById('out-photo-fallback');
+            if (!file || !img) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                img.src = String(reader.result || '');
+                img.hidden = false;
+                img.alt = getVal('in-name') || 'Profile photo';
+                if (fallback) fallback.style.display = 'none';
             };
-            Object.keys(map).forEach((id) => { document.getElementById(id).value = map[id]; });
-            document.getElementById('phrase-field').value = ex.field;
+            reader.readAsDataURL(file);
+        }
+
+        function clearPhoto() {
+            const img = document.getElementById('out-photo');
+            const fallback = document.getElementById('out-photo-fallback');
+            const input = document.getElementById('in-photo');
+            if (img) {
+                img.removeAttribute('src');
+                img.hidden = true;
+            }
+            if (fallback) fallback.style.display = '';
+            if (input) input.value = '';
+        }
+
+        function templateCardHtml(id, tpl, lang) {
+            const sub = lang === 'en' ? tpl.subEn : tpl.subHe;
+            return '<button type="button" class="template-card" data-example="' + id + '" aria-pressed="false" onclick="loadExample(\'' + id + '\')">' +
+                '<div class="template-thumb home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></div>' +
+                '<p class="template-card-title">' + tpl.title + '</p>' +
+                '<p class="template-card-sub">' + sub + '</p></button>';
+        }
+
+        function renderTemplateGalleries() {
+            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
+            const order = window.QCTemplateOrder || [];
+            const bank = window.QCTemplates || {};
+            const cards = order.map((id) => bank[id] ? templateCardHtml(id, bank[id], lang) : '').join('');
+            document.querySelectorAll('[data-template-gallery]').forEach((el) => { el.innerHTML = cards; });
+            const home = document.querySelector('[data-home-templates]');
+            if (home) {
+                home.innerHTML = order.map((id) => {
+                    const tpl = bank[id];
+                    if (!tpl) return '';
+                    return '<button type="button" class="home-layout" onclick="loadExample(\'' + id + '\')">' +
+                        '<div class="home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></div>' +
+                        '<p>' + tpl.title + '</p></button>';
+                }).join('');
+            }
+            markTemplateCards(window.QCExample || '');
+        }
+
+        function loadExample(key) {
+            if (TEMPLATE_ALIASES[key]) key = TEMPLATE_ALIASES[key];
+            const tpl = (window.QCTemplates || {})[key];
+            if (!tpl) return;
+            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
+            const pack = tpl[lang] || tpl.en || tpl.he;
+            if (!pack) return;
+            const map = {
+                'in-name': pack.name,
+                'in-title': pack.title,
+                'in-phone': pack.phone,
+                'in-email': pack.email,
+                'in-location': pack.location,
+                'in-linkedin': pack.linkedin,
+                'in-summary': pack.summary,
+                'in-experience': pack.experience,
+                'in-education': pack.education,
+                'in-military': pack.military,
+                'in-skills': pack.skills,
+                'in-languages': pack.languages,
+                'in-references': pack.references || ''
+            };
+            Object.keys(map).forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.value = map[id] == null ? '' : map[id];
+            });
+            const phrase = document.getElementById('phrase-field');
+            if (phrase && tpl.field) phrase.value = tpl.field;
             renderPhrases();
+            setCvLang(lang, { restore: true });
+            if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
+            setCvSkin(tpl.skin || '');
+            if (tpl.accent) {
+                const swatch = document.querySelector('.theme-swatch[data-color="' + tpl.accent + '"]');
+                setAccent(tpl.accent, swatch);
+            }
+            if (tpl.font) setCvFont(tpl.font);
+            if (tpl.bg) setPreviewBg(tpl.bg);
+            clearPhoto();
+            markTemplateCards(key);
             updateCV();
             QCDraft.save();
             closeExamplesModal();
             showStudio();
             markStep(1);
+            openMobilePreview();
         }
 
         function renderPhrases() {
+            const pack = phrasePack();
             const field = document.getElementById('phrase-field').value;
             const wrap = document.getElementById('phrase-bullets');
             wrap.innerHTML = '';
-            QCPhrases.bullets[field].forEach((text) => {
+            const align = window.QCCvLang === 'en' ? 'text-left' : 'text-right';
+            (pack.bullets[field] || []).forEach((text) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'text-[11px] bg-slate-800 border border-slate-600 text-slate-200 hover:border-blue-400 rounded-lg px-2.5 py-2 text-right leading-snug';
+                btn.className = 'text-[11px] bg-slate-800 border border-slate-600 text-slate-200 hover:border-blue-400 rounded-lg px-2.5 py-2 leading-snug ' + align;
                 btn.innerText = text;
                 btn.onclick = () => insertBullet(text);
                 wrap.appendChild(btn);
@@ -2470,9 +3605,10 @@
         }
 
         function insertSkills() {
+            const pack = phrasePack();
             const field = document.getElementById('phrase-field').value;
             const el = document.getElementById('in-skills');
-            const extra = QCPhrases.skills[field];
+            const extra = pack.skills[field];
             el.value = el.value.trim() ? el.value.trim() + ', ' + extra : extra;
             updateCV();
             QCDraft.save();
@@ -2480,13 +3616,17 @@
 
         function initPhrases() {
             const select = document.getElementById('phrase-field');
-            QCPhrases.fields.forEach((f, i) => {
+            if (!select) return;
+            const prev = select.value;
+            const pack = phrasePack();
+            select.innerHTML = '';
+            pack.fields.forEach((f) => {
                 const opt = document.createElement('option');
                 opt.value = f.id;
                 opt.innerText = f.label;
-                if (i === 0) opt.selected = true;
                 select.appendChild(opt);
             });
+            if (prev && pack.bullets[prev]) select.value = prev;
             renderPhrases();
         }
 
@@ -2538,9 +3678,37 @@
         window.updateCV = updateCV;
         window.showStudio = showStudio;
         window.showHome = showHome;
-        initPhrases();
-        QCDraft.restore();
-        renderPhrases();
+        window.setLayout = setLayout;
+        window.setCvSkin = setCvSkin;
+        window.setCvLang = setCvLang;
+        window.loadExample = loadExample;
+        window.onPhotoChange = onPhotoChange;
+        window.openMobilePreview = openMobilePreview;
+        window.closeMobilePreview = closeMobilePreview;
+        bindLivePreview();
+        try {
+            initPhrases();
+            renderTemplateGalleries();
+            QCDraft.restore();
+            const draft = QCDraft.read ? QCDraft.read() : null;
+            if (draft && (draft.cvLang === 'en' || draft.cvLang === 'he')) setCvLang(draft.cvLang, { restore: true });
+            else if (window.QCCvLang === 'en' || window.QCCvLang === 'he') setCvLang(window.QCCvLang, { restore: true });
+            if (draft && draft.layout) setLayout(draft.layout, null, { keepSkin: true });
+            if (draft && draft.skin) setCvSkin(draft.skin);
+            if (draft && draft.accent) {
+                const swatch = document.querySelector('.theme-swatch[data-color="' + String(draft.accent).trim() + '"]');
+                setAccent(String(draft.accent).trim(), swatch);
+            }
+            if (draft && draft.font) {
+                const match = String(draft.font).replace(/['"]/g, '').split(',')[0].trim();
+                if (match) setCvFont(match);
+            }
+            markTemplateCards(draft && draft.example ? draft.example : '');
+            renderTemplateGalleries();
+            renderPhrases();
+        } catch (err) {
+            console.error('studio init failed', err);
+        }
         updateCV();
         markStep(1);
         syncViewFromHash();

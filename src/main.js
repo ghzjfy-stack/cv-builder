@@ -114,25 +114,34 @@ function openModal() {
   const el = modal();
   if (!el) return;
   lastFocus = document.activeElement;
+  document.body.classList.add("qc-checkout-open");
   el.classList.remove("hidden");
   el.classList.add("flex");
   el.style.display = "flex";
-  el.style.zIndex = "9999";
+  el.style.zIndex = "10050";
   el.style.pointerEvents = "auto";
   el.setAttribute("aria-hidden", "false");
   window.setTimeout(() => {
-    (codeInput() || document.getElementById("btn-close-modal"))?.focus();
+    document.getElementById("btn-close-modal")?.focus();
   }, 30);
 }
 
 function closeModal() {
   const el = modal();
   if (!el) return;
+  document.body.classList.remove("qc-checkout-open");
   el.classList.add("hidden");
   el.classList.remove("flex");
   el.style.display = "none";
   el.setAttribute("aria-hidden", "true");
   if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+}
+
+function dismissCheckout(e) {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  setVerifyOverlay(false);
+  closeModal();
 }
 
 function flashCopyButton() {
@@ -279,7 +288,6 @@ function styleCta(el) {
   if (!el) return;
   el.removeAttribute("disabled");
   el.style.pointerEvents = "auto";
-  el.style.zIndex = "9999";
 }
 
 function buildShieldGrid() {
@@ -338,7 +346,7 @@ function bindPreviewGuard() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && modal() && !modal().classList.contains("hidden")) {
       e.preventDefault();
-      closeModal();
+      dismissCheckout(e);
       return;
     }
     trapFocus(e);
@@ -379,6 +387,7 @@ function bind() {
   document.getElementById("pdf-spinner")?.classList.remove("flex");
 
   window.openPaymentModal = openCheckoutModal;
+  window.closePaymentModal = dismissCheckout;
   window.onDownloadPdfClick = onDownloadPdfClick;
   window.triggerPDFDownload = triggerPDFDownload;
 
@@ -399,9 +408,9 @@ function bind() {
     true,
   );
 
-  document.getElementById("btn-close-modal")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeModal();
+  document.getElementById("btn-close-modal")?.addEventListener("click", dismissCheckout);
+  document.querySelectorAll(".btn-back-checkout").forEach((btn) => {
+    btn.addEventListener("click", dismissCheckout);
   });
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
@@ -424,7 +433,7 @@ function bind() {
   });
 
   modal()?.addEventListener("click", (e) => {
-    if (e.target === modal()) closeModal();
+    if (e.target === modal()) dismissCheckout(e);
   });
 }
 

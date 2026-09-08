@@ -11,10 +11,16 @@ function getJsPdfCtor() {
   return window.jspdf?.jsPDF || window.jsPDF;
 }
 
+function cvCaptureDir() {
+  const source = document.getElementById("cv-target");
+  return source?.getAttribute("dir") === "ltr" || window.QCCvLang === "en" ? "ltr" : "rtl";
+}
+
 function fileBase() {
-  const raw = document.getElementById("in-name")?.value || "קורות_חיים";
+  const english = cvCaptureDir() === "ltr";
+  const raw = document.getElementById("in-name")?.value || (english ? "Resume" : "קורות_חיים");
   const safe = window.QCSanitize?.filename?.(raw) || String(raw).replace(/[^\w\u0590-\u05FF-]+/g, "_");
-  return "קורות_חיים_" + (safe || "resume");
+  return (english ? "Resume_" : "קורות_חיים_") + (safe || "resume");
 }
 
 function copyCssVars(fromEl, toEl) {
@@ -70,7 +76,7 @@ function ensureCaptureHost() {
   if (!host) {
     host = document.createElement("div");
     host.id = "qc-print-host";
-    host.setAttribute("dir", "rtl");
+    host.setAttribute("dir", cvCaptureDir());
     document.body.appendChild(host);
   }
   return host;
@@ -84,6 +90,8 @@ function prepareCaptureClone() {
   window.QCDraft?.save?.();
 
   const host = ensureCaptureHost();
+  const dir = cvCaptureDir();
+  host.setAttribute("dir", dir);
   host.replaceChildren();
   copyCssVars(document.documentElement, host);
 
@@ -110,7 +118,7 @@ function prepareCaptureClone() {
     pointerEvents: "none",
     boxSizing: "border-box",
     transform: "none",
-    direction: "rtl",
+    direction: dir,
   });
 
   Object.assign(clone.style, {
@@ -313,7 +321,7 @@ async function captureToCanvas(el) {
         const host = doc.getElementById("qc-print-host");
         if (host instanceof HTMLElement) {
           host.classList.add("qc-capturing");
-          host.setAttribute("dir", "rtl");
+          host.setAttribute("dir", cvCaptureDir());
           Object.assign(host.style, {
             display: "block",
             position: "static",
@@ -327,7 +335,7 @@ async function captureToCanvas(el) {
             background: "#ffffff",
             overflow: "visible",
             transform: "none",
-            direction: "rtl",
+            direction: cvCaptureDir(),
           });
           prepareCaptureRoot(host, doc.defaultView);
           const cloned = measureLinks(host);

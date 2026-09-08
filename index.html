@@ -38,7 +38,7 @@
             min-height: 100dvh;
         }
         body.on-studio {
-            overflow-x: hidden;
+            overflow-x: clip;
             overflow-y: auto;
             height: auto;
             min-height: 100dvh;
@@ -46,6 +46,7 @@
             padding-bottom: 0;
         }
         body.on-studio #studio-view:not([hidden]) {
+            display: block;
             height: auto;
             min-height: 100dvh;
             min-height: 100svh;
@@ -62,20 +63,21 @@
             flex-shrink: 0;
         }
         .studio-workspace {
-            flex: 1 1 auto;
-            min-height: 0;
+            flex: none;
+            min-height: auto;
             width: 100%;
             max-width: 80rem;
             margin: 0 auto;
             display: block;
+            overflow: visible;
             padding: 0.75rem 1rem calc(5.35rem + env(safe-area-inset-bottom));
         }
         #studio-form-column,
         #preview-column {
             min-width: 0;
-            min-height: 0;
         }
         #studio-form-column {
+            min-height: auto;
             overflow: visible;
         }
         #preview-column {
@@ -538,7 +540,7 @@
         @media (min-width: 900px) {
             .home-hero { grid-template-columns: 1.08fr 0.92fr; padding-top: 3rem; }
             .home-cards { grid-template-columns: repeat(3, 1fr); }
-            .home-layouts { grid-template-columns: repeat(5, 1fr); }
+            .home-layouts { grid-template-columns: repeat(6, 1fr); }
             .home-price { grid-template-columns: 1.2fr 0.8fr; padding: 2.25rem 2.4rem; }
             .home-quotes { grid-template-columns: repeat(3, 1fr); }
         }
@@ -1611,19 +1613,92 @@
         .preview-close { display: none; }
 
         @media (max-width: 1023px) {
+            html {
+                scroll-padding-top: 6.75rem;
+            }
+            #studio-view {
+                display: block;
+            }
+            .studio-header .studio-promo {
+                padding-top: 0.35rem;
+                padding-bottom: 0.35rem;
+            }
+            .studio-header .studio-promo p {
+                font-size: 0.75rem;
+                line-height: 1.25;
+            }
+            .studio-header .studio-promo .studio-pay {
+                min-height: 2.25rem;
+                padding-left: 0.85rem;
+                padding-right: 0.85rem;
+                font-size: 0.75rem;
+            }
+            .studio-header .studio-toolbar {
+                flex-wrap: nowrap;
+                min-height: 0;
+                padding-top: 0.4rem;
+                padding-bottom: 0.4rem;
+                gap: 0.4rem;
+            }
+            .studio-header nav {
+                order: 0;
+                width: auto;
+                flex: 1 1 auto;
+                justify-content: center;
+                min-width: 0;
+            }
+            .studio-header .step-btn {
+                padding-left: 0.45rem;
+                padding-right: 0.45rem;
+                min-height: 2.25rem;
+            }
+            .studio-social {
+                display: none;
+            }
             #studio-form-column {
                 display: flex;
                 flex-direction: column;
-                gap: 1.5rem;
+                gap: 1rem;
                 overflow: visible;
                 height: auto;
+                min-height: auto;
+                width: 100%;
+            }
+            #studio-form-column > * {
+                flex: none;
+                width: 100%;
+                min-height: auto;
             }
             #studio-form-column > * + * {
                 margin-top: 0;
             }
-            #details-panel { order: 1; }
-            #templates-panel { order: 2; }
+            #templates-panel { order: 1; }
+            #details-panel { order: 2; }
             #design-panel { order: 3; }
+            #templates-panel,
+            #details-panel,
+            #design-panel {
+                scroll-margin-top: 6.5rem;
+            }
+            #templates-panel {
+                padding: 0.85rem;
+            }
+            #templates-panel .template-grid.canva-grid {
+                max-height: 13.25rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.5rem;
+            }
+            #templates-panel .template-thumb {
+                height: 4.35rem;
+                margin-bottom: 0.35rem;
+            }
+            #details-panel input:not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]),
+            #details-panel select,
+            #details-panel textarea {
+                background: #0f172a;
+                border-color: #64748b;
+                color: #f8fafc;
+            }
             #preview-column {
                 display: none !important;
             }
@@ -1672,13 +1747,19 @@
             }
             .studio-workspace {
                 display: grid;
+                flex: 1 1 auto;
+                min-height: 0;
                 grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
                 grid-template-rows: minmax(0, 1fr);
                 padding: 1rem 1.5rem 1.25rem;
                 gap: 1.5rem;
             }
+            body.on-studio #studio-view:not([hidden]) {
+                display: flex;
+            }
             #studio-form-column,
             #preview-column {
+                min-height: 0;
                 overflow: auto;
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior: contain;
@@ -1695,6 +1776,19 @@
             html { scroll-behavior: auto; }
             .cta-download { animation: none !important; }
             * { transition: none !important; }
+        }
+
+        #phrases-panel {
+            position: relative;
+            z-index: 2;
+            pointer-events: auto;
+        }
+        #phrases-panel button,
+        #phrases-panel select {
+            position: relative;
+            z-index: 1;
+            pointer-events: auto;
+            cursor: pointer;
         }
 
         .cta-download {
@@ -1940,7 +2034,7 @@
             html.qc-print-mode #qc-print-host .layout-navy #cv-header,
             html.qc-print-mode #qc-print-host .layout-navy .cv-photo-block,
             html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner {
-                background: #12192b !important;
+                background: var(--navy, #12192b) !important;
                 color: #fff !important;
             }
         }
@@ -1971,7 +2065,7 @@
                     <p class="home-kicker">אטלייה לקורות חיים</p>
                     <h1 id="home-title" class="home-title">מסמך שנראה כאילו נכתב רק בשבילכם</h1>
                     <p class="home-lead">
-                        עיצוב עברי מדויק, תצוגה חיה, ושמונה סגנונות מוכנים להגשה.
+                        עיצוב עברי מדויק, תצוגה חיה, ו־30 תבניות מוכנות להגשה.
                         מחיר השקה: <span data-price>9.9</span> ₪ במקום <span class="line-through opacity-60" data-compare-price>39.9</span> ₪.
                     </p>
                     <div class="home-hero-actions">
@@ -2011,7 +2105,7 @@
         <div class="home-band">
             <div class="home-inner home-band-row">
                 <p><strong>עברית ואנגלית</strong>פריסה מיושרת לימין או לשמאל לפי שפת הקורות חיים</p>
-                <p><strong>שמונה סגנונות</strong>קלאסי, ניהולי, מינימלי ועוד</p>
+                <p><strong>30 תבניות</strong>קלאסי, ניהולי, ציר־זמן נייבי ועוד</p>
                 <p><strong>הורדה מאובטחת</strong>Bit · קוד בוואטסאפ · PDF נקי</p>
             </div>
         </div>
@@ -2100,8 +2194,8 @@
     </div>
 
     <div id="studio-view" hidden>
-    <header class="no-print border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
-        <div class="bg-gradient-to-l from-emerald-500 via-teal-400 to-amber-300 text-slate-950">
+    <header class="studio-header no-print border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
+        <div class="studio-promo bg-gradient-to-l from-emerald-500 via-teal-400 to-amber-300 text-slate-950">
             <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <div class="flex items-center justify-center md:justify-start gap-3 flex-wrap">
                     <span class="inline-flex items-center rounded-full bg-slate-950 text-amber-300 text-[11px] font-black px-2.5 py-1">מחיר השקה</span>
@@ -2116,13 +2210,13 @@
                 </div>
                 <div class="flex items-center justify-center gap-3">
                     <p class="hidden sm:block text-xs font-semibold">תשלום מאובטח ב-Bit · קוד בוואטסאפ · הורדה מיידית</p>
-                    <button type="button" onclick="openPaymentModal()" class="min-h-11 px-4 rounded-full bg-slate-950 text-white font-black text-sm hover:bg-slate-800">
+                    <button type="button" onclick="openPaymentModal()" class="studio-pay min-h-11 px-4 rounded-full bg-slate-950 text-white font-black text-sm hover:bg-slate-800">
                         לשלם <span data-price>9.9</span>₪ ולהוריד
                     </button>
                 </div>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="studio-toolbar max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onclick="showHome()" class="flex items-center gap-3 text-right">
                 <span class="w-9 h-9 rounded-xl dynamic-bg text-white flex items-center justify-center font-black text-sm shadow-lg shadow-blue-900/30" aria-hidden="true">QC</span>
                 <span>
@@ -2223,6 +2317,7 @@
                         <option value="Heebo">Heebo — חד ומקצועי</option>
                         <option value="Inter">Inter — English / Latin</option>
                         <option value="Lato">Lato — English classic</option>
+                        <option value="Montserrat">Montserrat — Canva / corporate</option>
                         <option value="Assistant">Assistant — רך וקריא</option>
                         <option value="Noto Sans Hebrew">Noto Sans Hebrew — ניטרלי ונקי</option>
                         <option value="Alef">Alef — קלאסי ישראלי</option>
@@ -2719,7 +2814,7 @@
                 '#7a6a55': 'Cream'
             }
         };
-        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush', 'mint', 'terracotta', 'cream'];
+        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush', 'mint', 'terracotta', 'cream', 'midnight', 'emerald'];
         const BG_CLASSES = [
             'bg-preview-white', 'bg-preview-slate', 'bg-preview-cream', 'bg-preview-linen',
             'bg-preview-mint', 'bg-preview-blush', 'bg-preview-pearl', 'bg-preview-dots',
@@ -2768,12 +2863,14 @@
                 labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחרו שפה', languagesLevel: 'רמת שליטה', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה מהרשימה — בלי להקליד.', references: 'המלצות / References' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
                 examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
-                phrasesHeading: 'דוגמאות מוכנות לפי תפקיד',
-                phrasesHint: 'בחרו סוג תפקיד, טענו דוגמה מלאה, או לחצו על משפט כדי להוסיף לניסיון. אפשר לערוך אחרי ההוספה.',
-                phrasesField: 'בחרו תחום',
-                phrasesLoad: 'טען דוגמה מלאה לתפקיד',
+                phrasesHeading: 'משפטים מוכנים לפי תחום (לא חובה)',
+                phrasesHint: 'אפשר לדלג ולכתוב לבד. אם תרצו עזרה — בחרו תחום, ואז לחצו על כותרת או משפט כדי להוסיף. אפשר לערוך אחרי ההוספה.',
+                phrasesField: 'תחום (אופציונלי)',
+                phrasesNone: 'בלי דוגמאות — אכתוב בעצמי',
+                phrasesPick: 'בחרו תחום כדי לראות משפטים מוכנים. לא חובה.',
+                phrasesLoad: 'מלא שדות ריקים מדוגמה',
+                phrasesReplace: 'החלף בניסיון לדוגמה',
                 phrasesSkills: '+ הוסף כישורים מומלצים לתחום',
-                phrasesConfirm: 'לטעון דוגמה מוכנה? זה יחליף תפקיד, תקציר, ניסיון, השכלה, שירות וכישורים. שם ופרטי קשר יישארו.',
                 roleTitleHint: 'אפשר לבחור כותרת מוכנה מהרשימה או להקליד.'
             },
             en: {
@@ -2911,8 +3008,16 @@
             if (nameEl) nameEl.placeholder = pack.labels.name;
             if (titleEl) titleEl.placeholder = pack.labels.title;
             if (locEl) locEl.placeholder = pack.labels.location;
-            if ((window.QCLayout || (typeof currentLayoutName === 'function' && currentLayoutName())) === 'charcoal' && lang === 'en') {
+            const layoutName = window.QCLayout || (typeof currentLayoutName === 'function' && currentLayoutName()) || '';
+            if (layoutName === 'charcoal' && lang === 'en') {
                 const short = { summary: 'Profile', experience: 'Experience', languages: 'Language', references: 'References', contact: 'Contact', skills: 'Skills', educationSide: 'Education', education: 'Education' };
+                document.querySelectorAll('[data-i18n]').forEach((el) => {
+                    const key = el.getAttribute('data-i18n');
+                    if (short[key]) el.textContent = short[key];
+                });
+            }
+            if (layoutName === 'navy' && lang === 'en') {
+                const short = { summary: 'About Me', experience: 'Work Experience', languages: 'Language', references: 'References', contact: 'Contact', skills: 'Skills', educationSide: 'Education', education: 'Education' };
                 document.querySelectorAll('[data-i18n]').forEach((el) => {
                     const key = el.getAttribute('data-i18n');
                     if (short[key]) el.textContent = short[key];
@@ -3866,11 +3971,11 @@
             markStep(n);
             if (n === 1) {
                 closeMobilePreview();
-                document.getElementById('details-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('details-panel')?.scrollIntoView({ behavior: 'auto', block: 'start' });
             }
             if (n === 2) {
                 closeMobilePreview();
-                document.getElementById('design-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('design-panel')?.scrollIntoView({ behavior: 'auto', block: 'start' });
             }
             if (n === 3) openPaymentModal();
         }
@@ -4274,14 +4379,19 @@
             if (theme) theme.setAttribute('content', studio ? '#020617' : '#f3ece1');
         }
 
+        function resetStudioScroll() {
+            closeMobilePreview();
+            const html = document.documentElement;
+            const body = document.body;
+            html.scrollTop = 0;
+            body.scrollTop = 0;
+            window.scrollTo(0, 0);
+        }
+
         function showStudio() {
             applyView(true);
             if (location.hash !== '#studio') history.replaceState(null, '', '#studio');
-            closeMobilePreview();
-            window.scrollTo(0, 0);
-            window.setTimeout(() => {
-                document.getElementById('details-panel')?.scrollIntoView({ block: 'start' });
-            }, 0);
+            resetStudioScroll();
             updateCV();
         }
 
@@ -4289,6 +4399,8 @@
             applyView(false);
             if (location.hash === '#studio') history.replaceState(null, '', location.pathname + location.search);
             window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
         }
 
         function syncViewFromHash() {

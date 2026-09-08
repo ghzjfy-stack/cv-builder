@@ -11,11 +11,22 @@ export const CHECKOUT = {
     'היי, שילמתי 9.9 ש"ח ב-Bit עבור קורות החיים. מצרף צילום מסך לקבלת קוד האימות.',
 } as const;
 
+/** Bit's send screen expects two-decimal ILS (e.g. 9.90). */
+export function bitAmountValue(): string {
+  return Number(CHECKOUT.amountIls).toFixed(2);
+}
+
 /** Path Bit's app expects when opening a P2P send (phone + amount). */
 export function bitSendPath(): string {
   const phone = CHECKOUT.bitPhoneCopy;
-  const amount = String(CHECKOUT.amountIls);
-  return `www.bitpay.co.il/app/?phone=${encodeURIComponent(phone)}&amount=${encodeURIComponent(amount)}`;
+  const amount = bitAmountValue();
+  const query = [
+    `phone=${encodeURIComponent(phone)}`,
+    `phoneNumber=${encodeURIComponent(phone)}`,
+    `sum=${encodeURIComponent(amount)}`,
+    `amount=${encodeURIComponent(amount)}`,
+  ].join("&");
+  return `www.bitpay.co.il/app/?${query}`;
 }
 
 export function bitWebPayUrl(): string {
@@ -39,7 +50,7 @@ export function bitAppOpenUrl(): string {
     return `paymentsBIT://${path}`;
   }
   if (/Android/i.test(ua)) {
-    return `intent://${path}#Intent;scheme=bit;package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.bnhp.payments.paymentsapp;end`;
+    return `intent://${path}#Intent;scheme=bit;package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=${encodeURIComponent(bitWebPayUrl())};end`;
   }
   return bitWebPayUrl();
 }

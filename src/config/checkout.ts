@@ -11,6 +11,11 @@ export const CHECKOUT = {
     'היי, שילמתי 9.9 ש"ח ב-Bit עבור קורות החיים. מצרף צילום מסך לקבלת קוד האימות.',
 } as const;
 
+/** Shown on the site (e.g. 9.9). */
+export function displayAmountValue(): string {
+  return String(CHECKOUT.amountIls);
+}
+
 /** Bit's send screen expects two-decimal ILS (e.g. 9.90). */
 export function bitAmountValue(): string {
   return Number(CHECKOUT.amountIls).toFixed(2);

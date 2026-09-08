@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
-import { CHECKOUT, bitAmountValue, bitAppOpenUrl, bitPayUrl, whatsappUrl } from "./config/checkout.js";
+import { CHECKOUT, bitAppOpenUrl, bitPayUrl, displayAmountValue, whatsappUrl } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
 import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
@@ -283,7 +283,7 @@ function downloadFormat(kind) {
 function fillCheckoutUi() {
   const bitEl = document.getElementById("bit-number");
   if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
-  const amount = bitAmountValue();
+  const amount = displayAmountValue();
   document.querySelectorAll("[data-price]").forEach((el) => {
     el.textContent = amount;
   });

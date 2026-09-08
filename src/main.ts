@@ -283,12 +283,24 @@ function downloadFormat(kind) {
 function fillCheckoutUi() {
   const bitEl = document.getElementById("bit-number");
   if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
+  const amount = bitAmountValue();
   document.querySelectorAll("[data-price]").forEach((el) => {
-    el.textContent = String(CHECKOUT.amountIls);
+    el.textContent = amount;
   });
   document.querySelectorAll("[data-compare-price]").forEach((el) => {
     el.textContent = String(CHECKOUT.compareAtIls);
   });
+  const openBit = document.getElementById("btn-open-bit");
+  if (openBit instanceof HTMLAnchorElement) {
+    openBit.href = bitAppOpenUrl();
+    openBit.target = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "_self" : "_blank";
+    openBit.rel = "noopener";
+  }
+  const qr = document.getElementById("bit-qr");
+  if (qr instanceof HTMLImageElement) {
+    qr.src = bitPayUrl();
+    qr.alt = `קוד QR לתשלום ${amount} ₪ ב-Bit`;
+  }
 }
 
 function restoreUnlockUi() {

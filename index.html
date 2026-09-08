@@ -2438,19 +2438,20 @@
                     <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
-                <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
+                <div id="phrases-panel" class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <h4 class="font-bold text-slate-200 text-sm" id="phrases-heading">דוגמאות מוכנות לפי תפקיד</h4>
-                        <label class="sr-only" for="phrase-field" id="phrase-field-label">בחרו תחום</label>
-                        <select id="phrase-field" onchange="onRoleFieldChange()" class="bg-slate-800 border border-slate-600 text-sm rounded-lg p-2 text-slate-100 outline-none min-h-11">
-                        </select>
+                        <h4 class="font-bold text-slate-200 text-sm" id="phrases-heading">משפטים מוכנים לפי תחום (לא חובה)</h4>
+                        <label class="text-[11px] text-slate-400" for="phrase-field" id="phrase-field-label">תחום (אופציונלי)</label>
                     </div>
-                    <p class="text-[11px] text-slate-400" id="phrases-hint">בחרו סוג תפקיד, טענו דוגמה מלאה, או לחצו על משפט כדי להוסיף לניסיון. אפשר לערוך אחרי ההוספה.</p>
+                    <select id="phrase-field" class="w-full bg-slate-800 border border-slate-600 text-sm rounded-lg p-2 text-slate-100 outline-none min-h-11">
+                    </select>
+                    <p class="text-[11px] text-slate-400" id="phrases-hint">אפשר לדלג ולכתוב לבד. אם תרצו עזרה — בחרו תחום, ואז לחצו על כותרת או משפט כדי להוסיף. אפשר לערוך אחרי ההוספה.</p>
                     <div id="role-title-chips" class="flex flex-wrap gap-2"></div>
                     <div id="phrase-bullets" class="flex flex-wrap gap-2"></div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" id="btn-load-role-example" onclick="loadRoleExample()" class="text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 px-3 py-2 rounded-lg font-semibold">טען דוגמה מלאה לתפקיד</button>
-                        <button type="button" id="btn-insert-skills" onclick="insertSkills()" class="text-[11px] bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 px-3 py-2 rounded-lg font-semibold">+ הוסף כישורים מומלצים לתחום</button>
+                    <div id="phrases-actions" class="flex flex-wrap gap-2 hidden">
+                        <button type="button" id="btn-load-role-example" class="text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 px-3 py-2 rounded-lg font-semibold min-h-11">מלא שדות ריקים מדוגמה</button>
+                        <button type="button" id="btn-replace-role-example" class="text-[11px] bg-slate-800 border border-slate-600 text-slate-200 hover:border-emerald-400 px-3 py-2 rounded-lg font-semibold min-h-11">החלף בניסיון לדוגמה</button>
+                        <button type="button" id="btn-insert-skills" class="text-[11px] bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 px-3 py-2 rounded-lg font-semibold min-h-11">+ הוסף כישורים מומלצים לתחום</button>
                     </div>
                 </div>
 
@@ -2880,12 +2881,14 @@
                 labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language', languagesLevel: 'Proficiency', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency from the list — no typing needed.', references: 'References' },
                 i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
                 examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] },
-                phrasesHeading: 'Ready-made examples by role',
-                phrasesHint: 'Pick a role type, load a full example, or tap a sentence to add it to experience. You can edit afterward.',
-                phrasesField: 'Choose a field',
-                phrasesLoad: 'Load full role example',
+                phrasesHeading: 'Ready-made phrases by field (optional)',
+                phrasesHint: 'You can skip this and write your own. To get help, pick a field, then tap a title or sentence to add it. You can edit afterward.',
+                phrasesField: 'Field (optional)',
+                phrasesNone: 'None — I will write my own',
+                phrasesPick: 'Choose a field to see ready-made phrases. Optional.',
+                phrasesLoad: 'Fill empty fields from a sample',
+                phrasesReplace: 'Replace with sample experience',
                 phrasesSkills: '+ Add recommended skills for this field',
-                phrasesConfirm: 'Load a ready-made example? This replaces title, summary, experience, education, service, and skills. Name and contact stay.',
                 roleTitleHint: 'Pick a ready-made title from the list, or type your own.'
             }
         };
@@ -2995,6 +2998,7 @@
             setLabel('phrases-hint', pack.phrasesHint);
             setLabel('phrase-field-label', pack.phrasesField);
             setLabel('btn-load-role-example', pack.phrasesLoad);
+            setLabel('btn-replace-role-example', pack.phrasesReplace);
             setLabel('btn-insert-skills', pack.phrasesSkills);
             setLabel('role-title-hint', pack.roleTitleHint);
             const langNameSel = document.getElementById('lang-pick-name');
@@ -3044,7 +3048,10 @@
         }
 
         function phrasePack() {
-            return (window.QCPhrases && QCPhrases.forLang) ? QCPhrases.forLang(window.QCCvLang) : QCPhrases;
+            if (window.QCPhrases && typeof QCPhrases.forLang === 'function') {
+                return QCPhrases.forLang(window.QCCvLang) || {};
+            }
+            return window.QCPhrases || {};
         }
 
         function setCvLang(lang, opts) {
@@ -4219,24 +4226,28 @@
             if (fromHome && window.matchMedia('(max-width: 1023px)').matches) openMobilePreview();
         }
 
+        function phrasesI18n() {
+            return CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
+        }
+
         function currentRoleField() {
             const select = document.getElementById('phrase-field');
-            return select && select.value ? select.value : 'sales';
+            return select && select.value ? select.value : '';
         }
 
         function roleIdsFromPack(pack) {
             if (pack && pack.fields && pack.fields.length) return pack.fields.map((f) => f.id);
-            return (window.QCPhrases && QCPhrases.roleIds) || ['sales'];
+            return (window.QCPhrases && QCPhrases.roleIds) || [];
         }
 
         function fillRoleTitleList() {
-            const pack = phrasePack();
+            const pack = phrasePack() || {};
             const list = document.getElementById('role-title-list');
             if (!list) return;
             list.replaceChildren();
             const seen = {};
             roleIdsFromPack(pack).forEach((id) => {
-                (pack.titles && pack.titles[id] || []).forEach((title) => {
+                ((pack.titles && pack.titles[id]) || []).forEach((title) => {
                     if (seen[title]) return;
                     seen[title] = true;
                     const opt = document.createElement('option');
@@ -4246,20 +4257,31 @@
             });
         }
 
+        function phraseChipClass(kind) {
+            const align = window.QCCvLang === 'en' ? 'text-left' : 'text-right';
+            const base = 'text-[11px] rounded-lg px-2.5 py-2 leading-snug min-h-11 cursor-pointer pointer-events-auto ' + align;
+            if (kind === 'title') return base + ' bg-slate-800 border border-emerald-700/60 text-emerald-200 hover:border-emerald-400 font-semibold';
+            return base + ' bg-slate-800 border border-slate-600 text-slate-200 hover:border-blue-400';
+        }
+
+        function setPhrasesActionsVisible(on) {
+            const actions = document.getElementById('phrases-actions');
+            if (actions) actions.classList.toggle('hidden', !on);
+        }
+
         function renderRoleTitleChips() {
             const wrap = document.getElementById('role-title-chips');
             if (!wrap) return;
-            const pack = phrasePack();
+            const pack = phrasePack() || {};
             const field = currentRoleField();
-            const titles = (pack.titles && pack.titles[field]) || [];
             wrap.replaceChildren();
-            const align = window.QCCvLang === 'en' ? 'text-left' : 'text-right';
-            titles.forEach((title) => {
+            if (!field) return;
+            ((pack.titles && pack.titles[field]) || []).forEach((title) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'text-[11px] bg-slate-800 border border-emerald-700/60 text-emerald-200 hover:border-emerald-400 rounded-lg px-2.5 py-2 leading-snug font-semibold ' + align;
+                btn.className = phraseChipClass('title');
+                btn.setAttribute('data-role-title', title);
                 btn.innerText = title;
-                btn.onclick = () => applyRoleTitle(title);
                 wrap.appendChild(btn);
             });
         }
@@ -4277,15 +4299,8 @@
             renderRoleTitleChips();
         }
 
-        function loadRoleExample() {
-            const pack = phrasePack();
-            const field = currentRoleField();
-            const example = pack.examples && pack.examples[field];
-            if (!example) return;
-            const i18n = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'];
-            const msg = i18n.phrasesConfirm || '';
-            if (msg && !confirm(msg)) return;
-            const map = {
+        function roleExampleMap(example) {
+            return {
                 'in-title': example.title,
                 'in-summary': example.summary,
                 'in-experience': example.experience,
@@ -4294,9 +4309,21 @@
                 'in-skills': example.skills,
                 'in-languages': example.languages
             };
+        }
+
+        function applyRoleExample(opts) {
+            const pack = phrasePack() || {};
+            const field = currentRoleField();
+            const example = pack.examples && pack.examples[field];
+            if (!example) return;
+            const replace = !!(opts && opts.replace);
+            const map = roleExampleMap(example);
             Object.keys(map).forEach((id) => {
                 const el = formField(id);
-                if (el) el.value = map[id] == null ? '' : map[id];
+                if (!el) return;
+                const next = map[id] == null ? '' : map[id];
+                if (!replace && String(el.value || '').trim()) return;
+                el.value = next;
             });
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
             renderPhrases();
@@ -4306,25 +4333,43 @@
             markStep(1);
         }
 
+        function loadRoleExample() {
+            applyRoleExample({ replace: false });
+        }
+
+        function replaceRoleExample() {
+            applyRoleExample({ replace: true });
+        }
+
         function renderPhrases() {
-            const pack = phrasePack();
+            const pack = phrasePack() || {};
             const field = currentRoleField();
             const wrap = document.getElementById('phrase-bullets');
             if (!wrap) return;
-            wrap.innerHTML = '';
-            const align = window.QCCvLang === 'en' ? 'text-left' : 'text-right';
-            (pack.bullets[field] || []).forEach((text) => {
+            wrap.replaceChildren();
+            setPhrasesActionsVisible(!!field);
+            if (!field) {
+                const hint = document.createElement('p');
+                hint.className = 'text-[11px] text-slate-400';
+                hint.id = 'phrases-empty-hint';
+                hint.innerText = phrasesI18n().phrasesPick || '';
+                wrap.appendChild(hint);
+                return;
+            }
+            const bullets = (pack.bullets && pack.bullets[field]) || [];
+            bullets.forEach((text) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'text-[11px] bg-slate-800 border border-slate-600 text-slate-200 hover:border-blue-400 rounded-lg px-2.5 py-2 leading-snug ' + align;
+                btn.className = phraseChipClass('bullet');
+                btn.setAttribute('data-phrase', text);
                 btn.innerText = text;
-                btn.onclick = () => insertBullet(text);
                 wrap.appendChild(btn);
             });
         }
 
         function insertBullet(text) {
-            const el = document.getElementById('in-experience');
+            const el = formField('in-experience') || document.getElementById('in-experience');
+            if (!el || !text) return;
             const prefix = el.value.trim() ? '\n• ' : '• ';
             el.value = el.value + prefix + text;
             updateCV();
@@ -4332,28 +4377,77 @@
         }
 
         function insertSkills() {
-            const pack = phrasePack();
-            const field = document.getElementById('phrase-field').value;
-            const el = document.getElementById('in-skills');
-            const extra = pack.skills[field];
+            const pack = phrasePack() || {};
+            const field = currentRoleField();
+            const extra = pack.skills && pack.skills[field];
+            const el = formField('in-skills') || document.getElementById('in-skills');
+            if (!el || !extra) return;
             el.value = el.value.trim() ? el.value.trim() + ', ' + extra : extra;
             updateCV();
             QCDraft.save();
         }
 
+        function bindPhrasesPanel() {
+            const panel = document.getElementById('phrases-panel');
+            const select = document.getElementById('phrase-field');
+            if (select && !select.dataset.qcBound) {
+                select.dataset.qcBound = '1';
+                select.addEventListener('change', onRoleFieldChange);
+            }
+            if (!panel || panel.dataset.qcBound) return;
+            panel.dataset.qcBound = '1';
+            panel.addEventListener('click', function (e) {
+                const btn = e.target && e.target.closest && e.target.closest('button');
+                if (!btn || !panel.contains(btn)) return;
+                if (btn.id === 'btn-load-role-example') {
+                    e.preventDefault();
+                    loadRoleExample();
+                    return;
+                }
+                if (btn.id === 'btn-replace-role-example') {
+                    e.preventDefault();
+                    replaceRoleExample();
+                    return;
+                }
+                if (btn.id === 'btn-insert-skills') {
+                    e.preventDefault();
+                    insertSkills();
+                    return;
+                }
+                const title = btn.getAttribute('data-role-title');
+                if (title) {
+                    e.preventDefault();
+                    applyRoleTitle(title);
+                    return;
+                }
+                const phrase = btn.getAttribute('data-phrase');
+                if (phrase) {
+                    e.preventDefault();
+                    insertBullet(phrase);
+                }
+            });
+        }
+
         function initPhrases() {
             const select = document.getElementById('phrase-field');
             if (!select) return;
-            const prev = select.value;
+            bindPhrasesPanel();
             const pack = phrasePack();
-            select.innerHTML = '';
+            if (!pack || !pack.fields) return;
+            const prev = select.value;
+            select.replaceChildren();
+            const none = document.createElement('option');
+            none.value = '';
+            none.innerText = phrasesI18n().phrasesNone || '';
+            select.appendChild(none);
             pack.fields.forEach((f) => {
                 const opt = document.createElement('option');
                 opt.value = f.id;
                 opt.innerText = f.label;
                 select.appendChild(opt);
             });
-            if (prev && pack.bullets[prev]) select.value = prev;
+            if (prev && pack.bullets && pack.bullets[prev]) select.value = prev;
+            else select.value = '';
             fillRoleTitleList();
             renderPhrases();
             renderRoleTitleChips();
@@ -4425,7 +4519,11 @@
         window.setCvLang = setCvLang;
         window.loadExample = loadExample;
         window.loadRoleExample = loadRoleExample;
+        window.replaceRoleExample = replaceRoleExample;
         window.onRoleFieldChange = onRoleFieldChange;
+        window.insertSkills = insertSkills;
+        window.insertBullet = insertBullet;
+        window.applyRoleTitle = applyRoleTitle;
         window.onPhotoChange = onPhotoChange;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
@@ -4462,6 +4560,7 @@
             markTemplateCards(draft && draft.example ? draft.example : '');
             renderTemplateGalleries();
             renderPhrases();
+            renderRoleTitleChips();
             hydrateLanguagePicker();
         } catch (err) {
             console.error('studio init failed', err);

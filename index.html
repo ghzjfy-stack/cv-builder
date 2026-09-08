@@ -38,20 +38,23 @@
             min-height: 100dvh;
         }
         body.on-studio {
-            overflow: hidden;
-            height: 100dvh;
-            height: 100svh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: auto;
+            min-height: 100dvh;
+            min-height: 100svh;
+            padding-bottom: 0;
         }
         body.on-studio #studio-view:not([hidden]) {
-            height: 100dvh;
-            height: 100svh;
-            max-height: 100dvh;
-            max-height: 100svh;
-            overflow: hidden;
+            height: auto;
+            min-height: 100dvh;
+            min-height: 100svh;
+            max-height: none;
+            overflow: visible;
         }
         body.on-studio #studio-view > header {
-            position: relative;
-            top: auto;
+            position: sticky;
+            top: 0;
             flex-shrink: 0;
             z-index: 40;
         }
@@ -64,27 +67,27 @@
             width: 100%;
             max-width: 80rem;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-template-rows: minmax(0, 1fr) minmax(210px, 42svh);
-            gap: 0.75rem;
+            display: block;
             padding: 0.75rem 1rem calc(5.35rem + env(safe-area-inset-bottom));
         }
         #studio-form-column,
         #preview-column {
             min-width: 0;
             min-height: 0;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
+        }
+        #studio-form-column {
+            overflow: visible;
         }
         #preview-column {
-            display: flex;
+            display: none;
             flex-direction: column;
             background: #020617;
             border: 1px solid rgb(51 65 85);
             border-radius: 1rem;
             padding: 0.65rem 0.75rem 0.85rem;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
         #preview-column > .preview-toolbar {
             flex-shrink: 0;
@@ -628,9 +631,32 @@
             text-align: left;
         }
         #details-panel.cv-form-en input,
-        #details-panel.cv-form-en textarea {
+        #details-panel.cv-form-en textarea,
+        #details-panel.cv-form-en select {
             direction: ltr;
             text-align: left;
+        }
+        .lang-pick-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.7rem;
+            padding: 0.4rem 0.5rem;
+        }
+        .lang-pick-row .lang-pick-title {
+            flex: 1 1 auto;
+            min-width: 0;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        .lang-pick-row select {
+            flex: 0 1 9.5rem;
+            width: auto;
+            min-width: 7.5rem;
+        }
         }
         #cv-target #cv-header,
         #qc-print-host .cv-print-sheet #cv-header {
@@ -1585,10 +1611,27 @@
         .preview-close { display: none; }
 
         @media (max-width: 1023px) {
-            .preview-col.mobile-preview-open {
+            #studio-form-column {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                overflow: visible;
+                height: auto;
+            }
+            #studio-form-column > * + * {
+                margin-top: 0;
+            }
+            #details-panel { order: 1; }
+            #templates-panel { order: 2; }
+            #design-panel { order: 3; }
+            #preview-column {
+                display: none !important;
+            }
+            #preview-column.mobile-preview-open {
+                display: flex !important;
                 position: fixed;
                 inset: 0;
-                z-index: 45;
+                z-index: 60;
                 overflow: auto;
                 background: #020617;
                 padding: 1rem 1rem 6.5rem;
@@ -1611,13 +1654,37 @@
         }
 
         @media (min-width: 1024px) {
+            body.on-studio {
+                overflow: hidden;
+                height: 100dvh;
+                height: 100svh;
+            }
+            body.on-studio #studio-view:not([hidden]) {
+                height: 100dvh;
+                height: 100svh;
+                max-height: 100dvh;
+                max-height: 100svh;
+                overflow: hidden;
+            }
+            body.on-studio #studio-view > header {
+                position: relative;
+                top: auto;
+            }
             .studio-workspace {
+                display: grid;
                 grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
                 grid-template-rows: minmax(0, 1fr);
                 padding: 1rem 1.5rem 1.25rem;
                 gap: 1.5rem;
             }
+            #studio-form-column,
             #preview-column {
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+            #preview-column {
+                display: flex;
                 position: relative;
                 top: auto;
                 align-self: stretch;
@@ -1672,9 +1739,14 @@
             flex-shrink: 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
         }
-        body.qc-checkout-open #studio-mobile-dock {
+        body.qc-checkout-open #studio-mobile-dock,
+        body.qc-mobile-preview-open #studio-mobile-dock {
             visibility: hidden;
             pointer-events: none;
+        }
+        body.qc-mobile-preview-open {
+            overflow: hidden;
+            height: 100svh;
         }
         #payment-modal .pay-card {
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.86));
@@ -1751,7 +1823,7 @@
             }
             html.qc-unpaid body::after {
                 visibility: visible !important;
-                content: "QuickCV — התצוגה המקדימה מוגנת. להורדת PDF יש לשלם 5 ₪.";
+                content: "QuickCV — התצוגה המקדימה מוגנת. להורדת PDF יש לשלם 9.9 ₪.";
                 display: block;
                 padding: 2rem;
                 font-size: 18px;
@@ -1900,7 +1972,7 @@
                     <h1 id="home-title" class="home-title">מסמך שנראה כאילו נכתב רק בשבילכם</h1>
                     <p class="home-lead">
                         עיצוב עברי מדויק, תצוגה חיה, ושמונה סגנונות מוכנים להגשה.
-                        מחיר השקה: <span data-price>5</span> ₪ במקום <span class="line-through opacity-60" data-compare-price>29</span> ₪.
+                        מחיר השקה: <span data-price>9.9</span> ₪ במקום <span class="line-through opacity-60" data-compare-price>39.9</span> ₪.
                     </p>
                     <div class="home-hero-actions">
                         <button type="button" id="home-cta" class="home-cta" onclick="showStudio()">היכנסו לסטודיו</button>
@@ -1963,7 +2035,7 @@
                     <article class="home-step">
                         <p class="home-step-num">03</p>
                         <h3>הורדה</h3>
-                        <p>תשלום של <span data-price>5</span> ₪ ב-Bit, קוד בוואטסאפ, ו-PDF באיכות גבוהה.</p>
+                        <p>תשלום של <span data-price>9.9</span> ₪ ב-Bit, קוד בוואטסאפ, ו-PDF באיכות גבוהה.</p>
                     </article>
                 </div>
             </section>
@@ -1971,7 +2043,7 @@
             <section class="home-section" aria-labelledby="home-craft" style="padding-top:0">
                 <p class="home-kicker">הסטודיו</p>
                 <h2 id="home-craft">כלים של מעצב, לא אשף משעמם</h2>
-                <p class="home-section-lead">15 תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.</p>
+                <p class="home-section-lead" data-template-count-copy="home">תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.</p>
                 <div class="home-layouts" data-home-templates></div>
                 <div class="home-cards" style="margin-top:1rem">
                     <article class="home-card">
@@ -2016,7 +2088,7 @@
                         <p>תשלום מאובטח ב-Bit, קוד קצר בוואטסאפ, והורדה מיידית. בלי מנוי ובלי הפתעות.</p>
                         <button type="button" class="home-cta" onclick="showStudio()">יצירת קורות החיים</button>
                     </div>
-                    <p class="home-price-tag"><span data-price>5</span><small> ₪</small></p>
+                    <p class="home-price-tag"><span data-price>9.9</span><small> ₪</small></p>
                 </div>
             </section>
 
@@ -2036,16 +2108,16 @@
                     <p class="text-sm sm:text-base font-extrabold leading-tight">
                         קורות חיים מקצועיים ב-PDF —
                         <span class="sr-only">במקום </span>
-                        <span class="line-through opacity-60 font-bold" data-compare-price>29</span>
+                        <span class="line-through opacity-60 font-bold" data-compare-price>39.9</span>
                         <span class="line-through opacity-60 font-bold">₪</span>
                         <span class="sr-only">עכשיו רק </span>
-                        <span class="text-xl sm:text-2xl font-black mx-1" data-price>5</span>₪
+                        <span class="text-xl sm:text-2xl font-black mx-1" data-price>9.9</span>₪
                     </p>
                 </div>
                 <div class="flex items-center justify-center gap-3">
                     <p class="hidden sm:block text-xs font-semibold">תשלום מאובטח ב-Bit · קוד בוואטסאפ · הורדה מיידית</p>
                     <button type="button" onclick="openPaymentModal()" class="min-h-11 px-4 rounded-full bg-slate-950 text-white font-black text-sm hover:bg-slate-800">
-                        לשלם <span data-price>5</span>₪ ולהוריד
+                        לשלם <span data-price>9.9</span>₪ ולהוריד
                     </button>
                 </div>
             </div>
@@ -2102,7 +2174,7 @@
             <div id="templates-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-xl">
                 <div class="flex items-center justify-between gap-2">
                     <h3 class="font-bold text-slate-200 text-sm">תבניות מוכנות</h3>
-                    <span class="text-[10px] text-slate-400">15 עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת</span>
+                    <span class="text-[10px] text-slate-400" data-template-count-copy="studio">עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת</span>
                 </div>
                 <div class="template-grid canva-grid" data-template-gallery role="group" aria-label="תבניות קורות חיים"></div>
             </div>
@@ -2133,6 +2205,9 @@
                         <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#5a3640]" data-color="#5a3640" aria-label="יין" aria-pressed="false" onclick="setAccent('#5a3640', this)"></button>
                         <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#31443b]" data-color="#31443b" aria-label="יער" aria-pressed="false" onclick="setAccent('#31443b', this)"></button>
                         <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#6b5344]" data-color="#6b5344" aria-label="חול" aria-pressed="false" onclick="setAccent('#6b5344', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#2f6f6a]" data-color="#2f6f6a" aria-label="טורקיז" aria-pressed="false" onclick="setAccent('#2f6f6a', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#9a5b42]" data-color="#9a5b42" aria-label="טרקוטה" aria-pressed="false" onclick="setAccent('#9a5b42', this)"></button>
+                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#7a6a55]" data-color="#7a6a55" aria-label="שמנת" aria-pressed="false" onclick="setAccent('#7a6a55', this)"></button>
                         <label class="flex items-center gap-2 text-[11px] text-slate-200 mr-1">
                             <span>מותאם</span>
                             <input type="color" id="custom-accent" value="#4c4c4c" oninput="setCustomAccent(this.value)" class="w-11 h-11 rounded-lg border border-slate-600 bg-slate-900 cursor-pointer p-0" aria-label="בחירת צבע מותאם">
@@ -2236,7 +2311,9 @@
                         </div>
                         <div>
                             <label class="block text-xs text-slate-300 mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
-                            <input type="text" id="in-title" name="title" value="מנהל פרויקטים ומכירות" placeholder="מנהל פרויקטים" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <input type="text" id="in-title" name="title" list="role-title-list" value="מנהל פרויקטים ומכירות" placeholder="מנהל פרויקטים" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <datalist id="role-title-list"></datalist>
+                            <p class="text-[11px] text-slate-400 mt-1" id="role-title-hint">אפשר לבחור כותרת מוכנה מהרשימה או להקליד.</p>
                         </div>
                         <div>
                             <label class="block text-xs text-slate-300 mb-1" for="in-phone" id="label-phone">טלפון</label>
@@ -2268,14 +2345,18 @@
 
                 <div class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <h4 class="font-bold text-slate-200 text-sm">משפטים מוכנים לפי תחום</h4>
-                        <label class="sr-only" for="phrase-field">בחרו תחום</label>
-                        <select id="phrase-field" onchange="renderPhrases()" class="bg-slate-800 border border-slate-600 text-sm rounded-lg p-2 text-slate-100 outline-none min-h-11">
+                        <h4 class="font-bold text-slate-200 text-sm" id="phrases-heading">דוגמאות מוכנות לפי תפקיד</h4>
+                        <label class="sr-only" for="phrase-field" id="phrase-field-label">בחרו תחום</label>
+                        <select id="phrase-field" onchange="onRoleFieldChange()" class="bg-slate-800 border border-slate-600 text-sm rounded-lg p-2 text-slate-100 outline-none min-h-11">
                         </select>
                     </div>
-                    <p class="text-[11px] text-slate-400">לחיצה מוסיפה לניסיון או לכישורים. אפשר לערוך אחרי ההוספה.</p>
+                    <p class="text-[11px] text-slate-400" id="phrases-hint">בחרו סוג תפקיד, טענו דוגמה מלאה, או לחצו על משפט כדי להוסיף לניסיון. אפשר לערוך אחרי ההוספה.</p>
+                    <div id="role-title-chips" class="flex flex-wrap gap-2"></div>
                     <div id="phrase-bullets" class="flex flex-wrap gap-2"></div>
-                    <button type="button" onclick="insertSkills()" class="text-[11px] bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 px-3 py-2 rounded-lg font-semibold">+ הוסף כישורים מומלצים לתחום</button>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" id="btn-load-role-example" onclick="loadRoleExample()" class="text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 px-3 py-2 rounded-lg font-semibold">טען דוגמה מלאה לתפקיד</button>
+                        <button type="button" id="btn-insert-skills" onclick="insertSkills()" class="text-[11px] bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 px-3 py-2 rounded-lg font-semibold">+ הוסף כישורים מומלצים לתחום</button>
+                    </div>
                 </div>
 
                 <div class="space-y-2">
@@ -2306,8 +2387,17 @@
                         <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
                     </div>
                     <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-languages" id="label-languages">שפות</label>
-                        <input type="text" id="in-languages" value="עברית (שפת אם), אנגלית (ברמה גבוהה)" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                        <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages">שפות</label>
+                        <input type="hidden" id="in-languages" value="עברית (שפת אם), אנגלית (ברמה גבוהה)">
+                        <div id="lang-picker" class="space-y-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <select id="lang-pick-name" class="flex-1 bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11" aria-label="בחרו שפה"></select>
+                                <select id="lang-pick-level" class="sm:w-44 bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11" aria-label="רמת שליטה"></select>
+                                <button type="button" id="lang-pick-add" onclick="addCvLanguage()" class="shrink-0 bg-slate-700 hover:bg-slate-600 border border-slate-500 text-slate-100 font-semibold text-sm px-3 rounded-lg min-h-11">הוסף</button>
+                            </div>
+                            <div id="lang-pick-list" class="space-y-2"></div>
+                            <p class="text-[11px] text-slate-400" id="lang-pick-hint">בחרו שפה ורמת שליטה מהרשימה — בלי להקליד.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -2317,7 +2407,7 @@
                 </div>
 
                 <button type="button" id="btn-download-pdf" class="cta-download w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
-                    הורד PDF ב-<span data-price>5</span> ₪ בלבד
+                    הורד PDF ב-<span data-price>9.9</span> ₪ בלבד
                 </button>
             </div>
 
@@ -2461,7 +2551,7 @@
                 תצוגת קורות חיים
             </button>
             <button type="button" id="btn-download-pdf-mobile" class="cta-download flex-[1.3] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl text-sm min-h-12">
-                הורד ב-<span data-price>5</span> ₪
+                הורד ב-<span data-price>9.9</span> ₪
             </button>
         </div>
     </div>
@@ -2472,7 +2562,7 @@
         <div class="examples-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-4xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
             <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגור דוגמאות">✕</button>
             <h3 id="examples-title" class="text-lg font-extrabold">תבניות מוכנות</h3>
-            <p class="text-xs text-slate-400">15 תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.</p>
+            <p class="text-xs text-slate-400" data-template-count-copy="modal">תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.</p>
             <div class="template-grid canva-grid" data-template-gallery></div>
         </div>
     </div>
@@ -2486,10 +2576,10 @@
             <div id="pay-step" class="space-y-5">
                 <div class="pt-1">
                     <div class="mx-auto w-16 h-16 rounded-2xl bg-[#00C2C7] text-[#0B1F3A] flex items-center justify-center font-black text-2xl tracking-tight shadow-lg" aria-hidden="true">bit</div>
-                    <p class="mt-4 inline-flex items-center rounded-full bg-amber-300 text-slate-950 text-[11px] font-black px-3 py-1">מחיר השקה — חיסכון של 24 ₪</p>
-                    <h3 id="pay-title" class="text-xl font-extrabold text-white mt-3">תשלום <span data-price>5</span> ₪ ב-Bit</h3>
+                    <p class="mt-4 inline-flex items-center rounded-full bg-amber-300 text-slate-950 text-[11px] font-black px-3 py-1">מחיר השקה — חיסכון של 30 ₪</p>
+                    <h3 id="pay-title" class="text-xl font-extrabold text-white mt-3">תשלום <span data-price>9.9</span> ₪ ב-Bit</h3>
                     <p class="text-sm text-slate-200 mt-2 leading-relaxed">
-                        במקום <span class="line-through" data-compare-price>29</span> ₪, שלמו רק <span id="bit-amount" class="font-bold text-emerald-300" data-price>5</span> ₪, העלו צילום מסך לאימות אוטומטי, והורידו את ה-PDF.
+                        במקום <span class="line-through" data-compare-price>39.9</span> ₪, שלמו רק <span id="bit-amount" class="font-bold text-emerald-300" data-price>9.9</span> ₪, העלו צילום מסך לאימות אוטומטי, והורידו את ה-PDF.
                     </p>
                 </div>
 
@@ -2559,7 +2649,7 @@
     <div id="shot-block" class="fixed inset-0 hidden items-center justify-center bg-slate-950 text-white no-print px-6 text-center" style="z-index:2147483645" role="status" aria-live="assertive">
         <div>
             <p class="text-lg font-black">התצוגה המקדימה מוגנת</p>
-            <p class="text-sm text-slate-300 mt-2">לאחר תשלום של <span data-price>5</span> ₪ אפשר להוריד PDF נקי.</p>
+            <p class="text-sm text-slate-300 mt-2">לאחר תשלום של <span data-price>9.9</span> ₪ אפשר להוריד PDF נקי.</p>
         </div>
     </div>
 
@@ -2583,19 +2673,40 @@
     <script>
         let previewBgClass = 'bg-preview-white';
         const THEME_NAMES = {
-            '#4c4c4c': 'פחם',
-            '#12192b': 'נייבי',
-            '#3e342c': 'אספרסו',
-            '#4d5d52': 'מרווה',
-            '#3e4c58': 'צפחה',
-            '#5a3640': 'יין',
-            '#31443b': 'יער',
-            '#6b5344': 'חול',
-            '#1c1917': 'דיו',
-            '#3d5a6c': 'ערפל',
-            '#6b4a4e': 'אבק ורוד'
+            he: {
+                '#4c4c4c': 'פחם',
+                '#12192b': 'נייבי',
+                '#3e342c': 'אספרסו',
+                '#4d5d52': 'מרווה',
+                '#3e4c58': 'צפחה',
+                '#5a3640': 'יין',
+                '#31443b': 'יער',
+                '#6b5344': 'חול',
+                '#1c1917': 'דיו',
+                '#3d5a6c': 'תכלת',
+                '#6b4a4e': 'ורדרד',
+                '#2f6f6a': 'טורקיז',
+                '#9a5b42': 'טרקוטה',
+                '#7a6a55': 'שמנת'
+            },
+            en: {
+                '#4c4c4c': 'Charcoal',
+                '#12192b': 'Navy',
+                '#3e342c': 'Espresso',
+                '#4d5d52': 'Sage',
+                '#3e4c58': 'Slate',
+                '#5a3640': 'Burgundy',
+                '#31443b': 'Forest',
+                '#6b5344': 'Sand',
+                '#1c1917': 'Ink',
+                '#3d5a6c': 'Sky',
+                '#6b4a4e': 'Blush',
+                '#2f6f6a': 'Teal',
+                '#9a5b42': 'Terracotta',
+                '#7a6a55': 'Cream'
+            }
         };
-        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush'];
+        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush', 'mint', 'terracotta', 'cream'];
         const BG_CLASSES = [
             'bg-preview-white', 'bg-preview-slate', 'bg-preview-cream', 'bg-preview-linen',
             'bg-preview-mint', 'bg-preview-blush', 'bg-preview-pearl', 'bg-preview-dots',
@@ -2641,17 +2752,31 @@
                 nameFallback: 'שם מלא',
                 titleFallback: 'תפקיד',
                 detailsHeading: 'פרטים אישיים (שדה ריק לא יופיע)',
-                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', references: 'המלצות / References' },
+                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחרו שפה', languagesLevel: 'רמת שליטה', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה מהרשימה — בלי להקליד.', references: 'המלצות / References' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
-                examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] }
+                examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
+                phrasesHeading: 'דוגמאות מוכנות לפי תפקיד',
+                phrasesHint: 'בחרו סוג תפקיד, טענו דוגמה מלאה, או לחצו על משפט כדי להוסיף לניסיון. אפשר לערוך אחרי ההוספה.',
+                phrasesField: 'בחרו תחום',
+                phrasesLoad: 'טען דוגמה מלאה לתפקיד',
+                phrasesSkills: '+ הוסף כישורים מומלצים לתחום',
+                phrasesConfirm: 'לטעון דוגמה מוכנה? זה יחליף תפקיד, תקציר, ניסיון, השכלה, שירות וכישורים. שם ופרטי קשר יישארו.',
+                roleTitleHint: 'אפשר לבחור כותרת מוכנה מהרשימה או להקליד.'
             },
             en: {
                 nameFallback: 'Full name',
                 titleFallback: 'Job title',
                 detailsHeading: 'Personal details (empty fields stay hidden)',
-                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', references: 'References' },
+                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language', languagesLevel: 'Proficiency', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency from the list — no typing needed.', references: 'References' },
                 i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
-                examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] }
+                examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] },
+                phrasesHeading: 'Ready-made examples by role',
+                phrasesHint: 'Pick a role type, load a full example, or tap a sentence to add it to experience. You can edit afterward.',
+                phrasesField: 'Choose a field',
+                phrasesLoad: 'Load full role example',
+                phrasesSkills: '+ Add recommended skills for this field',
+                phrasesConfirm: 'Load a ready-made example? This replaces title, summary, experience, education, service, and skills. Name and contact stay.',
+                roleTitleHint: 'Pick a ready-made title from the list, or type your own.'
             }
         };
 
@@ -2708,7 +2833,9 @@
         function setAccent(color, btn) {
             document.documentElement.style.setProperty('--accent', color);
             document.getElementById('custom-accent').value = color;
-            document.getElementById('accent-label').textContent = THEME_NAMES[color.toLowerCase()] || 'צבע מותאם';
+            const names = THEME_NAMES[window.QCCvLang === 'en' ? 'en' : 'he'] || THEME_NAMES.he;
+            const custom = window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם';
+            document.getElementById('accent-label').textContent = names[color.toLowerCase()] || custom;
             document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
             if (btn) btn.setAttribute('aria-pressed', 'true');
             markStep(2);
@@ -2716,7 +2843,7 @@
 
         function setCustomAccent(color) {
             document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('accent-label').textContent = 'צבע מותאם';
+            document.getElementById('accent-label').textContent = window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם';
             document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
             markStep(2);
         }
@@ -2752,6 +2879,19 @@
             setLabel('label-skills', pack.labels.skills);
             setLabel('label-languages', pack.labels.languages);
             setLabel('label-references', pack.labels.references);
+            setLabel('lang-pick-add', pack.labels.languagesAdd);
+            setLabel('lang-pick-hint', pack.labels.languagesHint);
+            setLabel('phrases-heading', pack.phrasesHeading);
+            setLabel('phrases-hint', pack.phrasesHint);
+            setLabel('phrase-field-label', pack.phrasesField);
+            setLabel('btn-load-role-example', pack.phrasesLoad);
+            setLabel('btn-insert-skills', pack.phrasesSkills);
+            setLabel('role-title-hint', pack.roleTitleHint);
+            const langNameSel = document.getElementById('lang-pick-name');
+            const langLevelSel = document.getElementById('lang-pick-level');
+            if (langNameSel && pack.labels.languagesSelect) langNameSel.setAttribute('aria-label', pack.labels.languagesSelect);
+            if (langLevelSel && pack.labels.languagesLevel) langLevelSel.setAttribute('aria-label', pack.labels.languagesLevel);
+            if (typeof refreshLanguagePicker === 'function') refreshLanguagePicker();
             const nameEl = document.getElementById('in-name');
             const titleEl = document.getElementById('in-title');
             const locEl = document.getElementById('in-location');
@@ -2782,6 +2922,7 @@
                 const el = formField(id);
                 if (el) el.value = sample[id];
             });
+            if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
         }
 
         function phrasePack() {
@@ -2811,6 +2952,7 @@
             });
             applyCvI18n(next);
             if (matchesSample) fillCvSample(next);
+            else if (!restore && typeof relabelLanguageField === 'function') relabelLanguageField();
             if (!restore && next === 'en') {
                 const font = document.getElementById('font-select');
                 if (font && (font.value === 'Alef' || font.value === 'David Libre' || font.value === 'Secular One')) {
@@ -3024,6 +3166,284 @@
             const levelLabel = (m && m[2] ? m[2] : '').trim();
             return { name, levelLabel };
         }
+
+        const CV_LANGUAGE_OPTIONS = [
+            { id: 'he', he: 'עברית', en: 'Hebrew', aliases: ['עברית', 'hebrew'] },
+            { id: 'en', he: 'אנגלית', en: 'English', aliases: ['אנגלית', 'english'] },
+            { id: 'ar', he: 'ערבית', en: 'Arabic', aliases: ['ערבית', 'arabic'] },
+            { id: 'ru', he: 'רוסית', en: 'Russian', aliases: ['רוסית', 'russian'] },
+            { id: 'fr', he: 'צרפתית', en: 'French', aliases: ['צרפתית', 'french'] },
+            { id: 'es', he: 'ספרדית', en: 'Spanish', aliases: ['ספרדית', 'spanish'] },
+            { id: 'de', he: 'גרמנית', en: 'German', aliases: ['גרמנית', 'german'] },
+            { id: 'am', he: 'אמהרית', en: 'Amharic', aliases: ['אמהרית', 'amharic'] },
+            { id: 'yi', he: 'יידיש', en: 'Yiddish', aliases: ['יידיש', 'yiddish'] },
+            { id: 'it', he: 'איטלקית', en: 'Italian', aliases: ['איטלקית', 'italian'] },
+            { id: 'pt', he: 'פורטוגזית', en: 'Portuguese', aliases: ['פורטוגזית', 'portuguese'] },
+            { id: 'pl', he: 'פולנית', en: 'Polish', aliases: ['פולנית', 'polish'] },
+            { id: 'uk', he: 'אוקראינית', en: 'Ukrainian', aliases: ['אוקראינית', 'ukrainian'] },
+            { id: 'ro', he: 'רומנית', en: 'Romanian', aliases: ['רומנית', 'romanian'] },
+            { id: 'zh', he: 'סינית', en: 'Chinese', aliases: ['סינית', 'chinese', 'mandarin', 'מנדרינית'] },
+            { id: 'ja', he: 'יפנית', en: 'Japanese', aliases: ['יפנית', 'japanese'] },
+            { id: 'ko', he: 'קוריאנית', en: 'Korean', aliases: ['קוריאנית', 'korean'] },
+            { id: 'hi', he: 'הינדי', en: 'Hindi', aliases: ['הינדי', 'hindi'] },
+            { id: 'tr', he: 'טורקית', en: 'Turkish', aliases: ['טורקית', 'turkish'] },
+            { id: 'fa', he: 'פרסית', en: 'Persian', aliases: ['פרסית', 'persian', 'farsi'] },
+            { id: 'nl', he: 'הולנדית', en: 'Dutch', aliases: ['הולנדית', 'dutch'] },
+            { id: 'sv', he: 'שוודית', en: 'Swedish', aliases: ['שוודית', 'swedish'] },
+            { id: 'el', he: 'יוונית', en: 'Greek', aliases: ['יוונית', 'greek'] },
+            { id: 'hu', he: 'הונגרית', en: 'Hungarian', aliases: ['הונגרית', 'hungarian'] },
+            { id: 'cs', he: 'צ׳כית', en: 'Czech', aliases: ['צ׳כית', "צ'כית", 'czech'] },
+            { id: 'th', he: 'תאילנדית', en: 'Thai', aliases: ['תאילנדית', 'thai'] },
+            { id: 'vi', he: 'וייטנאמית', en: 'Vietnamese', aliases: ['וייטנאמית', 'vietnamese'] },
+            { id: 'tl', he: 'פיליפינית', en: 'Filipino', aliases: ['פיליפינית', 'filipino', 'tagalog'] },
+            { id: 'fi', he: 'פינית', en: 'Finnish', aliases: ['פינית', 'finnish'] },
+            { id: 'no', he: 'נורווגית', en: 'Norwegian', aliases: ['נורווגית', 'norwegian'] },
+            { id: 'da', he: 'דנית', en: 'Danish', aliases: ['דנית', 'danish'] },
+            { id: 'ka', he: 'גאורגית', en: 'Georgian', aliases: ['גאורגית', 'georgian'] },
+            { id: 'hy', he: 'ארמנית', en: 'Armenian', aliases: ['ארמנית', 'armenian'] },
+            { id: 'bn', he: 'בנגלית', en: 'Bengali', aliases: ['בנגלית', 'bengali'] },
+            { id: 'ur', he: 'אורדו', en: 'Urdu', aliases: ['אורדו', 'urdu'] }
+        ];
+        const CV_LANGUAGE_LEVELS = [
+            { id: 'native', he: 'שפת אם', en: 'native' },
+            { id: 'fluent', he: 'שוטפת', en: 'fluent' },
+            { id: 'professional', he: 'מקצועית', en: 'professional' },
+            { id: 'good', he: 'טובה', en: 'good' },
+            { id: 'intermediate', he: 'בינונית', en: 'intermediate' },
+            { id: 'basic', he: 'בסיסית', en: 'basic' }
+        ];
+        const CV_LANGUAGE_FEATURED = ['he', 'en', 'ar', 'ru', 'fr', 'es', 'de', 'am', 'yi'];
+        let cvLangEntries = [];
+
+        function cvUiLang() {
+            return window.QCCvLang === 'en' ? 'en' : 'he';
+        }
+
+        function langOptionLabel(opt, lang) {
+            return (lang === 'en' ? opt.en : opt.he) || opt.en;
+        }
+
+        function langLevelLabel(level, lang) {
+            if (!level) return '';
+            return (lang === 'en' ? level.en : level.he) || level.en;
+        }
+
+        function findLangOption(id) {
+            return CV_LANGUAGE_OPTIONS.find((opt) => opt.id === id) || null;
+        }
+
+        function findLangLevel(id) {
+            return CV_LANGUAGE_LEVELS.find((lvl) => lvl.id === id) || CV_LANGUAGE_LEVELS[2];
+        }
+
+        function matchLangOption(name) {
+            const raw = String(name || '').trim().toLowerCase();
+            if (!raw) return null;
+            const labelsOf = (opt) => [opt.he, opt.en].concat(opt.aliases || []).map((s) => String(s || '').toLowerCase()).filter(Boolean);
+            const exact = CV_LANGUAGE_OPTIONS.find((opt) => labelsOf(opt).indexOf(raw) >= 0);
+            if (exact) return exact;
+            return CV_LANGUAGE_OPTIONS.find((opt) => labelsOf(opt).some((label) => label.length > 3 && raw.indexOf(label) >= 0)) || null;
+        }
+
+        function matchLangLevel(label) {
+            const t = String(label || '').trim();
+            if (!t) return 'professional';
+            const pct = t.match(/(\d+)\s*%/);
+            if (pct) {
+                const n = Number(pct[1]);
+                if (n >= 95) return 'native';
+                if (n >= 85) return 'fluent';
+                if (n >= 72) return 'professional';
+                if (n >= 58) return 'good';
+                if (n >= 40) return 'intermediate';
+                return 'basic';
+            }
+            const low = t.toLowerCase();
+            if (/שפת אם|native|mother tongue/.test(low)) return 'native';
+            if (/שוטפת|fluent|מלאה/.test(low)) return 'fluent';
+            if (/בסיס|basic|beginner/.test(low)) return 'basic';
+            if (/בינונ|intermediate/.test(low)) return 'intermediate';
+            if (/\bgood\b|טובה|\bטוב\b/.test(low)) return 'good';
+            if (/גבוה|high|professional|very good|מקצוע|advanced|טכנית|academic|אקדמ|legal|משפט/.test(low)) return 'professional';
+            return 'professional';
+        }
+
+        function parseLanguageField(text) {
+            return splitListItems(text).map((entry) => {
+                const parsed = parseLangEntry(entry);
+                const opt = matchLangOption(parsed.name);
+                const levelId = matchLangLevel(parsed.levelLabel || entry);
+                if (opt) return { langId: opt.id, levelId: levelId };
+                return { langId: '', customName: parsed.name, levelId: levelId };
+            }).filter((row) => row.langId || row.customName);
+        }
+
+        function serializeLanguageField(entries, lang) {
+            const ui = lang === 'en' ? 'en' : 'he';
+            return (entries || []).map((row) => {
+                const opt = row.langId ? findLangOption(row.langId) : null;
+                const name = opt ? langOptionLabel(opt, ui) : String(row.customName || '').trim();
+                const level = findLangLevel(row.levelId);
+                if (!name) return '';
+                return name + ' (' + langLevelLabel(level, ui) + ')';
+            }).filter(Boolean).join(', ');
+        }
+
+        function writeLanguageField() {
+            const el = formField('in-languages');
+            if (!el) return;
+            el.value = serializeLanguageField(cvLangEntries, cvUiLang());
+        }
+
+        function selectedLangIds() {
+            return cvLangEntries.map((row) => row.langId).filter(Boolean);
+        }
+
+        function fillLanguageSelects() {
+            const lang = cvUiLang();
+            const pack = CV_I18N[lang] || CV_I18N.he;
+            const nameSel = document.getElementById('lang-pick-name');
+            const levelSel = document.getElementById('lang-pick-level');
+            if (nameSel) {
+                const taken = selectedLangIds();
+                const prev = nameSel.value;
+                const featured = CV_LANGUAGE_FEATURED.map(findLangOption).filter(Boolean);
+                const rest = CV_LANGUAGE_OPTIONS.filter((opt) => CV_LANGUAGE_FEATURED.indexOf(opt.id) < 0)
+                    .slice()
+                    .sort((a, b) => langOptionLabel(a, lang).localeCompare(langOptionLabel(b, lang), lang === 'en' ? 'en' : 'he'));
+                nameSel.replaceChildren();
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = pack.labels.languagesSelect;
+                nameSel.appendChild(placeholder);
+                featured.concat(rest).forEach((opt) => {
+                    const el = document.createElement('option');
+                    el.value = opt.id;
+                    el.textContent = langOptionLabel(opt, lang);
+                    el.disabled = taken.indexOf(opt.id) >= 0;
+                    nameSel.appendChild(el);
+                });
+                if (prev && taken.indexOf(prev) < 0) nameSel.value = prev;
+                else nameSel.value = '';
+            }
+            if (levelSel) {
+                const prevLevel = levelSel.value || 'professional';
+                levelSel.replaceChildren();
+                CV_LANGUAGE_LEVELS.forEach((lvl) => {
+                    const el = document.createElement('option');
+                    el.value = lvl.id;
+                    el.textContent = langLevelLabel(lvl, lang);
+                    levelSel.appendChild(el);
+                });
+                levelSel.value = findLangLevel(prevLevel).id;
+            }
+        }
+
+        function languageRowTitle(row, lang) {
+            const opt = row.langId ? findLangOption(row.langId) : null;
+            return opt ? langOptionLabel(opt, lang) : String(row.customName || '');
+        }
+
+        function renderLanguageList() {
+            const list = document.getElementById('lang-pick-list');
+            if (!list) return;
+            const lang = cvUiLang();
+            const pack = CV_I18N[lang] || CV_I18N.he;
+            list.replaceChildren();
+            cvLangEntries.forEach((row, index) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'lang-pick-row';
+                const title = document.createElement('span');
+                title.className = 'lang-pick-title';
+                title.textContent = languageRowTitle(row, lang);
+                const levelSel = document.createElement('select');
+                levelSel.className = 'bg-slate-900 border border-slate-700 p-2 text-sm rounded-lg text-slate-100 outline-none min-h-11';
+                levelSel.setAttribute('data-lang-level', String(index));
+                levelSel.setAttribute('aria-label', pack.labels.languagesLevel);
+                CV_LANGUAGE_LEVELS.forEach((lvl) => {
+                    const opt = document.createElement('option');
+                    opt.value = lvl.id;
+                    opt.textContent = langLevelLabel(lvl, lang);
+                    levelSel.appendChild(opt);
+                });
+                levelSel.value = findLangLevel(row.levelId).id;
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'shrink-0 text-slate-300 hover:text-rose-300 border border-slate-600 rounded-lg px-2.5 min-h-11 text-sm';
+                remove.setAttribute('data-lang-remove', String(index));
+                remove.setAttribute('aria-label', pack.labels.languagesRemove);
+                remove.textContent = '×';
+                wrap.append(title, levelSel, remove);
+                list.appendChild(wrap);
+            });
+        }
+
+        function refreshLanguagePicker() {
+            fillLanguageSelects();
+            renderLanguageList();
+        }
+
+        function hydrateLanguagePicker() {
+            const el = formField('in-languages');
+            cvLangEntries = parseLanguageField(el ? el.value : '');
+            refreshLanguagePicker();
+        }
+
+        function relabelLanguageField() {
+            if (!cvLangEntries.length) hydrateLanguagePicker();
+            writeLanguageField();
+            refreshLanguagePicker();
+        }
+
+        function commitLanguagePicker() {
+            writeLanguageField();
+            refreshLanguagePicker();
+            updateCV();
+        }
+
+        function addCvLanguage() {
+            const nameSel = document.getElementById('lang-pick-name');
+            const levelSel = document.getElementById('lang-pick-level');
+            const langId = nameSel ? nameSel.value : '';
+            if (!langId || !findLangOption(langId)) return;
+            const levelId = findLangLevel(levelSel ? levelSel.value : 'professional').id;
+            const existing = cvLangEntries.findIndex((row) => row.langId === langId);
+            if (existing >= 0) cvLangEntries[existing].levelId = levelId;
+            else cvLangEntries.push({ langId: langId, levelId: levelId });
+            if (nameSel) nameSel.value = '';
+            commitLanguagePicker();
+        }
+
+        function removeCvLanguage(index) {
+            if (index < 0 || index >= cvLangEntries.length) return;
+            cvLangEntries.splice(index, 1);
+            commitLanguagePicker();
+        }
+
+        function setCvLanguageLevel(index, levelId) {
+            if (!cvLangEntries[index]) return;
+            cvLangEntries[index].levelId = findLangLevel(levelId).id;
+            commitLanguagePicker();
+        }
+
+        function bindLanguagePicker() {
+            if (window.__qcLangPickerBound) return;
+            window.__qcLangPickerBound = true;
+            const list = document.getElementById('lang-pick-list');
+            if (!list) return;
+            list.addEventListener('change', (e) => {
+                const sel = e.target && e.target.closest ? e.target.closest('[data-lang-level]') : null;
+                if (!sel) return;
+                setCvLanguageLevel(Number(sel.getAttribute('data-lang-level')), sel.value);
+            });
+            list.addEventListener('click', (e) => {
+                const btn = e.target && e.target.closest ? e.target.closest('[data-lang-remove]') : null;
+                if (!btn) return;
+                removeCvLanguage(Number(btn.getAttribute('data-lang-remove')));
+            });
+        }
+
+        window.addCvLanguage = addCvLanguage;
 
         function timelineMark(kind) {
             const mark = document.createElement('div');
@@ -3393,6 +3813,7 @@
         function clearCvForm() {
             if (!confirm('למחוק את כל השדות ולשחזר טופס ריק?')) return;
             QCDraft.clear();
+            if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
             updateCV();
         }
 
@@ -3430,8 +3851,14 @@
 
         function goStep(n) {
             markStep(n);
-            if (n === 1) document.getElementById('templates-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            if (n === 2) document.getElementById('design-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (n === 1) {
+                closeMobilePreview();
+                document.getElementById('details-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            if (n === 2) {
+                closeMobilePreview();
+                document.getElementById('design-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
             if (n === 3) openPaymentModal();
         }
 
@@ -3473,6 +3900,7 @@
             if (!col) return;
             col.classList.add('mobile-preview-open');
             col.setAttribute('aria-modal', 'true');
+            document.body.classList.add('qc-mobile-preview-open');
             updateCV();
         }
 
@@ -3481,6 +3909,7 @@
             if (!col) return;
             col.classList.remove('mobile-preview-open');
             col.removeAttribute('aria-modal');
+            document.body.classList.remove('qc-mobile-preview-open');
         }
 
         function isCvFormField(el) {
@@ -3567,12 +3996,37 @@
             if (input) input.value = '';
         }
 
+        function templateDisplayTitle(tpl, lang) {
+            if (!tpl) return '';
+            if (lang === 'en') return tpl.titleEn || tpl.title || '';
+            return tpl.titleHe || tpl.title || '';
+        }
+
         function templateCardHtml(id, tpl, lang) {
-            const sub = lang === 'en' ? tpl.subEn : tpl.subHe;
+            const sub = lang === 'en' ? (tpl.subEn || tpl.subHe) : (tpl.subHe || tpl.subEn);
+            const title = templateDisplayTitle(tpl, lang);
             return '<button type="button" class="template-card" data-example="' + id + '" aria-pressed="false">' +
                 '<span class="template-thumb home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
-                '<span class="template-card-title">' + tpl.title + '</span>' +
+                '<span class="template-card-title">' + title + '</span>' +
                 '<span class="template-card-sub">' + sub + '</span></button>';
+        }
+
+        function updateTemplateCountCopy(n, lang) {
+            const he = {
+                home: n + ' תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.',
+                studio: n + ' עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת',
+                modal: n + ' תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.'
+            };
+            const en = {
+                home: n + ' ready-made Canva-style templates. Pick a design, fill in your details, and the preview updates live.',
+                studio: n + ' Canva-style designs — selecting one fills the preview live',
+                modal: n + ' ready-made Canva-style templates. A pick loads layout, colors, and a sample you can edit live.'
+            };
+            const pack = lang === 'en' ? en : he;
+            document.querySelectorAll('[data-template-count-copy]').forEach((el) => {
+                const key = el.getAttribute('data-template-count-copy');
+                if (pack[key]) el.textContent = pack[key];
+            });
         }
 
         function renderTemplateGalleries() {
@@ -3588,9 +4042,10 @@
                     if (!tpl) return '';
                     return '<button type="button" class="home-layout" data-example="' + id + '">' +
                         '<span class="home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
-                        '<span>' + tpl.title + '</span></button>';
+                        '<span>' + templateDisplayTitle(tpl, lang) + '</span></button>';
                 }).join('');
             }
+            updateTemplateCountCopy(order.length, lang);
             markTemplateCards(window.QCExample || '');
         }
 
@@ -3622,9 +4077,11 @@
                 const el = formField(id);
                 if (el) el.value = map[id] == null ? '' : map[id];
             });
+            if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
             const phrase = document.getElementById('phrase-field');
             if (phrase && tpl.field) phrase.value = tpl.field;
             renderPhrases();
+            if (typeof renderRoleTitleChips === 'function') renderRoleTitleChips();
             setCvLang(lang, { restore: true });
             if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
             setCvSkin(tpl.skin || '');
@@ -3644,10 +4101,98 @@
             if (fromHome && window.matchMedia('(max-width: 1023px)').matches) openMobilePreview();
         }
 
+        function currentRoleField() {
+            const select = document.getElementById('phrase-field');
+            return select && select.value ? select.value : 'sales';
+        }
+
+        function roleIdsFromPack(pack) {
+            if (pack && pack.fields && pack.fields.length) return pack.fields.map((f) => f.id);
+            return (window.QCPhrases && QCPhrases.roleIds) || ['sales'];
+        }
+
+        function fillRoleTitleList() {
+            const pack = phrasePack();
+            const list = document.getElementById('role-title-list');
+            if (!list) return;
+            list.replaceChildren();
+            const seen = {};
+            roleIdsFromPack(pack).forEach((id) => {
+                (pack.titles && pack.titles[id] || []).forEach((title) => {
+                    if (seen[title]) return;
+                    seen[title] = true;
+                    const opt = document.createElement('option');
+                    opt.value = title;
+                    list.appendChild(opt);
+                });
+            });
+        }
+
+        function renderRoleTitleChips() {
+            const wrap = document.getElementById('role-title-chips');
+            if (!wrap) return;
+            const pack = phrasePack();
+            const field = currentRoleField();
+            const titles = (pack.titles && pack.titles[field]) || [];
+            wrap.replaceChildren();
+            const align = window.QCCvLang === 'en' ? 'text-left' : 'text-right';
+            titles.forEach((title) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'text-[11px] bg-slate-800 border border-emerald-700/60 text-emerald-200 hover:border-emerald-400 rounded-lg px-2.5 py-2 leading-snug font-semibold ' + align;
+                btn.innerText = title;
+                btn.onclick = () => applyRoleTitle(title);
+                wrap.appendChild(btn);
+            });
+        }
+
+        function applyRoleTitle(title) {
+            const el = formField('in-title');
+            if (!el || !title) return;
+            el.value = title;
+            updateCV();
+            QCDraft.save();
+        }
+
+        function onRoleFieldChange() {
+            renderPhrases();
+            renderRoleTitleChips();
+        }
+
+        function loadRoleExample() {
+            const pack = phrasePack();
+            const field = currentRoleField();
+            const example = pack.examples && pack.examples[field];
+            if (!example) return;
+            const i18n = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'];
+            const msg = i18n.phrasesConfirm || '';
+            if (msg && !confirm(msg)) return;
+            const map = {
+                'in-title': example.title,
+                'in-summary': example.summary,
+                'in-experience': example.experience,
+                'in-education': example.education,
+                'in-military': example.military,
+                'in-skills': example.skills,
+                'in-languages': example.languages
+            };
+            Object.keys(map).forEach((id) => {
+                const el = formField(id);
+                if (el) el.value = map[id] == null ? '' : map[id];
+            });
+            if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
+            renderPhrases();
+            renderRoleTitleChips();
+            updateCV();
+            QCDraft.save();
+            markStep(1);
+        }
+
         function renderPhrases() {
             const pack = phrasePack();
-            const field = document.getElementById('phrase-field').value;
+            const field = currentRoleField();
             const wrap = document.getElementById('phrase-bullets');
+            if (!wrap) return;
             wrap.innerHTML = '';
             const align = window.QCCvLang === 'en' ? 'text-left' : 'text-right';
             (pack.bullets[field] || []).forEach((text) => {
@@ -3691,7 +4236,9 @@
                 select.appendChild(opt);
             });
             if (prev && pack.bullets[prev]) select.value = prev;
+            fillRoleTitleList();
             renderPhrases();
+            renderRoleTitleChips();
         }
 
         function applyView(studio) {
@@ -3717,7 +4264,11 @@
         function showStudio() {
             applyView(true);
             if (location.hash !== '#studio') history.replaceState(null, '', '#studio');
+            closeMobilePreview();
             window.scrollTo(0, 0);
+            window.setTimeout(() => {
+                document.getElementById('details-panel')?.scrollIntoView({ block: 'start' });
+            }, 0);
             updateCV();
         }
 
@@ -3735,6 +4286,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') return;
             closeExamplesModal();
+            closeMobilePreview();
         });
 
         document.getElementById('details-panel').addEventListener('focusin', function () { markStep(1); });
@@ -3747,6 +4299,8 @@
         window.setCvSkin = setCvSkin;
         window.setCvLang = setCvLang;
         window.loadExample = loadExample;
+        window.loadRoleExample = loadRoleExample;
+        window.onRoleFieldChange = onRoleFieldChange;
         window.onPhotoChange = onPhotoChange;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
@@ -3762,6 +4316,7 @@
             });
         }
         bindLivePreview();
+        bindLanguagePicker();
         try {
             initPhrases();
             renderTemplateGalleries();
@@ -3782,6 +4337,7 @@
             markTemplateCards(draft && draft.example ? draft.example : '');
             renderTemplateGalleries();
             renderPhrases();
+            hydrateLanguagePicker();
         } catch (err) {
             console.error('studio init failed', err);
         }

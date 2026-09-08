@@ -1,5 +1,5 @@
 export const VERIFY_FAIL_MSG =
-  "Payment screenshot could not be verified. Please make sure the transfer of 5 ILS to 054-3554888 is clearly visible.";
+  "Payment screenshot could not be verified. Please make sure the transfer of 9.9 ILS to 054-3554888 is clearly visible.";
 
 const MAX_BYTES = 4 * 1024 * 1024;
 const MAX_EDGE = 1600;

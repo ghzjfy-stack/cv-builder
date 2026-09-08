@@ -1,14 +1,14 @@
 /** Configure once: WhatsApp (international, no +) and Bit display/copy numbers. */
 export const CHECKOUT = {
-  amountIls: 5,
-  compareAtIls: 29,
+  amountIls: 9.9,
+  compareAtIls: 39.9,
   whatsappNumber: "972543554888",
   bitPhoneDisplay: "054-3554888",
   bitPhoneCopy: "0543554888",
   bitPhoneIntl: "972543554888",
   bitAppUrl: "https://www.bitpay.co.il/app/",
   whatsappMessage:
-    'היי, שילמתי 5 ש"ח ב-Bit עבור קורות החיים. מצרף צילום מסך לקבלת קוד האימות.',
+    'היי, שילמתי 9.9 ש"ח ב-Bit עבור קורות החיים. מצרף צילום מסך לקבלת קוד האימות.',
 } as const;
 
 /** Path Bit's app expects when opening a P2P send (phone + amount). */

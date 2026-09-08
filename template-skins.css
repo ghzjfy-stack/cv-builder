@@ -107,6 +107,7 @@
     }
 }
 .template-thumb {
+    display: block;
     height: 6.6rem;
 }
 .lay-espresso { background: #f7f3ec; }

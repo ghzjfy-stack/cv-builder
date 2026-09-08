@@ -425,6 +425,7 @@
             min-height: 7.5rem;
         }
         .home-layout-frame {
+            display: block;
             height: 4.4rem;
             border-radius: 0.45rem;
             background: #f4eee4;
@@ -437,7 +438,8 @@
             background: #d6c7ae;
             border-radius: 2px;
         }
-        .home-layout p {
+        .home-layout p,
+        .home-layout > span:last-child {
             font-size: 0.72rem;
             font-weight: 700;
             color: #44403c;
@@ -618,6 +620,7 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: normal;
+            color: #1e293b;
         }
         #cv-target.cv-lang-en,
         #qc-print-host .cv-print-sheet.cv-lang-en {
@@ -1103,6 +1106,24 @@
             grid-template-columns: 1fr 1fr;
             gap: 0.65rem;
         }
+        #examples-modal {
+            z-index: 10040;
+            align-items: center;
+            justify-content: center;
+        }
+        #examples-modal .examples-backdrop {
+            position: absolute;
+            inset: 0;
+            border: 0;
+            padding: 0;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        #examples-modal .examples-panel {
+            position: relative;
+            z-index: 1;
+            pointer-events: auto;
+        }
         .template-card {
             text-align: right;
             border-radius: 1.1rem;
@@ -1110,6 +1131,10 @@
             background: #0f172a;
             padding: 0.7rem;
             color: inherit;
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 1;
         }
         .template-card:hover { border-color: #60a5fa; }
         .template-card[aria-pressed="true"] {
@@ -1117,6 +1142,7 @@
             box-shadow: 0 0 0 1px #93c5fd inset;
         }
         .template-thumb {
+            display: block;
             height: 6.6rem;
             border-radius: 0.45rem;
             background: #f4eee4;
@@ -1130,11 +1156,13 @@
             border-radius: 2px;
         }
         .template-card-title {
+            display: block;
             font-size: 0.78rem;
             font-weight: 800;
             color: #e2e8f0;
         }
         .template-card-sub {
+            display: block;
             font-size: 0.65rem;
             color: #94a3b8;
             margin-top: 0.15rem;
@@ -1144,6 +1172,15 @@
             width: 100%;
             text-align: right;
             cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .template-thumb,
+        .home-layout-frame,
+        .template-thumb *,
+        .home-layout-frame * {
+            pointer-events: none;
         }
         .home-layout:hover { border-color: rgba(28, 25, 23, 0.22); }
         .cv-photo-file { display: none; }
@@ -2430,8 +2467,9 @@
     </div>
     </div>
 
-    <div id="examples-modal" class="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
-        <div class="bg-slate-900 text-slate-100 rounded-3xl max-w-4xl w-full my-4 p-5 sm:p-6 space-y-4 shadow-2xl relative border border-slate-700">
+    <div id="examples-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
+        <button type="button" class="examples-backdrop" onclick="closeExamplesModal()" aria-label="סגור דוגמאות"></button>
+        <div class="examples-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-4xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
             <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגור דוגמאות">✕</button>
             <h3 id="examples-title" class="text-lg font-extrabold">תבניות מוכנות</h3>
             <p class="text-xs text-slate-400">15 תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.</p>
@@ -2617,8 +2655,17 @@
             }
         };
 
+        function formField(id) {
+            const form = document.getElementById('studio-form-column') || document.getElementById('details-panel');
+            if (form) {
+                const scoped = form.querySelector('#' + id);
+                if (scoped) return scoped;
+            }
+            return document.getElementById(id);
+        }
+
         function getVal(id) {
-            const el = document.getElementById(id);
+            const el = formField(id);
             if (!el || el.value == null) return '';
             try {
                 return (window.QCSanitize && typeof QCSanitize.text === 'function')
@@ -2636,6 +2683,11 @@
                 if (scoped) return scoped;
             }
             return document.getElementById(id);
+        }
+
+        function setOutText(el, val) {
+            if (!el) return;
+            el.textContent = val || '';
         }
 
         function toMailto(value) {
@@ -2716,7 +2768,7 @@
         }
 
         function snapshotCvFields() {
-            return CV_SAMPLE_IDS.map((id) => (document.getElementById(id)?.value || '').replace(/\r\n/g, '\n').trim()).join('\n---\n');
+            return CV_SAMPLE_IDS.map((id) => (formField(id)?.value || '').replace(/\r\n/g, '\n').trim()).join('\n---\n');
         }
 
         function snapshotCvSample(lang) {
@@ -2727,7 +2779,7 @@
         function fillCvSample(lang) {
             const sample = CV_SAMPLES[lang];
             CV_SAMPLE_IDS.forEach((id) => {
-                const el = document.getElementById(id);
+                const el = formField(id);
                 if (el) el.value = sample[id];
             });
         }
@@ -2825,7 +2877,7 @@
                     if (!el) return;
                     el.replaceChildren();
                     if (val) {
-                        el.style.display = 'inline';
+                        el.style.display = '';
                         const icon = document.createElement('span');
                         icon.className = 'dynamic-icon';
                         icon.textContent = prefix;
@@ -2850,18 +2902,12 @@
                 const setSec = (secId, outId, val) => {
                     const sec = document.getElementById(secId);
                     const out = cvOut(outId);
-                    if (!sec || !out) return;
-                    if (val) {
-                        sec.style.display = 'block';
-                        out.innerText = val;
-                    } else {
-                        sec.style.display = 'none';
-                        out.innerText = '';
-                    }
+                    if (sec) sec.style.display = val ? 'block' : 'none';
+                    setOutText(out, val);
                 };
 
                 ['in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-references'].forEach((id) => {
-                    const el = document.getElementById(id);
+                    const el = formField(id);
                     if (el && window.QCSanitize && QCSanitize.looksSuspicious(el.value)) {
                         window.QCLog?.add('suspicious_input', id);
                     }
@@ -2869,8 +2915,8 @@
 
                 const nameOut = cvOut('out-name');
                 const titleOut = cvOut('out-title');
-                if (nameOut) nameOut.innerText = getVal('in-name') || pack.nameFallback;
-                if (titleOut) titleOut.innerText = getVal('in-title') || pack.titleFallback;
+                setOutText(nameOut, getVal('in-name') || pack.nameFallback);
+                setOutText(titleOut, getVal('in-title') || pack.titleFallback);
 
                 const emailVal = getVal('in-email');
                 const linkedinVal = getVal('in-linkedin');
@@ -2886,18 +2932,26 @@
                 setField('out-location-side', getVal('in-location'), '📍 ');
                 setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
                 document.querySelectorAll('#cv-target .cv-contact-row').forEach((row) => {
-                    const slot = row.querySelector('span[id]');
-                    row.style.display = slot && slot.style.display === 'none' ? 'none' : '';
+                    const slot = row.querySelector('[id^="out-"]');
+                    const empty = !slot || slot.style.display === 'none' || !slot.textContent.trim();
+                    row.style.display = empty ? 'none' : '';
                 });
 
                 setSec('sec-summary', 'out-summary', getVal('in-summary'));
                 setSec('sec-military', 'out-military', getVal('in-military'));
-                renderCharcoalFields();
-                if (window.QCDraft) QCDraft.saveSoon();
             } catch (err) {
                 console.error('updateCV failed', err);
             }
+            try {
+                renderCharcoalFields();
+            } catch (err) {
+                console.error('preview layout render failed', err);
+            }
+            try {
+                if (window.QCDraft) QCDraft.saveSoon();
+            } catch (err) { /* ignore draft errors during typing */ }
         }
+        window.updateCV = updateCV;
 
         function currentLayoutName() {
             const target = document.getElementById('cv-target');
@@ -3056,15 +3110,15 @@
             if (!charcoal && !navy && !azure) {
                 if (expOut) {
                     expOut.classList.add('whitespace-pre-line');
-                    expOut.innerText = expVal;
+                    expOut.textContent = expVal;
                 }
                 if (eduOut) {
                     eduOut.classList.add('whitespace-pre-line');
-                    eduOut.innerText = eduVal;
+                    eduOut.textContent = eduVal;
                 }
                 if (eduSide) eduSide.replaceChildren();
-                if (skillOut) skillOut.innerText = skillVal;
-                if (langOut) langOut.innerText = langVal;
+                if (skillOut) skillOut.textContent = skillVal;
+                if (langOut) langOut.textContent = langVal;
                 showSec(expSec, !!expVal);
                 showSec(eduSec, !!eduVal);
                 showSec(eduSideSec, false);
@@ -3119,7 +3173,7 @@
                         eduSide.appendChild(fallback);
                     }
                 }
-                if (eduOut) eduOut.innerText = '';
+                if (eduOut) eduOut.textContent = '';
                 showSec(eduSec, false);
                 showSec(eduSideSec, !!eduVal);
 
@@ -3184,7 +3238,7 @@
                     container.appendChild(wrap);
                 });
                 if (text && !container.childElementCount) {
-                    container.innerText = text;
+                    container.textContent = text;
                 }
             }
 
@@ -3239,7 +3293,7 @@
                     }
                 }
                 fillEdu(eduSide);
-                if (eduOut) eduOut.innerText = '';
+                if (eduOut) eduOut.textContent = '';
                 showSec(eduSec, false);
                 showSec(eduSideSec, !!eduVal);
             }
@@ -3308,7 +3362,7 @@
             sec.style.display = 'block';
             if (!structured) {
                 out.classList.add('whitespace-pre-line');
-                out.innerText = val;
+                out.textContent = val;
                 return;
             }
             out.classList.remove('whitespace-pre-line');
@@ -3360,14 +3414,15 @@
         function markStep(n) {
             for (let i = 1; i <= 3; i++) {
                 const btn = document.getElementById('step-' + i);
+                if (!btn) continue;
                 const num = btn.querySelector('span');
                 if (i === n) {
                     btn.className = 'step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white min-h-10';
-                    num.className = 'w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]';
+                    if (num) num.className = 'w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]';
                     btn.setAttribute('aria-current', 'step');
                 } else {
                     btn.className = 'step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:text-slate-100 min-h-10';
-                    num.className = 'w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]';
+                    if (num) num.className = 'w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]';
                     btn.removeAttribute('aria-current');
                 }
             }
@@ -3430,8 +3485,11 @@
 
         function isCvFormField(el) {
             if (!el || !(el instanceof Element)) return false;
-            if (el.closest('#payment-modal, #examples-modal, #download-code')) return false;
-            return !!(el.closest('#studio-form-column, #details-panel') && el.matches('input, textarea, select'));
+            if (el.closest('#payment-modal, #examples-modal, #download-code, #download-step')) return false;
+            if (el.closest('#studio-form-column, #details-panel, #design-panel, #templates-panel')) {
+                return el.matches('input, textarea, select');
+            }
+            return false;
         }
 
         function bindLivePreview() {
@@ -3447,18 +3505,22 @@
                 raf = requestAnimationFrame(run);
             };
             const onFormEvent = (e) => {
-                if (isCvFormField(e.target)) schedule();
+                const t = e.target;
+                if (isCvFormField(t) || (t && t.id && String(t.id).indexOf('in-') === 0)) schedule();
             };
             document.addEventListener('input', onFormEvent, true);
             document.addEventListener('change', onFormEvent, true);
             document.addEventListener('keyup', onFormEvent, true);
             document.addEventListener('compositionend', onFormEvent, true);
             document.addEventListener('paste', (e) => {
-                if (isCvFormField(e.target)) window.setTimeout(schedule, 0);
+                if (isCvFormField(e.target) || (e.target && e.target.id && String(e.target.id).indexOf('in-') === 0)) {
+                    window.setTimeout(schedule, 0);
+                }
             }, true);
         }
 
         function openExamplesModal() {
+            closeMobilePreview();
             const modal = document.getElementById('examples-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -3507,10 +3569,10 @@
 
         function templateCardHtml(id, tpl, lang) {
             const sub = lang === 'en' ? tpl.subEn : tpl.subHe;
-            return '<button type="button" class="template-card" data-example="' + id + '" aria-pressed="false" onclick="loadExample(\'' + id + '\')">' +
-                '<div class="template-thumb home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></div>' +
-                '<p class="template-card-title">' + tpl.title + '</p>' +
-                '<p class="template-card-sub">' + sub + '</p></button>';
+            return '<button type="button" class="template-card" data-example="' + id + '" aria-pressed="false">' +
+                '<span class="template-thumb home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
+                '<span class="template-card-title">' + tpl.title + '</span>' +
+                '<span class="template-card-sub">' + sub + '</span></button>';
         }
 
         function renderTemplateGalleries() {
@@ -3524,18 +3586,20 @@
                 home.innerHTML = order.map((id) => {
                     const tpl = bank[id];
                     if (!tpl) return '';
-                    return '<button type="button" class="home-layout" onclick="loadExample(\'' + id + '\')">' +
-                        '<div class="home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></div>' +
-                        '<p>' + tpl.title + '</p></button>';
+                    return '<button type="button" class="home-layout" data-example="' + id + '">' +
+                        '<span class="home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
+                        '<span>' + tpl.title + '</span></button>';
                 }).join('');
             }
             markTemplateCards(window.QCExample || '');
         }
 
         function loadExample(key) {
+            if (!key) return;
             if (TEMPLATE_ALIASES[key]) key = TEMPLATE_ALIASES[key];
             const tpl = (window.QCTemplates || {})[key];
             if (!tpl) return;
+            const fromHome = document.body.classList.contains('on-home');
             const lang = window.QCCvLang === 'en' ? 'en' : 'he';
             const pack = tpl[lang] || tpl.en || tpl.he;
             if (!pack) return;
@@ -3555,7 +3619,7 @@
                 'in-references': pack.references || ''
             };
             Object.keys(map).forEach((id) => {
-                const el = document.getElementById(id);
+                const el = formField(id);
                 if (el) el.value = map[id] == null ? '' : map[id];
             });
             const phrase = document.getElementById('phrase-field');
@@ -3577,7 +3641,7 @@
             closeExamplesModal();
             showStudio();
             markStep(1);
-            openMobilePreview();
+            if (fromHome && window.matchMedia('(max-width: 1023px)').matches) openMobilePreview();
         }
 
         function renderPhrases() {
@@ -3637,7 +3701,7 @@
             home.hidden = studio;
             studioEl.hidden = !studio;
             home.inert = studio;
-            studioEl.inert = !studio;
+            studioEl.inert = false;
             home.setAttribute('aria-hidden', studio ? 'true' : 'false');
             studioEl.setAttribute('aria-hidden', studio ? 'false' : 'true');
             document.body.classList.toggle('on-home', !studio);
@@ -3654,6 +3718,7 @@
             applyView(true);
             if (location.hash !== '#studio') history.replaceState(null, '', '#studio');
             window.scrollTo(0, 0);
+            updateCV();
         }
 
         function showHome() {
@@ -3685,6 +3750,17 @@
         window.onPhotoChange = onPhotoChange;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
+        if (!window.__qcExampleBound) {
+            window.__qcExampleBound = true;
+            document.addEventListener('click', function (e) {
+                const btn = e.target && e.target.closest && e.target.closest('[data-example]');
+                if (!btn || btn.disabled) return;
+                const key = btn.getAttribute('data-example');
+                if (!key) return;
+                e.preventDefault();
+                loadExample(key);
+            });
+        }
         bindLivePreview();
         try {
             initPhrases();
@@ -3709,9 +3785,9 @@
         } catch (err) {
             console.error('studio init failed', err);
         }
-        updateCV();
         markStep(1);
         syncViewFromHash();
+        updateCV();
         window.addEventListener('hashchange', syncViewFromHash);
     </script>
 </body>

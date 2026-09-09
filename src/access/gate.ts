@@ -43,7 +43,7 @@ export function unlockWithPaymentToken(token: string): void {
 
 export function getPaymentToken(): string | null {
   try {
-    return storage()?.getItem(PAYMENT_TOKEN_KEY);
+    return storage()?.getItem(PAYMENT_TOKEN_KEY) ?? null;
   } catch {
     return null;
   }

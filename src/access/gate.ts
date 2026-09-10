@@ -41,8 +41,7 @@ export function unlockWithPaymentToken(token: string): void {
 
 export function getPaymentToken(): string | null {
   try {
-    const token = storage()?.getItem(PAYMENT_TOKEN_KEY);
-    return token ?? null;
+    return storage()?.getItem(PAYMENT_TOKEN_KEY) ?? null;
   } catch {
     return null;
   }

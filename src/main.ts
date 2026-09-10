@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { requestCvAi } from "./ai/cvAi.js";
 import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken, WRONG_CODE_MSG } from "./access/gate.js";
 import {
   CHECKOUT,
@@ -58,6 +57,7 @@ function setSelectedPack(packId: PackId, persist = true) {
   }
   applyPackUi();
   payboxSessionCache = { key: "", sessionId: "", payUrl: "" };
+  if (selectedPayMethod === "paybox") void prefetchHostedPay("paybox");
 }
 
 function setScreenshotFeedback(text, ok) {
@@ -206,21 +206,19 @@ function stopPayboxPoll() {
 }
 
 function setPayMethod(method) {
-  selectedPayMethod = method === "paybox" || method === "card" ? method : "bit";
+  selectedPayMethod = method === "paybox" ? "paybox" : "bit";
   document.querySelectorAll("[data-pay-method]").forEach((btn) => {
     const on = btn.getAttribute("data-pay-method") === selectedPayMethod;
     btn.setAttribute("aria-selected", on ? "true" : "false");
   });
   document.getElementById("pay-panel-bit")?.classList.toggle("hidden", selectedPayMethod !== "bit");
   document.getElementById("pay-panel-paybox")?.classList.toggle("hidden", selectedPayMethod !== "paybox");
-  document.getElementById("pay-panel-card")?.classList.toggle("hidden", selectedPayMethod !== "card");
+  if (selectedPayMethod === "paybox") void prefetchHostedPay("paybox");
 }
 
 function setHostedPayStatus(text) {
   const paybox = document.getElementById("paybox-poll-status");
-  const card = document.getElementById("card-poll-status");
   if (paybox) paybox.textContent = selectedPayMethod === "paybox" ? text : "";
-  if (card) card.textContent = selectedPayMethod === "card" ? text : "";
 }
 
 function applyPaidUnlock(token, message) {
@@ -233,24 +231,43 @@ function applyPaidUnlock(token, message) {
   void runHighResExport();
 }
 
+function prefersSameTabCheckout() {
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  return /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
+}
+
+function isReadyPayUrl(url) {
+  const href = String(url || "").trim();
+  if (!href || href === "#" || href.endsWith("#")) return false;
+  try {
+    const parsed = new URL(href, window.location.href);
+    if (parsed.origin === window.location.origin && (parsed.pathname === "/" || parsed.pathname === window.location.pathname)) {
+      return false;
+    }
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 async function ensureHostedSession(method: PayboxMethod) {
-  const key = `${method}:${selectedPack}:${readCheckoutContact()}`;
+  const payMethod = "paybox";
+  const key = `${payMethod}:${selectedPack}:${readCheckoutContact()}`;
   if (payboxSessionCache.key === key && payboxSessionCache.sessionId && payboxSessionCache.payUrl) {
     return payboxSessionCache;
   }
   const created = await createPayboxSession({
     pack: selectedPack,
     contact: readCheckoutContact(),
-    method,
+    method: payMethod,
   });
   if (!created.ok || !created.session_id) {
     throw new Error(created.error || "session_failed");
   }
-  const fallback = method === "card" ? CHECKOUT.payboxCardUrl : CHECKOUT.payboxPayUrl;
   payboxSessionCache = {
     key,
     sessionId: created.session_id,
-    payUrl: created.pay_url || fallback,
+    payUrl: created.pay_url || CHECKOUT.payboxPayUrl,
   };
   return payboxSessionCache;
 }
@@ -259,20 +276,42 @@ function bindHostedPayLink(id, url) {
   const el = document.getElementById(id);
   if (!(el instanceof HTMLAnchorElement) || !url) return;
   el.href = url;
-  el.target = "_blank";
-  el.rel = "noopener";
+  el.target = prefersSameTabCheckout() ? "_self" : "paybox_checkout";
+  el.rel = "noopener noreferrer";
+}
+
+function openCheckoutUrl(url, popup) {
+  if (!url) return;
+  if (prefersSameTabCheckout()) {
+    window.location.assign(url);
+    return;
+  }
+  if (popup && !popup.closed) {
+    popup.location.replace(url);
+    return;
+  }
+  const opened = window.open(url, "paybox_checkout");
+  if (!opened) window.location.assign(url);
+}
+
+async function prefetchHostedPay(method: PayboxMethod) {
+  try {
+    const session = await ensureHostedSession(method);
+    bindHostedPayLink("btn-open-paybox", session.payUrl);
+  } catch {
+    /* click handler retries */
+  }
 }
 
 async function startHostedPayment(method: PayboxMethod) {
   stopPayboxPoll();
-  setHostedPayStatus("פותחים סשן תשלום...");
+  setHostedPayStatus("ממתינים לאישור PayBox...");
   try {
     const session = await ensureHostedSession(method);
-    bindHostedPayLink(method === "card" ? "btn-open-card" : "btn-open-paybox", session.payUrl);
-    setHostedPayStatus("ממתינים לאישור PayBox...");
+    bindHostedPayLink("btn-open-paybox", session.payUrl);
     setVerifyOverlay(
       true,
-      method === "card" ? "ממתינים לאישור כרטיס האשראי..." : "ממתינים לאישור PayBox...",
+      "ממתינים לאישור PayBox...",
       "אפשר לחזור לכאן אחרי התשלום — נזהה אותו אוטומטית",
     );
     payboxPoll = new AbortController();
@@ -297,12 +336,42 @@ async function startHostedPayment(method: PayboxMethod) {
 }
 
 async function onHostedPayClick(e, method: PayboxMethod) {
+  const el = e?.currentTarget;
+  const sameTab = prefersSameTabCheckout();
+  const readyHref = el instanceof HTMLAnchorElement ? el.href : "";
+  const cachedReady =
+    payboxSessionCache.payUrl &&
+    payboxSessionCache.key.startsWith("paybox:") &&
+    isReadyPayUrl(payboxSessionCache.payUrl);
+
+  if (sameTab && cachedReady && isReadyPayUrl(readyHref)) {
+    bindHostedPayLink("btn-open-paybox", payboxSessionCache.payUrl);
+    void startHostedPayment(method);
+    return;
+  }
+
   e?.preventDefault?.();
+  const popup = sameTab ? null : window.open("about:blank", "paybox_checkout");
+  setHostedPayStatus("פותחים את PayBox...");
   try {
     const session = await ensureHostedSession(method);
-    if (session.payUrl) window.open(session.payUrl, "_blank", "noopener");
+    bindHostedPayLink("btn-open-paybox", session.payUrl);
+    if (session.payUrl) openCheckoutUrl(session.payUrl, popup);
+    else {
+      try {
+        popup?.close();
+      } catch {
+        /* ignore */
+      }
+      throw new Error("לא קיבלנו קישור תשלום מ-PayBox.");
+    }
     void startHostedPayment(method);
   } catch (err) {
+    try {
+      popup?.close();
+    } catch {
+      /* ignore */
+    }
     const message = err instanceof Error && err.message ? err.message : "לא הצלחנו לפתוח את PayBox.";
     setHostedPayStatus(message);
     setFeedback(message, false);
@@ -733,7 +802,7 @@ function styleCta(el) {
 function buildShieldGrid() {
   const grid = document.getElementById("cv-shield-grid");
   if (!grid || grid.childElementCount) return;
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 16; i++) {
     const span = document.createElement("span");
     span.textContent = "תצוגה מקדימה · QuickCV";
     grid.appendChild(span);
@@ -859,9 +928,6 @@ function bind() {
   document.getElementById("btn-open-paybox")?.addEventListener("click", (e) => {
     void onHostedPayClick(e, "paybox");
   });
-  document.getElementById("btn-open-card")?.addEventListener("click", (e) => {
-    void onHostedPayClick(e, "card");
-  });
   document.querySelectorAll("[data-pay-method]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const method = btn.getAttribute("data-pay-method") || "bit";
@@ -903,8 +969,6 @@ function bind() {
   modal()?.addEventListener("click", (e) => {
     if (e.target === modal()) dismissCheckout(e);
   });
-
-  window.QCCvAi = { request: requestCvAi };
 }
 
 if (document.readyState === "loading") {

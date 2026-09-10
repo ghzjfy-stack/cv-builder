@@ -50,31 +50,6 @@ async function sendWhatsApp(phone, code) {
   return { delivered: true, channel: "whatsapp", error: null };
 }
 
-async function sendTwilioSms(phone, code) {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const auth = process.env.TWILIO_AUTH_TOKEN;
-  const from = process.env.TWILIO_FROM_NUMBER;
-  if (!sid || !auth || !from || !phone) return null;
-
-  const body = new URLSearchParams({
-    To: `+${phone}`,
-    From: from,
-    Body: messageBody(code),
-  });
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${sid}:${auth}`).toString("base64")}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body,
-  });
-  if (!res.ok) {
-    return { delivered: false, channel: "sms", error: "twilio_error" };
-  }
-  return { delivered: true, channel: "sms", error: null };
-}
-
 async function sendEmail(email, code) {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM || "QuickCV <noreply@quickcv.app>";
@@ -106,11 +81,9 @@ export async function sendVerificationCode({ phone, email, code }) {
   try {
     const wa = await sendWhatsApp(intlPhone, code);
     if (wa?.delivered) return wa;
-    const sms = await sendTwilioSms(intlPhone, code);
-    if (sms?.delivered) return sms;
     const em = await sendEmail(mail, code);
     if (em?.delivered) return em;
-    return wa || sms || em || FAIL;
+    return wa || em || FAIL;
   } catch {
     return { delivered: false, channel: null, error: "send_failed" };
   }

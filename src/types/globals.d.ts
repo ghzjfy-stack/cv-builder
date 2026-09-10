@@ -27,13 +27,7 @@ declare global {
       fromPath: (pathname: string) => { slug: string } | null;
     };
     updateCV?: () => void;
-    QCCvAi?: {
-      request: (
-        action: "parse" | "polish",
-        payload: { text: string; lang?: string; context?: string },
-      ) => Promise<{ ok: boolean; cv?: Record<string, string>; text?: string; error?: string }>;
-    };
-    QCExperienceEditor?: { refresh: () => void };
+    QCExperience?: { refresh: () => void; applyI18n: () => void };
     QCPhotoDataUrl?: string;
     QCDraft?: {
       save: () => void;

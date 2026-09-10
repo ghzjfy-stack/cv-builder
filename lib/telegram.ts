@@ -114,20 +114,33 @@ export async function sendTelegramOrderNotification(
       return { sent: false, error: "not_configured" };
     }
 
+    const code = String(orderData.verificationCode || "").trim();
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 8000);
     let res: Response;
     try {
+      const body: Record<string, unknown> = {
+        chat_id: cfg.chatId,
+        text: formatOrderNotificationMessage(orderData),
+        parse_mode: "Markdown",
+        disable_web_page_preview: true,
+      };
+      if (code) {
+        body.reply_markup = {
+          inline_keyboard: [
+            [
+              { text: "Revoke code", callback_data: `revoke:${code}` },
+              { text: "Help", callback_data: "help" },
+            ],
+          ],
+        };
+      }
       res = await fetch(`https://api.telegram.org/bot${cfg.token}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
-        body: JSON.stringify({
-          chat_id: cfg.chatId,
-          text: formatOrderNotificationMessage(orderData),
-          parse_mode: "Markdown",
-          disable_web_page_preview: true,
-        }),
+        body: JSON.stringify(body),
       });
     } finally {
       clearTimeout(timer);

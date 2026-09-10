@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { requestCvAi } from "./ai/cvAi.js";
 import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, WRONG_CODE_MSG } from "./access/gate.js";
 import {
   CHECKOUT,
@@ -571,7 +570,6 @@ function bind() {
     if (e.target === modal()) dismissCheckout(e);
   });
 
-  window.QCCvAi = { request: requestCvAi };
 }
 
 if (document.readyState === "loading") {

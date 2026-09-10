@@ -1,10 +1,10 @@
 import { createServer } from "node:http";
-import { handleCvAiRequest } from "./cvAi.js";
 import { handlePayboxSessionRequest, handlePayboxStatusRequest } from "./payboxSession.js";
 import { handlePayboxWebhookRequest } from "./payboxWebhook.js";
 import { handlePaymentWebhookRequest } from "./paymentWebhook.js";
 import { handleVerifyCodeAndDownloadRequest } from "./verifyCodeDownload.js";
 import { handleSendPdfWhatsappRequest } from "./sendPdfWhatsapp.js";
+import { handleTelegramWebhookRequest } from "./telegramBot.js";
 import { handleVerifyPaymentRequest } from "./verifyPayment.js";
 import { loadEnv } from "./env.js";
 
@@ -19,8 +19,8 @@ const routes = {
   "/api/paybox-session": handlePayboxSessionRequest,
   "/api/paybox-status": handlePayboxStatusRequest,
   "/api/verify-code-and-download": handleVerifyCodeAndDownloadRequest,
-  "/api/cv-ai": handleCvAiRequest,
   "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,
+  "/api/telegram-webhook": handleTelegramWebhookRequest,
 };
 
 createServer((req, res) => {

@@ -22,12 +22,12 @@
     "api/verify-code-and-download.js": {
       "maxDuration": 15
     },
-    "api/cv-ai.js": {
-      "maxDuration": 30
-    },
     "api/send-pdf-whatsapp.js": {
       "maxDuration": 30,
       "memory": 1024
+    },
+    "api/telegram-webhook.js": {
+      "maxDuration": 15
     }
   },
   "rewrites": [

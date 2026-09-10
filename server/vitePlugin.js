@@ -1,9 +1,9 @@
-import { handleCvAiRequest } from "./cvAi.js";
 import { handlePayboxSessionRequest, handlePayboxStatusRequest } from "./payboxSession.js";
 import { handlePayboxWebhookRequest } from "./payboxWebhook.js";
 import { handlePaymentWebhookRequest } from "./paymentWebhook.js";
 import { handleVerifyCodeAndDownloadRequest } from "./verifyCodeDownload.js";
 import { handleSendPdfWhatsappRequest } from "./sendPdfWhatsapp.js";
+import { handleTelegramWebhookRequest } from "./telegramBot.js";
 import { handleVerifyPaymentRequest } from "./verifyPayment.js";
 import { loadEnv } from "./env.js";
 
@@ -14,8 +14,8 @@ const routes = {
   "/api/paybox-session": handlePayboxSessionRequest,
   "/api/paybox-status": handlePayboxStatusRequest,
   "/api/verify-code-and-download": handleVerifyCodeAndDownloadRequest,
-  "/api/cv-ai": handleCvAiRequest,
   "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,
+  "/api/telegram-webhook": handleTelegramWebhookRequest,
 };
 
 function attach(middlewares) {
@@ -39,10 +39,10 @@ function attach(middlewares) {
 export function paymentApiPlugin() {
   loadEnv();
   if (!process.env.OPENAI_API_KEY) {
-    console.warn("[quickcv] OPENAI_API_KEY is missing. /api/verify-payment will return 500 until it is set in .env");
+    console.warn("[quickcv] OPENAI_API_KEY is missing. /api/verify-payment (Bit screenshot) will return 500 until it is set in .env");
   }
-  if (!process.env.OPENAI_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.warn("[quickcv] OPENAI_API_KEY and GEMINI_API_KEY are missing. /api/cv-ai will return 500 until one is set.");
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+    console.warn("[quickcv] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID missing. Order alerts and Telegram control panel are off.");
   }
   if (!process.env.PAYMENT_WEBHOOK_SECRET && !process.env.PAYBOX_WEBHOOK_SECRET) {
     console.warn(

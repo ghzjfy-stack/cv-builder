@@ -1,12 +1,12 @@
-import { handleCvAiRequest } from "../server/cvAi.js";
+import { handleTelegramWebhookRequest } from "../server/telegramBot.js";
 
 export const config = {
-  maxDuration: 30,
+  maxDuration: 15,
 };
 
 export default async function handler(req, res) {
   try {
-    await handleCvAiRequest(req, res);
+    await handleTelegramWebhookRequest(req, res);
   } catch {
     if (!res.headersSent) {
       res.statusCode = 500;

@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#020617">
-    <title>QuickCV - מחולל קורות חיים פרימיום</title>
+    <meta name="theme-color" content="#0b1220">
+    <title>QuickCV - מחולל קורות חיים</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css">
     <link rel="stylesheet" href="./app.css">
     <link rel="stylesheet" href="./cro.css">
 </head>
-<body class="on-home min-h-screen lg:pb-0" id="app-body">
+<body class="on-home" id="app-body">
     <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
 
     <div id="home-view" class="home-view no-print">
@@ -25,10 +25,7 @@
             <header class="home-nav">
                 <button type="button" class="home-brand" onclick="showHome()" aria-current="page">
                     <span class="home-mark" aria-hidden="true">QC</span>
-                    <span>
-                        <span class="home-brand-name">QuickCV</span>
-                        <span class="home-brand-sub">Launch</span>
-                    </span>
+                    <span class="home-brand-name">QuickCV</span>
                 </button>
                 <div class="home-nav-actions">
                     <button type="button" class="home-link hidden sm:inline-flex" onclick="openExamplesModal()">דוגמאות</button>
@@ -38,24 +35,14 @@
 
             <section class="home-hero" aria-labelledby="home-title">
                 <div>
-                    <p class="home-kicker">משגרים אותך לראיון הבא</p>
-                    <div class="home-ats-row"><span class="ats-badge" data-ats-badge>ATS-Friendly · נסרק בהצלחה במערכות סינון</span></div>
-                    <h1 id="home-title" class="home-title">הדחיפה החסרה לקורות החיים שלכם</h1>
+                    <p class="home-brand-lockup" aria-hidden="true">QuickCV</p>
+                    <h1 id="home-title" class="home-title">קורות חיים בעברית שנראים מוכנים להגשה</h1>
                     <p class="home-lead">
-                        עיצוב עברי חד, תצוגה חיה, ו־30 תבניות מוכנות להגשה.
-                        אתם ממלאים — אנחנו מזניקים את המסמך עד לראיון.
+                        ממלאים את הפרטים, בוחרים תבנית, ומורידים PDF נקי — בלי חשבונות ובלי תבניות מסורבלות.
                     </p>
-                    <div class="home-hero-offer">
-                        <p class="home-hero-price">
-                            <span class="sr-only">מחיר השקה</span>
-                            <s class="home-price-was"><span data-compare-price>49</span> ₪</s>
-                            <span class="home-price-now"><span data-price>9.90</span> ₪</span>
-                        </p>
-                        <p class="home-hero-sub">עיצוב ברמת מעצב פרטי — במחיר של קפה</p>
-                    </div>
                     <div class="home-hero-actions">
-                        <button type="button" id="home-cta" class="home-cta" onclick="showStudio()">היכנסו לסטודיו</button>
-                        <button type="button" class="home-cta-ghost" onclick="openExamplesModal()">צפו בדוגמאות מוכנות</button>
+                        <button type="button" id="home-cta" class="home-cta" onclick="showStudio()">התחילו עכשיו — <span data-price>9.90</span> ₪</button>
+                        <button type="button" class="home-cta-ghost" onclick="openExamplesModal()">דוגמאות</button>
                     </div>
                     <nav class="seo-cat-row" aria-label="תבניות לפי תחום">
                         <a class="seo-cat-chip" href="/templates/hi-tech/">הייטק</a>
@@ -63,11 +50,6 @@
                         <a class="seo-cat-chip" href="/templates/students/">סטודנטים</a>
                         <a class="seo-cat-chip" href="/templates/customer-service/">שירות לקוחות</a>
                     </nav>
-                    <div class="home-meta">
-                        <p><strong>1,200+</strong> קורות חיים השבוע</p>
-                        <p><strong>4.9/5</strong> מדירוגי לקוחות</p>
-                        <p><strong>PDF מיידי</strong> אחרי Bit</p>
-                    </div>
                 </div>
                 <div class="home-stage" aria-hidden="true">
                     <div class="home-stage-glow"></div>
@@ -417,23 +399,14 @@
 
     <div class="studio-social no-print max-w-7xl mx-auto w-full px-4 pt-4">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-slate-800/80 border border-slate-700 rounded-2xl px-4 py-3">
-            <p class="text-sm text-slate-100 font-medium">מעל 1,200 קורות חיים נוצרו השבוע</p>
-            <p class="text-amber-300 text-sm tracking-tight"><span class="sr-only">דירוג 4.9 מתוך 5. </span><span aria-hidden="true">★★★★★</span> <span class="text-slate-300 text-xs">4.9/5 מאנשים אמיתיים</span></p>
+            <p class="text-sm text-slate-100 font-medium">עברית מיושרת לימין · תצוגה חיה · PDF להגשה</p>
+            <p class="text-slate-400 text-xs">תבניות שנבדקו מול מערכות סינון (ATS)</p>
         </div>
     </div>
 
     <div class="studio-workspace">
 
         <div id="studio-form-column" class="no-print space-y-6">
-
-            <div id="ai-fast-create-bar" class="p-4 sm:p-5 rounded-2xl border shadow-xl space-y-2">
-                <button type="button" id="btn-ai-create" data-ai-open="1">
-                    <span class="ai-create-main">יצירה מהירה ב-AI</span>
-                    <span class="ai-create-sub">Create with AI</span>
-                </button>
-                <p class="text-[11px] text-slate-400 leading-relaxed">כתבו חופשי מי אתם — נמלא פרטים, ניסיון, השכלה וכישורים, והתצוגה תתעדכן מיד.</p>
-            </div>
-
             <div id="cv-strength-meter" class="bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3" data-tier="mid" role="region" aria-labelledby="cv-strength-title">
                 <div class="flex items-center justify-between gap-3">
                     <h3 id="cv-strength-title" class="font-bold text-slate-100 text-sm">חוזק קורות החיים</h3>
@@ -459,7 +432,6 @@
                     <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
                     <div class="flex items-center gap-2 flex-wrap justify-end">
                         <button type="button" id="btn-quick-paste" class="shrink-0 text-[11px] font-semibold border border-emerald-500/40 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 px-3 py-2 rounded-xl min-h-10">הדבקה מהירה</button>
-                        <button type="button" data-ai-open="1" class="shrink-0 text-[11px] font-semibold border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-200 px-3 py-2 rounded-xl min-h-10">Create with AI / יצירה מהירה ב-AI</button>
                         <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
                     </div>
                 </div>
@@ -498,11 +470,8 @@
                     </div>
                 </div>
 
-                <div class="space-y-2 ai-field-wrap">
-                    <div class="ai-field-head">
-                        <label class="font-bold dynamic-text text-sm" for="in-summary" id="label-summary">תקציר מקצועי</label>
-                        <button type="button" class="ai-polish-btn" data-ai-polish-field="in-summary">✨ שדרג ניסוח</button>
-                    </div>
+                <div class="space-y-2">
+                    <label class="font-bold dynamic-text text-sm block" for="in-summary" id="label-summary">תקציר מקצועי</label>
                     <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
@@ -524,7 +493,7 @@
                 </div>
 
                 <div class="space-y-2 relative">
-                    <div class="ai-field-head flex-wrap">
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
                         <label class="font-bold dynamic-text text-sm" for="in-experience" id="label-experience">ניסיון תעסוקתי</label>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" id="btn-experience-raw">עריכת טקסט מלא</button>
@@ -541,19 +510,13 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="ai-field-wrap">
-                        <div class="ai-field-head mb-2">
-                            <label class="font-bold dynamic-text text-sm" for="in-education" id="label-education">השכלה</label>
-                            <button type="button" class="ai-polish-btn" data-ai-polish-field="in-education">✨ שדרג ניסוח</button>
-                        </div>
+                    <div>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education" id="label-education">השכלה</label>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2015 - 2018 | BA במנהל עסקים
 2019 | קורס ניהול מוצר</textarea>
                     </div>
-                    <div class="ai-field-wrap">
-                        <div class="ai-field-head mb-2">
-                            <label class="font-bold dynamic-text text-sm" for="in-military" id="label-military">שירות צבאי / לאומי</label>
-                            <button type="button" class="ai-polish-btn" data-ai-polish-field="in-military">✨ שדרג ניסוח</button>
-                        </div>
+                    <div>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military" id="label-military">שירות צבאי / לאומי</label>
                         <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
                     </div>
                 </div>
@@ -890,7 +853,7 @@
                     <p id="cv-page-fit-msg"></p>
                 </div>
             </div>
-            <div id="cl-preview-wrapper" class="relative p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 min-h-[750px] bg-preview-white">
+            <div id="cl-preview-wrapper" class="relative overflow-hidden p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 min-h-[750px] bg-preview-white">
                 <div id="cl-target" dir="rtl">
                     <p id="cl-out-date" class="text-[11px] text-slate-500"></p>
                     <h1 id="cl-out-name" class="text-3xl font-bold dynamic-text mt-3"></h1>
@@ -937,33 +900,7 @@
         </div>
     </div>
 
-        <div id="ai-create-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="ai-create-title" aria-hidden="true">
-        <button type="button" class="examples-backdrop" id="ai-create-backdrop" aria-label="סגירה"></button>
-        <div id="ai-create-panel" class="relative bg-slate-900 text-slate-100 rounded-3xl max-w-xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
-            <button type="button" id="btn-ai-create-close" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגירה">✕</button>
-            <h3 id="ai-create-title" class="text-lg font-extrabold pe-10">יצירה מהירה ב-AI</h3>
-            <p id="ai-create-lead" class="text-sm text-slate-300 leading-relaxed">כתבו, הדביקו או דברו בקול מי אתם — נמלא את השדות ונעדכן את התצוגה החייה.</p>
-            <label class="sr-only" for="ai-create-text">תיאור רקע</label>
-            <div class="relative">
-                <textarea id="ai-create-text" rows="8" class="w-full bg-slate-950 border border-slate-700 p-3 pe-3 ps-14 text-sm rounded-xl text-slate-100 outline-none min-h-40" placeholder="לדוגמה: עבדתי כמנהל חנות שנתיים, שירות בלוגיסטיקה, עברית שפת אם ואנגלית שוטפת."></textarea>
-                <button type="button" id="btn-voice-input" class="absolute bottom-3 start-3 inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200" aria-pressed="false" aria-label="הקלטה קולית" title="דיבור במקום הקלדה">
-                    <span aria-hidden="true">🎤</span>
-                </button>
-            </div>
-            <p id="ai-create-feedback" class="text-sm min-h-5 font-semibold" role="status" aria-live="polite"></p>
-            <div id="ai-create-skeleton" class="hidden space-y-2" aria-hidden="true">
-                <div class="ai-skel-line w-full"></div>
-                <div class="ai-skel-line w-5/6"></div>
-                <div class="ai-skel-line w-2/3"></div>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <button type="button" id="btn-ai-create-run" class="flex-1 min-h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm">מלאו את הטופס</button>
-                <button type="button" id="btn-ai-create-cancel" class="min-h-12 px-4 rounded-xl border border-slate-600 text-slate-200 font-bold text-sm">ביטול</button>
-            </div>
-        </div>
-    </div>
-
-<div id="examples-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
+        <div id="examples-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
         <button type="button" class="examples-backdrop" onclick="closeExamplesModal()" aria-label="סגור דוגמאות"></button>
         <div class="examples-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-4xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
             <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגור דוגמאות">✕</button>
@@ -1016,7 +953,6 @@
                 <div class="pay-methods" role="tablist" aria-label="אמצעי תשלום">
                     <button type="button" class="pay-method-tab" role="tab" id="pay-tab-bit" data-pay-method="bit" aria-selected="true" aria-controls="pay-panel-bit">Bit</button>
                     <button type="button" class="pay-method-tab" role="tab" id="pay-tab-paybox" data-pay-method="paybox" aria-selected="false" aria-controls="pay-panel-paybox">PayBox</button>
-                    <button type="button" class="pay-method-tab" role="tab" id="pay-tab-card" data-pay-method="card" aria-selected="false" aria-controls="pay-panel-card">כרטיס אשראי</button>
                 </div>
 
                 <div id="pay-panel-bit" role="tabpanel" aria-labelledby="pay-tab-bit" class="space-y-3">
@@ -1072,20 +1008,10 @@
                             <li>אשרו את הסכום באפליקציית PayBox</li>
                             <li>חזרו לכאן — ההורדה תיפתח אוטומטית</li>
                         </ol>
-                        <a id="btn-open-paybox" href="#" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-[#5b4dff] hover:bg-[#4a3ee6] text-white font-extrabold text-sm border border-white/10">
+                        <a id="btn-open-paybox" href="https://www.paybox.co.il/" target="_self" rel="noopener noreferrer" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-[#5b4dff] hover:bg-[#4a3ee6] text-white font-extrabold text-sm border border-white/10">
                             שלמו <span data-pay-amount>9.9</span> ₪ ב-PayBox
                         </a>
                         <p id="paybox-poll-status" class="text-xs text-slate-400 min-h-4 text-center" aria-live="polite"></p>
-                    </div>
-                </div>
-
-                <div id="pay-panel-card" role="tabpanel" aria-labelledby="pay-tab-card" class="hidden space-y-3 text-right">
-                    <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
-                        <p class="text-sm text-slate-200 leading-relaxed">תשלום מאובטח בכרטיס אשראי דרך PayBox. אחרי אישור העסקה נפתח ה-PDF הנקי אוטומטית.</p>
-                        <a id="btn-open-card" href="#" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm">
-                            שלמו <span data-pay-amount>9.9</span> ₪ בכרטיס אשראי
-                        </a>
-                        <p id="card-poll-status" class="text-xs text-slate-400 min-h-4 text-center" aria-live="polite"></p>
                     </div>
                 </div>
 
@@ -1161,7 +1087,7 @@
     <script src="lib/security/log.js"></script>
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
-    <script src="lib/aiStudio.js"></script>
+    <script src="lib/experienceEditor.js"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/export.js"></script>
@@ -1269,7 +1195,6 @@
                 strengthTitle: 'חוזק קורות החיים',
                 strengthTipDefault: 'מלאו פרטי קשר, תקציר, ניסיון וכישורים כדי להעלות את הציון.',
                 strengthDone: 'מעולה — קורות החיים מוכנים להגשה.',
-                aiFill: 'מילוי ב-AI',
                 previewOpen: '👁️ תצוגה מקדימה',
                 previewClose: '✏️ חזרה לעריכה'
             },
@@ -1292,7 +1217,6 @@
                 strengthTitle: 'CV strength',
                 strengthTipDefault: 'Add contact details, a summary, experience, and skills to raise the score.',
                 strengthDone: 'Great — this CV is ready to send.',
-                aiFill: 'Fill with AI',
                 previewOpen: '👁️ Preview',
                 previewClose: '✏️ Back to editing'
             }
@@ -2561,7 +2485,7 @@
 
         function isCvFormField(el) {
             if (!el || !(el instanceof Element)) return false;
-            if (el.closest('#payment-modal, #examples-modal, #quick-paste-modal, #ai-create-modal, #download-code, #download-step')) return false;
+            if (el.closest('#payment-modal, #examples-modal, #quick-paste-modal, #download-code, #download-step')) return false;
             if (el.closest('#studio-form-column, #details-panel, #design-panel, #templates-panel')) {
                 return el.matches('input, textarea, select');
             }

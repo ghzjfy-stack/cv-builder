@@ -1,4 +1,4 @@
-export function isValidAccessCode(input: string): boolean {
-  const digits = String(input || "").replace(/\D/g, "");
-  return digits.length === 4 && Number(digits) === 1000 + 9;
+/** Local format check only. Real codes are issued after payment and verified on the server. */
+export function isSixDigitCode(input: string): boolean {
+  return /^[A-Z0-9]{6}$/i.test(String(input || "").replace(/[^A-Za-z0-9]/g, ""));
 }

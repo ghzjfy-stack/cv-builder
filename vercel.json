@@ -1,11 +1,36 @@
 {
-  "buildCommand": "vite build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "functions": {
     "api/verify-payment.js": {
       "maxDuration": 30,
       "memory": 1024
+    },
+    "api/payment-webhook.js": {
+      "maxDuration": 15
+    },
+    "api/webhooks/paybox.js": {
+      "maxDuration": 15
+    },
+    "api/paybox-session.js": {
+      "maxDuration": 10
+    },
+    "api/paybox-status.js": {
+      "maxDuration": 10
+    },
+    "api/verify-code-and-download.js": {
+      "maxDuration": 15
+    },
+    "api/cv-ai.js": {
+      "maxDuration": 30
+    },
+    "api/send-pdf-whatsapp.js": {
+      "maxDuration": 30,
+      "memory": 1024
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/cv-templates/:path*", "destination": "/index.html" }
+  ]
 }

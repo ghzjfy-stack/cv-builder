@@ -1,15 +1,64 @@
 // @ts-nocheck
-import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
-import { CHECKOUT, bitAppOpenUrl, bitPayUrl, displayAmountValue, whatsappUrl } from "./config/checkout.js";
+import { requestCvAi } from "./ai/cvAi.js";
+import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken, WRONG_CODE_MSG } from "./access/gate.js";
+import {
+  CHECKOUT,
+  REF_CODE_KEY,
+  REF_FROM_KEY,
+  bitAppOpenUrl,
+  bitPayUrl,
+  displayAmountValue,
+  displayCompareValue,
+  isPackId,
+  packAmount,
+  whatsappPdfShareUrl,
+  whatsappReferralUrl,
+  whatsappUrl,
+  type PackId,
+} from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
+import { CODE_FAIL_MSG, verifyDownloadCode } from "./payment/verifyCode.js";
+import { createPayboxSession, waitForPayboxPayment, type PayboxMethod } from "./payment/paybox.js";
 import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
 const modal = () => document.getElementById("payment-modal");
 const feedback = () => document.getElementById("code-feedback");
 const codeInput = () => document.getElementById("download-code");
 const preview = () => document.getElementById("cv-preview-wrapper");
+const PACK_KEY = "quickcv.checkoutPack";
 
 let lastFocus = null;
+let selectedPack: PackId = "basic";
+let selectedPayMethod = "bit";
+let payboxPoll = null;
+let payboxSessionCache = { key: "", sessionId: "", payUrl: "" };
+
+function readStoredPack(): PackId {
+  try {
+    const stored = sessionStorage.getItem(PACK_KEY);
+    if (isPackId(stored)) return stored;
+  } catch {
+    /* ignore */
+  }
+  return "basic";
+}
+
+function selectedAmount(): number {
+  return packAmount(selectedPack);
+}
+
+function setSelectedPack(packId: PackId, persist = true) {
+  selectedPack = packId === "complete" ? "complete" : "basic";
+  if (persist) {
+    try {
+      sessionStorage.setItem(PACK_KEY, selectedPack);
+    } catch {
+      /* ignore */
+    }
+  }
+  applyPackUi();
+  payboxSessionCache = { key: "", sessionId: "", payUrl: "" };
+}
 
 function setScreenshotFeedback(text, ok) {
   const el = document.getElementById("screenshot-feedback");
@@ -18,11 +67,15 @@ function setScreenshotFeedback(text, ok) {
   el.className = `text-sm min-h-5 text-center font-semibold ${ok ? "text-emerald-300" : "text-rose-400"}`;
 }
 
-function setVerifyOverlay(on) {
+function setVerifyOverlay(on, title, sub) {
   const el = document.getElementById("payment-verify-overlay");
   if (!el) return;
   el.classList.toggle("hidden", !on);
   el.classList.toggle("flex", on);
+  const titleEl = document.getElementById("verify-overlay-title");
+  const subEl = document.getElementById("verify-overlay-sub");
+  if (titleEl && title) titleEl.textContent = title;
+  if (subEl && sub) subEl.textContent = sub;
   const input = document.getElementById("payment-screenshot");
   if (input) {
     if (on) input.setAttribute("disabled", "true");
@@ -39,7 +92,7 @@ async function onPaymentScreenshotChange(e) {
   if (nameEl) nameEl.textContent = file.name;
 
   setScreenshotFeedback("", false);
-  setVerifyOverlay(true);
+  setVerifyOverlay(true, "מאמת את צילום המסך...", "זה לוקח כמה שניות");
   try {
     const result = await verifyPaymentScreenshot(file);
     if (result && result.is_valid === true) {
@@ -88,7 +141,15 @@ function showPayStep() {
 function showDownloadStep() {
   document.getElementById("pay-step")?.classList.add("hidden");
   document.getElementById("download-step")?.classList.remove("hidden");
+  document.getElementById("download-complete-note")?.classList.toggle("hidden", selectedPack !== "complete");
+  document.querySelectorAll("[data-pack-extra]").forEach((el) => {
+    el.classList.toggle("hidden", selectedPack !== "complete");
+  });
   setPaidUi(true);
+  fillReferralUi();
+  const phone = readCheckoutContact();
+  const waPhone = document.getElementById("wa-pdf-phone");
+  if (waPhone instanceof HTMLInputElement && phone && !waPhone.value) waPhone.value = phone;
 }
 
 function trapFocus(e) {
@@ -137,9 +198,121 @@ function closeModal() {
   if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
 }
 
+function stopPayboxPoll() {
+  if (payboxPoll) {
+    payboxPoll.abort();
+    payboxPoll = null;
+  }
+}
+
+function setPayMethod(method) {
+  selectedPayMethod = method === "paybox" || method === "card" ? method : "bit";
+  document.querySelectorAll("[data-pay-method]").forEach((btn) => {
+    const on = btn.getAttribute("data-pay-method") === selectedPayMethod;
+    btn.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.getElementById("pay-panel-bit")?.classList.toggle("hidden", selectedPayMethod !== "bit");
+  document.getElementById("pay-panel-paybox")?.classList.toggle("hidden", selectedPayMethod !== "paybox");
+  document.getElementById("pay-panel-card")?.classList.toggle("hidden", selectedPayMethod !== "card");
+}
+
+function setHostedPayStatus(text) {
+  const paybox = document.getElementById("paybox-poll-status");
+  const card = document.getElementById("card-poll-status");
+  if (paybox) paybox.textContent = selectedPayMethod === "paybox" ? text : "";
+  if (card) card.textContent = selectedPayMethod === "card" ? text : "";
+}
+
+function applyPaidUnlock(token, message) {
+  window.QCRateLimit?.reset();
+  if (token) unlockWithPaymentToken(token);
+  else unlock();
+  setPaidUi(true);
+  setFeedback(message, true);
+  showDownloadStep();
+  void runHighResExport();
+}
+
+async function ensureHostedSession(method: PayboxMethod) {
+  const key = `${method}:${selectedPack}:${readCheckoutContact()}`;
+  if (payboxSessionCache.key === key && payboxSessionCache.sessionId && payboxSessionCache.payUrl) {
+    return payboxSessionCache;
+  }
+  const created = await createPayboxSession({
+    pack: selectedPack,
+    contact: readCheckoutContact(),
+    method,
+  });
+  if (!created.ok || !created.session_id) {
+    throw new Error(created.error || "session_failed");
+  }
+  const fallback = method === "card" ? CHECKOUT.payboxCardUrl : CHECKOUT.payboxPayUrl;
+  payboxSessionCache = {
+    key,
+    sessionId: created.session_id,
+    payUrl: created.pay_url || fallback,
+  };
+  return payboxSessionCache;
+}
+
+function bindHostedPayLink(id, url) {
+  const el = document.getElementById(id);
+  if (!(el instanceof HTMLAnchorElement) || !url) return;
+  el.href = url;
+  el.target = "_blank";
+  el.rel = "noopener";
+}
+
+async function startHostedPayment(method: PayboxMethod) {
+  stopPayboxPoll();
+  setHostedPayStatus("פותחים סשן תשלום...");
+  try {
+    const session = await ensureHostedSession(method);
+    bindHostedPayLink(method === "card" ? "btn-open-card" : "btn-open-paybox", session.payUrl);
+    setHostedPayStatus("ממתינים לאישור PayBox...");
+    setVerifyOverlay(
+      true,
+      method === "card" ? "ממתינים לאישור כרטיס האשראי..." : "ממתינים לאישור PayBox...",
+      "אפשר לחזור לכאן אחרי התשלום — נזהה אותו אוטומטית",
+    );
+    payboxPoll = new AbortController();
+    const result = await waitForPayboxPayment(session.sessionId, { signal: payboxPoll.signal });
+    if (result.paid === true && result.token) {
+      window.QCLog?.add("auth_ok", "paybox webhook");
+      applyPaidUnlock(result.token, "התשלום אומת. מוריד את ה-PDF...");
+      return;
+    }
+    if (result.error && result.error !== "cancelled") {
+      setHostedPayStatus(result.error);
+      setFeedback(result.error, false);
+    }
+  } catch (err) {
+    const message = err instanceof Error && err.message ? err.message : "לא הצלחנו לפתוח את PayBox.";
+    setHostedPayStatus(message);
+    setFeedback(message, false);
+  } finally {
+    setVerifyOverlay(false);
+    payboxPoll = null;
+  }
+}
+
+async function onHostedPayClick(e, method: PayboxMethod) {
+  e?.preventDefault?.();
+  try {
+    const session = await ensureHostedSession(method);
+    if (session.payUrl) window.open(session.payUrl, "_blank", "noopener");
+    void startHostedPayment(method);
+  } catch (err) {
+    const message = err instanceof Error && err.message ? err.message : "לא הצלחנו לפתוח את PayBox.";
+    setHostedPayStatus(message);
+    setFeedback(message, false);
+  }
+}
+
 function dismissCheckout(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
+  stopPayboxPoll();
   setVerifyOverlay(false);
   closeModal();
 }
@@ -160,7 +333,7 @@ function copyBitPhone(e) {
 }
 
 function openBitApp(e) {
-  const url = bitAppOpenUrl();
+  const url = bitAppOpenUrl(selectedAmount());
   const el = e?.currentTarget;
   if (el instanceof HTMLAnchorElement) {
     el.href = url;
@@ -177,7 +350,178 @@ function openBitApp(e) {
 
 function openWhatsApp(e) {
   e?.preventDefault?.();
-  window.open(whatsappUrl(), "_blank", "noopener");
+  window.open(whatsappUrl(selectedAmount()), "_blank", "noopener");
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const comma = result.indexOf(",");
+      resolve(comma >= 0 ? result.slice(comma + 1) : result);
+    };
+    reader.onerror = () => reject(new Error("read_failed"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function intlPhoneDigits(raw) {
+  let digits = String(raw || "").replace(/\D/g, "");
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  if (digits.startsWith("0") && digits.length === 10) digits = `972${digits.slice(1)}`;
+  return digits;
+}
+
+async function sharePdfFile(blob, filename) {
+  const file = new File([blob], filename, { type: "application/pdf" });
+  const payload = { files: [file], title: filename, text: "קורות החיים מ-QuickCV" };
+  if (navigator.canShare && navigator.canShare(payload)) {
+    await navigator.share(payload);
+    return true;
+  }
+  return false;
+}
+
+async function sendPdfToWhatsApp(e) {
+  e?.preventDefault?.();
+  if (!isUnlocked()) {
+    openCheckoutModal();
+    return;
+  }
+  const status = document.getElementById("download-status");
+  const phoneEl = document.getElementById("wa-pdf-phone");
+  const phone = String(phoneEl && "value" in phoneEl ? phoneEl.value : readCheckoutContact()).trim();
+  if (status) status.textContent = "מכין PDF לשליחה...";
+  try {
+    const result = await exportHighResPdf({ download: false });
+    const blob = result?.blob;
+    const filename = result?.filename || "cv.pdf";
+    if (!blob) throw new Error("empty pdf");
+
+    const token = getPaymentToken();
+    const intl = intlPhoneDigits(phone);
+    if (token && intl.startsWith("972")) {
+      const pdfBase64 = await blobToBase64(blob);
+      const res = await fetch("/api/send-pdf-whatsapp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, phone: intl, filename, pdfBase64 }),
+      });
+      const data = await res.json().catch(() => null);
+      if (data?.ok) {
+        if (status) status.textContent = "ה-PDF נשלח לוואטסאפ.";
+        return;
+      }
+    }
+
+    try {
+      if (await sharePdfFile(blob, filename)) {
+        if (status) status.textContent = "בחרו WhatsApp בשיתוף כדי לשלוח את הקובץ.";
+        return;
+      }
+    } catch {
+      /* cancelled */
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.open(
+      whatsappPdfShareUrl(intl, "היי, אלה קורות החיים מ-QuickCV. הקובץ ירד למכשיר — צרפו אותו כאן."),
+      "_blank",
+      "noopener",
+    );
+    if (status) status.textContent = "הקובץ ירד. צרפו אותו בשיחת WhatsApp שנפתחה.";
+  } catch {
+    if (status) status.textContent = "לא הצלחנו לשלוח. נסו הורדה רגילה.";
+  }
+}
+
+function randomRefCode() {
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function getOrCreateReferralCode() {
+  try {
+    let code = localStorage.getItem(REF_CODE_KEY);
+    if (!code) {
+      code = randomRefCode();
+      localStorage.setItem(REF_CODE_KEY, code);
+    }
+    return code;
+  } catch {
+    return randomRefCode();
+  }
+}
+
+function referralUrl() {
+  const url = new URL(`${location.origin}/`);
+  url.searchParams.set("ref", getOrCreateReferralCode());
+  return url.toString();
+}
+
+function captureReferralFromUrl() {
+  try {
+    const ref = new URLSearchParams(location.search).get("ref");
+    if (ref && /^[a-zA-Z0-9_-]{3,32}$/.test(ref)) sessionStorage.setItem(REF_FROM_KEY, ref);
+  } catch {
+    /* ignore */
+  }
+}
+
+function fillReferralUi() {
+  const link = referralUrl();
+  const input = document.getElementById("referral-link");
+  if (input instanceof HTMLInputElement) input.value = link;
+  const wa = document.getElementById("btn-referral-whatsapp");
+  if (wa instanceof HTMLAnchorElement) {
+    wa.href = whatsappReferralUrl(link);
+    wa.target = "_blank";
+    wa.rel = "noopener";
+  }
+}
+
+async function copyReferralLink(e) {
+  e?.preventDefault?.();
+  const link = referralUrl();
+  const btn = document.getElementById("btn-copy-referral");
+  try {
+    await navigator.clipboard.writeText(link);
+    if (btn) {
+      const prev = btn.textContent;
+      btn.textContent = "הועתק";
+      setTimeout(() => {
+        btn.textContent = prev || "העתק קישור";
+      }, 1600);
+    }
+  } catch {
+    const input = document.getElementById("referral-link");
+    if (input instanceof HTMLInputElement) {
+      input.focus();
+      input.select();
+    }
+  }
+}
+
+function downloadCoverLetter(e) {
+  e?.preventDefault?.();
+  if (!isUnlocked() || selectedPack !== "complete") return;
+  window.QCCoverLetter?.download?.();
+  const status = document.getElementById("download-status");
+  if (status) status.textContent = "המכתב המקדים ירד.";
+}
+
+function onOrderBumpChange() {
+  const el = document.getElementById("order-bump");
+  setSelectedPack(el instanceof HTMLInputElement && el.checked ? "complete" : "basic");
 }
 
 async function runHighResExport() {
@@ -193,23 +537,21 @@ async function runHighResExport() {
 
 function readAccessCode() {
   const primary = document.getElementById("download-code") || document.getElementById("code-input");
-  return String(primary && "value" in primary ? primary.value : "").trim();
+  return String(primary && "value" in primary ? primary.value : "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
+}
+
+function readCheckoutContact() {
+  const el = document.getElementById("checkout-contact");
+  return String(el && "value" in el ? el.value : "").trim();
 }
 
 function triggerPDFDownload() {
   if (!isUnlocked()) {
-    const userCode = readAccessCode();
-    if (!validateCode(userCode)) {
-      setFeedback(WRONG_CODE_MSG, false);
-      return;
-    }
-    window.QCRateLimit?.reset();
-    window.QCLog?.add("auth_ok", "verified");
-    unlock();
-  }
-
-  if (!isUnlocked()) {
-    openCheckoutModal();
+    void verifyAndUnlock();
     return;
   }
 
@@ -221,8 +563,11 @@ function triggerPDFDownload() {
 function openCheckoutModal() {
   openModal();
   showPayStep();
+  stopPayboxPoll();
+  setPayMethod("bit");
   setVerifyOverlay(false);
   setScreenshotFeedback("", false);
+  setHostedPayStatus("");
   const shot = document.getElementById("payment-screenshot");
   if (shot && "value" in shot) shot.value = "";
   const nameEl = document.getElementById("payment-screenshot-name");
@@ -246,61 +591,133 @@ function onDownloadPdfClick(e) {
   openCheckoutModal();
 }
 
-function verifyAndUnlock(e) {
+async function verifyAndUnlock(e) {
   e?.preventDefault?.();
-  triggerPDFDownload();
-  if (!isUnlocked()) {
+  if (isUnlocked()) {
+    triggerPDFDownload();
+    return;
+  }
+
+  const limit = window.QCRateLimit?.status?.();
+  if (limit?.locked) {
+    setFeedback(WRONG_CODE_MSG, false);
+    return;
+  }
+
+  const userCode = readAccessCode();
+  if (userCode.length !== 6) {
+    setFeedback("נא להזין קוד בן 6 תווים מההודעה שקיבלתם.", false);
+    return;
+  }
+
+  const btn = document.getElementById("verify-btn");
+  btn?.setAttribute("disabled", "true");
+  setFeedback("מאמת את הקוד...", true);
+  try {
+    const result = await verifyDownloadCode(userCode, readCheckoutContact());
+    if (result && result.ok === true && result.download?.authorized !== false) {
+      window.QCRateLimit?.reset();
+      window.QCLog?.add("auth_ok", "code verified");
+      if (result.token) unlockWithPaymentToken(result.token);
+      else unlock();
+      setPaidUi(true);
+      setFeedback("הקוד אומת. מוריד את ה-PDF...", true);
+      showDownloadStep();
+      void runHighResExport();
+      return;
+    }
     window.QCLog?.add("auth_fail", "bad code");
     window.QCRateLimit?.fail();
+    setFeedback(result?.error || CODE_FAIL_MSG, false);
+  } catch {
+    setFeedback(CODE_FAIL_MSG, false);
+  } finally {
+    btn?.removeAttribute("disabled");
   }
 }
 
 function downloadFormat(kind) {
   if (!isUnlocked()) {
-    showPayStep();
-    setFeedback("יש לאמת קוד לפני ההורדה.", false);
+    openCheckoutModal();
+    setFeedback("יש לאמת תשלום או קוד לפני ההורדה.", false);
     return;
   }
   if (kind === "pdf") {
-    closeModal();
     void runHighResExport();
+    return;
+  }
+  if (kind === "cover") {
+    downloadCoverLetter();
     return;
   }
   const run = window.QCExport?.[kind];
   const status = document.getElementById("download-status");
-  if (!run || !status) return;
-  status.textContent = "מכין קובץ...";
+  if (!run) return;
+  if (status) status.textContent = "מכין קובץ...";
   Promise.resolve(run()).then(
     () => {
-      status.textContent = "ההורדה התחילה.";
+      if (status) status.textContent = "ההורדה התחילה.";
     },
     () => {
-      status.textContent = "ההורדה נכשלה. נסו שוב.";
+      if (status) status.textContent = "ההורדה נכשלה. נסו שוב.";
     },
   );
 }
 
-function fillCheckoutUi() {
-  const bitEl = document.getElementById("bit-number");
-  if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
-  const amount = displayAmountValue();
-  document.querySelectorAll("[data-price]").forEach((el) => {
-    el.textContent = amount;
+function applyPackUi() {
+  const amount = selectedAmount();
+  const display = displayAmountValue(amount);
+  document.querySelectorAll("[data-pay-amount]").forEach((el) => {
+    el.textContent = display;
   });
-  document.querySelectorAll("[data-compare-price]").forEach((el) => {
-    el.textContent = String(CHECKOUT.compareAtIls);
+  document.querySelectorAll('input[name="checkout-pack"]').forEach((input) => {
+    if (!(input instanceof HTMLInputElement)) return;
+    const on = input.value === selectedPack;
+    input.checked = on;
+    input.closest(".pay-pack")?.classList.toggle("is-selected", on);
   });
   const openBit = document.getElementById("btn-open-bit");
   if (openBit instanceof HTMLAnchorElement) {
-    openBit.href = bitAppOpenUrl();
+    openBit.href = bitAppOpenUrl(amount);
     openBit.target = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "_self" : "_blank";
     openBit.rel = "noopener";
   }
   const qr = document.getElementById("bit-qr");
   if (qr instanceof HTMLImageElement) {
-    qr.src = bitPayUrl();
-    qr.alt = `קוד QR לתשלום ${amount} ₪ ב-Bit`;
+    qr.src = bitPayUrl(amount);
+    qr.alt = `קוד QR לתשלום ${display} ₪ ב-Bit`;
   }
+  const saveEl = document.getElementById("pay-save-badge");
+  if (saveEl) {
+    const saved = Math.round(CHECKOUT.compareAtIls - amount);
+    saveEl.textContent =
+    selectedPack === "complete" ? "חבילה מלאה במחיר השקה" : `מחיר השקה — חיסכון של ${saved} ₪`;
+  }
+  const bump = document.getElementById("order-bump");
+  if (bump instanceof HTMLInputElement) bump.checked = selectedPack === "complete";
+}
+
+function fillCheckoutUi() {
+  selectedPack = readStoredPack();
+  const bitEl = document.getElementById("bit-number");
+  if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
+  const launch = displayAmountValue(CHECKOUT.amountIls);
+  document.querySelectorAll("[data-price]").forEach((el) => {
+    el.textContent = launch;
+  });
+  document.querySelectorAll("[data-compare-price]").forEach((el) => {
+    el.textContent = displayCompareValue();
+  });
+  document.querySelectorAll("[data-pack-complete-price]").forEach((el) => {
+    el.textContent = displayAmountValue(CHECKOUT.packCompleteIls);
+  });
+  applyPackUi();
+}
+
+function onPackChange(e) {
+  const input = e?.target;
+  if (!(input instanceof HTMLInputElement) || !isPackId(input.value)) return;
+  setSelectedPack(input.value);
 }
 
 function restoreUnlockUi() {
@@ -403,7 +820,9 @@ function bindPreviewGuard() {
 
 function bind() {
   clearPersistedUnlock();
+  captureReferralFromUrl();
   fillCheckoutUi();
+  fillReferralUi();
   restoreUnlockUi();
   bindPreviewGuard();
   document.getElementById("pdf-spinner")?.classList.add("hidden");
@@ -437,14 +856,40 @@ function bind() {
   });
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
+  document.getElementById("btn-open-paybox")?.addEventListener("click", (e) => {
+    void onHostedPayClick(e, "paybox");
+  });
+  document.getElementById("btn-open-card")?.addEventListener("click", (e) => {
+    void onHostedPayClick(e, "card");
+  });
+  document.querySelectorAll("[data-pay-method]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const method = btn.getAttribute("data-pay-method") || "bit";
+      stopPayboxPoll();
+      setVerifyOverlay(false);
+      setPayMethod(method);
+    });
+  });
   document.getElementById("btn-whatsapp")?.addEventListener("click", openWhatsApp);
+  document.getElementById("btn-send-pdf-whatsapp")?.addEventListener("click", sendPdfToWhatsApp);
+  document.getElementById("order-bump")?.addEventListener("change", onOrderBumpChange);
+  document.getElementById("cover-letter-download")?.addEventListener("click", downloadCoverLetter);
+  document.getElementById("btn-copy-referral")?.addEventListener("click", copyReferralLink);
   document.getElementById("verify-btn")?.addEventListener("click", verifyAndUnlock);
   document.getElementById("payment-screenshot")?.addEventListener("change", onPaymentScreenshotChange);
+  document.querySelectorAll('input[name="checkout-pack"]').forEach((input) => {
+    input.addEventListener("change", onPackChange);
+  });
 
+  codeInput()?.addEventListener("input", (e) => {
+    const el = e.currentTarget;
+    if (!(el instanceof HTMLInputElement)) return;
+    el.value = el.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 6);
+  });
   codeInput()?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      verifyAndUnlock(e);
+      void verifyAndUnlock(e);
     }
   });
 
@@ -458,6 +903,8 @@ function bind() {
   modal()?.addEventListener("click", (e) => {
     if (e.target === modal()) dismissCheckout(e);
   });
+
+  window.QCCvAi = { request: requestCvAi };
 }
 
 if (document.readyState === "loading") {

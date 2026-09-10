@@ -1,8 +1,6 @@
-import { isValidAccessCode } from "../config/accessCodes";
-
 export const UNLOCK_STORAGE_KEY = "quickcv.highResUnlocked";
 export const PAYMENT_TOKEN_KEY = "quickcv.paymentToken";
-export const WRONG_CODE_MSG = "קוד שגוי! נא לבדוק את הקוד שסופק לאחר התשלום ב-Bit";
+export const WRONG_CODE_MSG = "קוד שגוי או שפג תוקפו. בדקו את ההודעה שקיבלתם לאחר התשלום.";
 
 let memoryUnlocked = false;
 
@@ -43,14 +41,11 @@ export function unlockWithPaymentToken(token: string): void {
 
 export function getPaymentToken(): string | null {
   try {
-    return storage()?.getItem(PAYMENT_TOKEN_KEY) ?? null;
+    const token = storage()?.getItem(PAYMENT_TOKEN_KEY);
+    return token ?? null;
   } catch {
     return null;
   }
-}
-
-export function validateCode(input: string): boolean {
-  return isValidAccessCode(input);
 }
 
 /** Drop leftover localStorage unlocks so a prior visit cannot skip payment. */

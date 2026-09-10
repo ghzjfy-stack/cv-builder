@@ -1,21 +1,20 @@
-import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { TOKEN_TTL_MS, signUnlockToken } from "./unlockToken.js";
 
 const VISION_MODEL = "gpt-4o-mini";
 const MAX_JSON_BYTES = 6 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
-const TOKEN_TTL_MS = 30 * 60 * 1000;
 const RATE_MAX = 8;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"]);
 
 const VERIFY_FAIL_MSG =
-  "Payment screenshot could not be verified. Please make sure the transfer of 9.9 ILS to 054-3554888 is clearly visible.";
+  "Payment screenshot could not be verified. Please make sure the transfer of 9.90 ILS (or 19.90 ILS for the complete pack) to 054-3554888 is clearly visible.";
 
 const SYSTEM_PROMPT = `You are an automated payment verification assistant for an Israeli app.
       Examine the provided screenshot from the Bit (ביט) payment app.
       Verify all of the following rules:
       1. Is it a valid Bit payment confirmation screen showing a successful transfer?
-      2. Is the payment amount 9.9 NIS (₪9.9 / ₪9.90 / 9.9 ש״ח / 9.90 ש״ח)?
+      2. Is the payment amount 9.9 NIS (₪9.9 / ₪9.90 / 9.9 ש״ח / 9.90 ש״ח) OR 19.9 NIS (₪19.9 / ₪19.90) if the complete pack was purchased? Both amounts are valid.
       3. Is the recipient phone number or name matching '054-3554888' or '0543554888'?
       4. Is the screenshot recent and visually authentic (not a generic blank template)?
 
@@ -30,15 +29,6 @@ const SYSTEM_PROMPT = `You are an automated payment verification assistant for a
 const rateBuckets = new Map();
 /** @type {Map<string, number>} */
 const usedTxIds = new Map();
-let bootSecret = "";
-
-function getSigningSecret() {
-  const fromEnv = process.env.PAYMENT_TOKEN_SECRET || process.env.OPENAI_API_KEY;
-  if (fromEnv && fromEnv.length >= 16) return fromEnv;
-  if (!bootSecret) bootSecret = randomBytes(32).toString("hex");
-  return bootSecret;
-}
-
 function clientIp(req) {
   const fwd = req.headers["x-forwarded-for"];
   if (typeof fwd === "string" && fwd.trim()) return fwd.split(",")[0].trim();
@@ -150,34 +140,6 @@ function extractImage(payload) {
   }
   if (!buf.length || buf.length > MAX_IMAGE_BYTES) return null;
   return { mime, base64: raw, bytes: buf.length };
-}
-
-function signUnlockToken() {
-  const payload = Buffer.from(
-    JSON.stringify({
-      v: 1,
-      exp: Date.now() + TOKEN_TTL_MS,
-      nonce: randomBytes(16).toString("hex"),
-    }),
-  ).toString("base64url");
-  const sig = createHmac("sha256", getSigningSecret()).update(payload).digest("base64url");
-  return `${payload}.${sig}`;
-}
-
-export function verifyUnlockToken(token) {
-  if (typeof token !== "string" || !token.includes(".")) return false;
-  const [payload, sig] = token.split(".");
-  if (!payload || !sig) return false;
-  const expected = createHmac("sha256", getSigningSecret()).update(payload).digest("base64url");
-  const a = Buffer.from(sig);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return false;
-  try {
-    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    return Number(data.exp) > Date.now();
-  } catch {
-    return false;
-  }
 }
 
 function parseModelJson(text) {

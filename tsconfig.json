@@ -6,8 +6,15 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "jsx": "preserve",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "allowJs": true,
+    "incremental": true,
+    "plugins": [{ "name": "next" }]
   },
-  "include": ["src"]
+  "include": ["src", "lib/telegram.ts"],
+  "exclude": ["node_modules", "dist", "out"]
 }

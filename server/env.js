@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-/** Load `.env` into process.env without overriding existing values. */
-export function loadEnv(cwd = process.cwd()) {
-  const file = resolve(cwd, ".env");
-  if (!existsSync(file)) return;
+function parseEnvFile(file) {
+  /** @type {Record<string, string>} */
+  const parsed = {};
+  if (!existsSync(file)) return parsed;
   const text = readFileSync(file, "utf8");
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trim();
@@ -16,6 +16,21 @@ export function loadEnv(cwd = process.cwd()) {
     if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
       value = value.slice(1, -1);
     }
-    if (key && process.env[key] === undefined) process.env[key] = value;
+    if (key) parsed[key] = value;
+  }
+  return parsed;
+}
+
+/**
+ * Load `.env` then `.env.local` into process.env.
+ * `.env.local` overrides `.env`. Existing process.env values are not overridden.
+ */
+export function loadEnv(cwd = process.cwd()) {
+  const fromFiles = {
+    ...parseEnvFile(resolve(cwd, ".env")),
+    ...parseEnvFile(resolve(cwd, ".env.local")),
+  };
+  for (const [key, value] of Object.entries(fromFiles)) {
+    if (process.env[key] === undefined) process.env[key] = value;
   }
 }

@@ -13,8 +13,28 @@ declare global {
     };
     QCLog?: { add: (event: string, detail?: string) => void };
     QCExport?: Record<string, () => Promise<void> | void>;
-    QCHighResPdf?: () => Promise<void>;
+    QCHighResPdf?: (opts?: { download?: boolean }) => Promise<{ blob: Blob; filename: string } | void>;
+    QCCoverLetter?: {
+      download?: () => void;
+      buildText?: () => string;
+      filename?: () => string;
+      enabled?: () => boolean;
+      render?: () => void;
+    };
+    QCLandings?: {
+      list: () => Array<{ slug: string; h1: string }>;
+      get: (slug: string) => { slug: string; example: string; field?: string } | null;
+      fromPath: (pathname: string) => { slug: string } | null;
+    };
     updateCV?: () => void;
+    QCCvAi?: {
+      request: (
+        action: "parse" | "polish",
+        payload: { text: string; lang?: string; context?: string },
+      ) => Promise<{ ok: boolean; cv?: Record<string, string>; text?: string; error?: string }>;
+    };
+    QCExperienceEditor?: { refresh: () => void };
+    QCPhotoDataUrl?: string;
     QCDraft?: {
       save: () => void;
       saveSoon: () => void;

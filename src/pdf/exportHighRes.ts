@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { isUnlocked } from "../access/gate.js";
+import { exportSelectablePdf } from "./exportSelectable.js";
 
 const A4_CSS_PX = 794;
 const PAGE_W_MM = 210;
@@ -82,8 +83,8 @@ function ensureCaptureHost() {
   return host;
 }
 
-function prepareCaptureClone() {
-  const source = document.getElementById("cv-target");
+function prepareCaptureClone(sourceId = "cv-target") {
+  const source = document.getElementById(sourceId);
   if (!source) return null;
 
   if (typeof window.updateCV === "function") window.updateCV();
@@ -232,7 +233,7 @@ function overlayPdfLinks(pdf, links, pageTopPx, pageBottomPx, sx, sy, pxPerMm) {
   }
 }
 
-function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight) {
+function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, startNewPage = false) {
   const usableW = PAGE_W_MM - MARGIN_MM * 2;
   const usableH = PAGE_H_MM - MARGIN_MM * 2;
   const pxPerMm = canvas.width / usableW;
@@ -240,7 +241,7 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight) {
   const sx = canvas.width / Math.max(1, hostWidth);
   const sy = canvas.height / Math.max(1, hostHeight);
   let y = 0;
-  let first = true;
+  let first = !startNewPage;
 
   while (y < canvas.height) {
     let next = Math.min(canvas.height, y + pagePxH);
@@ -351,24 +352,29 @@ async function captureToCanvas(el) {
   }
 }
 
-export async function exportHighResPdf() {
+export async function exportHighResPdf(opts = {}) {
   if (!isUnlocked()) {
     throw new Error("payment required");
   }
-
-  const modal = document.getElementById("payment-modal");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    modal.style.display = "none";
-  }
+  const download = opts.download !== false;
 
   document.getElementById("cv-preview-wrapper")?.classList.add("paid");
+  setSpinner(true);
+
+  try {
+    const result = await exportSelectablePdf(opts);
+    setSpinner(false);
+    return result;
+  } catch (err) {
+    console.warn("selectable pdf failed, using visual fallback", err);
+  }
 
   const JsPDF = getJsPdfCtor();
-  if (!JsPDF) throw new Error("jsPDF missing");
+  if (!JsPDF) {
+    setSpinner(false);
+    throw new Error("jsPDF missing");
+  }
 
-  setSpinner(true);
   const host = prepareCaptureClone();
   if (!host) {
     setSpinner(false);
@@ -387,14 +393,35 @@ export async function exportHighResPdf() {
     const pdf = new JsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
     addCanvasPages(pdf, canvas, captured.links, captured.width, captured.height);
 
+    if (typeof window.QCCoverLetter?.enabled === "function" && window.QCCoverLetter.enabled()) {
+      window.QCCoverLetter.render?.();
+      const letterHost = prepareCaptureClone("cl-target");
+      if (letterHost) {
+        const letterCap = await captureToCanvas(letterHost);
+        if (letterCap.canvas?.width) {
+          addCanvasPages(
+            pdf,
+            letterCap.canvas,
+            letterCap.links,
+            letterCap.width,
+            letterCap.height,
+            true,
+          );
+        }
+      }
+    }
+
     const filename = fileBase() + ".pdf";
     const blob = pdf.output("blob");
     if (!blob || blob.size < 100) throw new Error("empty pdf");
-    try {
-      pdf.save(filename);
-    } catch {
-      triggerBlobDownload(blob, filename);
+    if (download) {
+      try {
+        pdf.save(filename);
+      } catch {
+        triggerBlobDownload(blob, filename);
+      }
     }
+    return { blob, filename };
   } finally {
     cleanupCapture();
     setSpinner(false);

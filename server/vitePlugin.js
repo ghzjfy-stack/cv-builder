@@ -1,18 +1,36 @@
+import { handleCvAiRequest } from "./cvAi.js";
+import { handlePayboxSessionRequest, handlePayboxStatusRequest } from "./payboxSession.js";
+import { handlePayboxWebhookRequest } from "./payboxWebhook.js";
+import { handlePaymentWebhookRequest } from "./paymentWebhook.js";
+import { handleVerifyCodeAndDownloadRequest } from "./verifyCodeDownload.js";
+import { handleSendPdfWhatsappRequest } from "./sendPdfWhatsapp.js";
 import { handleVerifyPaymentRequest } from "./verifyPayment.js";
 import { loadEnv } from "./env.js";
+
+const routes = {
+  "/api/verify-payment": handleVerifyPaymentRequest,
+  "/api/payment-webhook": handlePaymentWebhookRequest,
+  "/api/webhooks/paybox": handlePayboxWebhookRequest,
+  "/api/paybox-session": handlePayboxSessionRequest,
+  "/api/paybox-status": handlePayboxStatusRequest,
+  "/api/verify-code-and-download": handleVerifyCodeAndDownloadRequest,
+  "/api/cv-ai": handleCvAiRequest,
+  "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,
+};
 
 function attach(middlewares) {
   middlewares.use((req, res, next) => {
     const path = (req.url || "").split("?")[0];
-    if (path !== "/api/verify-payment") {
+    const handler = routes[path];
+    if (!handler) {
       next();
       return;
     }
-    handleVerifyPaymentRequest(req, res).catch(() => {
+    handler(req, res).catch(() => {
       if (!res.headersSent) {
         res.statusCode = 500;
         res.setHeader("Content-Type", "application/json; charset=utf-8");
-        res.end(JSON.stringify({ ok: false, is_valid: false, error: "Internal server error" }));
+        res.end(JSON.stringify({ ok: false, error: "Internal server error" }));
       }
     });
   });
@@ -22,6 +40,14 @@ export function paymentApiPlugin() {
   loadEnv();
   if (!process.env.OPENAI_API_KEY) {
     console.warn("[quickcv] OPENAI_API_KEY is missing. /api/verify-payment will return 500 until it is set in .env");
+  }
+  if (!process.env.OPENAI_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.warn("[quickcv] OPENAI_API_KEY and GEMINI_API_KEY are missing. /api/cv-ai will return 500 until one is set.");
+  }
+  if (!process.env.PAYMENT_WEBHOOK_SECRET && !process.env.PAYBOX_WEBHOOK_SECRET) {
+    console.warn(
+      "[quickcv] PAYMENT_WEBHOOK_SECRET / PAYBOX_WEBHOOK_SECRET is missing. Payment webhooks will return 500 until set.",
+    );
   }
   return {
     name: "quickcv-payment-api",

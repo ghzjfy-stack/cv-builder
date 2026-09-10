@@ -13,2139 +13,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css">
-    <style>
-        :root {
-            --accent: #4c4c4c;
-            --cv-font: 'Rubik', sans-serif;
-            --cv-scale: 1;
-            --cv-leading: 1.55;
-        }
-        html { scroll-behavior: smooth; overflow-x: hidden; }
-        body { font-family: 'Rubik', sans-serif; overflow-x: hidden; }
-
-        body.on-home {
-            background: #f3ece1;
-            color: #1c1917;
-            padding-bottom: 0;
-        }
-        #home-view[hidden],
-        #studio-view[hidden] {
-            display: none !important;
-        }
-        #studio-view {
-            display: flex;
-            flex-direction: column;
-            min-height: 100dvh;
-        }
-        body.on-studio {
-            overflow: visible;
-            height: auto;
-            min-height: 100svh;
-            padding-bottom: 0;
-        }
-        body.on-studio #studio-view:not([hidden]) {
-            display: block;
-            width: 100%;
-            height: auto;
-            min-height: 100svh;
-            max-height: none;
-            overflow: visible;
-        }
-        body.on-studio #studio-view > header {
-            position: sticky;
-            top: 0;
-            flex-shrink: 0;
-            z-index: 40;
-        }
-        .studio-social {
-            flex-shrink: 0;
-        }
-        .studio-workspace {
-            flex: none;
-            min-height: auto;
-            width: 100%;
-            max-width: 80rem;
-            margin: 0 auto;
-            display: block;
-            overflow: visible;
-            padding: 0.75rem 1rem calc(5.35rem + env(safe-area-inset-bottom));
-        }
-        #studio-form-column,
-        #preview-column {
-            min-width: 0;
-            width: 100%;
-        }
-        #studio-form-column {
-            min-height: auto;
-            overflow: visible;
-        }
-        #preview-column {
-            display: none !important;
-            flex-direction: column;
-            background: #020617;
-            border: 1px solid rgb(51 65 85);
-            border-radius: 1rem;
-            padding: 0.65rem 0.75rem 0.85rem;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-        }
-        #preview-column > .preview-toolbar {
-            flex-shrink: 0;
-        }
-        #cv-preview-wrapper {
-            flex: 1 1 auto;
-        }
-
-        .home-view {
-            position: relative;
-            min-height: 100vh;
-            overflow: clip;
-            background:
-                radial-gradient(1200px 500px at 100% -10%, rgba(184, 154, 106, 0.18), transparent 55%),
-                radial-gradient(900px 420px at -10% 20%, rgba(90, 58, 42, 0.08), transparent 50%),
-                #f3ece1;
-        }
-        .home-grain {
-            pointer-events: none;
-            position: absolute;
-            inset: 0;
-            opacity: 0.35;
-            mix-blend-mode: multiply;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
-        }
-        .home-inner {
-            position: relative;
-            z-index: 1;
-            max-width: 72rem;
-            margin: 0 auto;
-            padding: 0 1.25rem;
-        }
-        .home-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 1.15rem 0 0.5rem;
-        }
-        .home-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: none;
-            border: 0;
-            padding: 0;
-            cursor: pointer;
-            color: inherit;
-        }
-        .home-mark {
-            width: 2.35rem;
-            height: 2.35rem;
-            border-radius: 0.85rem;
-            background: #1c1917;
-            color: #f3ece1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Frank Ruhl Libre', serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            letter-spacing: 0.04em;
-        }
-        .home-brand-name {
-            font-family: 'Frank Ruhl Libre', serif;
-            font-weight: 700;
-            font-size: 1.15rem;
-            line-height: 1.1;
-        }
-        .home-brand-sub {
-            font-size: 0.65rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #78716c;
-            margin-top: 0.1rem;
-        }
-        .home-nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .home-link {
-            min-height: 2.75rem;
-            padding: 0.5rem 0.9rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #44403c;
-        }
-        .home-link:hover { color: #1c1917; }
-        .home-nav-cta,
-        .home-cta,
-        .home-cta-ghost {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 2.85rem;
-            padding: 0.65rem 1.2rem;
-            border-radius: 999px;
-            font-weight: 800;
-            font-size: 0.85rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        }
-        .home-nav-cta,
-        .home-cta {
-            background: #1c1917;
-            color: #faf6ef;
-            box-shadow: 0 12px 28px rgba(28, 25, 23, 0.18);
-        }
-        .home-nav-cta:hover,
-        .home-cta:hover {
-            transform: translateY(-1px);
-            background: #292524;
-        }
-        .home-cta-ghost {
-            border: 1px solid rgba(28, 25, 23, 0.18);
-            color: #1c1917;
-            background: rgba(255, 255, 255, 0.35);
-        }
-        .home-cta-ghost:hover { background: #fff; }
-        .home-hero {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2.5rem;
-            padding: 2.25rem 0 3.5rem;
-            align-items: center;
-        }
-        .home-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.55rem;
-            font-size: 0.7rem;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: #9a7b4f;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-        .home-kicker::before {
-            content: "";
-            width: 1.6rem;
-            height: 1px;
-            background: #b89a6a;
-        }
-        .home-title {
-            font-family: 'Frank Ruhl Libre', serif;
-            font-weight: 700;
-            font-size: clamp(2.15rem, 6vw, 4.15rem);
-            line-height: 1.12;
-            letter-spacing: -0.03em;
-            color: #1c1917;
-            max-width: 14ch;
-        }
-        .home-lead {
-            margin-top: 1.15rem;
-            max-width: 38rem;
-            font-size: 1.05rem;
-            line-height: 1.75;
-            color: #57534e;
-            font-weight: 400;
-        }
-        .home-hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-top: 1.75rem;
-        }
-        .home-cta { min-height: 3.15rem; padding: 0.8rem 1.45rem; font-size: 0.95rem; }
-        .home-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.25rem 1.75rem;
-            margin-top: 1.75rem;
-            font-size: 0.8rem;
-            color: #57534e;
-        }
-        .home-meta strong { color: #1c1917; font-weight: 700; }
-        .home-stage {
-            position: relative;
-            min-height: 28rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .home-stage-glow {
-            position: absolute;
-            width: 78%;
-            height: 62%;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(184, 154, 106, 0.35), transparent 68%);
-            filter: blur(8px);
-        }
-        .home-paper {
-            position: relative;
-            width: min(100%, 22rem);
-            aspect-ratio: 1 / 1.32;
-        }
-        .home-paper-back,
-        .home-paper-sheet {
-            position: absolute;
-            inset: 0;
-            border-radius: 0.35rem;
-            background: #fbf8f2;
-            box-shadow: 0 30px 60px rgba(28, 25, 23, 0.16);
-        }
-        .home-paper-back {
-            transform: rotate(-7deg) translate(8px, 10px);
-            background: #efe6d6;
-            box-shadow: 0 18px 40px rgba(28, 25, 23, 0.1);
-        }
-        .home-paper-mid {
-            position: absolute;
-            inset: 0;
-            border-radius: 0.35rem;
-            background: #f7f1e6;
-            transform: rotate(4deg) translate(-6px, 6px);
-            box-shadow: 0 16px 36px rgba(28, 25, 23, 0.08);
-        }
-        .home-paper-sheet {
-            padding: 1.35rem 1.4rem;
-            border: 1px solid rgba(184, 154, 106, 0.28);
-            display: flex;
-            flex-direction: column;
-            gap: 0.7rem;
-        }
-        .home-paper-rule {
-            width: 2.4rem;
-            height: 2px;
-            background: #9a7b4f;
-        }
-        .home-paper-name {
-            font-family: 'Frank Ruhl Libre', serif;
-            font-size: 1.55rem;
-            font-weight: 700;
-            color: #1e3a8a;
-            line-height: 1.1;
-        }
-        .home-paper-role {
-            font-size: 0.72rem;
-            color: #57534e;
-            letter-spacing: 0.04em;
-        }
-        .home-paper-line {
-            height: 6px;
-            border-radius: 99px;
-            background: #e7e0d4;
-        }
-        .home-paper-line.w-80 { width: 80%; }
-        .home-paper-line.w-62 { width: 62%; }
-        .home-paper-line.w-94 { width: 94%; }
-        .home-paper-line.short { width: 28%; height: 5px; background: #c4b49a; margin-top: 0.35rem; }
-        .home-ribbon {
-            position: absolute;
-            top: 1.1rem;
-            left: -0.65rem;
-            background: #1c1917;
-            color: #f6e7c1;
-            font-size: 0.65rem;
-            font-weight: 800;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            padding: 0.4rem 0.7rem;
-            border-radius: 999px;
-            box-shadow: 0 8px 18px rgba(28, 25, 23, 0.2);
-        }
-        .home-band {
-            border-top: 1px solid rgba(28, 25, 23, 0.08);
-            border-bottom: 1px solid rgba(28, 25, 23, 0.08);
-            background: rgba(255, 252, 247, 0.55);
-        }
-        .home-band-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.25rem;
-            padding: 1.35rem 0;
-            text-align: center;
-        }
-        .home-band p { font-size: 0.85rem; color: #44403c; }
-        .home-band strong { display: block; font-family: 'Frank Ruhl Libre', serif; font-size: 1.35rem; color: #1c1917; }
-        .home-section { padding: 3.5rem 0; }
-        .home-section h2 {
-            font-family: 'Frank Ruhl Libre', serif;
-            font-size: clamp(1.6rem, 3vw, 2.2rem);
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
-        }
-        .home-section-lead {
-            color: #57534e;
-            max-width: 36rem;
-            line-height: 1.7;
-            margin-bottom: 1.75rem;
-        }
-        .home-steps,
-        .home-cards,
-        .home-quotes {
-            display: grid;
-            gap: 1rem;
-        }
-        .home-step,
-        .home-card,
-        .home-quote {
-            background: rgba(255, 252, 247, 0.72);
-            border: 1px solid rgba(28, 25, 23, 0.08);
-            border-radius: 1.35rem;
-            padding: 1.35rem 1.25rem;
-            box-shadow: 0 10px 30px rgba(28, 25, 23, 0.04);
-        }
-        .home-step-num {
-            font-family: 'Frank Ruhl Libre', serif;
-            color: #9a7b4f;
-            font-size: 1.35rem;
-            font-weight: 700;
-            margin-bottom: 0.35rem;
-        }
-        .home-step h3,
-        .home-card h3 {
-            font-size: 1.02rem;
-            font-weight: 700;
-            margin-bottom: 0.35rem;
-        }
-        .home-step p,
-        .home-card p,
-        .home-quote p {
-            font-size: 0.9rem;
-            line-height: 1.7;
-            color: #57534e;
-        }
-        .home-layouts {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-        }
-        .home-layout {
-            border-radius: 1.1rem;
-            padding: 0.9rem;
-            background: #fffdf9;
-            border: 1px solid rgba(28, 25, 23, 0.08);
-            min-height: 7.5rem;
-        }
-        .home-layout-frame {
-            display: block;
-            height: 4.4rem;
-            border-radius: 0.45rem;
-            background: #f4eee4;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 0.55rem;
-        }
-        .home-layout-frame span {
-            position: absolute;
-            background: #d6c7ae;
-            border-radius: 2px;
-        }
-        .home-layout p,
-        .home-layout > span:last-child {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #44403c;
-        }
-        .lay-classic span:nth-child(1) { top: 8px; right: 10px; left: 10px; height: 7px; }
-        .lay-classic span:nth-child(2) { top: 22px; right: 10px; width: 42%; height: 4px; }
-        .lay-classic span:nth-child(3) { bottom: 10px; right: 10px; left: 10px; height: 18px; background: #e8dfd0; }
-        .lay-side span:nth-child(1) { inset: 8px auto 8px 8px; width: 28%; }
-        .lay-side span:nth-child(2) { top: 10px; right: 10px; width: 52%; height: 6px; }
-        .lay-side span:nth-child(3) { top: 22px; right: 10px; width: 40%; height: 22px; background: #e8dfd0; }
-        .lay-exec span:nth-child(1) { top: 0; right: 0; left: 0; height: 22px; background: #1e3a8a; }
-        .lay-exec span:nth-child(2) { top: 30px; right: 10px; left: 10px; height: 22px; background: #e8dfd0; }
-        .lay-min span:nth-child(1) { top: 12px; right: 18px; left: 18px; height: 5px; }
-        .lay-min span:nth-child(2) { top: 24px; right: 28px; left: 28px; height: 4px; opacity: 0.6; }
-        .lay-min span:nth-child(3) { bottom: 12px; right: 18px; left: 18px; height: 14px; background: #eee6d8; }
-        .lay-charcoal { background: #ececec; }
-        .lay-charcoal span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #4c4c4c; border-radius: 0; }
-        .lay-charcoal span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #4c4c4c; border-radius: 0; }
-        .lay-charcoal span:nth-child(3) { top: 26px; right: 10px; width: 48%; height: 22px; background: #e8dfd0; }
-        .lay-azure { background: #fff; }
-        .lay-azure span:nth-child(1) { top: 0; right: 0; left: 0; height: 16px; background: #dce8f0; border-radius: 0; }
-        .lay-azure span:nth-child(2) { top: 22px; right: 36%; bottom: 8px; width: 1px; background: #d4d8dd; border-radius: 0; }
-        .lay-azure span:nth-child(3) { top: 24px; right: 8px; width: 34%; height: 6px; background: #c5d0d8; }
-        .lay-navy { background: #fff; }
-        .lay-navy span:nth-child(1) { inset: 0 auto 0 0; width: 34%; background: #12192b; border-radius: 0; }
-        .lay-navy span:nth-child(2) { top: 10px; left: 8px; width: 18px; height: 18px; border-radius: 999px; background: #c9cdd6; }
-        .lay-navy span:nth-child(3) { top: 12px; right: 10px; width: 48%; height: 22px; background: #e8e9ee; }
-        .home-quote cite {
-            display: block;
-            margin-top: 0.85rem;
-            font-style: normal;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #1c1917;
-        }
-        .home-price {
-            display: grid;
-            gap: 1.5rem;
-            align-items: center;
-            background: #1c1917;
-            color: #faf6ef;
-            border-radius: 1.75rem;
-            padding: 1.75rem 1.5rem;
-            overflow: hidden;
-            position: relative;
-        }
-        .home-price::after {
-            content: "";
-            position: absolute;
-            width: 16rem;
-            height: 16rem;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(184, 154, 106, 0.28), transparent 70%);
-            left: -4rem;
-            bottom: -6rem;
-        }
-        .home-price > * { position: relative; z-index: 1; }
-        .home-price h2 { color: #faf6ef; margin-bottom: 0.4rem; }
-        .home-price p { color: #d6d3d1; font-size: 0.95rem; line-height: 1.7; }
-        .home-price-tag {
-            font-family: 'Frank Ruhl Libre', serif;
-            font-size: clamp(2.8rem, 7vw, 4.2rem);
-            line-height: 1;
-            color: #f6e7c1;
-        }
-        .home-price-tag small {
-            font-size: 0.35em;
-            font-family: 'Rubik', sans-serif;
-            font-weight: 700;
-        }
-        .home-price .home-cta {
-            background: #f6e7c1;
-            color: #1c1917;
-            margin-top: 1.1rem;
-        }
-        .home-price .home-cta:hover { background: #ffe9b0; }
-        .home-footer {
-            padding: 2rem 0 2.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            justify-content: space-between;
-            color: #78716c;
-            font-size: 0.75rem;
-            border-top: 1px solid rgba(28, 25, 23, 0.08);
-        }
-
-        @media (min-width: 640px) {
-            .home-band-row { grid-template-columns: repeat(3, 1fr); }
-            .home-steps { grid-template-columns: repeat(3, 1fr); }
-            .home-quotes { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 900px) {
-            .home-hero { grid-template-columns: 1.08fr 0.92fr; padding-top: 3rem; }
-            .home-cards { grid-template-columns: repeat(3, 1fr); }
-            .home-layouts { grid-template-columns: repeat(6, 1fr); }
-            .home-price { grid-template-columns: 1.2fr 0.8fr; padding: 2.25rem 2.4rem; }
-            .home-quotes { grid-template-columns: repeat(3, 1fr); }
-        }
-        .skip-link {
-            position: absolute;
-            top: -100%;
-            right: 1rem;
-            z-index: 100;
-            background: #fff;
-            color: #0f172a;
-            padding: 0.65rem 1rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-        }
-        .skip-link:focus {
-            top: 0.75rem;
-        }
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-        :focus-visible {
-            outline: 3px solid #38bdf8;
-            outline-offset: 2px;
-        }
-        button, a, input, select, textarea {
-            touch-action: manipulation;
-        }
-        .dynamic-text { color: var(--accent); }
-        .dynamic-border { border-color: var(--accent); }
-        .dynamic-bg { background-color: var(--accent); }
-        .dynamic-icon { color: var(--accent); }
-
-        .bg-preview-white { background-color: #ffffff; }
-        .bg-preview-slate { background-color: #f8fafc; }
-        .bg-preview-cream { background-color: #fafaf9; }
-        .bg-preview-linen { background-color: #f6f0e6; }
-        .bg-preview-mint { background-color: #f0fdf4; }
-        .bg-preview-blush { background-color: #fff1f2; }
-        .bg-preview-pearl {
-            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-        }
-        .bg-preview-dots {
-            background-color: #ffffff;
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 16px 16px;
-        }
-        .bg-preview-grid {
-            background-color: #ffffff;
-            background-image:
-                linear-gradient(#e2e8f0 1px, transparent 1px),
-                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
-            background-size: 22px 22px;
-        }
-        .bg-preview-lines {
-            background-color: #fffdf8;
-            background-image: repeating-linear-gradient(
-                -18deg,
-                rgba(148, 163, 184, 0.18),
-                rgba(148, 163, 184, 0.18) 1px,
-                transparent 1px,
-                transparent 12px
-            );
-        }
-
-        #cv-target,
-        #qc-print-host .cv-print-sheet {
-            font-family: var(--cv-font);
-            font-size: calc(0.75rem * var(--cv-scale));
-            line-height: var(--cv-leading);
-            direction: rtl;
-            text-align: right;
-            unicode-bidi: isolate;
-            overflow: visible;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: normal;
-            color: #1e293b;
-        }
-        #cv-target.cv-lang-en,
-        #qc-print-host .cv-print-sheet.cv-lang-en {
-            direction: ltr;
-            text-align: left;
-        }
-        #details-panel.cv-form-en input,
-        #details-panel.cv-form-en textarea,
-        #details-panel.cv-form-en select {
-            direction: ltr;
-            text-align: left;
-        }
-        .lang-pick-row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 0.7rem;
-            padding: 0.4rem 0.5rem;
-        }
-        .lang-pick-row .lang-pick-title {
-            flex: 1 1 auto;
-            min-width: 0;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-        .lang-pick-row select {
-            flex: 0 1 9.5rem;
-            width: auto;
-            min-width: 7.5rem;
-        }
-        #cv-target #cv-header,
-        #qc-print-host .cv-print-sheet #cv-header {
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-        #cv-target .whitespace-pre-line,
-        #qc-print-host .cv-print-sheet .whitespace-pre-line {
-            overflow: visible;
-            padding-inline-start: 0.25rem;
-            padding-inline-end: 0.55rem;
-        }
-        #cv-target #out-name,
-        #qc-print-host .cv-print-sheet #out-name {
-            font-size: calc(1.875rem * var(--cv-scale));
-            line-height: 1.25;
-        }
-        #cv-target #out-title,
-        #qc-print-host .cv-print-sheet #out-title {
-            font-size: calc(0.875rem * var(--cv-scale));
-        }
-        #cv-target .cv-section-title,
-        #qc-print-host .cv-print-sheet .cv-section-title {
-            font-size: calc(0.75rem * var(--cv-scale));
-        }
-
-        .cv-columns { display: flex; flex-direction: column; gap: calc(1rem * var(--cv-scale)); }
-        .cv-sidebar, .cv-main { display: flex; flex-direction: column; gap: calc(0.9rem * var(--cv-scale)); }
-        .cv-contact-sidebar { display: none; }
-        .layout-classic .cv-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-        .layout-sidebar .cv-columns {
-            display: grid;
-            grid-template-columns: 0.34fr 1fr;
-            grid-template-areas: "side main";
-            gap: calc(1.25rem * var(--cv-scale));
-            align-items: start;
-        }
-        .layout-sidebar .cv-sidebar { grid-area: side; }
-        .layout-sidebar .cv-main { grid-area: main; }
-        .layout-sidebar .cv-contact-header { display: none; }
-        .layout-sidebar .cv-contact-sidebar { display: flex; }
-        .layout-sidebar .cv-sidebar {
-            background: #f1f5f9;
-            border-radius: 0.75rem;
-            padding: calc(0.9rem * var(--cv-scale));
-            border-inline-start: 4px solid var(--accent);
-        }
-
-        .layout-minimal #cv-header {
-            border-bottom-width: 1px;
-            padding-bottom: calc(0.65rem * var(--cv-scale));
-            margin-bottom: calc(1.35rem * var(--cv-scale));
-        }
-        .layout-minimal #out-name { font-weight: 600; letter-spacing: -0.02em; }
-        .layout-minimal .cv-section-title {
-            text-transform: none;
-            letter-spacing: 0.04em;
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .layout-minimal .cv-columns { gap: calc(1.35rem * var(--cv-scale)); }
-
-        .layout-classic #cv-header { text-align: center; }
-        .layout-classic .cv-contact-header { justify-content: center; }
-
-        .layout-split .cv-columns {
-            display: grid;
-            grid-template-columns: 1fr 0.34fr;
-            grid-template-areas: "main side";
-            gap: calc(1.25rem * var(--cv-scale));
-            align-items: start;
-        }
-        .layout-split .cv-sidebar { grid-area: side; }
-        .layout-split .cv-main { grid-area: main; }
-        .layout-split .cv-contact-header { display: none; }
-        .layout-split .cv-contact-sidebar { display: flex; }
-        .layout-split .cv-sidebar {
-            background: #fff7ed;
-            border-radius: 0.75rem;
-            padding: calc(0.9rem * var(--cv-scale));
-            border-inline-end: 4px solid var(--accent);
-        }
-
-        .layout-executive #cv-header {
-            background: var(--accent);
-            color: #fff;
-            padding: calc(1.15rem * var(--cv-scale));
-            border: none;
-            border-radius: 0.85rem;
-            margin-bottom: calc(1.25rem * var(--cv-scale));
-            text-align: start;
-        }
-        #cv-target .cv-contact-link,
-        #qc-print-host .cv-contact-link {
-            color: inherit;
-            text-decoration: underline;
-            text-underline-offset: 0.14em;
-        }
-        .layout-executive #out-name,
-        .layout-executive #out-title,
-        .layout-executive .cv-contact-header,
-        .layout-executive #cv-header .dynamic-text,
-        .layout-executive #cv-header .dynamic-icon,
-        .layout-executive #cv-header .cv-contact-link {
-            color: #fff !important;
-        }
-        .layout-executive #out-title { opacity: 0.92; }
-        .layout-executive .cv-section-title {
-            border-bottom-width: 2px;
-            border-color: var(--accent);
-        }
-
-        .layout-modern #cv-target,
-        .layout-modern {
-            padding-inline-start: 0.15rem;
-        }
-        .layout-modern #cv-header {
-            border: none;
-            border-inline-start: 6px solid var(--accent);
-            padding-inline-start: 0.9rem;
-            padding-bottom: 0.35rem;
-        }
-        .layout-modern .cv-section-title {
-            text-transform: none;
-            letter-spacing: 0.02em;
-            display: inline-block;
-            background: #e2e8f0;
-            background: color-mix(in srgb, var(--accent) 14%, white);
-            border-bottom: none;
-            padding: 0.15rem 0.5rem;
-            border-radius: 0.35rem;
-        }
-
-        .layout-compact .cv-columns { gap: calc(0.65rem * var(--cv-scale)); }
-        .layout-compact #cv-header {
-            padding-bottom: calc(0.45rem * var(--cv-scale));
-            margin-bottom: calc(0.7rem * var(--cv-scale));
-        }
-        .layout-compact #out-name { font-size: calc(1.45rem * var(--cv-scale)); }
-        .layout-compact .cv-section-title { margin-bottom: 0.15rem; }
-
-        .cv-photo-block,
-        .cv-sec-ico,
-        .cv-contact-ico,
-        .cv-col-rule,
-        #sec-education-side,
-        #sec-extras-side { display: none; }
-        .layout-charcoal #sec-extras-side { display: none !important; }
-        .cv-sidebar-inner { display: contents; }
-
-        #cv-preview-wrapper:has(.layout-charcoal) {
-            padding: 0;
-            overflow: hidden;
-            background: #fff;
-        }
-
-        #cv-target.layout-charcoal,
-        #qc-print-host .cv-print-sheet.layout-charcoal {
-            --charcoal: #4c4c4c;
-            --charcoal-deep: #3f3f3f;
-            --charcoal-line: rgba(255, 255, 255, 0.55);
-            display: grid;
-            grid-template-columns: 0.34fr 1fr;
-            grid-template-rows: auto 1fr;
-            grid-template-areas: "side head" "side main";
-            min-height: 1040px;
-            background: var(--charcoal-paper, #fff);
-            direction: ltr;
-            text-align: start;
-            font-family: 'Lato', 'Rubik', sans-serif;
-            font-size: calc(0.72rem * var(--cv-scale));
-            line-height: 1.45;
-            overflow: hidden;
-        }
-        .layout-charcoal .cv-columns { display: contents; }
-        .layout-charcoal .cv-sidebar {
-            grid-area: side;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            background: var(--charcoal);
-            color: #fff;
-            border: 0;
-            border-radius: 0;
-            padding: 0;
-            min-height: 100%;
-            direction: rtl;
-            text-align: right;
-        }
-        .layout-charcoal .cv-contact-header { display: none; }
-        .layout-charcoal .cv-contact-sidebar {
-            display: flex;
-            color: #fff;
-            margin: 0;
-            gap: 0.55rem;
-        }
-        .layout-charcoal .cv-photo-block {
-            display: block;
-            position: relative;
-            height: 168px;
-            background: var(--charcoal-photo, #d8d8d8);
-            border-bottom-left-radius: 90px;
-            border-bottom-right-radius: 90px;
-            margin-bottom: 1.35rem;
-        }
-        .layout-charcoal .cv-photo-block::after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            bottom: -2px;
-            width: 78%;
-            height: 54%;
-            transform: translateX(-50%);
-            background: var(--charcoal-photo-2, #cfcfcf);
-            border-radius: 0 0 80px 80px;
-        }
-        .layout-charcoal .cv-photo {
-            position: absolute;
-            z-index: 1;
-            left: 50%;
-            bottom: -28px;
-            width: 118px;
-            height: 118px;
-            transform: translateX(-50%);
-            border-radius: 999px;
-            border: 6px solid #fff;
-            overflow: hidden;
-            background: #b9b9b9;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-        }
-        .layout-charcoal .cv-photo svg,
-        .layout-charcoal .cv-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .layout-charcoal .cv-sidebar-inner {
-            padding: 2.1rem 1.35rem 1.6rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.15rem;
-        }
-        .layout-charcoal #cv-header {
-            grid-area: head;
-            background: var(--charcoal);
-            color: #fff;
-            border: 0;
-            border-radius: 0;
-            margin: 0;
-            padding: 1.85rem 2rem 1.25rem;
-            text-align: left;
-            direction: ltr;
-        }
-        .layout-charcoal #out-name,
-        .layout-charcoal #out-title,
-        .layout-charcoal #cv-header .dynamic-text {
-            color: #fff !important;
-        }
-        .layout-charcoal #out-name {
-            font-family: 'Playfair Display', 'Frank Ruhl Libre', serif;
-            font-weight: 600;
-            font-size: calc(2.15rem * var(--cv-scale));
-            letter-spacing: 0.08em;
-            line-height: 1.15;
-            text-transform: uppercase;
-        }
-        .layout-charcoal #out-title {
-            margin-top: 0.7rem;
-            padding-top: 0.55rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.7);
-            font-family: 'Lato', sans-serif;
-            font-weight: 400;
-            font-size: calc(0.82rem * var(--cv-scale));
-            letter-spacing: 0.12em;
-            text-transform: none;
-            opacity: 1;
-        }
-        .layout-charcoal .cv-main {
-            grid-area: main;
-            background: var(--charcoal-paper, #fff);
-            padding: 1.35rem 1.85rem 1.6rem;
-            gap: 1.15rem;
-            direction: rtl;
-            text-align: right;
-            color: var(--charcoal-ink, #333);
-        }
-        .layout-charcoal .cv-section-title,
-        .layout-charcoal .cv-sidebar .cv-section-title {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            font-family: 'Playfair Display', 'Frank Ruhl Libre', serif;
-            font-weight: 600;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            border-bottom: 0;
-            padding-bottom: 0.35rem;
-            margin-bottom: 0.65rem;
-            color: var(--charcoal-title, #3f3f3f) !important;
-            position: relative;
-        }
-        .layout-charcoal .cv-section-title::after,
-        .layout-charcoal .cv-sidebar .cv-section-title::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 1px;
-            background: #d4d4d4;
-        }
-        .layout-charcoal .cv-sidebar .cv-section-title {
-            justify-content: center;
-            color: #fff !important;
-            letter-spacing: 0.32em;
-            font-size: calc(0.72rem * var(--cv-scale));
-        }
-        .layout-charcoal .cv-sidebar .cv-section-title::after {
-            background: var(--charcoal-line);
-        }
-        .layout-charcoal .cv-sec-ico {
-            display: inline-flex;
-            width: 1.05rem;
-            height: 1.05rem;
-            color: var(--charcoal, #4c4c4c);
-            flex: none;
-        }
-        .layout-charcoal .cv-sec-ico svg {
-            width: 100%;
-            height: 100%;
-            stroke: currentColor;
-            fill: none;
-            stroke-width: 1.6;
-        }
-        .layout-charcoal .cv-sidebar .cv-sec-ico { display: none; }
-        .layout-charcoal .cv-contact-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.55rem;
-            color: #fff;
-            font-size: calc(0.68rem * var(--cv-scale));
-            line-height: 1.35;
-        }
-        .layout-charcoal .cv-contact-ico {
-            display: inline-flex;
-            width: 0.85rem;
-            height: 0.85rem;
-            margin-top: 0.12rem;
-            flex: none;
-        }
-        .layout-charcoal .cv-contact-ico svg {
-            width: 100%;
-            height: 100%;
-            stroke: #fff;
-            fill: none;
-            stroke-width: 1.7;
-        }
-        .layout-charcoal .cv-contact-row .dynamic-icon { display: none; }
-        .layout-charcoal .cv-contact-link { text-decoration: none; color: inherit; }
-        .layout-charcoal #sec-education { display: none !important; }
-        .layout-charcoal #sec-education-side { display: block; }
-        .layout-charcoal .cv-edu-item { margin-bottom: 0.7rem; }
-        .layout-charcoal .cv-edu-item .cv-edu-school {
-            font-weight: 700;
-            color: #fff;
-            font-size: calc(0.72rem * var(--cv-scale));
-        }
-        .layout-charcoal .cv-edu-item .cv-edu-meta {
-            color: rgba(255, 255, 255, 0.82);
-            font-size: calc(0.62rem * var(--cv-scale));
-            margin-top: 0.12rem;
-        }
-        .layout-charcoal #out-skills {
-            color: #fff;
-            padding: 0;
-        }
-        .layout-charcoal .cv-skill-list {
-            list-style: disc;
-            padding-inline-start: 1.1rem;
-            margin: 0;
-            color: #fff;
-            font-size: calc(0.68rem * var(--cv-scale));
-        }
-        .layout-charcoal .cv-skill-list li { margin-bottom: 0.2rem; }
-        .layout-charcoal .cv-lang-row {
-            display: grid;
-            grid-template-columns: 4.2rem 1fr;
-            align-items: center;
-            gap: 0.45rem;
-            margin-bottom: 0.45rem;
-            color: #fff;
-            font-size: calc(0.66rem * var(--cv-scale));
-        }
-        .layout-charcoal .cv-lang-track {
-            height: 7px;
-            background: var(--charcoal-lang-track, #2e2e2e);
-            overflow: hidden;
-        }
-        .layout-charcoal .cv-lang-fill {
-            display: block;
-            height: 100%;
-            background: var(--charcoal-lang-fill, #c8c8c8);
-        }
-        .layout-charcoal #out-summary,
-        .layout-charcoal #out-experience,
-        .layout-charcoal #out-military {
-            color: var(--charcoal-muted, #4a4a4a);
-            font-size: calc(0.68rem * var(--cv-scale));
-            line-height: 1.55;
-            padding: 0;
-        }
-        .layout-charcoal .cv-job {
-            display: grid;
-            grid-template-columns: 5.6rem 12px 1fr;
-            column-gap: 0.15rem;
-            margin-bottom: 0.85rem;
-            direction: ltr;
-        }
-        .layout-charcoal .cv-job-date {
-            font-size: calc(0.62rem * var(--cv-scale));
-            color: #555;
-            padding-top: 0.15rem;
-            text-align: right;
-            direction: ltr;
-            white-space: nowrap;
-        }
-        .layout-charcoal .cv-job-rule {
-            width: 1px;
-            background: #cfcfcf;
-            justify-self: center;
-        }
-        .layout-charcoal .cv-job-body {
-            padding-inline-start: 0.55rem;
-            direction: rtl;
-            text-align: right;
-        }
-        .layout-charcoal .cv-job-title {
-            font-weight: 700;
-            color: #2f2f2f;
-            font-size: calc(0.74rem * var(--cv-scale));
-        }
-        .layout-charcoal .cv-job-role {
-            color: #5a5a5a;
-            font-size: calc(0.64rem * var(--cv-scale));
-            margin-bottom: 0.2rem;
-        }
-        .layout-charcoal .cv-job-list {
-            margin: 0;
-            padding-inline-start: 1rem;
-            list-style: disc;
-        }
-        .layout-charcoal .cv-job-list li { margin-bottom: 0.12rem; }
-        .layout-charcoal .cv-ref-item { margin-bottom: 0.75rem; }
-        .layout-charcoal .cv-ref-name {
-            font-weight: 700;
-            color: #2f2f2f;
-            font-size: calc(0.78rem * var(--cv-scale));
-        }
-        .layout-charcoal .cv-ref-role {
-            color: #5a5a5a;
-            font-size: calc(0.64rem * var(--cv-scale));
-            margin-bottom: 0.2rem;
-        }
-        .layout-charcoal .cv-ref-line {
-            color: #4a4a4a;
-            font-size: calc(0.62rem * var(--cv-scale));
-        }
-
-        .template-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.65rem;
-        }
-        #examples-modal {
-            z-index: 10040;
-            align-items: center;
-            justify-content: center;
-        }
-        #examples-modal .examples-backdrop {
-            position: absolute;
-            inset: 0;
-            border: 0;
-            padding: 0;
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(12px);
-        }
-        #examples-modal .examples-panel {
-            position: relative;
-            z-index: 1;
-            pointer-events: auto;
-        }
-        .template-card {
-            text-align: right;
-            border-radius: 1.1rem;
-            border: 1px solid #334155;
-            background: #0f172a;
-            padding: 0.7rem;
-            color: inherit;
-            cursor: pointer;
-            pointer-events: auto;
-            position: relative;
-            z-index: 1;
-        }
-        .template-card:hover { border-color: #60a5fa; }
-        .template-card[aria-pressed="true"] {
-            border-color: #93c5fd;
-            box-shadow: 0 0 0 1px #93c5fd inset;
-        }
-        .template-thumb {
-            display: block;
-            height: 6.6rem;
-            border-radius: 0.45rem;
-            background: #f4eee4;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-        .template-thumb span {
-            position: absolute;
-            background: #d6c7ae;
-            border-radius: 2px;
-        }
-        .template-card-title {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 800;
-            color: #e2e8f0;
-        }
-        .template-card-sub {
-            display: block;
-            font-size: 0.65rem;
-            color: #94a3b8;
-            margin-top: 0.15rem;
-            line-height: 1.35;
-        }
-        .home-layout {
-            width: 100%;
-            text-align: right;
-            cursor: pointer;
-            pointer-events: auto;
-            position: relative;
-            z-index: 1;
-        }
-        .template-thumb,
-        .home-layout-frame,
-        .template-thumb *,
-        .home-layout-frame * {
-            pointer-events: none;
-        }
-        .home-layout:hover { border-color: rgba(28, 25, 23, 0.22); }
-        .cv-photo-file { display: none; }
-
-        #cv-target.cv-lang-en.layout-charcoal .cv-sidebar,
-        #cv-target.cv-lang-en.layout-charcoal .cv-main,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-sidebar,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-main,
-        #cv-target.cv-lang-en.layout-charcoal .cv-job-body,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-body {
-            direction: ltr;
-            text-align: left;
-        }
-        #cv-target.cv-lang-en.layout-charcoal .cv-job-date,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-date {
-            text-align: left;
-        }
-
-        #cv-preview-wrapper:has(.layout-navy) {
-            padding: 0;
-            overflow: hidden;
-            background: #fff;
-        }
-        #cv-target.layout-navy,
-        #qc-print-host .cv-print-sheet.layout-navy {
-            --navy: #12192b;
-            --navy-muted: #333333;
-            --navy-line: rgba(255, 255, 255, 0.62);
-            display: grid;
-            grid-template-columns: 0.36fr 0.64fr;
-            grid-template-rows: auto auto 1fr;
-            grid-template-areas:
-                "photo main"
-                "head main"
-                "side main";
-            min-height: 1040px;
-            background: #fff;
-            direction: ltr;
-            text-align: start;
-            font-family: 'Montserrat', 'Heebo', 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
-            font-size: calc(0.72rem * var(--cv-scale));
-            line-height: 1.5;
-            overflow: hidden;
-        }
-        .layout-navy .cv-columns,
-        .layout-navy .cv-sidebar {
-            display: contents;
-        }
-        .layout-navy .cv-contact-header { display: none; }
-        .layout-navy .cv-photo-block {
-            grid-area: photo;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            background: var(--navy);
-            padding: 1.55rem 1rem 0.35rem;
-            z-index: 1;
-        }
-        .layout-navy .cv-photo {
-            position: relative;
-            left: auto;
-            bottom: auto;
-            transform: none;
-            width: 118px;
-            height: 118px;
-            border-radius: 999px;
-            border: 3px solid rgba(255, 255, 255, 0.92);
-            overflow: hidden;
-            background: #8d93a3;
-            box-shadow: none;
-        }
-        .layout-navy .cv-photo svg,
-        .layout-navy .cv-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .layout-navy #cv-header {
-            grid-area: head;
-            background: var(--navy);
-            color: #fff;
-            border: 0;
-            border-radius: 0;
-            margin: 0;
-            padding: 0.65rem 1.15rem 1.15rem;
-            text-align: center;
-            z-index: 1;
-        }
-        .layout-navy #out-name,
-        .layout-navy #out-title,
-        .layout-navy #cv-header .dynamic-text {
-            color: #fff !important;
-            unicode-bidi: plaintext;
-        }
-        .layout-navy #out-name {
-            font-weight: 700;
-            font-size: calc(1.05rem * var(--cv-scale));
-            letter-spacing: 0.14em;
-            line-height: 1.25;
-            text-transform: uppercase;
-        }
-        .layout-navy #out-title {
-            margin-top: 0.28rem;
-            font-weight: 500;
-            font-size: calc(0.62rem * var(--cv-scale));
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            opacity: 0.88;
-        }
-        .layout-navy .cv-sidebar-inner {
-            grid-area: side;
-            display: flex;
-            flex-direction: column;
-            gap: 1.15rem;
-            background: var(--navy);
-            color: #fff;
-            padding: 0.35rem 1.25rem 1.7rem;
-            min-height: 100%;
-            z-index: 1;
-            direction: rtl;
-            text-align: right;
-        }
-        .layout-navy .cv-contact-sidebar {
-            display: flex;
-            color: #fff;
-            margin: 0;
-            gap: 0.55rem;
-        }
-        .layout-navy .cv-main {
-            grid-area: main;
-            background: #fff;
-            padding: 1.55rem 1.7rem 1.7rem 1.45rem;
-            gap: 1.15rem;
-            direction: rtl;
-            text-align: right;
-            color: var(--navy-muted);
-            z-index: 1;
-        }
-        .layout-navy .cv-section-title,
-        .layout-navy .cv-sidebar .cv-section-title {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            border-bottom: 0;
-            padding-bottom: 0.42rem;
-            margin-bottom: 0.7rem;
-            color: var(--navy) !important;
-            position: relative;
-        }
-        .layout-navy .cv-section-title::after,
-        .layout-navy .cv-sidebar .cv-section-title::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-bottom: 1px dashed #12192b;
-        }
-        .layout-navy .cv-sidebar .cv-section-title {
-            color: #fff !important;
-            letter-spacing: 0.18em;
-            font-size: calc(0.68rem * var(--cv-scale));
-            justify-content: flex-start;
-        }
-        .layout-navy .cv-sidebar .cv-section-title::after {
-            border-bottom-color: var(--navy-line);
-        }
-        .layout-navy .cv-sec-ico { display: none; }
-        .layout-navy .cv-contact-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.55rem;
-            color: #fff;
-            font-size: calc(0.66rem * var(--cv-scale));
-            line-height: 1.35;
-            unicode-bidi: plaintext;
-        }
-        .layout-navy .cv-contact-ico {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 1.28rem;
-            height: 1.28rem;
-            margin-top: 0;
-            flex: none;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.88);
-        }
-        .layout-navy .cv-contact-ico svg {
-            width: 0.62rem;
-            height: 0.62rem;
-            stroke: #fff;
-            fill: none;
-            stroke-width: 1.8;
-        }
-        .layout-navy .cv-contact-row .dynamic-icon { display: none; }
-        .layout-navy .cv-contact-link { text-decoration: none; color: inherit; }
-        .layout-navy #sec-education { display: block; }
-        .layout-navy #sec-education-side { display: none !important; }
-        .layout-navy #out-skills {
-            color: #fff;
-            padding: 0;
-        }
-        .layout-navy .cv-skill-list {
-            list-style: disc;
-            padding-inline-start: 1.05rem;
-            margin: 0;
-            color: #fff;
-            font-size: calc(0.66rem * var(--cv-scale));
-        }
-        .layout-navy .cv-skill-list li { margin-bottom: 0.22rem; unicode-bidi: plaintext; }
-        .layout-navy .cv-lang-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 0.6rem;
-            margin-bottom: 0.35rem;
-            color: #fff;
-            font-size: calc(0.66rem * var(--cv-scale));
-        }
-        .layout-navy .cv-lang-name,
-        .layout-navy .cv-lang-level {
-            unicode-bidi: plaintext;
-        }
-        .layout-navy .cv-lang-level {
-            opacity: 0.88;
-            font-weight: 500;
-        }
-        .layout-navy #out-summary,
-        .layout-navy #out-experience,
-        .layout-navy #out-education,
-        .layout-navy #out-military {
-            color: var(--navy-muted);
-            font-size: calc(0.68rem * var(--cv-scale));
-            line-height: 1.55;
-            padding: 0;
-            unicode-bidi: plaintext;
-        }
-        .layout-navy #out-experience,
-        .layout-navy #out-education {
-            position: relative;
-            padding-inline-start: 1.55rem;
-            unicode-bidi: isolate;
-        }
-        .layout-navy #out-experience::before,
-        .layout-navy #out-education::before {
-            content: "";
-            position: absolute;
-            inset-inline-start: 0.46rem;
-            top: 0.55rem;
-            bottom: 0.35rem;
-            border-inline-start: 1px dashed #c5c9d4;
-        }
-        .layout-navy .cv-job {
-            position: relative;
-            display: block;
-            margin-bottom: 0.95rem;
-            direction: inherit;
-        }
-        .layout-navy .cv-job-mark {
-            position: absolute;
-            inset-inline-start: -1.42rem;
-            top: 0.05rem;
-            width: 1.18rem;
-            height: 1.18rem;
-            border-radius: 999px;
-            background: var(--navy);
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-        }
-        .layout-navy .cv-job-mark svg {
-            width: 0.62rem;
-            height: 0.62rem;
-            stroke: #fff;
-            fill: none;
-            stroke-width: 1.8;
-        }
-        .layout-navy .cv-job-body {
-            padding: 0;
-            direction: inherit;
-            text-align: inherit;
-        }
-        .layout-navy .cv-job-title {
-            font-weight: 700;
-            color: var(--navy);
-            font-size: calc(0.78rem * var(--cv-scale));
-            unicode-bidi: plaintext;
-        }
-        .layout-navy .cv-job-role,
-        .layout-navy .cv-job-date {
-            color: var(--navy);
-            font-size: calc(0.66rem * var(--cv-scale));
-            unicode-bidi: plaintext;
-        }
-        .layout-navy .cv-job-date {
-            margin: 0.08rem 0 0.28rem;
-            white-space: normal;
-            text-align: inherit;
-        }
-        .layout-navy .cv-job-list {
-            margin: 0;
-            padding-inline-start: 1rem;
-            list-style: disc;
-            color: var(--navy-muted);
-        }
-        .layout-navy .cv-job-list li { margin-bottom: 0.12rem; unicode-bidi: plaintext; }
-
-        #cv-target.cv-lang-en.layout-navy .cv-sidebar-inner,
-        #cv-target.cv-lang-en.layout-navy .cv-main,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-sidebar-inner,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-main {
-            direction: ltr;
-            text-align: left;
-        }
-
-        .cv-watermark {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 10;
-            overflow: hidden;
-            border-radius: 1rem;
-        }
-        .cv-watermark span {
-            position: absolute;
-            top: 42%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-28deg);
-            font-size: clamp(1.6rem, 4vw, 2.6rem);
-            font-weight: 800;
-            letter-spacing: 0.18em;
-            color: rgba(15, 23, 42, 0.08);
-            white-space: nowrap;
-            text-transform: uppercase;
-        }
-        .paid .cv-watermark,
-        .paid .cv-shield { display: none; }
-
-        #cv-preview-wrapper:not(.paid) {
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
-        #cv-preview-wrapper:not(.paid) #cv-target {
-            pointer-events: none;
-        }
-        .cv-shield {
-            position: absolute;
-            inset: 0;
-            z-index: 12;
-            overflow: hidden;
-            border-radius: 1rem;
-            pointer-events: none;
-            background-image: repeating-linear-gradient(
-                -28deg,
-                transparent,
-                transparent 42px,
-                rgba(15, 23, 42, 0.045) 42px,
-                rgba(15, 23, 42, 0.045) 43px
-            );
-        }
-        #cv-shield-grid {
-            position: absolute;
-            inset: -45%;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.4rem 2rem;
-            transform: rotate(-24deg);
-            color: rgba(15, 23, 42, 0.09);
-            font-weight: 800;
-            font-size: clamp(0.7rem, 2.2vw, 0.95rem);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        input[type="range"] {
-            accent-color: var(--accent);
-        }
-        .theme-swatch[aria-pressed="true"],
-        .layout-chip[aria-pressed="true"],
-        .lang-chip[aria-pressed="true"],
-        .bg-swatch[aria-pressed="true"] {
-            outline: 2px solid white;
-            outline-offset: 2px;
-            box-shadow: 0 0 0 4px var(--accent);
-        }
-        .layout-chip[aria-pressed="true"],
-        .bg-swatch[aria-pressed="true"] {
-            border-color: var(--accent);
-            background: rgba(30, 58, 138, 0.25);
-            color: #fff;
-        }
-
-        .preview-close { display: none; }
-
-        @media (max-width: 1023px) {
-            html {
-                scroll-padding-top: 5.5rem;
-            }
-            html, body, body.on-studio {
-                overflow-x: hidden;
-                overflow-y: auto;
-                height: auto;
-                max-height: none;
-            }
-            #studio-view,
-            body.on-studio #studio-view:not([hidden]) {
-                display: block !important;
-                width: 100%;
-                max-width: 100%;
-                height: auto !important;
-                max-height: none !important;
-                overflow: visible !important;
-            }
-            .studio-workspace {
-                width: 100%;
-                max-width: 100%;
-                display: block;
-                padding: 0.6rem 0.85rem calc(5.75rem + env(safe-area-inset-bottom));
-            }
-            .studio-header .studio-promo {
-                padding-top: 0.3rem;
-                padding-bottom: 0.3rem;
-            }
-            .studio-header .studio-promo > div {
-                flex-direction: row;
-                flex-wrap: nowrap;
-                align-items: center;
-                justify-content: space-between;
-                gap: 0.45rem;
-            }
-            .studio-header .studio-promo > div > div:first-child {
-                flex: 1 1 auto;
-                min-width: 0;
-                justify-content: flex-start;
-            }
-            .studio-header .studio-promo span.rounded-full {
-                display: none;
-            }
-            .studio-header .studio-promo p {
-                font-size: 0.72rem;
-                line-height: 1.2;
-            }
-            .studio-header .studio-promo .studio-pay {
-                min-height: 2.1rem;
-                padding-left: 0.7rem;
-                padding-right: 0.7rem;
-                font-size: 0.7rem;
-                flex-shrink: 0;
-            }
-            .studio-header .studio-toolbar {
-                display: grid;
-                grid-template-columns: auto 1fr;
-                grid-template-areas: "brand actions" "steps steps";
-                align-items: center;
-                min-height: 0;
-                padding-top: 0.3rem;
-                padding-bottom: 0.35rem;
-                gap: 0.25rem 0.45rem;
-            }
-            .studio-header .studio-toolbar > button:first-child {
-                grid-area: brand;
-            }
-            .studio-header .studio-toolbar > div:last-child {
-                grid-area: actions;
-                justify-self: end;
-            }
-            .studio-header nav {
-                grid-area: steps;
-                order: unset;
-                width: 100%;
-                flex: none;
-                justify-content: center;
-                min-width: 0;
-            }
-            .studio-header .step-btn {
-                padding-left: 0.45rem;
-                padding-right: 0.45rem;
-                min-height: 2.1rem;
-            }
-            .studio-social {
-                display: none;
-            }
-            #studio-form-column {
-                display: flex !important;
-                flex-direction: column;
-                gap: 0.85rem;
-                overflow: visible !important;
-                height: auto !important;
-                max-height: none !important;
-                min-height: 0;
-                width: 100%;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-            #studio-form-column > * {
-                flex: none;
-                width: 100%;
-                min-height: auto;
-                max-height: none;
-                display: block;
-            }
-            #studio-form-column > * + * {
-                margin-top: 0;
-            }
-            #templates-panel { order: 1; }
-            #details-panel { order: 2; }
-            #design-panel { order: 3; }
-            #templates-panel,
-            #details-panel,
-            #design-panel {
-                scroll-margin-top: 5.25rem;
-            }
-            #templates-panel {
-                padding: 0.7rem 0.75rem 0.8rem;
-            }
-            #templates-panel .template-grid.canva-grid {
-                display: flex;
-                flex-wrap: nowrap;
-                max-height: none;
-                overflow-x: auto;
-                overflow-y: hidden;
-                gap: 0.5rem;
-                padding-bottom: 0.2rem;
-                -webkit-overflow-scrolling: touch;
-                overscroll-behavior-x: contain;
-                scroll-snap-type: x mandatory;
-            }
-            #templates-panel .template-card {
-                flex: 0 0 7.6rem;
-                scroll-snap-align: start;
-                padding: 0.45rem;
-            }
-            #templates-panel .template-thumb {
-                height: 3.6rem;
-                margin-bottom: 0.3rem;
-            }
-            #details-panel {
-                padding: 1rem 0.9rem 1.15rem;
-            }
-            #details-panel input:not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]),
-            #details-panel select,
-            #details-panel textarea {
-                background: #0f172a;
-                border-color: #64748b;
-                color: #f8fafc;
-            }
-            #studio-form-column #btn-download-pdf {
-                display: none;
-            }
-            #preview-column {
-                display: none !important;
-            }
-            #preview-column.mobile-preview-open {
-                display: flex !important;
-                position: fixed;
-                inset: 0;
-                z-index: 80;
-                overflow: auto;
-                background: #020617;
-                padding: max(0.75rem, env(safe-area-inset-top)) 0.85rem calc(5.5rem + env(safe-area-inset-bottom));
-                border-radius: 0;
-                max-height: none;
-                width: 100%;
-            }
-            .preview-col.mobile-preview-open .preview-close {
-                display: inline-flex;
-            }
-            #preview-column.mobile-preview-open #cv-preview-wrapper {
-                min-height: 0;
-                padding: 0.85rem;
-            }
-        }
-
-        @media (max-width: 1023px) {
-            input:not([type="range"]):not([type="color"]),
-            select,
-            textarea {
-                font-size: 16px !important;
-                min-height: 44px;
-            }
-            textarea { min-height: 5.5rem; }
-        }
-
-        @media (min-width: 1024px) {
-            body.on-studio {
-                overflow: hidden;
-                height: 100dvh;
-                height: 100svh;
-            }
-            body.on-studio #studio-view:not([hidden]) {
-                height: 100dvh;
-                height: 100svh;
-                max-height: 100dvh;
-                max-height: 100svh;
-                overflow: hidden;
-            }
-            body.on-studio #studio-view > header {
-                position: relative;
-                top: auto;
-            }
-            .studio-workspace {
-                display: grid;
-                flex: 1 1 auto;
-                min-height: 0;
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-                grid-template-rows: minmax(0, 1fr);
-                padding: 1rem 1.5rem 1.25rem;
-                gap: 1.5rem;
-            }
-            body.on-studio #studio-view:not([hidden]) {
-                display: flex;
-            }
-            #studio-form-column,
-            #preview-column {
-                min-height: 0;
-                overflow: auto;
-                -webkit-overflow-scrolling: touch;
-                overscroll-behavior: contain;
-            }
-            #preview-column {
-                display: flex !important;
-                position: relative;
-                top: auto;
-                align-self: stretch;
-            }
-        }
-
-        html.qc-narrow body.on-studio {
-            overflow: visible !important;
-            height: auto !important;
-            max-height: none !important;
-        }
-        html.qc-narrow body.on-studio #studio-view:not([hidden]) {
-            display: block !important;
-            height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-        }
-        html.qc-narrow .studio-workspace {
-            display: block !important;
-            grid-template-columns: none !important;
-        }
-        html.qc-narrow #studio-form-column {
-            display: flex !important;
-            flex-direction: column;
-            overflow: visible !important;
-            height: auto !important;
-            max-height: none !important;
-        }
-        html.qc-narrow #preview-column {
-            display: none !important;
-        }
-        html.qc-narrow #preview-column.mobile-preview-open {
-            display: flex !important;
-            position: fixed !important;
-            inset: 0;
-            z-index: 80;
-            width: 100%;
-            max-height: none;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            .cta-download { animation: none !important; }
-            * { transition: none !important; }
-        }
-
-        #phrases-panel {
-            position: relative;
-            z-index: 2;
-            pointer-events: auto;
-        }
-        #phrases-panel button,
-        #phrases-panel select {
-            position: relative;
-            z-index: 1;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        .cta-download {
-            position: relative;
-            z-index: 20;
-            pointer-events: auto !important;
-            animation: cta-pulse 2.2s ease-in-out infinite;
-        }
-        .cta-download:hover {
-            animation: none;
-            transform: translateY(-1px);
-            filter: brightness(1.05);
-        }
-        @keyframes cta-pulse {
-            0%, 100% { box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35); }
-            50% { box-shadow: 0 8px 28px rgba(16, 185, 129, 0.7), 0 0 0 8px rgba(16, 185, 129, 0.12); }
-        }
-
-        #payment-modal {
-            z-index: 10050;
-            pointer-events: auto;
-        }
-        #payment-modal .pay-close-btn {
-            position: sticky;
-            top: 0;
-            z-index: 10060;
-            pointer-events: auto !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            min-height: 2.75rem;
-            padding: 0 1rem;
-            margin: 0 auto 0.75rem;
-            border-radius: 9999px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-weight: 800;
-            font-size: 0.875rem;
-            cursor: pointer;
-            flex-shrink: 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-        }
-        body.qc-checkout-open #studio-mobile-dock,
-        body.qc-mobile-preview-open #studio-mobile-dock {
-            visibility: hidden;
-            pointer-events: none;
-        }
-        body.qc-mobile-preview-open {
-            overflow: hidden;
-            height: 100svh;
-        }
-        #payment-modal .pay-card {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.86));
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-        }
-        #download-code:focus {
-            border-color: #34d399;
-            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.25);
-            background: #fff;
-        }
-        #payment-screenshot-label:hover {
-            border-color: rgba(52, 211, 153, 0.7);
-            background: rgba(16, 185, 129, 0.12);
-        }
-        #payment-verify-overlay {
-            background: rgba(2, 6, 23, 0.78);
-            backdrop-filter: blur(8px);
-        }
-
-        #cv-preview-wrapper {
-            background: #ffffff;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-        }
-
-        #qc-print-host {
-            display: none;
-        }
-        #qc-print-host.qc-capturing {
-            display: block !important;
-        }
-        #qc-print-host.qc-capturing,
-        #qc-print-host.qc-capturing .cv-print-sheet,
-        #qc-print-host.qc-capturing .cv-print-sheet * {
-            overflow: visible !important;
-            max-height: none !important;
-            text-overflow: clip !important;
-        }
-        #qc-print-host.qc-capturing .cv-print-sheet {
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        @page {
-            size: A4;
-            margin: 12mm;
-        }
-
-        @media print {
-            html, body {
-                background: #ffffff !important;
-                color: #0f172a !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            .no-print,
-            header,
-            .home-view,
-            #studio-view > header,
-            #payment-modal,
-            #pdf-spinner,
-            #examples-modal,
-            #shot-block,
-            .cv-watermark,
-            .cv-shield {
-                display: none !important;
-            }
-
-            html.qc-unpaid body * {
-                visibility: hidden !important;
-            }
-            html.qc-unpaid body::after {
-                visibility: visible !important;
-                content: "QuickCV — התצוגה המקדימה מוגנת. להורדת PDF יש לשלם 9.9 ₪.";
-                display: block;
-                padding: 2rem;
-                font-size: 18px;
-                color: #0f172a;
-            }
-
-            html.qc-print-mode body > *:not(#qc-print-host) {
-                display: none !important;
-            }
-
-            html.qc-print-mode #qc-print-host {
-                display: block !important;
-                position: static !important;
-                width: 100% !important;
-                max-width: 186mm !important;
-                margin: 0 auto !important;
-                padding: 0 !important;
-                background: #ffffff !important;
-                color: #0f172a !important;
-                direction: rtl !important;
-                text-align: right !important;
-                overflow: visible !important;
-            }
-
-            html.qc-print-mode #qc-print-host .cv-print-sheet,
-            html.qc-print-mode #qc-print-host #cv-target {
-                display: block !important;
-                width: 100% !important;
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #ffffff !important;
-                color: #0f172a !important;
-                direction: rtl !important;
-                text-align: right !important;
-                overflow: visible !important;
-                font-family: var(--cv-font), 'Rubik', sans-serif !important;
-            }
-
-            html.qc-print-mode #qc-print-host .cv-columns {
-                display: flex !important;
-            }
-
-            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns {
-                display: grid !important;
-            }
-
-            html.qc-print-mode #qc-print-host .layout-charcoal {
-                display: grid !important;
-                grid-template-columns: 0.34fr 1fr !important;
-                grid-template-rows: auto 1fr !important;
-                grid-template-areas: "side head" "side main" !important;
-                direction: ltr !important;
-                text-align: start !important;
-                background: var(--charcoal-paper, #fff) !important;
-                min-height: 277mm !important;
-            }
-            html.qc-print-mode #qc-print-host .layout-charcoal .cv-columns {
-                display: contents !important;
-            }
-            html.qc-print-mode #qc-print-host[dir="ltr"],
-            html.qc-print-mode #qc-print-host[dir="ltr"] .cv-print-sheet,
-            html.qc-print-mode #qc-print-host[dir="ltr"] #cv-target {
-                direction: ltr !important;
-                text-align: left !important;
-            }
-
-            html.qc-print-mode #qc-print-host .layout-charcoal .cv-sidebar,
-            html.qc-print-mode #qc-print-host .layout-charcoal .cv-main {
-                direction: rtl !important;
-                text-align: right !important;
-            }
-            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-sidebar,
-            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-main {
-                direction: ltr !important;
-                text-align: left !important;
-            }
-            html.qc-print-mode #qc-print-host .layout-charcoal #cv-header {
-                background: var(--charcoal, #4c4c4c) !important;
-                color: #fff !important;
-            }
-            html.qc-print-mode #qc-print-host .layout-charcoal .cv-sidebar {
-                background: var(--charcoal, #4c4c4c) !important;
-                color: #fff !important;
-            }
-
-            html.qc-print-mode #qc-print-host .layout-navy {
-                display: grid !important;
-                grid-template-columns: 0.36fr 0.64fr !important;
-                grid-template-rows: auto auto 1fr !important;
-                grid-template-areas:
-                    "photo main"
-                    "head main"
-                    "side main" !important;
-                direction: ltr !important;
-                text-align: start !important;
-                background: #fff !important;
-                min-height: 277mm !important;
-            }
-            html.qc-print-mode #qc-print-host .layout-navy .cv-columns,
-            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar {
-                display: contents !important;
-            }
-            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner,
-            html.qc-print-mode #qc-print-host .layout-navy .cv-main {
-                direction: rtl !important;
-                text-align: right !important;
-            }
-            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-sidebar-inner,
-            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-main {
-                direction: ltr !important;
-                text-align: left !important;
-            }
-            html.qc-print-mode #qc-print-host .layout-navy #cv-header,
-            html.qc-print-mode #qc-print-host .layout-navy .cv-photo-block,
-            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner {
-                background: var(--navy, #12192b) !important;
-                color: #fff !important;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="./app.css">
+    <link rel="stylesheet" href="./cro.css">
 </head>
-<body class="on-home min-h-screen pb-24 lg:pb-0" id="app-body">
+<body class="on-home min-h-screen lg:pb-0" id="app-body">
     <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
 
     <div id="home-view" class="home-view no-print">
@@ -2156,7 +27,7 @@
                     <span class="home-mark" aria-hidden="true">QC</span>
                     <span>
                         <span class="home-brand-name">QuickCV</span>
-                        <span class="home-brand-sub">Atelier</span>
+                        <span class="home-brand-sub">Launch</span>
                     </span>
                 </button>
                 <div class="home-nav-actions">
@@ -2167,16 +38,31 @@
 
             <section class="home-hero" aria-labelledby="home-title">
                 <div>
-                    <p class="home-kicker">אטלייה לקורות חיים</p>
-                    <h1 id="home-title" class="home-title">מסמך שנראה כאילו נכתב רק בשבילכם</h1>
+                    <p class="home-kicker">משגרים אותך לראיון הבא</p>
+                    <div class="home-ats-row"><span class="ats-badge" data-ats-badge>ATS-Friendly · נסרק בהצלחה במערכות סינון</span></div>
+                    <h1 id="home-title" class="home-title">הדחיפה החסרה לקורות החיים שלכם</h1>
                     <p class="home-lead">
-                        עיצוב עברי מדויק, תצוגה חיה, ו־30 תבניות מוכנות להגשה.
-                        מחיר השקה: <span data-price>9.9</span> ₪ במקום <span class="line-through opacity-60" data-compare-price>39.9</span> ₪.
+                        עיצוב עברי חד, תצוגה חיה, ו־30 תבניות מוכנות להגשה.
+                        אתם ממלאים — אנחנו מזניקים את המסמך עד לראיון.
                     </p>
+                    <div class="home-hero-offer">
+                        <p class="home-hero-price">
+                            <span class="sr-only">מחיר השקה</span>
+                            <s class="home-price-was"><span data-compare-price>49</span> ₪</s>
+                            <span class="home-price-now"><span data-price>9.90</span> ₪</span>
+                        </p>
+                        <p class="home-hero-sub">עיצוב ברמת מעצב פרטי — במחיר של קפה</p>
+                    </div>
                     <div class="home-hero-actions">
                         <button type="button" id="home-cta" class="home-cta" onclick="showStudio()">היכנסו לסטודיו</button>
                         <button type="button" class="home-cta-ghost" onclick="openExamplesModal()">צפו בדוגמאות מוכנות</button>
                     </div>
+                    <nav class="seo-cat-row" aria-label="תבניות לפי תחום">
+                        <a class="seo-cat-chip" href="/templates/hi-tech/">הייטק</a>
+                        <a class="seo-cat-chip" href="/templates/sales/">מכירות</a>
+                        <a class="seo-cat-chip" href="/templates/students/">סטודנטים</a>
+                        <a class="seo-cat-chip" href="/templates/customer-service/">שירות לקוחות</a>
+                    </nav>
                     <div class="home-meta">
                         <p><strong>1,200+</strong> קורות חיים השבוע</p>
                         <p><strong>4.9/5</strong> מדירוגי לקוחות</p>
@@ -2207,6 +93,38 @@
             </section>
         </div>
 
+        <section class="home-ats" aria-labelledby="home-ats-title">
+            <div class="home-inner">
+                <p id="home-ats-title" class="home-ats-copy">קורות חיים שנבדקו ואושרו למערכות סינון (ATS)</p>
+                <ul class="home-ats-logos">
+                    <li class="home-ats-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 12.2 10.4 14.7 16.2 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        ATS
+                    </li>
+                    <li class="home-ats-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7.2L19.5 9v11.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M14 3.7V9h5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="12" y="16.4" text-anchor="middle" font-size="6.2" font-weight="700" fill="currentColor" font-family="Arial, sans-serif">PDF</text></svg>
+                        PDF
+                    </li>
+                    <li class="home-ats-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 8h8M8 12h8M8 16h5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        DOCX
+                    </li>
+                    <li class="home-ats-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M12 8c1.7 2.3 1.7 5.7 0 8M12 8c-1.7 2.3-1.7 5.7 0 8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                        Unicode
+                    </li>
+                    <li class="home-ats-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3.8" width="12" height="16.4" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 8h6M9 11.5h6M9 15h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                        עמוד אחד
+                    </li>
+                    <li class="home-ats-badge">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5 12 4.8 19 8.5v7L12 19.2 5 15.5v-7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 9.2v5.6M9.6 12h4.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        HR-XML
+                    </li>
+                </ul>
+            </div>
+        </section>
+
         <div class="home-band">
             <div class="home-inner home-band-row">
                 <p><strong>עברית ואנגלית</strong>פריסה מיושרת לימין או לשמאל לפי שפת הקורות חיים</p>
@@ -2234,8 +152,59 @@
                     <article class="home-step">
                         <p class="home-step-num">03</p>
                         <h3>הורדה</h3>
-                        <p>תשלום של <span data-price>9.9</span> ₪ ב-Bit, קוד בוואטסאפ, ו-PDF באיכות גבוהה.</p>
+                        <p>תשלום של <span data-price>9.90</span> ₪ ב-Bit, קוד בוואטסאפ, ו-PDF באיכות גבוהה.</p>
                     </article>
+                </div>
+            </section>
+
+            <section class="home-section" aria-labelledby="home-compare">
+                <div class="home-compare">
+                    <div>
+                        <p class="home-kicker">לפני ואחרי</p>
+                        <h2 id="home-compare">ממסמך Word שטוח ל־PDF מוכן להגשה</h2>
+                        <p class="home-section-lead">הזיזו את הסרגל: משמאל קורות חיים פשוטים בסגנון Word, מימין הפלט המעוצב של QuickCV — אותם פרטים, רושם אחר לגמרי.</p>
+                    </div>
+                    <div class="ba-frame" id="ba-slider">
+                        <div class="ba-layer ba-after" aria-hidden="true">
+                            <div class="ba-doc ba-pro">
+                                <div class="home-paper-rule"></div>
+                                <p class="home-paper-name">נועה כהן</p>
+                                <p class="home-paper-role">מנהלת מכירות ארצית</p>
+                                <div class="home-paper-line short"></div>
+                                <div class="home-paper-line w-94"></div>
+                                <div class="home-paper-line w-80"></div>
+                                <div class="home-paper-line w-62"></div>
+                                <div class="home-paper-line short"></div>
+                                <div class="home-paper-line w-94"></div>
+                                <div class="home-paper-line w-80"></div>
+                            </div>
+                        </div>
+                        <div class="ba-layer ba-before" id="ba-before" aria-hidden="true">
+                            <div class="ba-doc ba-word">
+                                <div class="flex items-start justify-between gap-3" style="direction:rtl">
+                                    <div>
+                                        <p class="ba-kicker">Curriculum Vitae</p>
+                                        <p class="ba-name">נועה כהן</p>
+                                        <p class="ba-role">מנהלת מכירות??</p>
+                                    </div>
+                                    <span class="ba-clip"></span>
+                                </div>
+                                <p class="ba-bullet">o ניסיון בניהול צוותים וגם מכירות וגם אדמיניסטרציה</p>
+                                <p class="ba-bullet">o השכלה: תואר... ראו קובץ מצורף</p>
+                                <div class="ba-line" style="width:92%"></div>
+                                <div class="ba-line" style="width:74%"></div>
+                                <div class="ba-line" style="width:88%"></div>
+                                <div class="ba-line" style="width:61%"></div>
+                                <div class="ba-line" style="width:80%"></div>
+                            </div>
+                        </div>
+                        <div class="ba-handle" id="ba-handle"><span class="ba-knob">⇆</span></div>
+                        <input class="ba-range" id="ba-range" type="range" min="8" max="92" value="52" aria-label="השוואת לפני ואחרי">
+                        <div class="ba-labels">
+                            <span>Word</span>
+                            <span>QuickCV</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -2243,6 +212,9 @@
                 <p class="home-kicker">הסטודיו</p>
                 <h2 id="home-craft">כלים של מעצב, לא אשף משעמם</h2>
                 <p class="home-section-lead" data-template-count-copy="home">תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.</p>
+                <div class="home-ats-row">
+                    <span class="ats-badge" data-ats-badge>ATS-Friendly · נסרק בהצלחה במערכות סינון</span>
+                </div>
                 <div class="home-layouts" data-home-templates></div>
                 <div class="home-cards" style="margin-top:1rem">
                     <article class="home-card">
@@ -2254,10 +226,35 @@
                         <p>הפרטים נשמרים בדפדפן, כדי שאפשר לחזור וללטש בלי להתחיל מחדש.</p>
                     </article>
                     <article class="home-card">
-                        <h3>PDF, Word וטקסט</h3>
-                        <p>אחרי הפתיחה אפשר להוריד גם DOCX ו-TXT, לא רק קובץ מעוצב.</p>
+                        <h3>מכתב מקדים</h3>
+                        <p>עמוד נלווה באותו גופן וצבע — מוכן להגשה יחד עם קורות החיים.</p>
                     </article>
                 </div>
+            </section>
+
+            <section class="home-section" aria-labelledby="home-roles" style="padding-top:0">
+                <p class="home-kicker">לפי תפקיד</p>
+                <h2 id="home-roles">תבניות מוכנות למכירות, הייטק ועוד</h2>
+                <p class="home-section-lead">כל עמוד ממלא תקציר, ניסיון וכישורים לתחום — ואז פותח את הסטודיו לעריכה.</p>
+                <div class="home-cards">
+                    <a class="home-card home-role-card" href="/templates/sales/">
+                        <h3>מכירות</h3>
+                        <p>משפך, KPI ו-CRM. כפתור: השתמשו בתבנית לקורות חיים למכירות.</p>
+                    </a>
+                    <a class="home-card home-role-card" href="/templates/hi-tech/">
+                        <h3>הייטק</h3>
+                        <p>סטאק, ייצור ובדיקות — פריסה נקייה ל-ATS.</p>
+                    </a>
+                    <a class="home-card home-role-card" href="/templates/students/">
+                        <h3>סטודנטים</h3>
+                        <p>התמחות, פרויקט גמר ומשרה ראשונה בעמוד אחד.</p>
+                    </a>
+                    <a class="home-card home-role-card" href="/templates/customer-service/">
+                        <h3>שירות לקוחות</h3>
+                        <p>CSAT, SLA וטיפול בפניות מורכבות.</p>
+                    </a>
+                </div>
+                <p class="home-section-lead" style="margin-top:1rem"><a class="home-link" href="/templates/" style="padding:0">כל התחומים</a></p>
             </section>
 
             <section class="home-section" aria-labelledby="home-voices" style="padding-top:0">
@@ -2285,16 +282,74 @@
                         <p class="home-kicker" style="color:#e7c98a">מחיר השקה</p>
                         <h2 id="home-offer">קורות חיים מוכנים להגשה</h2>
                         <p>תשלום מאובטח ב-Bit, קוד קצר בוואטסאפ, והורדה מיידית. בלי מנוי ובלי הפתעות.</p>
+                        <p class="home-price-coffee">עיצוב ברמת מעצב פרטי — במחיר של קפה</p>
+                        <p class="guarantee-badge mt-4" role="status">
+                            <span class="gb-mark" aria-hidden="true">30</span>
+                            <span>רוכשים פעם אחת ומקבלים גישה לעריכה והורדה חופשית ל-30 יום!</span>
+                        </p>
                         <button type="button" class="home-cta" onclick="showStudio()">יצירת קורות החיים</button>
                     </div>
-                    <p class="home-price-tag"><span data-price>9.9</span><small> ₪</small></p>
+                    <p class="home-price-tag">
+                        <s class="home-price-was"><span data-compare-price>49</span><small> ₪</small></s>
+                        <span><span data-price>9.90</span><small> ₪</small></span>
+                    </p>
                 </div>
             </section>
 
             <footer class="home-footer">
                 <p>QuickCV · מחולל קורות חיים פרימיום</p>
-                <p>Bit · WhatsApp · PDF</p>
+                <p>
+                    <a href="/templates/hi-tech/">הייטק</a>
+                    ·
+                    <a href="/templates/sales/">מכירות</a>
+                    ·
+                    <a href="/templates/students/">סטודנטים</a>
+                    ·
+                    <a href="/templates/">כל התחומים</a>
+                </p>
             </footer>
+        </div>
+    </div>
+
+    <div id="seo-landing-view" class="home-view seo-landing no-print" hidden>
+        <div class="home-grain" aria-hidden="true"></div>
+        <div class="home-inner">
+            <header class="home-nav">
+                <button type="button" class="home-brand" onclick="showHome()">
+                    <span class="home-mark" aria-hidden="true">QC</span>
+                    <span>
+                        <span class="home-brand-name">QuickCV</span>
+                        <span class="home-brand-sub">Templates</span>
+                    </span>
+                </button>
+                <div class="home-nav-actions">
+                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/tech" data-seo-landing>הייטק</a>
+                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/sales" data-seo-landing>מכירות</a>
+                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/students" data-seo-landing>סטודנטים</a>
+                    <button type="button" class="home-nav-cta" onclick="showStudio()">הסטודיו</button>
+                </div>
+            </header>
+            <section class="home-hero" aria-labelledby="seo-landing-title">
+                <div>
+                    <p class="home-kicker" id="seo-landing-kicker">תבניות לפי תחום</p>
+                    <h1 id="seo-landing-title" class="home-title">קורות חיים ממוקדים</h1>
+                    <p class="home-lead" id="seo-landing-lead"></p>
+                    <ul class="seo-landing-bullets" id="seo-landing-bullets"></ul>
+                    <div class="home-hero-actions">
+                        <button type="button" class="home-cta" id="seo-landing-cta">התחילו עם דוגמה</button>
+                        <button type="button" class="home-cta-ghost" onclick="showStudio()">לסטודיו ריק</button>
+                    </div>
+                </div>
+                <blockquote class="home-quote seo-landing-quote">
+                    <p id="seo-landing-quote"></p>
+                    <cite id="seo-landing-cite"></cite>
+                </blockquote>
+            </section>
+            <section class="home-section" aria-labelledby="seo-landing-examples-heading">
+                <p class="home-kicker">דוגמאות מוכנות</p>
+                <h2 id="seo-landing-examples-heading">בחרו תבנית וערכו מיד</h2>
+                <div class="home-layouts" id="seo-landing-examples"></div>
+            </section>
         </div>
     </div>
 
@@ -2318,6 +373,7 @@
                     <button type="button" onclick="openPaymentModal()" class="studio-pay min-h-11 px-4 rounded-full bg-slate-950 text-white font-black text-sm hover:bg-slate-800">
                         לשלם <span data-price>9.9</span>₪ ולהוריד
                     </button>
+                    <p class="pay-guarantee text-[11px] font-extrabold text-slate-950/90 max-w-[16rem] leading-snug text-center md:text-right" id="studio-pay-guarantee">רוכשים פעם אחת ומקבלים גישה לעריכה והורדה חופשית ל-30 יום!</p>
                 </div>
             </div>
         </div>
@@ -2326,7 +382,7 @@
                 <span class="w-9 h-9 rounded-xl dynamic-bg text-white flex items-center justify-center font-black text-sm shadow-lg shadow-blue-900/30" aria-hidden="true">QC</span>
                 <span>
                     <span class="block text-base sm:text-lg font-bold leading-tight">QuickCV</span>
-                    <span class="block text-[10px] text-slate-300 hidden sm:block">חזרה לאטלייה</span>
+                    <span class="block text-[10px] text-slate-300 hidden sm:block">חזרה לדף הבית</span>
                 </span>
             </button>
 
@@ -2370,20 +426,42 @@
 
         <div id="studio-form-column" class="no-print space-y-6">
 
-            <div id="templates-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-xl">
-                <div class="flex items-center justify-between gap-2">
-                    <h3 class="font-bold text-slate-200 text-sm">תבניות מוכנות</h3>
-                    <span class="text-[10px] text-slate-400" data-template-count-copy="studio">עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת</span>
+            <div id="ai-fast-create-bar" class="p-4 sm:p-5 rounded-2xl border shadow-xl space-y-2">
+                <button type="button" id="btn-ai-create" data-ai-open="1">
+                    <span class="ai-create-main">יצירה מהירה ב-AI</span>
+                    <span class="ai-create-sub">Create with AI</span>
+                </button>
+                <p class="text-[11px] text-slate-400 leading-relaxed">כתבו חופשי מי אתם — נמלא פרטים, ניסיון, השכלה וכישורים, והתצוגה תתעדכן מיד.</p>
+            </div>
+
+            <div id="cv-strength-meter" class="bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-700 shadow-xl space-y-3" data-tier="mid" role="region" aria-labelledby="cv-strength-title">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 id="cv-strength-title" class="font-bold text-slate-100 text-sm">חוזק קורות החיים</h3>
+                    <p id="cv-strength-value" class="text-lg font-black text-emerald-300 tabular-nums" aria-live="polite">0%</p>
                 </div>
+                <div class="h-3 rounded-full bg-slate-900 border border-slate-700 overflow-hidden" role="progressbar" id="cv-strength-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="cv-strength-title">
+                    <div class="cv-score-fill" id="cv-strength-fill"></div>
+                </div>
+                <p id="cv-strength-tip" class="text-xs text-amber-200 min-h-4 leading-relaxed">מלאו פרטי קשר, תקציר, ניסיון וכישורים כדי להעלות את הציון.</p>
+            </div>
+
+            <div id="templates-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-xl">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <h3 class="font-bold text-slate-200 text-sm">תבניות מוכנות</h3>
+                    <span class="ats-badge ats-badge-dark" data-ats-badge>ATS-Friendly · נסרק בהצלחה במערכות סינון</span>
+                </div>
+                <p class="text-[10px] text-slate-400" data-template-count-copy="studio">עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת</p>
                 <div class="template-grid canva-grid" data-template-gallery role="group" aria-label="תבניות קורות חיים"></div>
             </div>
 
             <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-6 shadow-xl">
-                <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
                     <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
-                    <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">
-                        נקה טופס
-                    </button>
+                    <div class="flex items-center gap-2 flex-wrap justify-end">
+                        <button type="button" id="btn-quick-paste" class="shrink-0 text-[11px] font-semibold border border-emerald-500/40 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 px-3 py-2 rounded-xl min-h-10">הדבקה מהירה</button>
+                        <button type="button" data-ai-open="1" class="shrink-0 text-[11px] font-semibold border border-amber-400/40 bg-amber-400/10 hover:bg-amber-400/20 text-amber-200 px-3 py-2 rounded-xl min-h-10">Create with AI / יצירה מהירה ב-AI</button>
+                        <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
+                    </div>
                 </div>
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -2420,8 +498,11 @@
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="font-bold dynamic-text text-sm" for="in-summary" id="label-summary">תקציר מקצועי</label>
+                <div class="space-y-2 ai-field-wrap">
+                    <div class="ai-field-head">
+                        <label class="font-bold dynamic-text text-sm" for="in-summary" id="label-summary">תקציר מקצועי</label>
+                        <button type="button" class="ai-polish-btn" data-ai-polish-field="in-summary">✨ שדרג ניסוח</button>
+                    </div>
                     <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
@@ -2442,9 +523,16 @@
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label class="font-bold dynamic-text text-sm" for="in-experience" id="label-experience">ניסיון תעסוקתי</label>
-                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2021 - נוכחי | מנהל מכירות ארצי
+                <div class="space-y-2 relative">
+                    <div class="ai-field-head flex-wrap">
+                        <label class="font-bold dynamic-text text-sm" for="in-experience" id="label-experience">ניסיון תעסוקתי</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" id="btn-experience-raw">עריכת טקסט מלא</button>
+                            <button type="button" id="btn-add-experience">הוסף משרה</button>
+                        </div>
+                    </div>
+                    <div id="experience-items"></div>
+                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none experience-raw-hidden">2021 - נוכחי | מנהל מכירות ארצי
 • ניהול צוות עובדים והגדלת היעדים ב-35%.
 • הובלת הסכמים אסטרטגיים.
 
@@ -2453,13 +541,19 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education" id="label-education">השכלה</label>
+                    <div class="ai-field-wrap">
+                        <div class="ai-field-head mb-2">
+                            <label class="font-bold dynamic-text text-sm" for="in-education" id="label-education">השכלה</label>
+                            <button type="button" class="ai-polish-btn" data-ai-polish-field="in-education">✨ שדרג ניסוח</button>
+                        </div>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2015 - 2018 | BA במנהל עסקים
 2019 | קורס ניהול מוצר</textarea>
                     </div>
-                    <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military" id="label-military">שירות צבאי / לאומי</label>
+                    <div class="ai-field-wrap">
+                        <div class="ai-field-head mb-2">
+                            <label class="font-bold dynamic-text text-sm" for="in-military" id="label-military">שירות צבאי / לאומי</label>
+                            <button type="button" class="ai-polish-btn" data-ai-polish-field="in-military">✨ שדרג ניסוח</button>
+                        </div>
                         <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
                     </div>
                 </div>
@@ -2489,9 +583,54 @@
                     <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none"></textarea>
                 </div>
 
-                <button type="button" id="btn-download-pdf" class="cta-download w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
+                <div class="rounded-xl border border-slate-600 bg-slate-900/50 p-4 space-y-3">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="checkbox" id="include-cover-letter" class="mt-1 w-4 h-4 accent-blue-600" onchange="onCoverLetterToggle()">
+                        <span>
+                            <span class="block font-bold text-sm text-slate-100" id="cl-toggle-title">מכתב מקדים תואם</span>
+                            <span class="block text-[11px] text-slate-400 mt-0.5" id="cl-toggle-hint">עמוד אחד באותו גופן וצבע הדגשה. נכלל בהורדה בלי תשלום נוסף.</span>
+                        </span>
+                    </label>
+                    <div id="cover-letter-panel" hidden class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-300 mb-1" for="in-cl-company" id="label-cl-company">שם החברה</label>
+                                <input type="text" id="in-cl-company" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-300 mb-1" for="in-cl-recipient" id="label-cl-recipient">נמען (אופציונלי)</label>
+                                <input type="text" id="in-cl-recipient" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1" for="in-cl-role" id="label-cl-role">משרה אליה פונים</label>
+                            <input type="text" id="in-cl-role" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                        </div>
+                        <div>
+                            <label class="font-bold dynamic-text text-sm" for="in-cl-body" id="label-cl-body">גוף המכתב</label>
+                            <textarea id="in-cl-body" rows="8" oninput="onCoverLetterBodyInput()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none"></textarea>
+                        </div>
+                        <button type="button" id="btn-cl-generate" class="min-h-11 px-3 rounded-xl border border-emerald-500/40 bg-emerald-500/15 text-emerald-200 text-xs font-semibold" onclick="QCCoverLetter.fillGenerated(); setStudioDoc('letter');">
+                            צור מכתב מהקורות חיים
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" id="btn-download-pdf" class="cta-download unpaid-only w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
                     הורד PDF ב-<span data-price>9.9</span> ₪ בלבד
                 </button>
+                <div id="paid-export-bar" class="paid-only space-y-2">
+                    <p class="text-xs text-slate-300 text-center" id="paid-export-hint">הגישה נפתחה — בחרו פורמט להורדה</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <button type="button" data-download="pdf" class="min-h-12 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-3 rounded-xl text-sm">PDF</button>
+                        <button type="button" data-download="docx" class="min-h-12 bg-slate-900 hover:bg-slate-800 border border-slate-600 text-white font-extrabold py-3 px-3 rounded-xl text-sm">Word</button>
+                        <button type="button" data-download="txt" class="min-h-12 bg-slate-900 hover:bg-slate-800 border border-slate-600 text-white font-extrabold py-3 px-3 rounded-xl text-sm">TXT</button>
+                    </div>
+                </div>
+                <p class="guarantee-badge pay w-full justify-center text-center" id="form-pay-guarantee" role="status">
+                    <span class="gb-mark" aria-hidden="true">30</span>
+                    <span>רוכשים פעם אחת ומקבלים גישה לעריכה והורדה חופשית ל-30 יום!</span>
+                </p>
             </div>
 
             <div id="design-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-5 shadow-xl">
@@ -2615,12 +754,17 @@
         </div>
 
         <div id="preview-column" class="preview-col space-y-3" role="region" aria-label="תצוגה מקדימה חיה של קורות החיים">
-            <div class="preview-toolbar no-print flex items-center justify-between gap-2">
-                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">תצוגה מקדימה בזמן אמת</h2>
+            <div class="preview-toolbar no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="preview-heading">תצוגה מקדימה בזמן אמת</h2>
+                <div class="doc-switch" role="tablist" aria-label="סוג מסמך">
+                    <button type="button" id="doc-tab-cv" aria-pressed="true" onclick="setStudioDoc('cv')">קורות חיים</button>
+                    <button type="button" id="doc-tab-letter" aria-pressed="false" onclick="setStudioDoc('letter')">מכתב מקדים</button>
+                </div>
                 <button type="button" onclick="closeMobilePreview()" class="preview-close items-center text-xs bg-slate-800 border border-slate-600 px-3 py-2 rounded-lg min-h-11">סגור תצוגה</button>
             </div>
+            <p id="cv-page-fit-banner" class="no-print" hidden></p>
 
-            <div id="cv-preview-wrapper" class="relative p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all min-h-[750px] bg-preview-white">
+            <div id="cv-preview-wrapper" class="relative overflow-hidden p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all min-h-[750px] bg-preview-white">
                 <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
                 <div id="cv-target" class="layout-classic" dir="rtl">
@@ -2741,6 +885,21 @@
                         </aside>
                     </div>
                 </div>
+                <div id="cv-page-fit" class="cv-page-fit no-print" hidden aria-hidden="true">
+                    <div id="cv-page-break-line"></div>
+                    <p id="cv-page-fit-msg"></p>
+                </div>
+            </div>
+            <div id="cl-preview-wrapper" class="relative p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 min-h-[750px] bg-preview-white">
+                <div id="cl-target" dir="rtl">
+                    <p id="cl-out-date" class="text-[11px] text-slate-500"></p>
+                    <h1 id="cl-out-name" class="text-3xl font-bold dynamic-text mt-3"></h1>
+                    <p id="cl-out-title" class="text-sm font-semibold text-slate-600 mt-1"></p>
+                    <p id="cl-out-contact" class="text-[11px] text-slate-500 mt-2"></p>
+                    <div class="cl-rule" aria-hidden="true"></div>
+                    <p id="cl-out-meta" class="text-xs font-semibold dynamic-text mb-4"></p>
+                    <p id="cl-out-body" class="cl-body"></p>
+                </div>
             </div>
         </div>
 
@@ -2748,17 +907,63 @@
 
     <div id="studio-mobile-dock" class="no-print lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-slate-800 bg-slate-950/95 backdrop-blur px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
         <div class="flex gap-2 max-w-7xl mx-auto">
-            <button type="button" onclick="openMobilePreview()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 rounded-xl text-sm min-h-12">
-                תצוגת קורות חיים
+            <button type="button" id="btn-mobile-preview-toggle" onclick="toggleMobilePreview()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 rounded-xl text-sm min-h-12" aria-pressed="false" aria-controls="preview-column">
+                👁️ תצוגה מקדימה
             </button>
-            <button type="button" id="btn-download-pdf-mobile" class="cta-download flex-[1.3] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl text-sm min-h-12">
+            <button type="button" id="btn-download-pdf-mobile" class="cta-download unpaid-only flex-[1.3] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl text-sm min-h-12">
                 הורד ב-<span data-price>9.9</span> ₪
             </button>
+            <div class="paid-only flex-[1.3] grid grid-cols-3 gap-1">
+                <button type="button" data-download="pdf" class="min-h-12 bg-emerald-500 text-slate-950 font-extrabold rounded-xl text-[11px]">PDF</button>
+                <button type="button" data-download="docx" class="min-h-12 bg-slate-800 border border-slate-600 text-white font-extrabold rounded-xl text-[11px]">Word</button>
+                <button type="button" data-download="txt" class="min-h-12 bg-slate-800 border border-slate-600 text-white font-extrabold rounded-xl text-[11px]">TXT</button>
+            </div>
         </div>
     </div>
     </div>
 
-    <div id="examples-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
+    <div id="quick-paste-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="quick-paste-title" aria-hidden="true">
+        <button type="button" class="examples-backdrop" onclick="closeQuickPaste()" aria-label="סגירה"></button>
+        <div class="relative bg-slate-900 text-slate-100 rounded-3xl max-w-xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
+            <button type="button" id="btn-quick-paste-close" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגירה">✕</button>
+            <h3 id="quick-paste-title" class="text-lg font-extrabold pe-10">הדבקה מהירה</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">הדביקו טקסט מקורות חיים או מ-LinkedIn. נמלא שם, ניסיון והשכלה.</p>
+            <textarea id="quick-paste-text" rows="10" class="w-full bg-slate-950 border border-slate-700 p-3 text-sm rounded-xl text-slate-100 outline-none min-h-44" placeholder="שם מלא&#10;תפקיד&#10;&#10;Experience&#10;&#10;Education"></textarea>
+            <p id="quick-paste-feedback" class="text-sm min-h-5 font-semibold" role="status"></p>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" id="btn-quick-paste-apply" class="flex-1 min-h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm">מלא שדות</button>
+                <button type="button" class="min-h-12 px-4 rounded-xl border border-slate-600 text-slate-200 font-bold text-sm" onclick="closeQuickPaste()">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+        <div id="ai-create-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="ai-create-title" aria-hidden="true">
+        <button type="button" class="examples-backdrop" id="ai-create-backdrop" aria-label="סגירה"></button>
+        <div id="ai-create-panel" class="relative bg-slate-900 text-slate-100 rounded-3xl max-w-xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
+            <button type="button" id="btn-ai-create-close" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגירה">✕</button>
+            <h3 id="ai-create-title" class="text-lg font-extrabold pe-10">יצירה מהירה ב-AI</h3>
+            <p id="ai-create-lead" class="text-sm text-slate-300 leading-relaxed">כתבו, הדביקו או דברו בקול מי אתם — נמלא את השדות ונעדכן את התצוגה החייה.</p>
+            <label class="sr-only" for="ai-create-text">תיאור רקע</label>
+            <div class="relative">
+                <textarea id="ai-create-text" rows="8" class="w-full bg-slate-950 border border-slate-700 p-3 pe-3 ps-14 text-sm rounded-xl text-slate-100 outline-none min-h-40" placeholder="לדוגמה: עבדתי כמנהל חנות שנתיים, שירות בלוגיסטיקה, עברית שפת אם ואנגלית שוטפת."></textarea>
+                <button type="button" id="btn-voice-input" class="absolute bottom-3 start-3 inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-200" aria-pressed="false" aria-label="הקלטה קולית" title="דיבור במקום הקלדה">
+                    <span aria-hidden="true">🎤</span>
+                </button>
+            </div>
+            <p id="ai-create-feedback" class="text-sm min-h-5 font-semibold" role="status" aria-live="polite"></p>
+            <div id="ai-create-skeleton" class="hidden space-y-2" aria-hidden="true">
+                <div class="ai-skel-line w-full"></div>
+                <div class="ai-skel-line w-5/6"></div>
+                <div class="ai-skel-line w-2/3"></div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" id="btn-ai-create-run" class="flex-1 min-h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm">מלאו את הטופס</button>
+                <button type="button" id="btn-ai-create-cancel" class="min-h-12 px-4 rounded-xl border border-slate-600 text-slate-200 font-bold text-sm">ביטול</button>
+            </div>
+        </div>
+    </div>
+
+<div id="examples-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
         <button type="button" class="examples-backdrop" onclick="closeExamplesModal()" aria-label="סגור דוגמאות"></button>
         <div class="examples-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-4xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
             <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגור דוגמאות">✕</button>
@@ -2776,55 +981,117 @@
         <div class="pay-card text-slate-100 rounded-3xl max-w-md w-full my-4 p-6 sm:p-7 text-center space-y-5 relative" style="z-index:10000;pointer-events:auto;">
             <div id="pay-step" class="space-y-5">
                 <div class="pt-1">
-                    <div class="mx-auto w-16 h-16 rounded-2xl bg-[#00C2C7] text-[#0B1F3A] flex items-center justify-center font-black text-2xl tracking-tight shadow-lg" aria-hidden="true">bit</div>
-                    <p class="mt-4 inline-flex items-center rounded-full bg-amber-300 text-slate-950 text-[11px] font-black px-3 py-1">מחיר השקה — חיסכון של 30 ₪</p>
-                    <h3 id="pay-title" class="text-xl font-extrabold text-white mt-3">תשלום <span data-price>9.9</span> ₪ ב-Bit</h3>
+                    <p class="mt-1 inline-flex items-center rounded-full bg-amber-300 text-slate-950 text-[11px] font-black px-3 py-1" id="pay-save-badge">מחיר השקה — חיסכון של 30 ₪</p>
+                    <h3 id="pay-title" class="text-xl font-extrabold text-white mt-3">תשלום <span data-pay-amount data-price>9.9</span> ₪</h3>
                     <p class="text-sm text-slate-200 mt-2 leading-relaxed">
-                        במקום <span class="line-through" data-compare-price>39.9</span> ₪, שלמו רק <span id="bit-amount" class="font-bold text-emerald-300" data-price>9.9</span> ₪, העלו צילום מסך לאימות אוטומטי, והורידו את ה-PDF.
+                        במקום <s><span data-compare-price>49</span> ₪</s>, שלמו רק <span id="bit-amount" class="font-bold text-emerald-300" data-pay-amount>9.90</span> ₪. בחרו חבילה ואמצעי תשלום — אחרי אישור התשלום ה-PDF נפתח אוטומטית.
                     </p>
+                    <p class="pay-guarantee mt-3 rounded-xl bg-emerald-400/15 border border-emerald-400/30 text-emerald-200 text-sm font-extrabold leading-relaxed px-3 py-2.5" id="modal-pay-guarantee">רוכשים פעם אחת ומקבלים גישה לעריכה והורדה חופשית ל-30 יום!</p>
+                    <div class="pay-packs" role="radiogroup" aria-label="בחירת חבילה">
+                        <label class="pay-pack is-selected">
+                            <input type="radio" name="checkout-pack" value="basic" checked>
+                            <span class="pay-pack-body">
+                                <span class="pay-pack-name">בסיסי</span>
+                                <span class="pay-pack-desc">קובץ PDF מוכן להגשה</span>
+                                <span class="pay-pack-price"><span data-price>9.90</span> ₪</span>
+                            </span>
+                        </label>
+                        <label class="pay-pack">
+                            <input type="radio" name="checkout-pack" value="complete">
+                            <span class="pay-pack-body">
+                                <span class="pay-pack-kicker">מומלץ</span>
+                                <span class="pay-pack-name">חבילה מלאה</span>
+                                <span class="pay-pack-desc">PDF + Word + עריכות ל-30 יום + מכתב מקדים</span>
+                                <span class="pay-pack-price"><span data-pack-complete-price>19.90</span> ₪</span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <p class="text-xs text-slate-400">סכום ב-Bit</p>
-                            <p class="text-3xl font-black tracking-wide text-emerald-300" id="bit-pay-amount"><span data-price>9.9</span> ₪</p>
+                <div class="text-right space-y-2">
+                    <label for="checkout-contact" class="block text-xs font-bold text-slate-300">נייד או אימייל לקבלת הקוד</label>
+                    <input type="text" id="checkout-contact" autocomplete="tel" inputmode="email" placeholder="054-0000000 או name@email.com" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
+                </div>
+
+                <div class="pay-methods" role="tablist" aria-label="אמצעי תשלום">
+                    <button type="button" class="pay-method-tab" role="tab" id="pay-tab-bit" data-pay-method="bit" aria-selected="true" aria-controls="pay-panel-bit">Bit</button>
+                    <button type="button" class="pay-method-tab" role="tab" id="pay-tab-paybox" data-pay-method="paybox" aria-selected="false" aria-controls="pay-panel-paybox">PayBox</button>
+                    <button type="button" class="pay-method-tab" role="tab" id="pay-tab-card" data-pay-method="card" aria-selected="false" aria-controls="pay-panel-card">כרטיס אשראי</button>
+                </div>
+
+                <div id="pay-panel-bit" role="tabpanel" aria-labelledby="pay-tab-bit" class="space-y-3">
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <p class="text-xs text-slate-400">סכום ב-Bit</p>
+                                <p class="text-3xl font-black tracking-wide text-emerald-300" id="bit-pay-amount"><span data-pay-amount data-price>9.9</span> ₪</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">מספר Bit לתשלום</p>
+                                <p class="text-2xl sm:text-3xl font-black tracking-wide text-white" id="bit-number">054-3554888</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs text-slate-400">מספר Bit לתשלום</p>
-                            <p class="text-2xl sm:text-3xl font-black tracking-wide text-white" id="bit-number">054-3554888</p>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">לחיצה פותחת את Bit עם הסכום והמספר כבר על המסך — בלי להקליד.</p>
+                        <button type="button" id="btn-copy-bit" class="inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 font-extrabold text-sm border border-emerald-400/30">
+                            העתק מספר
+                        </button>
+                        <a id="btn-open-bit" href="https://www.bitpay.co.il/app/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=9.90&amp;amount=9.90" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-[#00C2C7] hover:bg-[#00b0b5] text-[#0B1F3A] font-extrabold text-sm border border-white/10">
+                            שלמו <span data-pay-amount data-price>9.9</span> ₪ ב-Bit
+                        </a>
+                        <label class="order-bump" for="order-bump">
+                            <input type="checkbox" id="order-bump" class="order-bump-check">
+                            <span>
+                                <span class="order-bump-title">הוסף מכתב מקדים תואם ב-5 ₪ בלבד</span>
+                                <span class="order-bump-sub">מכתב מקדים לפי הפרטים שלכם. הסכום ב-Bit יתעדכן ל-<span data-pack-complete-price>14.9</span> ₪.</span>
+                            </span>
+                        </label>
+                        <div class="pt-1 hidden sm:block">
+                            <img id="bit-qr" class="mx-auto w-36 h-36 rounded-xl bg-white p-2" width="144" height="144" alt="קוד QR לתשלום 9.9 ₪ ב-Bit">
+                            <p class="mt-2 text-[11px] text-slate-400">סריקה מתוך Bit ממלאת את אותו סכום</p>
                         </div>
                     </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">לחיצה פותחת את Bit עם הסכום והמספר כבר על המסך — בלי להקליד.</p>
-                    <button type="button" id="btn-copy-bit" class="inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 font-extrabold text-sm border border-emerald-400/30">
-                        העתק מספר
+                    <div class="text-right space-y-2">
+                        <p class="text-xs font-bold text-slate-300">אימות אוטומטי עם צילום מסך</p>
+                        <label id="payment-screenshot-label" for="payment-screenshot" class="block cursor-pointer rounded-2xl border-2 border-dashed border-white/25 bg-white/5 px-4 py-5 text-center transition">
+                            <input type="file" id="payment-screenshot" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" class="sr-only">
+                            <span class="block text-sm font-extrabold text-white">העלו צילום מסך של התשלום ב-Bit</span>
+                            <span id="payment-screenshot-name" class="mt-1 block text-[11px] text-slate-400">קובץ תמונה עד 4MB · אימות מיידי</span>
+                        </label>
+                        <p id="screenshot-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
+                    </div>
+                    <button type="button" id="btn-whatsapp" class="w-full min-h-12 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold text-sm">
+                        שלח צילום מסך ב-WhatsApp
                     </button>
-                    <a id="btn-open-bit" href="https://www.bitpay.co.il/app/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=9.90&amp;amount=9.90" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-[#00C2C7] hover:bg-[#00b0b5] text-[#0B1F3A] font-extrabold text-sm border border-white/10">
-                        שלמו <span data-price>9.9</span> ₪ ב-Bit
-                    </a>
-                    <div class="pt-1 hidden sm:block">
-                        <img id="bit-qr" class="mx-auto w-36 h-36 rounded-xl bg-white p-2" width="144" height="144" alt="קוד QR לתשלום 9.9 ₪ ב-Bit">
-                        <p class="mt-2 text-[11px] text-slate-400">סריקה מתוך Bit ממלאת את אותו סכום</p>
+                </div>
+
+                <div id="pay-panel-paybox" role="tabpanel" aria-labelledby="pay-tab-paybox" class="hidden space-y-3 text-right">
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
+                        <p class="text-sm text-slate-200 leading-relaxed">פתחו את PayBox, השלימו תשלום של <span data-pay-amount>9.9</span> ₪, והמסך יזהה את האישור לבד — בלי להקליד קוד.</p>
+                        <ol class="text-xs text-slate-400 leading-relaxed space-y-1 list-decimal pr-4">
+                            <li>לחצו על כפתור התשלום למטה</li>
+                            <li>אשרו את הסכום באפליקציית PayBox</li>
+                            <li>חזרו לכאן — ההורדה תיפתח אוטומטית</li>
+                        </ol>
+                        <a id="btn-open-paybox" href="#" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-[#5b4dff] hover:bg-[#4a3ee6] text-white font-extrabold text-sm border border-white/10">
+                            שלמו <span data-pay-amount>9.9</span> ₪ ב-PayBox
+                        </a>
+                        <p id="paybox-poll-status" class="text-xs text-slate-400 min-h-4 text-center" aria-live="polite"></p>
                     </div>
                 </div>
 
-                <div class="text-right space-y-2">
-                    <p class="text-xs font-bold text-slate-300">אימות אוטומטי עם צילום מסך</p>
-                    <label id="payment-screenshot-label" for="payment-screenshot" class="block cursor-pointer rounded-2xl border-2 border-dashed border-white/25 bg-white/5 px-4 py-5 text-center transition">
-                        <input type="file" id="payment-screenshot" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" class="sr-only">
-                        <span class="block text-sm font-extrabold text-white">העלו צילום מסך של התשלום ב-Bit</span>
-                        <span id="payment-screenshot-name" class="mt-1 block text-[11px] text-slate-400">קובץ תמונה עד 4MB · אימות מיידי</span>
-                    </label>
-                    <p id="screenshot-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
+                <div id="pay-panel-card" role="tabpanel" aria-labelledby="pay-tab-card" class="hidden space-y-3 text-right">
+                    <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
+                        <p class="text-sm text-slate-200 leading-relaxed">תשלום מאובטח בכרטיס אשראי דרך PayBox. אחרי אישור העסקה נפתח ה-PDF הנקי אוטומטית.</p>
+                        <a id="btn-open-card" href="#" class="flex items-center justify-center w-full min-h-12 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-extrabold text-sm">
+                            שלמו <span data-pay-amount>9.9</span> ₪ בכרטיס אשראי
+                        </a>
+                        <p id="card-poll-status" class="text-xs text-slate-400 min-h-4 text-center" aria-live="polite"></p>
+                    </div>
                 </div>
 
-                <button type="button" id="btn-whatsapp" class="w-full min-h-12 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold text-sm">
-                    שלח צילום מסך ב-WhatsApp
-                </button>
-
-                <div class="text-right space-y-2">
-                    <label for="download-code" class="block text-xs font-bold text-slate-300">קוד אימות (4 ספרות)</label>
-                    <input type="text" id="download-code" inputmode="numeric" maxlength="4" autocomplete="one-time-code" placeholder="0000" class="w-full bg-white text-slate-900 border-2 border-white/20 p-3.5 text-center font-black text-2xl tracking-[0.4em] rounded-xl outline-none">
+                <div class="text-right space-y-2 rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <label for="download-code" class="block text-xs font-bold text-slate-300">קוד אימות (6 תווים)</label>
+                    <input type="text" id="download-code" inputmode="text" maxlength="6" autocomplete="one-time-code" placeholder="A7K2M9" class="w-full bg-white text-slate-900 border-2 border-white/20 p-3.5 text-center font-black text-2xl tracking-[0.35em] rounded-xl outline-none" dir="ltr" aria-describedby="code-feedback">
                     <p id="code-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
                     <button type="button" id="verify-btn" class="w-full min-h-14 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 rounded-2xl text-base">
                         אימות והורדת PDF
@@ -2837,18 +1104,32 @@
 
             <div id="payment-verify-overlay" class="hidden absolute inset-0 z-10 rounded-3xl flex-col items-center justify-center px-6 text-center" aria-live="polite" aria-busy="true">
                 <div class="h-10 w-10 rounded-full border-4 border-white/20 border-t-emerald-400 animate-spin" role="status"></div>
-                <p class="mt-4 text-sm font-extrabold text-white">מאמת את צילום המסך...</p>
-                <p class="mt-1 text-xs text-slate-300">זה לוקח כמה שניות</p>
+                <p id="verify-overlay-title" class="mt-4 text-sm font-extrabold text-white">מאמת את צילום המסך...</p>
+                <p id="verify-overlay-sub" class="mt-1 text-xs text-slate-300">זה לוקח כמה שניות</p>
             </div>
 
             <div id="download-step" class="hidden space-y-4">
                 <div class="w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl">✓</div>
-                <h3 class="text-xl font-extrabold text-white">הגישה נפתחה</h3>
-                <p class="text-xs text-slate-300">אפשר להוריד שוב או לבחור פורמט נוסף.</p>
+                <h3 class="text-xl font-extrabold text-white">תודה! הגישה נפתחה</h3>
+                <p class="text-xs text-slate-300">הורידו לדפדפן או שלחו את ה-PDF לוואטסאפ.</p>
+                <p id="download-complete-note" class="hidden text-xs text-amber-200 font-semibold">נכלל מכתב מקדים — אפשר להוריד אותו למטה.</p>
                 <div class="grid grid-cols-1 gap-2 text-right">
-                    <button type="button" data-download="pdf" class="w-full min-h-12 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 px-4 rounded-xl text-sm">PDF</button>
+                    <button type="button" data-download="pdf" class="w-full min-h-12 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 px-4 rounded-xl text-sm">הורדת PDF לדפדפן</button>
+                    <button type="button" id="btn-send-pdf-whatsapp" class="w-full min-h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold py-3 px-4 rounded-xl text-sm">שלח PDF לוואטסאפ שלי</button>
+                    <label for="wa-pdf-phone" class="block text-[11px] font-bold text-slate-300">נייד לשליחה</label>
+                    <input type="tel" id="wa-pdf-phone" inputmode="tel" autocomplete="tel" placeholder="054-0000000" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
+                    <button type="button" id="cover-letter-download" data-pack-extra data-download="cover" class="hidden w-full min-h-12 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-3 px-4 rounded-xl text-sm">הורד מכתב מקדים</button>
                     <button type="button" data-download="docx" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">Word (.docx)</button>
                     <button type="button" data-download="txt" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">טקסט (.txt)</button>
+                </div>
+                <div class="text-right rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                    <p class="text-xs font-extrabold text-white">שתפו עם חברים</p>
+                    <p class="text-[11px] text-slate-300">קישור הפניה אישי — וואטסאפ או העתקה.</p>
+                    <input type="text" id="referral-link" readonly class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-2.5 text-center text-[11px] rounded-xl outline-none" dir="ltr">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="btn-copy-referral" class="min-h-11 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15">העתק קישור</button>
+                        <a id="btn-referral-whatsapp" class="inline-flex items-center justify-center min-h-11 rounded-xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold text-xs" href="https://wa.me/" target="_blank" rel="noopener">שיתוף ב-WhatsApp</a>
+                    </div>
                 </div>
                 <p id="download-status" class="text-xs text-emerald-300 min-h-4"></p>
                 <button type="button" class="btn-back-checkout w-full min-h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/15" onclick="closePaymentModal(event)">
@@ -2880,9 +1161,16 @@
     <script src="lib/security/log.js"></script>
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
+    <script src="lib/aiStudio.js"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/export.js"></script>
+    <script src="lib/coverLetter.js"></script>
+    <script src="lib/seoLandings.js"></script>
+    <script src="lib/seoPresets.js"></script>
+    <script src="lib/spellcheck.js"></script>
+    <script src="lib/pageFit.js"></script>
+    <script src="lib/quickPaste.js"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
         let previewBgClass = 'bg-preview-white';
@@ -2977,7 +1265,13 @@
                 phrasesLoad: 'מלא שדות ריקים מדוגמה',
                 phrasesReplace: 'החלף בניסיון לדוגמה',
                 phrasesSkills: '+ הוסף כישורים מומלצים לתחום',
-                roleTitleHint: 'אפשר לבחור כותרת מוכנה מהרשימה או להקליד.'
+                roleTitleHint: 'אפשר לבחור כותרת מוכנה מהרשימה או להקליד.',
+                strengthTitle: 'חוזק קורות החיים',
+                strengthTipDefault: 'מלאו פרטי קשר, תקציר, ניסיון וכישורים כדי להעלות את הציון.',
+                strengthDone: 'מעולה — קורות החיים מוכנים להגשה.',
+                aiFill: 'מילוי ב-AI',
+                previewOpen: '👁️ תצוגה מקדימה',
+                previewClose: '✏️ חזרה לעריכה'
             },
             en: {
                 nameFallback: 'Full name',
@@ -2994,7 +1288,13 @@
                 phrasesLoad: 'Fill empty fields from a sample',
                 phrasesReplace: 'Replace with sample experience',
                 phrasesSkills: '+ Add recommended skills for this field',
-                roleTitleHint: 'Pick a ready-made title from the list, or type your own.'
+                roleTitleHint: 'Pick a ready-made title from the list, or type your own.',
+                strengthTitle: 'CV strength',
+                strengthTipDefault: 'Add contact details, a summary, experience, and skills to raise the score.',
+                strengthDone: 'Great — this CV is ready to send.',
+                aiFill: 'Fill with AI',
+                previewOpen: '👁️ Preview',
+                previewClose: '✏️ Back to editing'
             }
         };
 
@@ -3106,6 +1406,16 @@
             setLabel('btn-replace-role-example', pack.phrasesReplace);
             setLabel('btn-insert-skills', pack.phrasesSkills);
             setLabel('role-title-hint', pack.roleTitleHint);
+            setLabel('cv-strength-title', pack.strengthTitle);
+            setLabel('btn-quick-paste', pack.quickPaste || 'הדבקה מהירה');
+            document.querySelectorAll('[data-ats-badge]').forEach((el) => {
+                el.textContent = lang === 'en'
+                    ? 'ATS-Friendly · Passes applicant tracking scans'
+                    : 'ATS-Friendly · נסרק בהצלחה במערכות סינון';
+            });
+            if (typeof applyCvI18nAi === 'function') applyCvI18nAi();
+            if (typeof syncMobilePreviewToggle === 'function') syncMobilePreviewToggle();
+            if (typeof updateCvScore === 'function') updateCvScore();
             const langNameSel = document.getElementById('lang-pick-name');
             const langLevelSel = document.getElementById('lang-pick-level');
             if (langNameSel && pack.labels.languagesSelect) langNameSel.setAttribute('aria-label', pack.labels.languagesSelect);
@@ -3150,6 +1460,7 @@
                 if (el) el.value = sample[id];
             });
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
+            if (window.QCExperienceEditor) QCExperienceEditor.refresh();
         }
 
         function phrasePack() {
@@ -3231,6 +1542,8 @@
             document.getElementById('font-scale-val').textContent = val + '%';
             document.getElementById('font-scale').setAttribute('aria-valuenow', val);
             markStep(2);
+            window.QCPageFit?.updateSoon?.();
+            if (window.QCDraft) QCDraft.saveSoon();
         }
 
         function setLineHeight(val) {
@@ -3239,6 +1552,7 @@
             document.getElementById('line-height-val').textContent = lh;
             document.getElementById('line-height').setAttribute('aria-valuenow', val);
             markStep(2);
+            if (window.QCDraft) QCDraft.saveSoon();
         }
 
         function updateCV() {
@@ -3322,6 +1636,12 @@
             try {
                 if (window.QCDraft) QCDraft.saveSoon();
             } catch (err) { /* ignore draft errors during typing */ }
+            try {
+                updateCvScore();
+            } catch (err) { /* ignore score meter errors */ }
+            try {
+                window.QCPageFit?.updateSoon?.();
+            } catch (err) { /* ignore page-fit */ }
         }
         window.updateCV = updateCV;
 
@@ -4043,7 +2363,9 @@
         function clearCvForm() {
             if (!confirm('למחוק את כל השדות ולשחזר טופס ריק?')) return;
             QCDraft.clear();
+            if (typeof clearPhoto === 'function') clearPhoto();
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
+            if (window.QCExperienceEditor) QCExperienceEditor.refresh();
             updateCV();
         }
 
@@ -4060,6 +2382,7 @@
             });
             if (btn) btn.setAttribute('aria-pressed', 'true');
             markStep(2);
+            if (window.QCDraft) QCDraft.saveSoon();
         }
 
         function markStep(n) {
@@ -4132,6 +2455,7 @@
             col.setAttribute('aria-modal', 'true');
             document.body.classList.add('qc-mobile-preview-open');
             updateCV();
+            syncMobilePreviewToggle();
         }
 
         function closeMobilePreview() {
@@ -4140,11 +2464,104 @@
             col.classList.remove('mobile-preview-open');
             col.removeAttribute('aria-modal');
             document.body.classList.remove('qc-mobile-preview-open');
+            syncMobilePreviewToggle();
+        }
+
+        function toggleMobilePreview() {
+            if (document.body.classList.contains('qc-mobile-preview-open')) closeMobilePreview();
+            else openMobilePreview();
+        }
+
+        function syncMobilePreviewToggle() {
+            const open = document.body.classList.contains('qc-mobile-preview-open');
+            const btn = document.getElementById('btn-mobile-preview-toggle');
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || CV_I18N.he;
+            if (!btn) return;
+            btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+            btn.textContent = open ? (pack.previewClose || '✏️ חזרה לעריכה') : (pack.previewOpen || '👁️ תצוגה מקדימה');
+        }
+
+        function countExperienceEntries(text) {
+            const blocks = typeof parseDatedBlocks === 'function' ? parseDatedBlocks(text) : [];
+            if (blocks.length) return blocks.length;
+            return String(text || '').split(/\n\s*\n/).filter((chunk) => chunk.trim().length > 20).length;
+        }
+
+        function countSkills(text) {
+            return String(text || '').split(/[,،;؛\n]+/).map((s) => s.trim()).filter(Boolean).length;
+        }
+
+        function computeCvScore() {
+            const en = window.QCCvLang === 'en';
+            const pack = CV_I18N[en ? 'en' : 'he'] || {};
+            const name = getVal('in-name');
+            const phone = getVal('in-phone');
+            const email = getVal('in-email');
+            const summary = getVal('in-summary').replace(/\s+/g, ' ').trim();
+            const entries = countExperienceEntries(getVal('in-experience'));
+            const skillCount = countSkills(getVal('in-skills'));
+            const skillTarget = 5;
+            const tips = [];
+            let score = 0;
+
+            if (name) score += 10;
+            else tips.push(en ? 'Add your full name.' : 'הוסיפו שם מלא.');
+            if (phone) score += 10;
+            else tips.push(en ? 'Add a phone number.' : 'הוסיפו מספר טלפון.');
+            if (email) score += 10;
+            else tips.push(en ? 'Add an email address.' : 'הוסיפו כתובת אימייל.');
+
+            if (summary.length >= 80) score += 20;
+            else if (summary.length >= 40) {
+                score += 10;
+                tips.push(en ? 'Expand the summary to at least 80 characters.' : 'הרחיבו את התקציר ל-80 תווים לפחות.');
+            } else {
+                tips.push(en ? 'Write a professional summary of about 80 characters.' : 'הוסיפו תקציר מקצועי של כ-80 תווים.');
+            }
+
+            if (entries >= 2) score += 30;
+            else if (entries === 1) {
+                score += 15;
+                tips.push(en ? 'Add 1 more experience entry to hit 100%.' : 'הוסיפו עוד תפקיד אחד (לפחות 2 משרות).');
+            } else {
+                tips.push(en ? 'Add at least 2 experience entries.' : 'הוסיפו לפחות 2 תפקידים בניסיון התעסוקתי.');
+            }
+
+            if (skillCount >= skillTarget) score += 20;
+            else {
+                score += Math.round((skillCount / skillTarget) * 20);
+                const missing = skillTarget - skillCount;
+                tips.push(en
+                    ? ('Add ' + missing + ' more skill' + (missing === 1 ? '' : 's') + ' to hit 100%.')
+                    : ('הוסיפו עוד ' + missing + ' כישורים כדי להגיע ל-100%.'));
+            }
+
+            return {
+                score: Math.max(0, Math.min(100, score)),
+                tips: tips,
+                done: pack.strengthDone || (en ? 'Great — this CV is ready to send.' : 'מעולה — קורות החיים מוכנים להגשה.')
+            };
+        }
+
+        function updateCvScore() {
+            const meter = document.getElementById('cv-strength-meter');
+            const fill = document.getElementById('cv-strength-fill');
+            const valueEl = document.getElementById('cv-strength-value');
+            const tipEl = document.getElementById('cv-strength-tip');
+            const bar = document.getElementById('cv-strength-bar');
+            if (!meter || !fill || !valueEl || !tipEl || !bar) return;
+            const result = computeCvScore();
+            const score = result.score;
+            fill.style.width = score + '%';
+            valueEl.textContent = score + '%';
+            bar.setAttribute('aria-valuenow', String(score));
+            meter.setAttribute('data-tier', score >= 80 ? 'high' : score >= 45 ? 'mid' : 'low');
+            tipEl.textContent = result.tips[0] || result.done;
         }
 
         function isCvFormField(el) {
             if (!el || !(el instanceof Element)) return false;
-            if (el.closest('#payment-modal, #examples-modal, #download-code, #download-step')) return false;
+            if (el.closest('#payment-modal, #examples-modal, #quick-paste-modal, #ai-create-modal, #download-code, #download-step')) return false;
             if (el.closest('#studio-form-column, #details-panel, #design-panel, #templates-panel')) {
                 return el.matches('input, textarea, select');
             }
@@ -4207,9 +2624,11 @@
             const reader = new FileReader();
             reader.onload = () => {
                 img.src = String(reader.result || '');
+                window.QCPhotoDataUrl = String(reader.result || '');
                 img.hidden = false;
                 img.alt = getVal('in-name') || 'Profile photo';
                 if (fallback) fallback.style.display = 'none';
+                if (window.QCDraft) QCDraft.save();
             };
             reader.readAsDataURL(file);
         }
@@ -4224,6 +2643,7 @@
             }
             if (fallback) fallback.style.display = '';
             if (input) input.value = '';
+            window.QCPhotoDataUrl = '';
         }
 
         function templateDisplayTitle(tpl, lang) {
@@ -4236,6 +2656,7 @@
             const sub = lang === 'en' ? (tpl.subEn || tpl.subHe) : (tpl.subHe || tpl.subEn);
             const title = templateDisplayTitle(tpl, lang);
             return '<button type="button" class="template-card" data-example="' + id + '" aria-pressed="false">' +
+                '<span class="ats-badge ats-badge-on-card">ATS</span>' +
                 '<span class="template-thumb home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
                 '<span class="template-card-title">' + title + '</span>' +
                 '<span class="template-card-sub">' + sub + '</span></button>';
@@ -4567,25 +2988,125 @@
             document.documentElement.classList.toggle('qc-narrow', isNarrowStudio());
         }
 
-        function applyView(studio) {
+        function applyView(mode) {
+            const view = mode === true ? 'studio' : mode === false ? 'home' : mode;
+            const isStudio = view === 'studio';
+            const isLanding = view === 'landing';
+            const isHome = view === 'home';
             const home = document.getElementById('home-view');
+            const landing = document.getElementById('seo-landing-view');
             const studioEl = document.getElementById('studio-view');
             const skip = document.getElementById('skip-link');
-            home.hidden = studio;
-            studioEl.hidden = !studio;
-            home.inert = studio;
-            studioEl.inert = !studio;
+            if (home) {
+                home.hidden = !isHome;
+                home.inert = !isHome;
+                home.setAttribute('aria-hidden', isHome ? 'false' : 'true');
+            }
+            if (landing) {
+                landing.hidden = !isLanding;
+                landing.inert = !isLanding;
+                landing.setAttribute('aria-hidden', isLanding ? 'false' : 'true');
+            }
+            studioEl.hidden = !isStudio;
+            studioEl.inert = !isStudio;
+            studioEl.setAttribute('aria-hidden', isStudio ? 'false' : 'true');
             syncNarrowStudio();
-            home.setAttribute('aria-hidden', studio ? 'true' : 'false');
-            studioEl.setAttribute('aria-hidden', studio ? 'false' : 'true');
-            document.body.classList.toggle('on-home', !studio);
-            document.body.classList.toggle('on-studio', studio);
-            document.body.classList.toggle('bg-slate-900', studio);
-            document.body.classList.toggle('text-slate-100', studio);
-            if (skip) skip.setAttribute('href', studio ? '#details-panel' : '#home-cta');
-            document.documentElement.style.setProperty('--theme-color', studio ? '#020617' : '#f3ece1');
+            document.body.classList.toggle('on-home', isHome || isLanding);
+            document.body.classList.toggle('on-landing', isLanding);
+            document.body.classList.toggle('on-studio', isStudio);
+            document.documentElement.classList.toggle('on-studio', isStudio);
+            if (isStudio) window.scrollTo(0, 0);
+            document.body.classList.toggle('bg-slate-900', isStudio);
+            document.body.classList.toggle('text-slate-100', isStudio);
+            if (skip) skip.setAttribute('href', isStudio ? '#details-panel' : '#home-cta');
+            document.documentElement.style.setProperty('--theme-color', isStudio ? '#020617' : '#f3ece1');
             const theme = document.querySelector('meta[name="theme-color"]');
-            if (theme) theme.setAttribute('content', studio ? '#020617' : '#f3ece1');
+            if (theme) theme.setAttribute('content', isStudio ? '#020617' : '#f3ece1');
+        }
+
+        const DEFAULT_SEO = {
+            title: 'QuickCV - מחולל קורות חיים פרימיום',
+            description: 'מחולל קורות חיים בעברית: תבניות מוכנות, תצוגה חיה, והורדת PDF אחרי תשלום ב-Bit.'
+        };
+
+        function applySeoMeta(page) {
+            document.title = page && page.title ? page.title : DEFAULT_SEO.title;
+            let desc = document.getElementById('meta-description');
+            if (!desc) {
+                desc = document.querySelector('meta[name="description"]');
+            }
+            if (!desc) {
+                desc = document.createElement('meta');
+                desc.setAttribute('name', 'description');
+                desc.id = 'meta-description';
+                document.head.appendChild(desc);
+            }
+            desc.setAttribute('content', page && page.description ? page.description : DEFAULT_SEO.description);
+            let canonical = document.getElementById('canonical-url');
+            if (!canonical) {
+                canonical = document.createElement('link');
+                canonical.rel = 'canonical';
+                canonical.id = 'canonical-url';
+                document.head.appendChild(canonical);
+            }
+            canonical.setAttribute('href', location.origin + (page && page.slug ? '/cv-templates/' + page.slug : '/'));
+        }
+
+        function renderSeoLanding(page) {
+            if (!page) return;
+            const set = function (id, text) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text || '';
+            };
+            set('seo-landing-kicker', page.kicker);
+            set('seo-landing-title', page.h1);
+            set('seo-landing-lead', page.lead);
+            set('seo-landing-quote', page.quote);
+            set('seo-landing-cite', page.cite);
+            const cta = document.getElementById('seo-landing-cta');
+            if (cta) {
+                cta.textContent = page.cta || 'התחילו עם דוגמה';
+                cta.onclick = function () {
+                    if (page.field && typeof applyIndustryPreset === 'function') applyIndustryPreset(page.field);
+                    else loadExample(page.example);
+                };
+            }
+            const bullets = document.getElementById('seo-landing-bullets');
+            if (bullets) {
+                bullets.innerHTML = (page.bullets || []).map(function (item) {
+                    return '<li>' + item + '</li>';
+                }).join('');
+            }
+            const examples = document.getElementById('seo-landing-examples');
+            const bank = window.QCTemplates || {};
+            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
+            if (examples) {
+                examples.innerHTML = (page.examples || []).map(function (id) {
+                    const tpl = bank[id];
+                    if (!tpl) return '';
+                    const label = lang === 'en' ? (tpl.titleEn || tpl.title) : (tpl.titleHe || tpl.title);
+                    return '<button type="button" class="home-layout" data-example="' + id + '">' +
+                        '<span class="home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
+                        '<span>' + label + '</span></button>';
+                }).join('');
+            }
+            applySeoMeta(page);
+        }
+
+        function showSeoLanding(page, opts) {
+            if (!page) {
+                showHome();
+                return;
+            }
+            applyView('landing');
+            renderSeoLanding(page);
+            const url = '/cv-templates/' + page.slug;
+            if (!opts || !opts.skipHistory) {
+                if (location.pathname.replace(/\/+$/, '') !== url) {
+                    history[opts && opts.replace ? 'replaceState' : 'pushState'](null, '', url);
+                }
+            }
+            window.scrollTo(0, 0);
         }
 
         function resetStudioScroll() {
@@ -4598,24 +3119,73 @@
         }
 
         function showStudio() {
-            applyView(true);
-            if (location.hash !== '#studio') history.replaceState(null, '', '#studio');
+            applyView('studio');
+            if (location.hash !== '#studio') {
+                history.replaceState(null, '', '/' + (location.search || '') + '#studio');
+            }
+            applySeoMeta(null);
             resetStudioScroll();
             window.setTimeout(resetStudioScroll, 60);
             updateCV();
         }
 
         function showHome() {
-            applyView(false);
-            if (location.hash === '#studio') history.replaceState(null, '', location.pathname + location.search);
+            applyView('home');
+            applySeoMeta(null);
+            const search = location.search || '';
+            if (location.hash === '#studio' || location.pathname.indexOf('/cv-templates/') === 0) {
+                history.replaceState(null, '', '/' + search.replace(/^\?$/, ''));
+            }
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
         }
 
-        function syncViewFromHash() {
-            if (location.hash === '#studio') showStudio();
-            else showHome();
+        function applyIndustryPreset(fieldId) {
+            if (!fieldId) return;
+            var phrase = document.getElementById('phrase-field');
+            if (phrase) phrase.value = fieldId;
+            renderPhrases();
+            renderRoleTitleChips();
+            applyRoleExample({ replace: true });
+            var layoutId = window.QCSeoPresets && QCSeoPresets.layoutFor(fieldId);
+            var tpl = layoutId && (window.QCTemplates || {})[layoutId];
+            if (tpl) {
+                if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
+                setCvSkin(tpl.skin || '');
+                if (tpl.accent) {
+                    var swatch = document.querySelector('.theme-swatch[data-color="' + tpl.accent + '"]');
+                    setAccent(tpl.accent, swatch);
+                }
+                if (tpl.font) setCvFont(tpl.font);
+                if (tpl.bg) setPreviewBg(tpl.bg);
+                markTemplateCards(layoutId);
+            }
+            showStudio();
+        }
+
+        function applyPresetFromQuery() {
+            var params = new URLSearchParams(location.search);
+            var raw = params.get('preset') || params.get('category') || params.get('field');
+            var field = window.QCSeoPresets && QCSeoPresets.resolve(raw);
+            if (!field) return false;
+            applyIndustryPreset(field);
+            return true;
+        }
+
+        function syncAppRoute() {
+            if (location.hash === '#studio') {
+                applyView('studio');
+                applySeoMeta(null);
+                return;
+            }
+            const page = window.QCLandings && QCLandings.fromPath(location.pathname);
+            if (page) {
+                showSeoLanding(page, { skipHistory: true, replace: true });
+                return;
+            }
+            applyView('home');
+            applySeoMeta(null);
         }
 
         document.addEventListener('keydown', function (e) {
@@ -4630,6 +3200,7 @@
         window.updateCV = updateCV;
         window.showStudio = showStudio;
         window.showHome = showHome;
+        window.showSeoLanding = showSeoLanding;
         window.setLayout = setLayout;
         window.setCvSkin = setCvSkin;
         window.setCvLang = setCvLang;
@@ -4640,6 +3211,7 @@
         window.insertSkills = insertSkills;
         window.insertBullet = insertBullet;
         window.applyRoleTitle = applyRoleTitle;
+        window.applyIndustryPreset = applyIndustryPreset;
         window.onPhotoChange = onPhotoChange;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
@@ -4678,14 +3250,35 @@
             renderPhrases();
             renderRoleTitleChips();
             hydrateLanguagePicker();
+            if (draft && draft.fontScale) setFontScale(draft.fontScale);
+            if (draft && draft.lineHeight) setLineHeight(draft.lineHeight);
+            if (draft && draft.previewBg) setPreviewBg(draft.previewBg);
+            if (window.QCExperienceEditor) QCExperienceEditor.refresh();
         } catch (err) {
             console.error('studio init failed', err);
         }
         markStep(1);
         syncNarrowStudio();
-        syncViewFromHash();
+        var usedPreset = false;
+        try {
+            usedPreset = applyPresetFromQuery();
+        } catch (presetErr) {
+            console.error('preset apply failed', presetErr);
+        }
+        if (!usedPreset) syncAppRoute();
         updateCV();
-        window.addEventListener('hashchange', syncViewFromHash);
+        window.QCPageFit?.bind?.();
+        window.addEventListener('hashchange', syncAppRoute);
+        window.addEventListener('popstate', syncAppRoute);
+        document.addEventListener('click', function (e) {
+            const link = e.target && e.target.closest && e.target.closest('a[data-seo-landing]');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!href || href.indexOf('/cv-templates/') !== 0) return;
+            e.preventDefault();
+            const page = window.QCLandings && QCLandings.fromPath(href);
+            if (page) showSeoLanding(page);
+        });
         window.addEventListener('resize', syncNarrowStudio);
         window.addEventListener('orientationchange', function () {
             window.setTimeout(syncNarrowStudio, 80);

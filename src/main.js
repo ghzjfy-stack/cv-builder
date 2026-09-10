@@ -1,15 +1,54 @@
 // @ts-nocheck
-import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, validateCode, WRONG_CODE_MSG } from "./access/gate.js";
-import { CHECKOUT, bitAppOpenUrl, bitPayUrl, displayAmountValue, whatsappUrl } from "./config/checkout.js";
+import { requestCvAi } from "./ai/cvAi.js";
+import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken, WRONG_CODE_MSG } from "./access/gate.js";
+import {
+  CHECKOUT,
+  bitAppOpenUrl,
+  bitPayUrl,
+  displayAmountValue,
+  displayCompareValue,
+  isPackId,
+  packAmount,
+  whatsappUrl,
+} from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
+import { CODE_FAIL_MSG, verifyDownloadCode } from "./payment/verifyCode.js";
 import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
 const modal = () => document.getElementById("payment-modal");
 const feedback = () => document.getElementById("code-feedback");
 const codeInput = () => document.getElementById("download-code");
 const preview = () => document.getElementById("cv-preview-wrapper");
+const PACK_KEY = "quickcv.checkoutPack";
 
 let lastFocus = null;
+let selectedPack = "basic";
+
+function readStoredPack() {
+  try {
+    const stored = sessionStorage.getItem(PACK_KEY);
+    if (isPackId(stored)) return stored;
+  } catch {
+    /* ignore */
+  }
+  return "basic";
+}
+
+function selectedAmount() {
+  return packAmount(selectedPack);
+}
+
+function setSelectedPack(packId, persist = true) {
+  selectedPack = packId === "complete" ? "complete" : "basic";
+  if (persist) {
+    try {
+      sessionStorage.setItem(PACK_KEY, selectedPack);
+    } catch {
+      /* ignore */
+    }
+  }
+  applyPackUi();
+}
 
 function setScreenshotFeedback(text, ok) {
   const el = document.getElementById("screenshot-feedback");
@@ -88,6 +127,10 @@ function showPayStep() {
 function showDownloadStep() {
   document.getElementById("pay-step")?.classList.add("hidden");
   document.getElementById("download-step")?.classList.remove("hidden");
+  document.getElementById("download-complete-note")?.classList.toggle("hidden", selectedPack !== "complete");
+  document.querySelectorAll("[data-pack-extra]").forEach((el) => {
+    el.classList.toggle("hidden", selectedPack !== "complete");
+  });
   setPaidUi(true);
 }
 
@@ -160,7 +203,7 @@ function copyBitPhone(e) {
 }
 
 function openBitApp(e) {
-  const url = bitAppOpenUrl();
+  const url = bitAppOpenUrl(selectedAmount());
   const el = e?.currentTarget;
   if (el instanceof HTMLAnchorElement) {
     el.href = url;
@@ -177,7 +220,7 @@ function openBitApp(e) {
 
 function openWhatsApp(e) {
   e?.preventDefault?.();
-  window.open(whatsappUrl(), "_blank", "noopener");
+  window.open(whatsappUrl(selectedAmount()), "_blank", "noopener");
 }
 
 async function runHighResExport() {
@@ -193,23 +236,17 @@ async function runHighResExport() {
 
 function readAccessCode() {
   const primary = document.getElementById("download-code") || document.getElementById("code-input");
-  return String(primary && "value" in primary ? primary.value : "").trim();
+  return String(primary && "value" in primary ? primary.value : "").replace(/\D/g, "");
+}
+
+function readCheckoutContact() {
+  const el = document.getElementById("checkout-contact");
+  return String(el && "value" in el ? el.value : "").trim();
 }
 
 function triggerPDFDownload() {
   if (!isUnlocked()) {
-    const userCode = readAccessCode();
-    if (!validateCode(userCode)) {
-      setFeedback(WRONG_CODE_MSG, false);
-      return;
-    }
-    window.QCRateLimit?.reset();
-    window.QCLog?.add("auth_ok", "verified");
-    unlock();
-  }
-
-  if (!isUnlocked()) {
-    openCheckoutModal();
+    void verifyAndUnlock();
     return;
   }
 
@@ -246,12 +283,48 @@ function onDownloadPdfClick(e) {
   openCheckoutModal();
 }
 
-function verifyAndUnlock(e) {
+async function verifyAndUnlock(e) {
   e?.preventDefault?.();
-  triggerPDFDownload();
-  if (!isUnlocked()) {
+  if (isUnlocked()) {
+    triggerPDFDownload();
+    return;
+  }
+
+  const limit = window.QCRateLimit?.status?.();
+  if (limit?.locked) {
+    setFeedback(WRONG_CODE_MSG, false);
+    return;
+  }
+
+  const userCode = readAccessCode();
+  if (userCode.length !== 6) {
+    setFeedback("נא להזין קוד בן 6 ספרות מההודעה שקיבלתם.", false);
+    return;
+  }
+
+  const btn = document.getElementById("verify-btn");
+  btn?.setAttribute("disabled", "true");
+  setFeedback("מאמת את הקוד...", true);
+  try {
+    const result = await verifyDownloadCode(userCode, readCheckoutContact());
+    if (result && result.ok === true && result.download?.authorized !== false) {
+      window.QCRateLimit?.reset();
+      window.QCLog?.add("auth_ok", "code verified");
+      if (result.token) unlockWithPaymentToken(result.token);
+      else unlock();
+      setPaidUi(true);
+      setFeedback("הקוד אומת. מוריד את ה-PDF...", true);
+      showDownloadStep();
+      void runHighResExport();
+      return;
+    }
     window.QCLog?.add("auth_fail", "bad code");
     window.QCRateLimit?.fail();
+    setFeedback(result?.error || CODE_FAIL_MSG, false);
+  } catch {
+    setFeedback(CODE_FAIL_MSG, false);
+  } finally {
+    btn?.removeAttribute("disabled");
   }
 }
 
@@ -280,27 +353,58 @@ function downloadFormat(kind) {
   );
 }
 
-function fillCheckoutUi() {
-  const bitEl = document.getElementById("bit-number");
-  if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
-  const amount = displayAmountValue();
-  document.querySelectorAll("[data-price]").forEach((el) => {
-    el.textContent = amount;
+function applyPackUi() {
+  const amount = selectedAmount();
+  const display = displayAmountValue(amount);
+  document.querySelectorAll("[data-pay-amount]").forEach((el) => {
+    el.textContent = display;
   });
-  document.querySelectorAll("[data-compare-price]").forEach((el) => {
-    el.textContent = String(CHECKOUT.compareAtIls);
+  document.querySelectorAll('input[name="checkout-pack"]').forEach((input) => {
+    if (!(input instanceof HTMLInputElement)) return;
+    const on = input.value === selectedPack;
+    input.checked = on;
+    input.closest(".pay-pack")?.classList.toggle("is-selected", on);
   });
   const openBit = document.getElementById("btn-open-bit");
   if (openBit instanceof HTMLAnchorElement) {
-    openBit.href = bitAppOpenUrl();
+    openBit.href = bitAppOpenUrl(amount);
     openBit.target = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "_self" : "_blank";
     openBit.rel = "noopener";
   }
   const qr = document.getElementById("bit-qr");
   if (qr instanceof HTMLImageElement) {
-    qr.src = bitPayUrl();
-    qr.alt = `קוד QR לתשלום ${amount} ₪ ב-Bit`;
+    qr.src = bitPayUrl(amount);
+    qr.alt = `קוד QR לתשלום ${display} ₪ ב-Bit`;
   }
+  const saveEl = document.getElementById("pay-save-badge");
+  if (saveEl) {
+    const saved = Math.round(CHECKOUT.compareAtIls - amount);
+    saveEl.textContent =
+      selectedPack === "complete" ? "חבילה מלאה במחיר השקה" : `מחיר השקה — חיסכון של ${saved} ₪`;
+  }
+}
+
+function fillCheckoutUi() {
+  selectedPack = readStoredPack();
+  const bitEl = document.getElementById("bit-number");
+  if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
+  const launch = displayAmountValue(CHECKOUT.amountIls);
+  document.querySelectorAll("[data-price]").forEach((el) => {
+    el.textContent = launch;
+  });
+  document.querySelectorAll("[data-compare-price]").forEach((el) => {
+    el.textContent = displayCompareValue();
+  });
+  document.querySelectorAll("[data-pack-complete-price]").forEach((el) => {
+    el.textContent = displayAmountValue(CHECKOUT.packCompleteIls);
+  });
+  applyPackUi();
+}
+
+function onPackChange(e) {
+  const input = e?.target;
+  if (!(input instanceof HTMLInputElement) || !isPackId(input.value)) return;
+  setSelectedPack(input.value);
 }
 
 function restoreUnlockUi() {
@@ -440,11 +544,19 @@ function bind() {
   document.getElementById("btn-whatsapp")?.addEventListener("click", openWhatsApp);
   document.getElementById("verify-btn")?.addEventListener("click", verifyAndUnlock);
   document.getElementById("payment-screenshot")?.addEventListener("change", onPaymentScreenshotChange);
+  document.querySelectorAll('input[name="checkout-pack"]').forEach((input) => {
+    input.addEventListener("change", onPackChange);
+  });
 
+  codeInput()?.addEventListener("input", (e) => {
+    const el = e.currentTarget;
+    if (!(el instanceof HTMLInputElement)) return;
+    el.value = el.value.replace(/\D/g, "").slice(0, 6);
+  });
   codeInput()?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      verifyAndUnlock(e);
+      void verifyAndUnlock(e);
     }
   });
 
@@ -458,6 +570,8 @@ function bind() {
   modal()?.addEventListener("click", (e) => {
     if (e.target === modal()) dismissCheckout(e);
   });
+
+  window.QCCvAi = { request: requestCvAi };
 }
 
 if (document.readyState === "loading") {

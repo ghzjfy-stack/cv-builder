@@ -1,7 +1,6 @@
 import { createHmac, createVerify, timingSafeEqual } from "node:crypto";
 import { issuePaidCode } from "./codes.js";
 import { json, parseBody, readBody } from "./http.js";
-import { sendVerificationCode } from "./notify.js";
 import { notifyPaidOrder } from "./orderNotify.js";
 import { extractSessionId, getCheckoutSession, markCheckoutPaid } from "./payboxSession.js";
 
@@ -285,6 +284,7 @@ export async function handlePayboxWebhookRequest(req, res) {
   }
 
   let expectedAmount = 0;
+  let sessionPack = "";
   if (payment.sessionId) {
     const session = await getCheckoutSession(payment.sessionId);
     if (!session) {
@@ -292,6 +292,7 @@ export async function handlePayboxWebhookRequest(req, res) {
       return;
     }
     expectedAmount = session.amount_ils;
+    sessionPack = session.pack === "complete" ? "complete" : "basic";
     payment.method = session.method === "card" ? "card" : "paybox";
     if (!payment.phone && !payment.email && session.contact) {
       if (session.contact.includes("@")) payment.email = session.contact;
@@ -331,14 +332,7 @@ export async function handlePayboxWebhookRequest(req, res) {
     return;
   }
 
-  const notify = issued.code
-    ? await sendVerificationCode({
-        phone: payment.phone,
-        email: payment.email,
-        code: issued.code,
-      })
-    : { delivered: false, channel: null, error: "no_code" };
-
+  // Email is sent only after admin presses Confirm in Telegram.
   if (issued.code) {
     await notifyPaidOrder({
       provider: payment.method === "card" ? "card" : "paybox",
@@ -349,6 +343,7 @@ export async function handlePayboxWebhookRequest(req, res) {
       paymentMethod: payment.method === "card" ? "card" : "paybox",
       amountIls: payment.amount,
       verificationCode: issued.code,
+      pack: sessionPack || undefined,
     });
   }
 
@@ -356,11 +351,12 @@ export async function handlePayboxWebhookRequest(req, res) {
   json(res, 200, {
     ok: true,
     is_paid: true,
-    delivered: Boolean(notify.delivered),
-    channel: notify.channel,
+    delivered: false,
+    pending_admin_confirm: true,
+    channel: null,
     expires_at: issued.record?.expires_at || null,
     session_id: payment.sessionId || null,
     ...(debug ? { debug_code: issued.code } : {}),
-    ...(!notify.delivered && !payment.phone && !payment.email ? { warning: "missing_contact" } : {}),
+    ...(!payment.phone && !payment.email ? { warning: "missing_contact" } : {}),
   });
 }

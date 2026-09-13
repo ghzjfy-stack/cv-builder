@@ -1,7 +1,14 @@
 import { issuePaidCode, normalizeContact, normalizeRedemptionCode, consumeCode } from "./codes.js";
 import { json, parseBody, readBody } from "./http.js";
 import { kvGet, kvSet } from "./kv.js";
-import { escapeTelegramMarkdown, formatAmountIls, formatPaymentMethod } from "../lib/telegram.js";
+import { sendPurchaseConfirmationEmail } from "./notify.js";
+import { getPendingOrder, updatePendingOrder } from "./pendingOrders.js";
+import {
+  escapeTelegramMarkdown,
+  formatAmountIls,
+  formatPackLabel,
+  formatPaymentMethod,
+} from "../lib/telegram.js";
 
 const MAX_BYTES = 256 * 1024;
 
@@ -80,17 +87,29 @@ export async function sendTelegramText(chatId, text, extra = {}) {
   });
 }
 
+async function editTelegramMessage(chatId, messageId, text) {
+  if (chatId == null || messageId == null) return { ok: false };
+  return telegramApi("editMessageText", {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: "Markdown",
+    disable_web_page_preview: true,
+    reply_markup: { inline_keyboard: [] },
+  });
+}
+
 function helpText() {
   return (
-    "*QuickCV control panel*\n\n" +
-    "`/help` — this list\n" +
-    "`/status` — env + storage health\n" +
-    "`/code` — issue a one-time unlock code\n" +
-    "`/code 0501234567` — code tied to a phone\n" +
-    "`/code 19.9 paybox` — amount + provider note\n" +
-    "`/lookup ABC123` — inspect a code (hashed lookup)\n" +
-    "`/revoke ABC123` — mark a code as used / blocked\n\n" +
-    "New paid orders also post here automatically."
+    "*לוח בקרה QuickCV*\n\n" +
+    "`/help` — רשימת פקודות\n" +
+    "`/status` — מצב מערכת\n" +
+    "`/code` — הנפקת קוד הורדה\n" +
+    "`/code 0501234567` — קוד מקושר לטלפון\n" +
+    "`/lookup ABC123` — בדיקת קוד\n" +
+    "`/revoke ABC123` — ביטול קוד\n\n" +
+    "הזמנות חדשות מגיעות לכאן עם כפתורי *אישור* / *מחיקה*.\n" +
+    "אישור שולח מייל Resend ללקוח לפי החבילה."
   );
 }
 
@@ -100,17 +119,19 @@ async function statusText() {
   const hasKv = Boolean(envValue("KV_REST_API_URL") || envValue("UPSTASH_REDIS_REST_URL"));
   const hasPaySecret = Boolean(envValue("PAYMENT_TOKEN_SECRET"));
   const hasWebhook = Boolean(envValue("PAYMENT_WEBHOOK_SECRET") || envValue("PAYBOX_WEBHOOK_SECRET"));
+  const hasResend = Boolean(envValue("RESEND_API_KEY"));
   const hasOpenAi = Boolean(envValue("OPENAI_API_KEY"));
   const amount = formatAmountIls(process.env.PAYMENT_AMOUNT_ILS || 9.9);
   return (
-    "*QuickCV status*\n\n" +
-    `*Bot token:* ${hasToken ? "ok" : "missing"}\n` +
-    `*Admin chat:* ${hasChat ? "ok" : "missing"}\n` +
-    `*KV / Redis:* ${hasKv ? "ok" : "missing (codes may reset on cold start)"}\n` +
-    `*Payment token secret:* ${hasPaySecret ? "ok" : "missing"}\n` +
-    `*Payment webhooks:* ${hasWebhook ? "ok" : "missing"}\n` +
-    `*Bit screenshot AI:* ${hasOpenAi ? "ok" : "missing (Bit image verify)"}\n` +
-    `*Basic price:* ${escapeTelegramMarkdown(amount)} ₪`
+    "*סטטוס QuickCV*\n\n" +
+    `*טוקן בוט:* ${hasToken ? "תקין" : "חסר"}\n` +
+    `*צ׳אט מנהל:* ${hasChat ? "תקין" : "חסר"}\n` +
+    `*KV / Redis:* ${hasKv ? "תקין" : "חסר (קודים עלולים להתאפס)"}\n` +
+    `*Resend:* ${hasResend ? "תקין" : "חסר"}\n` +
+    `*סוד תשלום:* ${hasPaySecret ? "תקין" : "חסר"}\n` +
+    `*Webhook תשלום:* ${hasWebhook ? "תקין" : "חסר"}\n` +
+    `*אימות Bit:* ${hasOpenAi ? "תקין" : "חסר"}\n` +
+    `*מחיר בסיסי:* ${escapeTelegramMarkdown(amount)} ₪`
   );
 }
 
@@ -138,7 +159,7 @@ async function handleIssueCode(chatId, args) {
     transactionId: `tg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
   });
   if (!issued?.code) {
-    return sendTelegramText(chatId, "Could not issue a code. Check KV / Redis env vars.");
+    return sendTelegramText(chatId, "לא הצלחנו להנפיק קוד. בדקו את משתני KV / Redis.");
   }
   try {
     await kvSet(
@@ -158,55 +179,149 @@ async function handleIssueCode(chatId, args) {
   }
   const contactLine =
     parsed.phone || parsed.email
-      ? `*Contact:* ${escapeTelegramMarkdown(parsed.phone || parsed.email)}\n`
+      ? `*איש קשר:* ${escapeTelegramMarkdown(parsed.phone || parsed.email)}\n`
       : "";
   return sendTelegramText(
     chatId,
-    `*Unlock code issued*\n\n` +
-      `*Code:* \`${escapeTelegramMarkdown(issued.code)}\`\n` +
+    `*קוד הורדה הונפק*\n\n` +
+      `*קוד:* \`${escapeTelegramMarkdown(issued.code)}\`\n` +
       contactLine +
-      `*Note amount:* ${escapeTelegramMarkdown(formatAmountIls(parsed.amount))} ₪\n` +
-      `*Provider tag:* ${escapeTelegramMarkdown(formatPaymentMethod(parsed.provider))}\n\n` +
-      `Send this code to the customer. It is one-time use.`,
+      `*סכום לציון:* ${escapeTelegramMarkdown(formatAmountIls(parsed.amount))} ₪\n` +
+      `*ספק:* ${escapeTelegramMarkdown(formatPaymentMethod(parsed.provider))}\n\n` +
+      `שלחו את הקוד ללקוח. הקוד לשימוש חד־פעמי.`,
   );
 }
 
 async function handleLookup(chatId, codeRaw) {
   const code = normalizeRedemptionCode(codeRaw);
   if (code.length !== 6) {
-    return sendTelegramText(chatId, "Usage: `/lookup ABC123`");
+    return sendTelegramText(chatId, "שימוש: `/lookup ABC123`");
   }
   const indexed = await kvGet(`qc:tg:code:${code}`);
   if (indexed && typeof indexed === "object") {
     return sendTelegramText(
       chatId,
-      `*Code* \`${escapeTelegramMarkdown(code)}\`\n` +
-        `*Phone:* ${escapeTelegramMarkdown(indexed.phone || "—")}\n` +
-        `*Email:* ${escapeTelegramMarkdown(indexed.email || "—")}\n` +
-        `*Provider:* ${escapeTelegramMarkdown(indexed.provider || "—")}\n` +
-        `*Created:* ${escapeTelegramMarkdown(indexed.created_at || "—")}`,
+      `*קוד* \`${escapeTelegramMarkdown(code)}\`\n` +
+        `*טלפון:* ${escapeTelegramMarkdown(indexed.phone || "—")}\n` +
+        `*אימייל:* ${escapeTelegramMarkdown(indexed.email || "—")}\n` +
+        `*ספק:* ${escapeTelegramMarkdown(indexed.provider || "—")}\n` +
+        `*נוצר:* ${escapeTelegramMarkdown(indexed.created_at || "—")}`,
     );
   }
   return sendTelegramText(
     chatId,
-    `No admin index for \`${escapeTelegramMarkdown(code)}\`. ` +
-      `Codes issued by payment webhooks are stored hashed only — use /revoke to burn one.`,
+    `אין אינדקס מנהל ל-\`${escapeTelegramMarkdown(code)}\`. ` +
+      `אפשר לבטל עם /revoke.`,
   );
 }
 
 async function handleRevoke(chatId, codeRaw) {
   const code = normalizeRedemptionCode(codeRaw);
   if (code.length !== 6) {
-    return sendTelegramText(chatId, "Usage: `/revoke ABC123`");
+    return sendTelegramText(chatId, "שימוש: `/revoke ABC123`");
   }
   const result = await consumeCode(code, "");
   if (result.ok) {
-    return sendTelegramText(chatId, `Code \`${escapeTelegramMarkdown(code)}\` marked used / revoked.`);
+    return sendTelegramText(chatId, `הקוד \`${escapeTelegramMarkdown(code)}\` בוטל.`);
   }
   if (result.reason === "used") {
-    return sendTelegramText(chatId, `Code \`${escapeTelegramMarkdown(code)}\` was already used.`);
+    return sendTelegramText(chatId, `הקוד \`${escapeTelegramMarkdown(code)}\` כבר שומש.`);
   }
-  return sendTelegramText(chatId, `Could not revoke \`${escapeTelegramMarkdown(code)}\` (${result.reason || "invalid"}).`);
+  return sendTelegramText(
+    chatId,
+    `לא ניתן לבטל \`${escapeTelegramMarkdown(code)}\` (${result.reason || "invalid"}).`,
+  );
+}
+
+async function handleConfirmOrder(chatId, orderId, messageId) {
+  const order = await getPendingOrder(orderId);
+  if (!order) {
+    await sendTelegramText(chatId, `הזמנה \`${escapeTelegramMarkdown(orderId)}\` לא נמצאה.`);
+    return;
+  }
+  if (order.status === "confirmed") {
+    await sendTelegramText(chatId, `הזמנה #${order.order_number} כבר אושרה.`);
+    return;
+  }
+  if (order.status === "deleted") {
+    await sendTelegramText(chatId, `הזמנה #${order.order_number} כבר נמחקה.`);
+    return;
+  }
+
+  const mail = await sendPurchaseConfirmationEmail({
+    email: order.email,
+    code: order.verification_code,
+    pack: order.pack,
+    customerName: order.customer_name,
+    amountIls: order.amount_ils,
+  });
+
+  await updatePendingOrder(orderId, {
+    status: "confirmed",
+    email_delivered: Boolean(mail.delivered),
+    email_error: mail.error || null,
+    confirmed_at: new Date().toISOString(),
+  });
+
+  const pack = formatPackLabel(order.pack);
+  const mailLine = mail.delivered
+    ? "✅ מייל אישור נשלח ב-Resend"
+    : `⚠️ המייל לא נשלח (${escapeTelegramMarkdown(mail.error || "שגיאה")})`;
+
+  const text =
+    `✅ *הזמנה #${order.order_number} אושרה*\n\n` +
+    optionalLine("לקוח", order.customer_name) +
+    optionalLine("אימייל", order.email) +
+    `*חבילה:* ${escapeTelegramMarkdown(pack)}\n` +
+    `*קוד:* \`${escapeTelegramMarkdown(order.verification_code || "—")}\`\n` +
+    mailLine;
+
+  await editTelegramMessage(chatId, messageId, text);
+  if (!mail.delivered) {
+    await sendTelegramText(
+      chatId,
+      `ההזמנה אושרה, אבל המייל נכשל. בדקו \`RESEND_API_KEY\` / אימייל לקוח.\nקוד: \`${escapeTelegramMarkdown(order.verification_code || "")}\``,
+    );
+  }
+}
+
+async function handleDeleteOrder(chatId, orderId, messageId) {
+  const order = await getPendingOrder(orderId);
+  if (!order) {
+    await sendTelegramText(chatId, `הזמנה \`${escapeTelegramMarkdown(orderId)}\` לא נמצאה.`);
+    return;
+  }
+  if (order.status === "deleted") {
+    await sendTelegramText(chatId, `הזמנה #${order.order_number} כבר נמחקה.`);
+    return;
+  }
+  if (order.status === "confirmed") {
+    await sendTelegramText(chatId, `הזמנה #${order.order_number} כבר אושרה — לא מוחקים אחרי אישור.`);
+    return;
+  }
+
+  if (order.verification_code) {
+    await consumeCode(order.verification_code, "");
+  }
+  await updatePendingOrder(orderId, {
+    status: "deleted",
+    deleted_at: new Date().toISOString(),
+  });
+
+  const text =
+    `🗑 *הזמנה #${order.order_number} נמחקה*\n\n` +
+    optionalLine("לקוח", order.customer_name) +
+    optionalLine("אימייל", order.email) +
+    `*קוד בוטל:* \`${escapeTelegramMarkdown(order.verification_code || "—")}\`\n` +
+    `_לא נשלח מייל ללקוח._`;
+
+  await editTelegramMessage(chatId, messageId, text);
+}
+
+function optionalLine(label, value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return `*${label}:* ${escapeTelegramMarkdown(text)}\n`;
 }
 
 async function handleCommand(chatId, text) {
@@ -229,7 +344,7 @@ async function handleCommand(chatId, text) {
   if (cmd === "/revoke") {
     return handleRevoke(chatId, args[0] || "");
   }
-  return sendTelegramText(chatId, "Unknown command. Try `/help`.");
+  return sendTelegramText(chatId, "פקודה לא מוכרת. נסו `/help`.");
 }
 
 function verifyTelegramSecret(req) {
@@ -241,7 +356,6 @@ function verifyTelegramSecret(req) {
 
 /**
  * POST /api/telegram-webhook
- * Telegram Bot API update endpoint for the admin control panel.
  */
 export async function handleTelegramWebhookRequest(req, res) {
   if (req.method === "OPTIONS") {
@@ -272,7 +386,6 @@ export async function handleTelegramWebhookRequest(req, res) {
     return;
   }
 
-  // Always ack quickly so Telegram does not retry.
   json(res, 200, { ok: true });
 
   try {
@@ -281,22 +394,48 @@ export async function handleTelegramWebhookRequest(req, res) {
         update?.message?.chat?.id ??
         update?.callback_query?.message?.chat?.id;
       if (chatId != null) {
-        await sendTelegramText(chatId, "Unauthorized. This bot only answers the QuickCV admin chat.");
+        await sendTelegramText(chatId, "אין הרשאה. הבוט עונה רק לצ׳אט המנהל של QuickCV.");
       }
       return;
     }
 
     if (update.callback_query) {
       const cq = update.callback_query;
-      await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
       const data = String(cq.data || "");
       const chatId = cq.message?.chat?.id;
-      if (chatId == null) return;
-      if (data.startsWith("revoke:")) {
-        await handleRevoke(chatId, data.slice(7));
-      } else if (data === "help") {
-        await sendTelegramText(chatId, helpText());
+      const messageId = cq.message?.message_id;
+      if (chatId == null) {
+        await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
+        return;
       }
+
+      if (data.startsWith("ok:")) {
+        await telegramApi("answerCallbackQuery", {
+          callback_query_id: cq.id,
+          text: "מאשר ושולח מייל...",
+        });
+        await handleConfirmOrder(chatId, data.slice(3), messageId);
+        return;
+      }
+      if (data.startsWith("no:")) {
+        await telegramApi("answerCallbackQuery", {
+          callback_query_id: cq.id,
+          text: "מוחק הזמנה...",
+        });
+        await handleDeleteOrder(chatId, data.slice(3), messageId);
+        return;
+      }
+      if (data.startsWith("revoke:")) {
+        await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
+        await handleRevoke(chatId, data.slice(7));
+        return;
+      }
+      if (data === "help") {
+        await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
+        await sendTelegramText(chatId, helpText());
+        return;
+      }
+      await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
       return;
     }
 

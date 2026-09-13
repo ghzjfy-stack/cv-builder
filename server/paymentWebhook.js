@@ -1,7 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { issuePaidCode } from "./codes.js";
 import { json, parseBody, readBody } from "./http.js";
-import { sendVerificationCode } from "./notify.js";
 import { notifyPaidOrder } from "./orderNotify.js";
 
 const MAX_BYTES = 64 * 1024;
@@ -202,14 +201,7 @@ export async function handlePaymentWebhookRequest(req, res) {
     return;
   }
 
-  const notify = issued.code
-    ? await sendVerificationCode({
-        phone: payment.phone,
-        email: payment.email,
-        code: issued.code,
-      })
-    : { delivered: false, channel: null, error: "no_code" };
-
+  // Email is sent only after admin presses Confirm in Telegram.
   if (issued.code) {
     await notifyPaidOrder({
       provider: payment.provider,
@@ -227,12 +219,11 @@ export async function handlePaymentWebhookRequest(req, res) {
   json(res, 200, {
     ok: true,
     is_paid: true,
-    delivered: Boolean(notify.delivered),
-    channel: notify.channel,
+    delivered: false,
+    pending_admin_confirm: true,
+    channel: null,
     expires_at: issued.record?.expires_at || null,
     ...(debug ? { debug_code: issued.code } : {}),
-    ...(!notify.delivered && !payment.phone && !payment.email
-      ? { warning: "missing_contact" }
-      : {}),
+    ...(!payment.phone && !payment.email ? { warning: "missing_contact" } : {}),
   });
 }

@@ -44,6 +44,9 @@ export function paymentApiPlugin() {
   if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
     console.warn("[quickcv] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID missing. Order alerts and Telegram control panel are off.");
   }
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[quickcv] RESEND_API_KEY missing. Confirming an order in Telegram will not send the customer email.");
+  }
   if (!process.env.PAYMENT_WEBHOOK_SECRET && !process.env.PAYBOX_WEBHOOK_SECRET) {
     console.warn(
       "[quickcv] PAYMENT_WEBHOOK_SECRET / PAYBOX_WEBHOOK_SECRET is missing. Payment webhooks will return 500 until set.",

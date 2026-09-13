@@ -3,16 +3,19 @@
 export type TelegramNotifyResult = {
   sent: boolean;
   error?: string;
+  messageId?: number;
 };
 
 export type OrderNotificationData = {
   orderNumber: number;
+  orderId?: string;
   customerName?: string;
   phone?: string;
   email?: string;
   paymentMethod: string;
   amountIls: number;
   verificationCode: string;
+  pack?: string;
   timestamp?: Date | string | number;
 };
 
@@ -42,9 +45,9 @@ export function formatPaymentMethod(providerOrMethod: string): string {
   if (raw === "bit") return "Bit";
   if (raw === "paybox") return "PayBox";
   if (raw === "card" || raw === "credit" || raw === "creditcard" || raw === "credit_card") {
-    return "Credit Card";
+    return "כרטיס אשראי";
   }
-  if (!raw) return "Unknown";
+  if (!raw) return "לא ידוע";
   return String(providerOrMethod).trim();
 }
 
@@ -52,6 +55,10 @@ export function formatAmountIls(amount: number): string {
   const n = Number(amount);
   if (!Number.isFinite(n) || n < 0) return "0.00";
   return n.toFixed(2);
+}
+
+export function formatPackLabel(pack?: string): string {
+  return pack === "complete" ? "חבילה מלאה" : "חבילה בסיסית";
 }
 
 function formatTimestamp(timestamp?: Date | string | number): string {
@@ -85,15 +92,18 @@ export function formatOrderNotificationMessage(orderData: OrderNotificationData)
   const amount = formatAmountIls(orderData.amountIls);
   const method = formatPaymentMethod(orderData.paymentMethod);
   const code = String(orderData.verificationCode || "").trim() || "—";
+  const pack = formatPackLabel(orderData.pack);
 
   return (
-    `🛒 *New paid order* ${escapeTelegramMarkdown(orderLabel)}\n\n` +
-    optionalLine("Customer", orderData.customerName) +
-    optionalLine("Phone", orderData.phone) +
-    optionalLine("Email", orderData.email) +
-    `*Payment:* ${escapeTelegramMarkdown(`${amount} ₪`)} via ${escapeTelegramMarkdown(method)}\n` +
-    `*Verification code:* \`${escapeTelegramMarkdown(code)}\`\n` +
-    `*Time:* ${escapeTelegramMarkdown(formatTimestamp(orderData.timestamp))}`
+    `🛒 *הזמנה חדשה ממתינה לאישור* ${escapeTelegramMarkdown(orderLabel)}\n\n` +
+    optionalLine("לקוח", orderData.customerName) +
+    optionalLine("טלפון", orderData.phone) +
+    optionalLine("אימייל", orderData.email) +
+    `*חבילה:* ${escapeTelegramMarkdown(pack)}\n` +
+    `*תשלום:* ${escapeTelegramMarkdown(`${amount} ₪`)} ב-${escapeTelegramMarkdown(method)}\n` +
+    `*קוד גישה:* \`${escapeTelegramMarkdown(code)}\`\n` +
+    `*זמן:* ${escapeTelegramMarkdown(formatTimestamp(orderData.timestamp))}\n\n` +
+    `_אשרו כדי לשלוח מייל אישור ללקוח, או מחקו כדי לבטל את ההזמנה._`
   );
 }
 
@@ -114,7 +124,7 @@ export async function sendTelegramOrderNotification(
       return { sent: false, error: "not_configured" };
     }
 
-    const code = String(orderData.verificationCode || "").trim();
+    const orderId = String(orderData.orderId || orderData.orderNumber || "").trim();
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 8000);
@@ -126,12 +136,12 @@ export async function sendTelegramOrderNotification(
         parse_mode: "Markdown",
         disable_web_page_preview: true,
       };
-      if (code) {
+      if (orderId) {
         body.reply_markup = {
           inline_keyboard: [
             [
-              { text: "Revoke code", callback_data: `revoke:${code}` },
-              { text: "Help", callback_data: "help" },
+              { text: "✅ אישור הזמנה", callback_data: `ok:${orderId}` },
+              { text: "🗑 מחיקת הזמנה", callback_data: `no:${orderId}` },
             ],
           ],
         };
@@ -154,11 +164,14 @@ export async function sendTelegramOrderNotification(
       };
     }
 
-    const payload = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+    const payload = (await res.json().catch(() => null)) as {
+      ok?: boolean;
+      result?: { message_id?: number };
+    } | null;
     if (!payload || payload.ok !== true) {
       return { sent: false, error: "telegram_rejected" };
     }
-    return { sent: true };
+    return { sent: true, messageId: payload.result?.message_id };
   } catch (err) {
     const message = err instanceof Error ? err.message : "telegram_failed";
     return { sent: false, error: message.slice(0, 200) };

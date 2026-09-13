@@ -11,8 +11,8 @@ The editor is a Vite SPA (`index.html` + `src/`). Category landing pages are a N
 - Optional cover letter in the export pack
 - High-res / selectable PDF (html2canvas, jsPDF, html2pdf.js)
 - Checkout packs (basic ~₪9.90, complete ~₪19.90) with access codes
-- WhatsApp / email delivery of the PDF after payment
-- Telegram order alerts + admin control bot (`/code`, `/status`, `/revoke`)
+- Paid unlock codes; Resend confirmation email after Telegram admin Confirm (package-specific)
+- Telegram order alerts with Confirm / Delete + admin bot (`/code`, `/status`, `/revoke`)
 
 ## Stack
 

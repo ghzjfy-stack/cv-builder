@@ -62,9 +62,16 @@ declare global {
       restore: () => boolean;
       clear: () => void;
     };
-    html2pdf?: unknown;
-    html2canvas?: (el: HTMLElement, opt?: Record<string, unknown>) => Promise<HTMLCanvasElement>;
+    html2pdf?: {
+      (): { set: (opt: Record<string, unknown>) => unknown };
+    };
     jspdf?: { jsPDF: new (opt: Record<string, unknown>) => unknown };
     jsPDF?: new (opt: Record<string, unknown>) => unknown;
+    QCPageFit?: {
+      update: () => void;
+      updateSoon: () => void;
+      bind: () => void;
+      pageCount: () => number;
+    };
   }
 }

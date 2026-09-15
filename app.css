@@ -3194,8 +3194,11 @@
         #cv-preview-page-2 {
             background: #ffffff;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-            /* Reinforce A4 clip after other rules */
+            width: 100%;
+            max-width: 100%;
+            margin-inline: auto;
             overflow: hidden !important;
+            overflow-x: hidden !important;
         }
         #cv-preview-wrapper.cv-over-one-page,
         #cv-preview-wrapper.cv-fit-scaled {

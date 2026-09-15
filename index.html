@@ -2249,6 +2249,7 @@
             });
             if (btn) btn.setAttribute('aria-pressed', 'true');
             markStep(2);
+            window.QCPageFit?.updateSoon?.();
             if (window.QCDraft) QCDraft.saveSoon();
         }
 

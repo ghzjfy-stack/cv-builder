@@ -9,8 +9,8 @@ export const CHECKOUT = {
   bitPhoneCopy: "0543554888",
   bitPhoneIntl: "972543554888",
   bitAppUrl: "https://www.bitpay.co.il/app/",
-  payboxPayUrl: "https://www.paybox.co.il/",
-  payboxCardUrl: "https://www.paybox.co.il/",
+  payboxPayUrl: "https://www.payboxapp.com/",
+  payboxCardUrl: "https://www.payboxapp.com/",
   whatsappMessage: 'היי, שילמתי 10 ש"ח ב-Bit עבור קורות החיים.',
   packageName: "הורדת קובץ PDF מוכן להגשה",
 } as const;
@@ -48,18 +48,6 @@ export function bitAmountValue(total = CHECKOUT.amountIls): string {
   return Number(total).toFixed(2);
 }
 
-/** Mobile deep link — Bit app. */
-export function bitDeepLink(total = CHECKOUT.amountIls): string {
-  const amount = Math.round(Number(total) || CHECKOUT.amountIls);
-  return `bitapp://send?phone=${encodeURIComponent(CHECKOUT.bitPhoneCopy)}&amount=${amount}`;
-}
-
-/** Mobile deep link — PayBox app. */
-export function payboxDeepLink(total = CHECKOUT.amountIls): string {
-  const amount = Math.round(Number(total) || CHECKOUT.amountIls);
-  return `paybox://send?phone=${encodeURIComponent(CHECKOUT.bitPhoneCopy)}&amount=${amount}`;
-}
-
 /** Path Bit's web/app bridge expects when opening a P2P send. */
 export function bitSendPath(total = CHECKOUT.amountIls): string {
   const phone = CHECKOUT.bitPhoneCopy;
@@ -73,8 +61,33 @@ export function bitSendPath(total = CHECKOUT.amountIls): string {
   return `www.bitpay.co.il/app/?${query}`;
 }
 
+/** Safari-safe Bit https request / web bridge URL (never a custom scheme). */
 export function bitWebPayUrl(total = CHECKOUT.amountIls): string {
   return `https://${bitSendPath(total)}`;
+}
+
+/** Safari-safe PayBox https URL with phone + amount hints. */
+export function payboxWebPayUrl(total = CHECKOUT.amountIls): string {
+  const phone = CHECKOUT.bitPhoneCopy;
+  const amount = bitAmountValue(total);
+  const base = String(CHECKOUT.payboxPayUrl || "https://www.payboxapp.com/").replace(/\/?$/, "/");
+  const query = [
+    `phone=${encodeURIComponent(phone)}`,
+    `phoneNumber=${encodeURIComponent(phone)}`,
+    `sum=${encodeURIComponent(amount)}`,
+    `amount=${encodeURIComponent(amount)}`,
+  ].join("&");
+  return `${base}?${query}`;
+}
+
+/** @deprecated Alias — always https Bit web URL (Safari rejects bitapp://). */
+export function bitDeepLink(total = CHECKOUT.amountIls): string {
+  return bitWebPayUrl(total);
+}
+
+/** @deprecated Alias — always https PayBox URL (Safari rejects paybox://). */
+export function payboxDeepLink(total = CHECKOUT.amountIls): string {
+  return payboxWebPayUrl(total);
 }
 
 export function bitQrPayload(total = CHECKOUT.amountIls): string {
@@ -86,21 +99,14 @@ export function bitPayUrl(total = CHECKOUT.amountIls): string {
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${data}&ecc=M`;
 }
 
-/** Prefer native deep link on phones; fall back to https Bit page. */
+/** Always open Bit via https (web/app bridge). */
 export function bitAppOpenUrl(total = CHECKOUT.amountIls): string {
-  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  if (/iPhone|iPad|iPod|Android/i.test(ua)) {
-    return bitDeepLink(total);
-  }
   return bitWebPayUrl(total);
 }
 
+/** Always open PayBox via fully-qualified https URL. */
 export function payboxAppOpenUrl(total = CHECKOUT.amountIls): string {
-  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  if (/iPhone|iPad|iPod|Android/i.test(ua)) {
-    return payboxDeepLink(total);
-  }
-  return CHECKOUT.payboxPayUrl;
+  return payboxWebPayUrl(total);
 }
 
 export function whatsappPaymentMessage(total = CHECKOUT.amountIls): string {

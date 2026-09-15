@@ -297,6 +297,15 @@ html.qc-paid .unpaid-only { display: none !important; }
         background: linear-gradient(180deg, transparent 55%, rgba(11, 18, 32, 0.9) 100%);
         pointer-events: auto;
     }
+    /* Studio carousel: keep CTA in flow so titles stay readable */
+    #templates-panel .template-card-hover {
+        background: none;
+    }
+}
+@media (max-width: 1023px) {
+    #templates-panel .template-use-btn {
+        letter-spacing: 0;
+    }
 }
 @media (max-width: 640px) {
     .tpl-ats-banner-text {

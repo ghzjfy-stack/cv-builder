@@ -21,23 +21,120 @@ export function normalizeOrderId(value) {
   return raw;
 }
 
-function signOrderSnapshot(order) {
-  const payload = Buffer.from(
-    JSON.stringify({
-      order_id: order.order_id,
-      phone: order.phone || "",
-      email: order.email || "",
-      customer_name: order.customer_name || "",
-      payment_method: order.payment_method || "bit",
-      amount_ils: order.amount_ils || 10,
-      pack: order.pack || "basic",
-    }),
-  ).toString("base64url");
-  const sig = createHmac("sha256", getSigningSecret()).update(payload).digest("base64url").slice(0, 24);
-  return `${payload}.${sig}`;
+/** Telegram inline button callback_data hard limit. */
+const CALLBACK_DATA_MAX_BYTES = 64;
+
+function snapshotRecord(data) {
+  const orderId = normalizeOrderId(data.order_id);
+  if (!orderId) return null;
+  return {
+    order_id: orderId,
+    phone: String(data.phone || "").slice(0, 40),
+    email: String(data.email || "").slice(0, 120),
+    customer_name: String(data.customer_name || "").slice(0, 120),
+    payment_method: String(data.payment_method || "bit").toLowerCase() || "bit",
+    amount_ils: Number(data.amount_ils) > 0 ? Number(data.amount_ils) : 10,
+    pack: "basic",
+    status: "PENDING",
+    unlock_token: null,
+    telegram_message_id: null,
+    storage: orderStorageMode(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    paid_at: null,
+    from_snapshot: true,
+  };
 }
 
-export function parseOrderSnapshot(raw) {
+/**
+ * Compact signed recovery token for callback_data (fits within Telegram's 64-byte limit).
+ * Variants (pipe-separated, trailing HMAC): id|phone|email|name|amount|method|sig
+ */
+function signCompactOrderSnapshot(order) {
+  const id = normalizeOrderId(order.order_id);
+  if (!id) return "";
+  const phone = String(order.phone || "").replace(/[|\n\r]/g, "").slice(0, 20);
+  const email = String(order.email || "").replace(/[|\n\r]/g, "").slice(0, 40);
+  const name = String(order.customer_name || "").replace(/[|\n\r]/g, "").slice(0, 30);
+  const amount = Number(order.amount_ils) > 0 ? Number(order.amount_ils) : 10;
+  const method = String(order.payment_method || "bit").toLowerCase() === "paybox" ? "p" : "b";
+  const contact = phone || email;
+  const attempts = [
+    `${id}|${phone}|${email}|${name}|${amount}|${method}`,
+    `${id}|${contact}|${name}|${amount}|${method}`,
+    `${id}|${contact}|${amount}|${method}`,
+    `${id}|${amount}|${method}`,
+  ];
+  for (const payload of attempts) {
+    const sig = createHmac("sha256", getSigningSecret())
+      .update(`qccompact:${payload}`)
+      .digest("base64url")
+      .slice(0, 8);
+    const token = `${payload}|${sig}`;
+    if (Buffer.byteLength(`pay:${token}`, "utf8") <= CALLBACK_DATA_MAX_BYTES) {
+      return token;
+    }
+  }
+  return id;
+}
+
+function parseCompactOrderSnapshot(token) {
+  const parts = String(token || "").split("|");
+  if (parts.length < 4) return null;
+  const sig = parts[parts.length - 1];
+  const payload = parts.slice(0, -1).join("|");
+  const expected = createHmac("sha256", getSigningSecret())
+    .update(`qccompact:${payload}`)
+    .digest("base64url")
+    .slice(0, 8);
+  if (sig !== expected) return null;
+
+  const orderId = normalizeOrderId(parts[0]);
+  if (!orderId) return null;
+
+  let phone = "";
+  let email = "";
+  let customer_name = "";
+  let amount_ils = 10;
+  let payment_method = "bit";
+
+  if (parts.length === 7) {
+    phone = parts[1];
+    email = parts[2];
+    customer_name = parts[3];
+    amount_ils = Number(parts[4]) || 10;
+    payment_method = parts[5] === "p" ? "paybox" : "bit";
+  } else if (parts.length === 6) {
+    const contact = parts[1];
+    if (contact.includes("@")) email = contact;
+    else phone = contact;
+    customer_name = parts[2];
+    amount_ils = Number(parts[3]) || 10;
+    payment_method = parts[4] === "p" ? "paybox" : "bit";
+  } else if (parts.length === 5) {
+    const contact = parts[1];
+    if (contact.includes("@")) email = contact;
+    else phone = contact;
+    amount_ils = Number(parts[2]) || 10;
+    payment_method = parts[3] === "p" ? "paybox" : "bit";
+  } else if (parts.length === 4) {
+    amount_ils = Number(parts[1]) || 10;
+    payment_method = parts[2] === "p" ? "paybox" : "bit";
+  } else {
+    return null;
+  }
+
+  return snapshotRecord({
+    order_id: orderId,
+    phone,
+    email,
+    customer_name,
+    payment_method,
+    amount_ils,
+  });
+}
+
+function parseLegacyQcordSnapshot(raw) {
   const text = String(raw || "").trim();
   const match = text.match(/QCORD\.([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/);
   const token = match ? match[1] : text.includes(".") ? text : "";
@@ -48,28 +145,48 @@ export function parseOrderSnapshot(raw) {
   if (sig !== expected) return null;
   try {
     const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    const orderId = normalizeOrderId(data.order_id);
-    if (!orderId) return null;
-    return {
-      order_id: orderId,
-      phone: String(data.phone || "").slice(0, 40),
-      email: String(data.email || "").slice(0, 120),
-      customer_name: String(data.customer_name || "").slice(0, 120),
-      payment_method: String(data.payment_method || "bit").toLowerCase() || "bit",
-      amount_ils: Number(data.amount_ils) > 0 ? Number(data.amount_ils) : 10,
-      pack: "basic",
-      status: "PENDING",
-      unlock_token: null,
-      telegram_message_id: null,
-      storage: orderStorageMode(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      paid_at: null,
-      from_snapshot: true,
-    };
+    return snapshotRecord(data);
   } catch {
     return null;
   }
+}
+
+export function parseOrderSnapshot(raw) {
+  const text = String(raw || "").trim();
+  if (!text) return null;
+
+  const legacy = parseLegacyQcordSnapshot(text);
+  if (legacy) return legacy;
+
+  // Compact callback token: "pay:CV-…|…|sig" or bare "CV-…|…|sig"
+  for (const line of text.split(/\n+/)) {
+    const trimmed = line.trim();
+    const token = trimmed.startsWith("pay:") ? trimmed.slice(4) : trimmed;
+    if (!token.includes("|")) continue;
+    const compact = parseCompactOrderSnapshot(token);
+    if (compact) return compact;
+  }
+  return null;
+}
+
+/** Build Approve callback_data; embeds a compact recovery snapshot when it fits. */
+export function buildPayCallbackData(order) {
+  const orderId = normalizeOrderId(order?.order_id);
+  if (!orderId) return "pay:";
+  const compact = signCompactOrderSnapshot(order);
+  const withCompact = `pay:${compact || orderId}`;
+  if (Buffer.byteLength(withCompact, "utf8") <= CALLBACK_DATA_MAX_BYTES) {
+    return withCompact;
+  }
+  return `pay:${orderId}`;
+}
+
+/** Extract CV-XXXX from pay: callback_data (plain id or compact snapshot). */
+export function orderIdFromPayCallback(callbackData) {
+  const raw = String(callbackData || "").trim();
+  const token = raw.startsWith("pay:") ? raw.slice(4) : raw;
+  const head = token.split("|")[0] || "";
+  return normalizeOrderId(head);
 }
 
 async function writeOrderVerified(orderId, record) {
@@ -186,21 +303,13 @@ function telegramConfig() {
 
 export function formatManualOrderTelegramMessage(order) {
   const amount = formatAmountIls(order.amount_ils || 10);
-  const method = String(order.payment_method || "bit").toLowerCase() === "paybox" ? "PayBox" : "Bit";
   const phone = String(order.phone || "").trim() || "—";
-  const snap = signOrderSnapshot(order);
+  const name = String(order.customer_name || "").trim() || "—";
   return (
-    `🧾 *New checkout order* \`${escapeTelegramMarkdown(order.order_id)}\`\n\n` +
-    `*Name:* ${escapeTelegramMarkdown(order.customer_name || "—")}\n` +
-    `*Phone (Bit/PayBox ID):* \`${escapeTelegramMarkdown(phone)}\`\n` +
-    `*Amount:* ${escapeTelegramMarkdown(amount)} ILS\n` +
-    `*Pack:* PDF Download\n` +
-    `*Method:* ${escapeTelegramMarkdown(method)}\n` +
-    `*Status:* PENDING\n\n` +
-    `_Match this phone in Bit/PayBox, then Approve._\n` +
-    "`QCORD." +
-    snap +
-    "`"
+    `*Order:* \`${escapeTelegramMarkdown(order.order_id)}\`\n` +
+    `*Customer:* ${escapeTelegramMarkdown(name)}\n` +
+    `*Phone:* \`${escapeTelegramMarkdown(phone)}\`\n` +
+    `*Amount:* ${escapeTelegramMarkdown(amount)} ILS`
   );
 }
 
@@ -227,8 +336,8 @@ export async function sendManualOrderTelegram(order) {
           inline_keyboard: [
             [
               {
-                text: "🟢 Approve Payment & Release Download",
-                callback_data: `pay:${order.order_id}`,
+                text: "Approve",
+                callback_data: buildPayCallbackData(order),
               },
             ],
           ],

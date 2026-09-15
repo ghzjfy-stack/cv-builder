@@ -40,7 +40,7 @@ export default function TemplatesIndexPage() {
             <p className="seo-kicker">ספריית תבניות</p>
             <h1 className="seo-h1">קורות חיים לפי תפקיד</h1>
             <p className="seo-lead">
-              כל עמוד טוען תקציר, ניסיון וכישורים לתחום — ואז פותח את הסטודיו עם אותם נתונים לעריכה.
+              בחרו את התחום שלכם לקבלת תבנית מותאמת אישית עם ניסוחים מקצועיים מוכנים לשימוש.
             </p>
           </div>
         </section>

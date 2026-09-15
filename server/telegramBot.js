@@ -3,7 +3,7 @@ import { json, parseBody, readBody } from "./http.js";
 import { kvGet, kvSet } from "./kv.js";
 import { sendPurchaseConfirmationEmail } from "./notify.js";
 import { getPendingOrder, updatePendingOrder } from "./pendingOrders.js";
-import { approveManualOrder } from "./manualOrders.js";
+import { approveManualOrder, orderIdFromPayCallback } from "./manualOrders.js";
 import {
   escapeTelegramMarkdown,
   formatAmountIls,
@@ -471,7 +471,10 @@ export async function handleTelegramWebhookRequest(req, res) {
           callback_query_id: cq.id,
           text: "Approving payment...",
         });
-        await handleApprovePayment(chatId, data.slice(4), messageId, cq.message?.text || "");
+        const orderId = orderIdFromPayCallback(data);
+        // Prefer callback_data snapshot; keep message text for legacy QCORD bodies.
+        const snapshotSource = [data, cq.message?.text || ""].filter(Boolean).join("\n");
+        await handleApprovePayment(chatId, orderId, messageId, snapshotSource);
         return;
       }
       if (data.startsWith("ok:")) {

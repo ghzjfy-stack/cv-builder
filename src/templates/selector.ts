@@ -66,15 +66,15 @@ function cardHtml(tpl: CvTemplate): string {
   </article>`;
 }
 
-function updateCountCopy(n: number): void {
+function updateCountCopy(_n: number): void {
   const L = lang();
   const he = {
-    home: `${n} תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.`,
-    studio: `${n} עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת`,
+    home: "תבניות מעוצבות ומותאמות לסינון ATS. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.",
+    studio: "בחרו עיצוב לקורות החיים",
   };
   const en = {
-    home: `${n} ready-made Canva-style templates. Pick a design, fill in your details, and the preview updates live.`,
-    studio: `${n} Canva-style designs — selecting one fills the preview live`,
+    home: "Designed templates optimized for ATS screening. Pick a design, fill in your details, and the preview updates live.",
+    studio: "Choose a design for your CV",
   };
   const pack = L === "en" ? en : he;
   document.querySelectorAll("[data-template-count-copy]").forEach((el) => {

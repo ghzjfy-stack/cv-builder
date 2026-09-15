@@ -6,14 +6,12 @@ import {
   REF_CODE_KEY,
   REF_FROM_KEY,
   bitAppOpenUrl,
-  bitDeepLink,
   displayAmountValue,
   displayCompareValue,
   isLikelyIsraeliMobile,
   isPackId,
   packAmount,
   payboxAppOpenUrl,
-  payboxDeepLink,
   whatsappPdfShareUrl,
   whatsappReferralUrl,
   type PackId,
@@ -372,10 +370,44 @@ function prefersSameTabCheckout() {
   return /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
 }
 
+const PAY_FALLBACK_TOAST = "המספר הועתק! שנה לאפליקציית התשלום";
+let payToastTimer = 0;
+
+function showPayFallbackToast(message = PAY_FALLBACK_TOAST) {
+  let el = document.getElementById("qc-pay-toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "qc-pay-toast";
+    el.className = "qc-pay-toast";
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    document.body.appendChild(el);
+  }
+  el.textContent = message;
+  el.classList.add("is-visible");
+  window.clearTimeout(payToastTimer);
+  payToastTimer = window.setTimeout(() => {
+    el?.classList.remove("is-visible");
+  }, 3200);
+}
+
+function copyPayPhoneFallback() {
+  const phone = CHECKOUT.bitPhoneCopy;
+  const done = () => {
+    flashCopyButton();
+    showPayFallbackToast();
+  };
+  if (navigator.clipboard?.writeText) {
+    void navigator.clipboard.writeText(phone).then(done, done);
+    return;
+  }
+  done();
+}
+
 function openDeepLink(url) {
   if (!url) return;
-  // Deep links (bitapp:// / paybox://) must use location — window.open is unreliable.
-  if (/^(bitapp|paybox):/i.test(url) || prefersSameTabCheckout()) {
+  // https only — same-tab on mobile so Bit/PayBox can hand off from the web bridge.
+  if (prefersSameTabCheckout()) {
     window.location.href = url;
     return;
   }
@@ -414,15 +446,22 @@ function bindDeepLinkAnchor(id, url) {
   const el = document.getElementById(id);
   if (!(el instanceof HTMLAnchorElement) || !url) return;
   el.href = url;
+  el.rel = "noopener";
+  if (prefersSameTabCheckout()) {
+    el.removeAttribute("target");
+  } else {
+    el.target = "_blank";
+  }
 }
 
 function openBitApp(e) {
   e?.preventDefault?.();
+  // Copy while the user gesture is fresh (before await); toast guides manual paste fallback.
+  copyPayPhoneFallback();
   void (async () => {
     const orderId = await ensureManualOrderForCheckout("bit");
     if (!orderId) return;
-    const amount = CHECKOUT.amountIls;
-    const url = prefersSameTabCheckout() ? bitDeepLink(amount) : bitAppOpenUrl(amount);
+    const url = bitAppOpenUrl(CHECKOUT.amountIls);
     bindDeepLinkAnchor("btn-open-bit", url);
     openDeepLink(url);
   })();
@@ -430,11 +469,11 @@ function openBitApp(e) {
 
 function openPayboxApp(e) {
   e?.preventDefault?.();
+  copyPayPhoneFallback();
   void (async () => {
     const orderId = await ensureManualOrderForCheckout("paybox");
     if (!orderId) return;
-    const amount = CHECKOUT.amountIls;
-    const url = prefersSameTabCheckout() ? payboxDeepLink(amount) : payboxAppOpenUrl(amount);
+    const url = payboxAppOpenUrl(CHECKOUT.amountIls);
     bindDeepLinkAnchor("btn-open-paybox", url);
     openDeepLink(url);
   })();
@@ -703,11 +742,8 @@ function applyPackUi() {
   document.querySelectorAll("[data-pay-amount]").forEach((el) => {
     el.textContent = display;
   });
-  bindDeepLinkAnchor("btn-open-bit", prefersSameTabCheckout() ? bitDeepLink(amount) : bitAppOpenUrl(amount));
-  bindDeepLinkAnchor(
-    "btn-open-paybox",
-    prefersSameTabCheckout() ? payboxDeepLink(amount) : payboxAppOpenUrl(amount),
-  );
+  bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(amount));
+  bindDeepLinkAnchor("btn-open-paybox", payboxAppOpenUrl(amount));
   const saveEl = document.getElementById("pay-save-badge");
   if (saveEl) saveEl.textContent = "מחיר השקה — 10 ₪ בלבד";
   const nameEl = document.getElementById("mvp-pack-name");

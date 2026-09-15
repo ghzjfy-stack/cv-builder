@@ -62,6 +62,7 @@ declare global {
       restore: () => boolean;
       clear: () => void;
     };
+    html2canvas?: (el: HTMLElement, opt?: Record<string, unknown>) => Promise<HTMLCanvasElement>;
     html2pdf?: {
       (): { set: (opt: Record<string, unknown>) => unknown };
     };

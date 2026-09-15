@@ -3,7 +3,8 @@ import { json, parseBody, readBody } from "./http.js";
 import { kvGet, kvSet } from "./kv.js";
 import { sendPurchaseConfirmationEmail } from "./notify.js";
 import { getPendingOrder, updatePendingOrder } from "./pendingOrders.js";
-import { approveManualOrder, orderIdFromPayCallback } from "./manualOrders.js";
+import { approveManualOrder, orderIdFromPayCallback, rejectManualOrder } from "./manualOrders.js";
+import { isSupabaseConfigured } from "./supabaseOrders.js";
 import {
   escapeTelegramMarkdown,
   formatAmountIls,
@@ -109,8 +110,8 @@ function helpText() {
     "`/code 0501234567` — קוד מקושר לטלפון\n" +
     "`/lookup ABC123` — בדיקת קוד\n" +
     "`/revoke ABC123` — ביטול קוד\n\n" +
-    "הזמנות חדשות מגיעות לכאן עם כפתור *Approve Payment*.\n" +
-    "אישור משחרר הורדה ללקוח (polling) ושולח מייל Resend אם יש אימייל."
+    "הזמנות חדשות מגיעות לכאן עם כפתורי *Yes / No*.\n" +
+    "אישור משחרר הורדה ללקוח (Supabase confirm) ושולח מייל Resend אם יש אימייל."
   );
 }
 
@@ -122,11 +123,13 @@ async function statusText() {
   const hasWebhook = Boolean(envValue("PAYMENT_WEBHOOK_SECRET") || envValue("PAYBOX_WEBHOOK_SECRET"));
   const hasResend = Boolean(envValue("RESEND_API_KEY"));
   const hasOpenAi = Boolean(envValue("OPENAI_API_KEY"));
+  const hasSupabase = isSupabaseConfigured();
   const amount = formatAmountIls(process.env.PAYMENT_AMOUNT_ILS || 10);
   return (
     "*סטטוס QuickCV*\n\n" +
     `*טוקן בוט:* ${hasToken ? "תקין" : "חסר"}\n` +
     `*צ׳אט מנהל:* ${hasChat ? "תקין" : "חסר"}\n` +
+    `*Supabase:* ${hasSupabase ? "מחובר" : "חסר"}\n` +
     `*אחסון הזמנות:* ${hasKv ? "KV מחובר" : "זיכרון מקומי (ללא KV)"}\n` +
     `*Resend:* ${hasResend ? "תקין" : "חסר"}\n` +
     `*סוד תשלום:* ${hasPaySecret ? "תקין" : "חסר"}\n` +
@@ -285,7 +288,43 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
     optionalLine("Name", order.customer_name) +
     optionalLine("Phone", order.phone || order.email) +
     `*Amount:* ${escapeTelegramMarkdown(formatAmountIls(order.amount_ils))} ILS\n` +
+    `*Supabase confirm:* yes\n` +
     (result.already ? `_Already approved earlier._` : `_Client polling will unlock download now._`);
+
+  await editTelegramMessage(chatId, messageId, text);
+}
+
+async function handleRejectPayment(chatId, orderId, messageId, messageText) {
+  let result;
+  try {
+    result = await rejectManualOrder(orderId, { messageText: messageText || "" });
+  } catch (err) {
+    await sendTelegramText(
+      chatId,
+      `Could not reject \`${escapeTelegramMarkdown(orderId)}\`. Please try again.`,
+    );
+    return;
+  }
+  if (!result.ok) {
+    await sendTelegramText(
+      chatId,
+      result.reason === "already_paid"
+        ? `Order \`${escapeTelegramMarkdown(orderId)}\` was already approved — download stays open.`
+        : result.reason === "not_found"
+          ? `Order \`${escapeTelegramMarkdown(orderId)}\` not found.`
+          : `Could not reject \`${escapeTelegramMarkdown(orderId)}\` (${result.reason || "error"}).`,
+    );
+    return;
+  }
+
+  const order = result.order;
+  const text =
+    `❌ Payment Rejected — Download Blocked\n\n` +
+    `*Order:* \`${escapeTelegramMarkdown(order.order_id)}\`\n` +
+    optionalLine("Name", order.customer_name) +
+    optionalLine("Phone", order.phone || order.email) +
+    `*Supabase confirm:* no\n` +
+    (result.already ? `_Already rejected earlier._` : `_Customer will not get PDF access._`);
 
   await editTelegramMessage(chatId, messageId, text);
 }
@@ -475,6 +514,16 @@ export async function handleTelegramWebhookRequest(req, res) {
         // Prefer callback_data snapshot; keep message text for legacy QCORD bodies.
         const snapshotSource = [data, cq.message?.text || ""].filter(Boolean).join("\n");
         await handleApprovePayment(chatId, orderId, messageId, snapshotSource);
+        return;
+      }
+      if (data.startsWith("deny:")) {
+        await telegramApi("answerCallbackQuery", {
+          callback_query_id: cq.id,
+          text: "Rejecting payment...",
+        });
+        const orderId = orderIdFromPayCallback(data.replace(/^deny:/, "pay:"));
+        const snapshotSource = [data, cq.message?.text || ""].filter(Boolean).join("\n");
+        await handleRejectPayment(chatId, orderId, messageId, snapshotSource);
         return;
       }
       if (data.startsWith("ok:")) {

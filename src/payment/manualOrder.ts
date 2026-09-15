@@ -13,6 +13,7 @@ export type ManualOrderStatusResponse = {
   order_id?: string;
   status?: string;
   paid?: boolean;
+  confirm?: string;
   token?: string;
   error?: string;
 };
@@ -93,7 +94,15 @@ export async function waitForManualOrderPaid(
     if (status.paid === true && status.token) return status;
     // Soft-wait on missing/pending — never break the UX for storage lag.
     if (status.status === "CANCELLED") {
-      return { ok: false, paid: false, error: "ההזמנה בוטלה." };
+      return { ok: false, paid: false, status: "CANCELLED", error: "ההזמנה בוטלה." };
+    }
+    if (status.status === "EXPIRED") {
+      return {
+        ok: false,
+        paid: false,
+        status: "EXPIRED",
+        error: "פג תוקף הגישה. יש לבצע הזמנה חדשה.",
+      };
     }
     await new Promise((resolve) => {
       const timer = window.setTimeout(resolve, intervalMs);

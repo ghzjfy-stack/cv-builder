@@ -1,5 +1,11 @@
 import { createHmac, randomInt } from "node:crypto";
 import { orderGet, orderSet, orderSetNx, orderStorageMode } from "./orderStore.js";
+import {
+  addDaysIso,
+  getSupabaseOrder,
+  setSupabaseConfirm,
+  upsertSupabaseOrder,
+} from "./supabaseOrders.js";
 import { getSigningSecret, signUnlockToken } from "./unlockToken.js";
 import { escapeTelegramMarkdown, formatAmountIls } from "../lib/telegram.js";
 
@@ -36,12 +42,14 @@ function snapshotRecord(data) {
     amount_ils: Number(data.amount_ils) > 0 ? Number(data.amount_ils) : 10,
     pack: "basic",
     status: "PENDING",
+    confirm: "no",
     unlock_token: null,
     telegram_message_id: null,
     storage: orderStorageMode(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     paid_at: null,
+    exp_date: addDaysIso(new Date(), 30),
     from_snapshot: true,
   };
 }
@@ -223,9 +231,11 @@ export async function createManualOrder(input) {
     else phone = contact;
   }
   const amount = Number(input.amountIls);
+  const createdAt = new Date().toISOString();
   const record = {
     order_id: orderId,
     status: "PENDING",
+    confirm: "no",
     customer_name: String(input.customerName || "").trim().slice(0, 120),
     phone: phone.slice(0, 40),
     email: email.slice(0, 120),
@@ -235,11 +245,16 @@ export async function createManualOrder(input) {
     unlock_token: null,
     telegram_message_id: null,
     storage: orderStorageMode(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: createdAt,
+    updated_at: createdAt,
     paid_at: null,
+    exp_date: addDaysIso(createdAt, 30),
   };
-  return writeOrderVerified(orderId, record);
+  const stored = await writeOrderVerified(orderId, record);
+  await upsertSupabaseOrder(stored, { confirm: "no", status: "pending" }).catch((err) => {
+    console.error("[quickcv] supabase insert failed:", err?.message || err);
+  });
+  return stored;
 }
 
 export async function getManualOrder(orderId) {
@@ -273,24 +288,109 @@ export async function approveManualOrder(orderId, options = {}) {
       current = await writeOrderVerified(snap.order_id, snap);
     }
   }
+  if (!current) {
+    const sb = await getSupabaseOrder(orderId);
+    if (sb?.order_id) {
+      current = await writeOrderVerified(sb.order_id, {
+        order_id: sb.order_id,
+        status: "PENDING",
+        confirm: sb.confirm || "no",
+        customer_name: sb.name,
+        phone: sb.phone,
+        email: "",
+        payment_method: "bit",
+        amount_ils: Number(process.env.PAYMENT_AMOUNT_ILS || 10),
+        pack: "basic",
+        unlock_token: null,
+        telegram_message_id: null,
+        storage: orderStorageMode(),
+        created_at: sb.order_date || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        paid_at: null,
+        exp_date: sb.exp_date || addDaysIso(sb.order_date, 30),
+      });
+    }
+  }
   if (!current) return { ok: false, reason: "not_found" };
   if (current.status === "PAID" && current.unlock_token) {
+    await setSupabaseConfirm(current, "yes").catch(() => {});
     return { ok: true, already: true, order: current };
   }
   if (current.status === "CANCELLED") {
     return { ok: false, reason: "cancelled", order: current };
   }
   const token = signUnlockToken();
+  const paidAt = new Date().toISOString();
   const order = await writeOrderVerified(current.order_id, {
     ...current,
     status: "PAID",
+    confirm: "yes",
     unlock_token: token,
-    paid_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    paid_at: paidAt,
+    updated_at: paidAt,
+    exp_date: current.exp_date || addDaysIso(current.created_at || paidAt, 30),
   });
   if (!order || order.status !== "PAID" || !order.unlock_token) {
     return { ok: false, reason: "persist_failed" };
   }
+  await setSupabaseConfirm(order, "yes").catch((err) => {
+    console.error("[quickcv] supabase confirm=yes failed:", err?.message || err);
+  });
+  return { ok: true, already: false, order };
+}
+
+/**
+ * Telegram No — confirm=no, block PDF download.
+ */
+export async function rejectManualOrder(orderId, options = {}) {
+  let current = await getManualOrder(orderId);
+  if (!current && options.messageText) {
+    const snap = parseOrderSnapshot(options.messageText);
+    if (snap && snap.order_id === normalizeOrderId(orderId)) {
+      current = await writeOrderVerified(snap.order_id, snap);
+    }
+  }
+  if (!current) {
+    const sb = await getSupabaseOrder(orderId);
+    if (sb?.order_id) {
+      current = await writeOrderVerified(sb.order_id, {
+        order_id: sb.order_id,
+        status: "PENDING",
+        confirm: "no",
+        customer_name: sb.name,
+        phone: sb.phone,
+        email: "",
+        payment_method: "bit",
+        amount_ils: Number(process.env.PAYMENT_AMOUNT_ILS || 10),
+        pack: "basic",
+        unlock_token: null,
+        telegram_message_id: null,
+        storage: orderStorageMode(),
+        created_at: sb.order_date || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        paid_at: null,
+        exp_date: sb.exp_date || addDaysIso(sb.order_date, 30),
+      });
+    }
+  }
+  if (!current) return { ok: false, reason: "not_found" };
+  if (current.status === "PAID" && current.unlock_token) {
+    return { ok: false, reason: "already_paid", order: current };
+  }
+  if (current.status === "CANCELLED") {
+    await setSupabaseConfirm(current, "no").catch(() => {});
+    return { ok: true, already: true, order: current };
+  }
+  const order = await writeOrderVerified(current.order_id, {
+    ...current,
+    status: "CANCELLED",
+    confirm: "no",
+    unlock_token: null,
+    updated_at: new Date().toISOString(),
+  });
+  await setSupabaseConfirm(order, "no").catch((err) => {
+    console.error("[quickcv] supabase confirm=no failed:", err?.message || err);
+  });
   return { ok: true, already: false, order };
 }
 
@@ -309,7 +409,8 @@ export function formatManualOrderTelegramMessage(order) {
     `*Order:* \`${escapeTelegramMarkdown(order.order_id)}\`\n` +
     `*Customer:* ${escapeTelegramMarkdown(name)}\n` +
     `*Phone:* \`${escapeTelegramMarkdown(phone)}\`\n` +
-    `*Amount:* ${escapeTelegramMarkdown(amount)} ILS`
+    `*Amount:* ${escapeTelegramMarkdown(amount)} ILS\n\n` +
+    `_Yes = confirm yes, release PDF. No = confirm no, block download._`
   );
 }
 
@@ -336,8 +437,12 @@ export async function sendManualOrderTelegram(order) {
           inline_keyboard: [
             [
               {
-                text: "Approve",
+                text: "✅ Yes",
                 callback_data: buildPayCallbackData(order),
+              },
+              {
+                text: "❌ No",
+                callback_data: `deny:${order.order_id}`,
               },
             ],
           ],

@@ -2,11 +2,19 @@ import { clientIp, json, parseBody, rateLimited, readBody } from "./http.js";
 import { orderStorageMode } from "./orderStore.js";
 import { packAmount } from "../src/config/checkout.js";
 import {
+  approveManualOrder,
   createManualOrder,
   getManualOrder,
   normalizeOrderId,
   sendManualOrderTelegram,
 } from "./manualOrders.js";
+import {
+  getSupabaseOrder,
+  isAccessExpired,
+  isDownloadAllowed,
+  isRejectedRow,
+  isSupabaseConfigured,
+} from "./supabaseOrders.js";
 
 const MAX_BYTES = 32 * 1024;
 
@@ -130,18 +138,61 @@ export async function handleOrderStatusRequest(req, res) {
     return;
   }
 
+  let supabaseRow = null;
+  if (isSupabaseConfigured()) {
+    try {
+      supabaseRow = await getSupabaseOrder(orderId);
+    } catch (err) {
+      console.warn("[quickcv] supabase order-status read failed:", err?.message || err);
+    }
+  }
+
+  if (isRejectedRow(supabaseRow) || order?.status === "CANCELLED") {
+    json(res, 200, {
+      ok: true,
+      order_id: orderId,
+      status: "CANCELLED",
+      paid: false,
+      confirm: "no",
+    });
+    return;
+  }
+
+  if (isAccessExpired(supabaseRow)) {
+    json(res, 200, {
+      ok: true,
+      order_id: orderId,
+      status: "EXPIRED",
+      paid: false,
+      confirm: "yes",
+    });
+    return;
+  }
+
+  const confirmedYes = isDownloadAllowed(supabaseRow);
+  if (confirmedYes && order?.status !== "PAID") {
+    try {
+      const approved = await approveManualOrder(orderId);
+      if (approved.ok) order = approved.order;
+    } catch (err) {
+      console.warn("[quickcv] supabase confirm sync failed:", err?.message || err);
+    }
+  }
+
   if (!order) {
     // Keep the spinner waiting instead of failing the UX while approve propagates.
     json(res, 200, { ok: true, order_id: orderId, status: "PENDING", paid: false });
     return;
   }
 
-  const paid = order.status === "PAID";
+  const supabaseBlocks = isRejectedRow(supabaseRow) || isAccessExpired(supabaseRow);
+  const paid = Boolean((confirmedYes || order.status === "PAID") && !supabaseBlocks);
   json(res, 200, {
     ok: true,
     order_id: order.order_id,
-    status: order.status,
+    status: paid ? "PAID" : order.status,
     paid,
+    confirm: paid ? "yes" : supabaseRow?.confirm || order.confirm || "no",
     amount_ils: order.amount_ils,
     pack: order.pack,
     ...(paid && order.unlock_token ? { token: order.unlock_token } : {}),

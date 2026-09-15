@@ -6,6 +6,7 @@ import {
   registerQcTemplates,
   type CvTemplate,
 } from "../data/templates";
+import { badgeHtml, homeThumbHtml, thumbHtml } from "./thumbs";
 
 type Lang = "he" | "en";
 
@@ -49,13 +50,11 @@ function filteredList(): CvTemplate[] {
 }
 
 function cardHtml(tpl: CvTemplate): string {
-  const ats = tpl.atsOptimized
-    ? `<span class="ats-badge ats-badge-on-card" aria-label="${lang() === "en" ? "ATS optimized template" : "תבנית מותאמת ל-ATS"}">ATS</span>`
-    : "";
-  const useLabel = lang() === "en" ? "Use This Template" : "השתמש בתבנית זו";
+  const L = lang();
+  const useLabel = L === "en" ? "Use This Template" : "השתמש בתבנית זו";
   return `<article class="template-card" data-example="${esc(tpl.id)}" data-ats="${tpl.atsOptimized ? "1" : "0"}" aria-pressed="false">
-    ${ats}
-    <div class="template-thumb home-layout-frame ${esc(tpl.thumb)}" aria-hidden="true"><span></span><span></span><span></span></div>
+    ${badgeHtml(tpl, L)}
+    ${thumbHtml(tpl, L)}
     <div class="template-card-meta">
       <span class="template-card-title">${esc(titleOf(tpl))}</span>
       <span class="template-card-sub">${esc(subOf(tpl))}</span>
@@ -117,7 +116,7 @@ export function renderTemplateGalleries(): void {
       .map(
         (tpl) =>
           `<button type="button" class="home-layout" data-example="${esc(tpl.id)}">
-            <span class="home-layout-frame ${esc(tpl.thumb)}"><span></span><span></span><span></span></span>
+            ${homeThumbHtml(tpl, lang())}
             <span>${esc(titleOf(tpl))}${tpl.atsOptimized ? ' <span class="ats-badge ats-badge-home">ATS</span>' : ""}</span>
           </button>`
       )
@@ -257,6 +256,8 @@ export function initTemplateSelector(): void {
 
   const w = window as Window & {
     renderTemplateGalleries?: () => void;
+    __qcTsGalleries?: () => void;
+    qcTemplateCardHtml?: (tpl: CvTemplate) => string;
     loadExample?: (key: string) => void;
     applyCvTemplate?: (key: string) => void;
     QCTemplates?: Record<string, CvTemplate>;
@@ -265,6 +266,8 @@ export function initTemplateSelector(): void {
   w.QCTemplates = TEMPLATES;
   w.QCTemplateOrder = TEMPLATE_ORDER;
   w.renderTemplateGalleries = renderTemplateGalleries;
+  w.__qcTsGalleries = renderTemplateGalleries;
+  w.qcTemplateCardHtml = cardHtml;
   w.applyCvTemplate = applyTemplate;
   w.loadExample = (key: string) => applyTemplate(key);
 

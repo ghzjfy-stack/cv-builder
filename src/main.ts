@@ -279,6 +279,18 @@ async function startManualOrderPolling(orderId, options = {}) {
       setFeedback("התשלום אושר בהצלחה. ההורדה מתחילה.", true);
       return;
     }
+    if (result.status === "CANCELLED") {
+      persistManualOrderId("");
+      setManualOrderUi(orderId, "ההזמנה נדחתה.");
+      setFeedback("ההזמנה לא אושרה. אפשר לפתוח הזמנה חדשה.", false);
+      return;
+    }
+    if (result.status === "EXPIRED") {
+      persistManualOrderId("");
+      setManualOrderUi(orderId, "פג תוקף הגישה.");
+      setFeedback(result.error || "פג תוקף הגישה. יש לבצע הזמנה חדשה.", false);
+      return;
+    }
     if (result.error && result.error !== "cancelled") {
       const soft = /kv|redis|אחסון|database/i.test(String(result.error))
         ? "ממתין לאישור התשלום..."

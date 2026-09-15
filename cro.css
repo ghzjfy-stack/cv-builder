@@ -103,6 +103,61 @@ html.qc-paid .unpaid-only { display: none !important; }
     border: 1px solid #5eead4;
     pointer-events: none;
 }
+.tpl-badge {
+    position: absolute;
+    top: 0.45rem;
+    inset-inline-start: 0.45rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    max-width: calc(100% - 0.9rem);
+    padding: 0.14rem 0.4rem;
+    border-radius: 999px;
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    border: 1px solid transparent;
+}
+.tpl-badge-popular { color: #1c1917; background: #fbbf24; border-color: #f59e0b; }
+.tpl-badge-minimal { color: #0f172a; background: #e2e8f0; border-color: #cbd5e1; }
+.tpl-badge-executive { color: #fafaf9; background: #44403c; border-color: #78716c; }
+.tpl-badge-ats { color: #042f2e; background: #2dd4bf; border-color: #5eead4; }
+.tpl-badge-modern { color: #0c4a6e; background: #e0f2fe; border-color: #7dd3fc; }
+.tpl-badge-creative { color: #7c2d12; background: #ffedd5; border-color: #fdba74; }
+.tpl-badge-photo { color: #f8fafc; background: #475569; border-color: #94a3b8; }
+.tpl-badge-sidebar { color: #1e3a8a; background: #dbeafe; border-color: #93c5fd; }
+.tpl-badge-student { color: #5b21b6; background: #ede9fe; border-color: #c4b5fd; }
+.tpl-badge-healthcare { color: #115e59; background: #ccfbf1; border-color: #5eead4; }
+.tpl-badge-finance { color: #f8fafc; background: #12192b; border-color: #334155; }
+.tpl-badge-tech { color: #0f172a; background: #e2e8f0; border-color: #64748b; }
+.tpl-badge-professional { color: #14532d; background: #dcfce7; border-color: #86efac; }
+.tpl-badge-compact { color: #1e293b; background: #cbd5e1; border-color: #94a3b8; }
+.tpl-badge-colorful { color: #9d174d; background: #fce7f3; border-color: #f9a8d4; }
+.tpl-badge-split { color: #78350f; background: #fef3c7; border-color: #fcd34d; }
+.tpl-badge-academic { color: #fafaf9; background: #3e342c; border-color: #a8a29e; }
+.tpl-badge-entry { color: #134e4a; background: #ccfbf1; border-color: #5eead4; }
+.tpl-badge-sales { color: #1e3a5f; background: #e0e7ff; border-color: #a5b4fc; }
+.tpl-badge-legal { color: #fafaf9; background: #3e342c; border-color: #d6d3d1; }
+.tpl-badge-europe { color: #fff; background: #1e4b8c; border-color: #93c5fd; }
+.tpl-badge-people { color: #6b4a4e; background: #ead9d4; border-color: #d6b8b4; }
+.tpl-badge-consulting { color: #f8fafc; background: #31443b; border-color: #86efac; }
+.tpl-badge-elegant { color: #44403c; background: #f5f0e6; border-color: #d6c7ae; }
+.tpl-badge-timeline { color: #f8fafc; background: #12192b; border-color: #64748b; }
+.tpl-badge-corporate { color: #f8fafc; background: #0f172a; border-color: #64748b; }
+@media (max-width: 1023px) {
+    #templates-panel .tpl-badge {
+        font-size: 0.48rem;
+        padding: 0.1rem 0.3rem;
+        top: 0.3rem;
+        inset-inline-start: 0.3rem;
+        max-width: calc(100% - 0.6rem);
+    }
+}
 .ats-badge-home {
     position: static;
     display: inline-flex;

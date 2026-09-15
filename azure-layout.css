@@ -4,7 +4,8 @@
     background: #fff;
 }
 
-#cv-target.layout-azure {
+#cv-target.layout-azure,
+#cv-target-page2.layout-azure {
     --azure-ink: #1a1a1a;
     --azure-muted: #3f3f3f;
     --azure-line: #d4d8dd;
@@ -25,6 +26,7 @@
     line-height: 1.5;
     overflow: hidden;
 }
+#qc-print-host .cv-print-sheet.layout-azure {
     --azure-ink: #1a1a1a;
     --azure-muted: #3f3f3f;
     --azure-line: #d4d8dd;

@@ -11,8 +11,8 @@ The editor is a Vite SPA (`index.html` + `src/`). Category landing pages are a N
 - Optional cover letter in the export pack
 - High-res / selectable PDF (html2canvas, jsPDF, html2pdf.js)
 - Checkout: single PDF package at a flat ₪10 (Bit / PayBox deep links + manual transfer)
-- Paid unlock via Telegram **Approve Payment** (client polls every 3s) + optional Resend email
-- Telegram order alerts with Approve button + admin bot (`/code`, `/status`, `/revoke`)
+- Paid unlock via Telegram **Yes / No** (writes `confirm` to Supabase; client polls every 3s) + optional Resend email
+- Telegram order alerts with Yes/No buttons + admin bot (`/code`, `/status`, `/revoke`)
 
 ## Stack
 
@@ -70,6 +70,7 @@ See `.env.example`. Groups:
 - **Prices:** `PAYMENT_AMOUNT_ILS=10` (single PDF package)
 - **Codes:** `CODE_TTL_SECONDS` (default 30 days), KV / Redis
 - **Notify / send:** WhatsApp Cloud API, Resend, Telegram
+- **Supabase orders:** `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (run `supabase/schema.sql` once)
 - **Telegram admin:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `TELEGRAM_ADMIN_IDS`, `TELEGRAM_WEBHOOK_SECRET`
 - **Public URL:** `NEXT_PUBLIC_SITE_URL` (canonical / Open Graph)
 

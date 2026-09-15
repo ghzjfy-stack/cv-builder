@@ -53,6 +53,9 @@
             min-height: 0;
             padding-bottom: 0;
             overscroll-behavior: none;
+            background: #0b1220;
+            color: #e8eef7;
+            color-scheme: dark;
         }
         body.on-studio #studio-view:not([hidden]) {
             display: flex;
@@ -91,6 +94,7 @@
             min-width: 0;
             min-height: 0;
             width: 100%;
+            max-width: 100%;
         }
         #studio-form-column {
             flex: 1 1 auto;
@@ -103,10 +107,12 @@
         #preview-column {
             display: none !important;
             flex-direction: column;
+            align-items: stretch;
             background: #020617;
             border: 1px solid rgb(51 65 85);
             border-radius: 1rem;
             padding: 0.65rem 0.75rem 0.85rem;
+            max-width: 100%;
             overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -116,40 +122,82 @@
             flex-shrink: 0;
         }
         #cv-preview-wrapper,
+        #cv-preview-page-2,
         #cl-preview-wrapper {
             position: relative;
-            overflow: hidden;
             isolation: isolate;
             contain: layout paint;
             flex: 0 0 auto;
+            min-width: 0;
             min-height: 0;
+            width: 100%;
+            max-width: 100%;
+            margin-inline: auto;
+            box-sizing: border-box;
             height: auto;
             padding-bottom: 0;
+            overflow-x: hidden;
+            overflow-y: hidden;
             --a4-ratio: 1.414285714; /* 297 / 210 */
             --a4-page-height: calc(100% * 297 / 210);
             --cv-fit-scale: 1;
         }
+        .cv-preview-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.85rem;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin-inline: auto;
+            flex: 0 0 auto;
+        }
         #cv-preview-wrapper {
             container-type: inline-size;
             container-name: cv-preview;
-            /* Strict single A4 sheet — never grow into a blank second page */
+            /* Page 1 is always a single A4 sheet. Page 2 is a separate container. */
             max-height: calc(100cqw * 297 / 210);
             aspect-ratio: 210 / 297;
             height: auto;
             overflow: hidden !important;
+            overflow-x: hidden !important;
+        }
+        #cv-preview-page-2 {
+            container-type: inline-size;
+            aspect-ratio: 210 / 297;
+            max-height: calc(100cqw * 297 / 210);
+            overflow: hidden;
+            overflow-x: hidden;
+        }
+        #cv-preview-page-2[hidden] {
+            display: none !important;
+        }
+        #cv-preview-page-2-clip {
+            height: 100%;
+            overflow: hidden;
+        }
+        #cv-preview-page-2-shift {
+            transform-origin: top center;
         }
         #cv-preview-wrapper:has(.layout-charcoal),
         #cv-preview-wrapper:has(.layout-navy),
-        #cv-preview-wrapper:has(.layout-azure) {
+        #cv-preview-wrapper:has(.layout-azure),
+        #cv-preview-page-2:has(.layout-charcoal),
+        #cv-preview-page-2:has(.layout-navy),
+        #cv-preview-page-2:has(.layout-azure) {
             padding: 0 !important;
         }
         #cv-preview-wrapper #cv-target {
             box-sizing: border-box;
             width: 100%;
+            max-width: 100%;
+            min-width: 0;
             min-height: 0 !important;
             height: auto;
             max-height: none;
             padding-bottom: 0;
+            margin-inline: auto;
             margin-bottom: 0;
             page-break-before: avoid;
             page-break-after: avoid;
@@ -159,15 +207,40 @@
             transform-origin: top center;
             overflow: hidden;
         }
-        /* Keep overflow clipped — do not open a scrollable second page in live preview */
+        #cl-preview-wrapper #cl-target {
+            box-sizing: border-box;
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin-inline: auto;
+        }
+        #cv-preview-wrapper #cv-target .cv-columns,
+        #cv-preview-wrapper #cv-target .cv-sidebar,
+        #cv-preview-wrapper #cv-target .cv-main,
+        #cv-preview-wrapper #cv-target #cv-header {
+            min-width: 0;
+            max-width: 100%;
+        }
+        /* Page 1 stays a clipped A4 sheet; overflow continues on #cv-preview-page-2 when needed */
         #cv-preview-wrapper.cv-over-one-page {
             overflow: hidden !important;
             max-height: calc(100cqw * 297 / 210);
         }
         #cl-preview-wrapper {
+            display: none;
             max-height: calc(100cqw * 297 / 210);
             aspect-ratio: 210 / 297;
             overflow: hidden;
+            overflow-x: hidden;
+            max-width: 100%;
+            margin-inline: auto;
+        }
+        body.qc-doc-letter .cv-preview-stack {
+            display: none;
+        }
+        body.qc-doc-letter #cl-preview-wrapper {
+            display: block;
         }
 
         .home-view {
@@ -726,6 +799,16 @@
             overflow: hidden;
             margin-bottom: 0.55rem;
         }
+        .home-layout-frame.tpl-mini {
+            background: #fff;
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+        }
+        .home-layout-frame.tpl-mini svg,
+        .template-thumb.tpl-mini svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
         .home-layout-frame span {
             position: absolute;
             background: #94a3b8;
@@ -942,6 +1025,7 @@
         }
 
         #cv-target,
+        #cv-target-page2,
         #qc-print-host .cv-print-sheet {
             font-family: var(--cv-font);
             font-size: calc(0.75rem * var(--cv-scale));
@@ -956,6 +1040,7 @@
             color: #1e293b;
         }
         #cv-target.cv-lang-en,
+        #cv-target-page2.cv-lang-en,
         #qc-print-host .cv-print-sheet.cv-lang-en {
             direction: ltr;
             text-align: left;
@@ -1158,7 +1243,8 @@
             background: #fff;
         }
 
-        #cv-target.layout-charcoal {
+        #cv-target.layout-charcoal,
+        #cv-target-page2.layout-charcoal {
             --charcoal: #4c4c4c;
             --charcoal-deep: #3f3f3f;
             --charcoal-line: rgba(255, 255, 255, 0.55);
@@ -1541,6 +1627,10 @@
             overflow: hidden;
             margin-bottom: 0.5rem;
         }
+        .template-thumb.tpl-mini {
+            background: #fff;
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+        }
         .template-thumb span {
             position: absolute;
             background: #d6c7ae;
@@ -1595,7 +1685,8 @@
             overflow: hidden;
             background: #fff;
         }
-        #cv-target.layout-navy {
+        #cv-target.layout-navy,
+        #cv-target-page2.layout-navy {
             --navy: #12192b;
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
@@ -1939,12 +2030,14 @@
         .paid .cv-watermark,
         .paid .cv-shield { display: none; }
 
-        #cv-preview-wrapper:not(.paid) {
+        #cv-preview-wrapper:not(.paid),
+        #cv-preview-page-2:not(.paid) {
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
         }
-        #cv-preview-wrapper:not(.paid) #cv-target {
+        #cv-preview-wrapper:not(.paid) #cv-target,
+        #cv-preview-page-2:not(.paid) .cv-page2-sheet {
             pointer-events: none;
         }
         .cv-shield {
@@ -2252,12 +2345,18 @@
             .preview-col.mobile-preview-open .preview-close {
                 display: inline-flex;
             }
-            #preview-column.mobile-preview-open #cv-preview-wrapper {
+            #preview-column.mobile-preview-open #cv-preview-wrapper,
+            #preview-column.mobile-preview-open #cv-preview-page-2 {
+                min-width: 0;
                 min-height: 0;
+                width: 100%;
+                max-width: 100%;
+                margin-inline: auto;
                 padding: 0.85rem;
                 max-height: calc(100cqw * 297 / 210);
                 aspect-ratio: 210 / 297;
                 overflow: hidden !important;
+                overflow-x: hidden !important;
             }
         }
 
@@ -2353,6 +2452,84 @@
         }
         #details-panel {
             overflow: visible;
+        }
+        #studio-form-column {
+            color-scheme: dark;
+        }
+        #details-panel h4,
+        #details-panel label.dynamic-text,
+        #details-panel .dynamic-text,
+        #design-panel h3 {
+            color: #00E5FF;
+        }
+        #details-panel label:not(.dynamic-text),
+        #design-panel label,
+        #design-panel p.block {
+            color: #FFFFFF;
+        }
+        .studio-field,
+        #studio-form-column input:not([type="range"]):not([type="color"]):not([type="hidden"]):not([type="checkbox"]),
+        #studio-form-column select:not(.sr-only),
+        #studio-form-column textarea,
+        #experience-items input,
+        #experience-items textarea,
+        .experience-item-header,
+        .experience-bullet-input,
+        .experience-raw-textarea {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: #475569;
+            color: #FFFFFF;
+            -webkit-text-fill-color: #FFFFFF;
+            caret-color: #FFFFFF;
+        }
+        .studio-field::placeholder,
+        #studio-form-column input::placeholder,
+        #studio-form-column textarea::placeholder,
+        #experience-items input::placeholder,
+        #experience-items textarea::placeholder,
+        .experience-item-header::placeholder,
+        .experience-bullet-input::placeholder,
+        .experience-raw-textarea::placeholder {
+            color: #94A3B8;
+            -webkit-text-fill-color: #94A3B8;
+            opacity: 1;
+        }
+        .studio-field:focus,
+        .studio-field:focus-visible,
+        #studio-form-column input:not([type="range"]):not([type="color"]):not([type="hidden"]):not([type="checkbox"]):focus,
+        #studio-form-column input:not([type="range"]):not([type="color"]):not([type="hidden"]):not([type="checkbox"]):focus-visible,
+        #studio-form-column select:not(.sr-only):focus,
+        #studio-form-column select:not(.sr-only):focus-visible,
+        #studio-form-column textarea:focus,
+        #studio-form-column textarea:focus-visible,
+        #experience-items input:focus,
+        #experience-items input:focus-visible,
+        #experience-items textarea:focus,
+        #experience-items textarea:focus-visible,
+        .experience-item-header:focus,
+        .experience-item-header:focus-visible,
+        .experience-bullet-input:focus,
+        .experience-bullet-input:focus-visible,
+        .experience-raw-textarea:focus,
+        .experience-raw-textarea:focus-visible {
+            border-color: #00E5FF;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+            outline: none;
+        }
+        #studio-form-column input:-webkit-autofill,
+        #studio-form-column input:-webkit-autofill:hover,
+        #studio-form-column input:-webkit-autofill:focus,
+        #studio-form-column textarea:-webkit-autofill,
+        #studio-form-column textarea:-webkit-autofill:hover,
+        #studio-form-column textarea:-webkit-autofill:focus {
+            -webkit-text-fill-color: #FFFFFF;
+            caret-color: #FFFFFF;
+            box-shadow: 0 0 0 1000px #0F172A inset, 0 0 10px rgba(0, 229, 255, 0.3);
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        #studio-form-column select option {
+            background: #0F172A;
+            color: #FFFFFF;
         }
         .phrase-field-wrap {
             position: relative;
@@ -2717,10 +2894,12 @@
         .experience-item-header,
         .experience-bullet-input {
             width: 100%;
-            background: #0f172a;
-            border: 1px solid rgb(51 65 85);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #475569;
             border-radius: 0.7rem;
-            color: #f1f5f9;
+            color: #FFFFFF;
+            -webkit-text-fill-color: #FFFFFF;
+            caret-color: #FFFFFF;
             padding: 0.6rem 0.7rem;
             font-size: 0.875rem;
             outline: none;
@@ -2830,9 +3009,11 @@
             width: 100%;
             min-height: 16rem;
             border-radius: 0.9rem;
-            border: 1px solid rgb(71 85 105);
-            background: #020617;
-            color: #f8fafc;
+            border: 1px solid #475569;
+            background: rgba(15, 23, 42, 0.6);
+            color: #FFFFFF;
+            -webkit-text-fill-color: #FFFFFF;
+            caret-color: #FFFFFF;
             padding: 0.9rem;
             font-size: 0.9rem;
             line-height: 1.5;
@@ -3005,10 +3186,11 @@
             backdrop-filter: blur(8px);
         }
 
-        #cv-preview-wrapper {
+        #cv-preview-wrapper,
+        #cv-preview-page-2 {
             background: #ffffff;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-            /* Reinforce single-page clip after other rules */
+            /* Reinforce A4 clip after other rules */
             overflow: hidden !important;
         }
         #cv-preview-wrapper.cv-over-one-page,
@@ -3186,6 +3368,13 @@
                 text-align: left !important;
             }
             html.qc-print-mode #qc-print-host .layout-navy #cv-header,
+            html.qc-print-mode #qc-print-host .layout-navy .cv-photo-block,
+            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner {
+                background: var(--navy, #12192b) !important;
+                color: #fff !important;
+            }
+        }
+t .layout-navy #cv-header,
             html.qc-print-mode #qc-print-host .layout-navy .cv-photo-block,
             html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner {
                 background: var(--navy, #12192b) !important;

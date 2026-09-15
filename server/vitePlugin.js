@@ -47,6 +47,9 @@ export function paymentApiPlugin() {
   if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
     console.warn("[quickcv] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID missing. Order alerts and Telegram control panel are off.");
   }
+  if (!process.env.SUPABASE_URL || !(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY)) {
+    console.warn("[quickcv] SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY missing. Orders will not be saved to Supabase.");
+  }
   if (!process.env.KV_REST_API_URL && !process.env.UPSTASH_REDIS_REST_URL) {
     console.info(
       "[quickcv] KV optional — orders use in-memory + /tmp store (Telegram approve + client poll).",

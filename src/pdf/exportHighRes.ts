@@ -2,9 +2,10 @@
 import { isUnlocked } from "../access/gate.js";
 import { exportSelectablePdf } from "./exportSelectable.js";
 
-const A4_CSS_PX = 794;
 const PAGE_W_MM = 210;
 const PAGE_H_MM = 297;
+const A4_CSS_PX = 794;
+const A4_CSS_H = Math.round(A4_CSS_PX * PAGE_H_MM / PAGE_W_MM);
 const MARGIN_MM = 8;
 const MAX_CANVAS = 8192;
 
@@ -72,6 +73,12 @@ function prepareCaptureRoot(root, view) {
   flattenUnsupportedColors(root, win);
 }
 
+function isFullBleedLayout(el) {
+  return el.classList.contains("layout-charcoal")
+    || el.classList.contains("layout-navy")
+    || el.classList.contains("layout-azure");
+}
+
 function ensureCaptureHost() {
   let host = document.getElementById("qc-print-host");
   if (!host) {
@@ -102,6 +109,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
   host.appendChild(clone);
 
   host.classList.add("qc-capturing");
+  const fullBleed = isFullBleedLayout(clone);
   Object.assign(host.style, {
     display: "block",
     position: "fixed",
@@ -110,7 +118,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
     width: A4_CSS_PX + "px",
     minWidth: A4_CSS_PX + "px",
     maxWidth: A4_CSS_PX + "px",
-    padding: "28px 44px 36px",
+    padding: "0",
     margin: "0",
     background: "#ffffff",
     color: "#0f172a",
@@ -127,6 +135,9 @@ function prepareCaptureClone(sourceId = "cv-target") {
     width: "100%",
     maxWidth: "100%",
     margin: "0",
+    padding: fullBleed ? "0" : "28px 44px 36px",
+    minHeight: A4_CSS_H + "px",
+    height: "auto",
     overflow: "visible",
     boxSizing: "border-box",
     wordWrap: "break-word",
@@ -233,6 +244,22 @@ function overlayPdfLinks(pdf, links, pageTopPx, pageBottomPx, sx, sy, pxPerMm) {
   }
 }
 
+function isCanvasRegionBlank(canvas, y0, height) {
+  const h = Math.min(canvas.height - y0, Math.max(0, Math.ceil(height)));
+  if (h <= 0) return true;
+  const ctx = canvas.getContext("2d");
+  const { width } = canvas;
+  const data = ctx.getImageData(0, Math.max(0, Math.floor(y0)), width, h).data;
+  let inkRows = 0;
+  for (let row = 0; row < h; row += 3) {
+    if (!isMostlyBlankRow(data, width, row)) {
+      inkRows += 1;
+      if (inkRows > 2) return false;
+    }
+  }
+  return true;
+}
+
 function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, startNewPage = false) {
   const usableW = PAGE_W_MM - MARGIN_MM * 2;
   const usableH = PAGE_H_MM - MARGIN_MM * 2;
@@ -243,12 +270,20 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, startNewPage 
   let y = 0;
   let first = !startNewPage;
 
-  while (y < canvas.height) {
+  while (y < canvas.height - 1) {
+    const remaining = canvas.height - y;
+    if (remaining < Math.max(10, pagePxH * 0.03) && isCanvasRegionBlank(canvas, y, remaining)) {
+      break;
+    }
     let next = Math.min(canvas.height, y + pagePxH);
     if (next < canvas.height) {
       next = findSplitY(canvas, next, y + Math.floor(pagePxH * 0.55));
     }
     const sliceH = Math.max(1, next - y);
+    if (isCanvasRegionBlank(canvas, y, sliceH)) {
+      if (!first || startNewPage) break;
+    }
+
     const slice = document.createElement("canvas");
     slice.width = canvas.width;
     slice.height = sliceH;
@@ -331,7 +366,7 @@ async function captureToCanvas(el) {
             width: A4_CSS_PX + "px",
             minWidth: A4_CSS_PX + "px",
             maxWidth: A4_CSS_PX + "px",
-            padding: "28px 44px 36px",
+            padding: "0",
             margin: "0",
             background: "#ffffff",
             overflow: "visible",

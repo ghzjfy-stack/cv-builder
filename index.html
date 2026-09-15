@@ -390,41 +390,41 @@
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-name" id="label-name">שם מלא</label>
-                            <input type="text" id="in-name" name="name" autocomplete="name" value="ישראל ישראלי" placeholder="ישראל ישראלי" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-name" id="label-name">שם מלא</label>
+                            <input type="text" id="in-name" name="name" autocomplete="name" value="ישראל ישראלי" placeholder="ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
-                            <input type="text" id="in-title" name="title" list="role-title-list" value="מנהל פרויקטים ומכירות" placeholder="מנהל פרויקטים" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
+                            <input type="text" id="in-title" name="title" list="role-title-list" value="מנהל פרויקטים ומכירות" placeholder="מנהל פרויקטים" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                             <datalist id="role-title-list"></datalist>
                             <p class="text-[11px] text-slate-400 mt-1" id="role-title-hint">אפשר לבחור כותרת מוכנה מהרשימה או להקליד.</p>
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-phone" id="label-phone">טלפון</label>
-                            <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="050-1234567" placeholder="050-1234567" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון</label>
+                            <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="050-1234567" placeholder="050-1234567" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-email" id="label-email">אימייל</label>
-                            <input type="email" id="in-email" name="email" autocomplete="email" value="israel@example.com" placeholder="israel@example.com" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-email" id="label-email">אימייל</label>
+                            <input type="email" id="in-email" name="email" autocomplete="email" value="israel@example.com" placeholder="israel@example.com" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-location" id="label-location">עיר מגורים</label>
-                            <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="תל אביב" placeholder="תל אביב" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-location" id="label-location">עיר מגורים</label>
+                            <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="תל אביב" placeholder="תל אביב" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-linkedin" id="label-linkedin">קישור ל-LinkedIn / אתר</label>
-                            <input type="text" id="in-linkedin" name="url" inputmode="url" value="linkedin.com/in/israel" placeholder="linkedin.com/in/..." oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-linkedin" id="label-linkedin">קישור ל-LinkedIn / אתר</label>
+                            <input type="text" id="in-linkedin" name="url" inputmode="url" value="linkedin.com/in/israel" placeholder="linkedin.com/in/..." oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-300 mb-1" for="in-photo">תמונת פרופיל</label>
-                            <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="w-full bg-slate-900 border border-slate-700 p-2 text-sm rounded-lg text-slate-100 outline-none min-h-11 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700 file:px-3 file:py-1.5 file:text-xs file:text-slate-100">
+                            <label class="block text-xs text-white mb-1" for="in-photo">תמונת פרופיל</label>
+                            <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2 text-sm rounded-lg text-white outline-none min-h-11 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700 file:px-3 file:py-1.5 file:text-xs file:text-white">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="font-bold dynamic-text text-sm block" for="in-summary" id="label-summary">תקציר מקצועי</label>
-                    <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
+                    <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
                 <div class="space-y-2 relative">
@@ -436,7 +436,7 @@
                         </div>
                     </div>
                     <div id="experience-items"></div>
-                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none experience-raw-hidden">2021 - נוכחי | מנהל מכירות ארצי
+                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden">2021 - נוכחי | מנהל מכירות ארצי
 • ניהול צוות עובדים והגדלת היעדים ב-35%.
 • הובלת הסכמים אסטרטגיים.
 
@@ -447,27 +447,27 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education" id="label-education">השכלה</label>
-                        <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2015 - 2018 | BA במנהל עסקים
+                        <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">2015 - 2018 | BA במנהל עסקים
 2019 | קורס ניהול מוצר</textarea>
                     </div>
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military" id="label-military">שירות צבאי / לאומי</label>
-                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
+                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills" id="label-skills">כישורים</label>
-                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11">
+                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                     </div>
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages">שפות</label>
                         <input type="hidden" id="in-languages" value="עברית (שפת אם), אנגלית (מקצועית)">
                         <div id="lang-picker" class="space-y-2">
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <select id="lang-pick-name" class="flex-1 bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11" aria-label="בחרו שפה"></select>
-                                <select id="lang-pick-level" class="sm:w-44 bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none min-h-11" aria-label="רמת שליטה"></select>
+                                <select id="lang-pick-name" class="flex-1 studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" aria-label="בחרו שפה"></select>
+                                <select id="lang-pick-level" class="sm:w-44 studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" aria-label="רמת שליטה"></select>
                                 <button type="button" id="lang-pick-add" onclick="addCvLanguage()" class="shrink-0 bg-slate-700 hover:bg-slate-600 border border-slate-500 text-slate-100 font-semibold text-sm px-3 rounded-lg min-h-11">הוסף</button>
                             </div>
                             <div id="lang-pick-list" class="space-y-2"></div>
@@ -478,7 +478,7 @@
 
                 <div class="space-y-2">
                     <label class="font-bold dynamic-text text-sm" for="in-references" id="label-references">המלצות / References</label>
-                    <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none"></textarea>
+                    <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea>
                 </div>
 
                 <button type="button" id="btn-download-pdf" class="cta-download unpaid-only w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
@@ -535,8 +535,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs text-slate-300 mb-1" for="font-select" id="font-select-label">טיפוגרפיה</label>
-                    <select id="font-select" onchange="setCvFont(this.value)" class="w-full bg-slate-900 border border-slate-700 text-sm rounded-lg p-2.5 text-slate-100 outline-none min-h-11">
+                    <label class="block text-xs text-white mb-1" for="font-select" id="font-select-label">טיפוגרפיה</label>
+                    <select id="font-select" onchange="setCvFont(this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 text-sm rounded-lg p-2.5 text-white outline-none min-h-11">
                         <option value="Rubik">Rubik — ברור ומודרני</option>
                         <option value="Heebo">Heebo — חד ומקצועי</option>
                         <option value="Inter">Inter — English / Latin</option>
@@ -947,6 +947,7 @@
     <script src="lib/experienceEditor.js"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
+    <script src="lib/templateThumbs.js"></script>
     <script src="lib/export.js"></script>
     <script src="lib/coverLetter.js"></script>
     <script src="lib/seoLandings.js"></script>
@@ -1730,7 +1731,7 @@
                 title.className = 'lang-pick-title';
                 title.textContent = languageRowTitle(row, lang);
                 const levelSel = document.createElement('select');
-                levelSel.className = 'bg-slate-900 border border-slate-700 p-2 text-sm rounded-lg text-slate-100 outline-none min-h-11';
+                levelSel.className = 'studio-field bg-slate-900/60 border border-slate-600 p-2 text-sm rounded-lg text-white outline-none min-h-11';
                 levelSel.setAttribute('data-lang-level', String(index));
                 levelSel.setAttribute('aria-label', pack.labels.languagesLevel);
                 CV_LANGUAGE_LEVELS.forEach((lvl) => {
@@ -2489,15 +2490,18 @@
         }
 
         function templateCardHtml(id, tpl, lang) {
+            if (typeof window.qcTemplateCardHtml === 'function') {
+                return window.qcTemplateCardHtml(tpl);
+            }
+            if (window.QCTemplateThumbs && typeof window.QCTemplateThumbs.cardHtml === 'function') {
+                tpl.id = tpl.id || id;
+                return window.QCTemplateThumbs.cardHtml(tpl, lang, id);
+            }
             const sub = lang === 'en' ? (tpl.subEn || tpl.subHe) : (tpl.subHe || tpl.subEn);
             const title = templateDisplayTitle(tpl, lang);
-            const ats = tpl.atsOptimized
-                ? '<span class="ats-badge ats-badge-on-card" aria-label="' + (lang === 'en' ? 'ATS optimized template' : 'תבנית מותאמת ל-ATS') + '">ATS</span>'
-                : '';
             const useLabel = lang === 'en' ? 'Use This Template' : 'השתמש בתבנית זו';
             return '<article class="template-card" data-example="' + id + '" data-ats="' + (tpl.atsOptimized ? '1' : '0') + '" aria-pressed="false">' +
-                ats +
-                '<span class="template-thumb home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
+                '<div class="template-thumb tpl-mini" aria-hidden="true"></div>' +
                 '<div class="template-card-meta"><span class="template-card-title">' + title + '</span>' +
                 '<span class="template-card-sub">' + sub + '</span></div>' +
                 '<span class="template-card-hover" aria-hidden="true"><button type="button" class="template-use-btn" data-use-template="' + id + '">' + useLabel + '</button></span>' +
@@ -2521,6 +2525,10 @@
         }
 
         function renderTemplateGalleries() {
+            if (typeof window.__qcTsGalleries === 'function') {
+                window.__qcTsGalleries();
+                return;
+            }
             const lang = window.QCCvLang === 'en' ? 'en' : 'he';
             const order = window.QCTemplateOrder || [];
             const bank = window.QCTemplates || {};
@@ -2531,8 +2539,12 @@
                 home.innerHTML = order.map((id) => {
                     const tpl = bank[id];
                     if (!tpl) return '';
+                    tpl.id = tpl.id || id;
+                    const frame = window.QCTemplateThumbs && window.QCTemplateThumbs.thumbHtml
+                        ? window.QCTemplateThumbs.thumbHtml(tpl, lang).replace('template-thumb', 'home-layout-frame')
+                        : '<span class="home-layout-frame tpl-mini"></span>';
                     return '<button type="button" class="home-layout" data-example="' + id + '">' +
-                        '<span class="home-layout-frame ' + tpl.thumb + '"><span></span><span></span><span></span></span>' +
+                        frame +
                         '<span>' + templateDisplayTitle(tpl, lang) + '</span></button>';
                 }).join('');
             }

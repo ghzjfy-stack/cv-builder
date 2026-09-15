@@ -148,6 +148,19 @@
     display: block;
     height: 6.6rem;
 }
+.tpl-mini {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.45rem;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+.tpl-mini svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 .lay-espresso { background: #f7f3ec; }
 .lay-espresso span:nth-child(1) { inset: 0 auto 0 0; width: 32%; background: #3e342c; border-radius: 0; }
 .lay-espresso span:nth-child(2) { top: 0; right: 0; left: 32%; height: 18px; background: #3e342c; border-radius: 0; }

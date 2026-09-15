@@ -151,6 +151,7 @@ function navyTone(tpl: CvTemplate): string {
 
 function azureHead(tpl: CvTemplate): string {
   if (tpl.id === "europass") return "#1e4b8c";
+  if (tpl.id === "clinic") return "#cfe8e4";
   switch (tpl.skin) {
     case "mint":
       return "#d7ece8";
@@ -268,11 +269,16 @@ function azureInner(tpl: CvTemplate, paper: string, ink: string, accent: string,
   const darkHead = tpl.id === "europass";
   const nameFill = darkHead ? "#ffffff" : accent;
   const rule = darkHead ? "#9bb7e0" : "#d4d8dd";
+  const clinic =
+    tpl.id === "clinic"
+      ? r(58, 5, 7, 2.2, accent, `rx="0.4"`) + r(60.4, 2.6, 2.2, 7, accent, `rx="0.4"`)
+      : "";
   return (
     r(0, 0, W, H, paper) +
     r(0, 0, W, headH, head) +
     r(8, 5, 32, 3.4, nameFill, `rx="0.45"`) +
     r(8, 10, 20, 1.4, nameFill, `opacity="0.55"`) +
+    clinic +
     r(26, headH + 4, 1, H - headH - 8, rule) +
     r(8, headH + 6, 14, 1.8, accent, `opacity="0.85"`) +
     lines(8, headH + 11, 14, 8, 6.2, ink, 0.22, s) +

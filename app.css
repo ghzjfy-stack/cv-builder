@@ -1668,6 +1668,8 @@
 
         #cv-target.cv-lang-en.layout-charcoal .cv-sidebar,
         #cv-target.cv-lang-en.layout-charcoal .cv-main,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-sidebar,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-main,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-sidebar,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-main,
         #cv-target.cv-lang-en.layout-charcoal .cv-job-body,
@@ -2400,6 +2402,8 @@
                 position: relative;
                 top: auto;
                 align-self: stretch;
+                max-width: 100%;
+                overflow-x: hidden;
             }
         }
 

@@ -239,13 +239,15 @@ export async function exportSelectablePdf(opts = {}) {
 
   if (typeof window.QCCoverLetter?.enabled === "function" && window.QCCoverLetter.enabled()) {
     window.QCCoverLetter.render?.();
-    pdf.addPage();
-    y = MARGIN + 2;
-    pdf.setTextColor(color);
-    writeLines(rtl ? "מכתב מקדים" : "Cover Letter", 14, "bold", 7, { after: 3 });
-    pdf.setTextColor(15, 23, 42);
     const letter = window.QCCoverLetter.buildText?.() || "";
-    writeLines(letter, 11, "normal", 5.4, { after: 2 });
+    if (String(letter).trim()) {
+      pdf.addPage();
+      y = MARGIN + 2;
+      pdf.setTextColor(color);
+      writeLines(rtl ? "מכתב מקדים" : "Cover Letter", 14, "bold", 7, { after: 3 });
+      pdf.setTextColor(15, 23, 42);
+      writeLines(letter, 11, "normal", 5.4, { after: 2 });
+    }
   }
 
   const filename = fileBase() + ".pdf";

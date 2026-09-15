@@ -9,7 +9,15 @@ html.qc-paid .unpaid-only { display: none !important; }
 #cv-preview-wrapper:not(.paid) #out-experience,
 #cv-preview-wrapper:not(.paid) #out-education,
 #cv-preview-wrapper:not(.paid) #out-education-side,
-#cv-preview-wrapper:not(.paid) #out-references {
+#cv-preview-wrapper:not(.paid) #out-references,
+#cv-preview-page-2:not(.paid) .cv-sensitive,
+#cv-preview-page-2:not(.paid) .cv-contact-header,
+#cv-preview-page-2:not(.paid) .cv-contact-sidebar,
+#cv-preview-page-2:not(.paid) .cv-photo-block,
+#cv-preview-page-2:not(.paid) #out-experience,
+#cv-preview-page-2:not(.paid) #out-education,
+#cv-preview-page-2:not(.paid) #out-education-side,
+#cv-preview-page-2:not(.paid) #out-references {
     filter: blur(3.5px);
     opacity: 0.9;
 }

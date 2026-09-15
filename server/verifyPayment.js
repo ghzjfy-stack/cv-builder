@@ -8,13 +8,13 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"]);
 
 const VERIFY_FAIL_MSG =
-  "Payment screenshot could not be verified. Please make sure the transfer of 9.90 ILS (or 19.90 ILS for the complete pack) to 054-3554888 is clearly visible.";
+  "Payment screenshot could not be verified. Please make sure the transfer of 10 ILS to 054-3554888 is clearly visible.";
 
 const SYSTEM_PROMPT = `You are an automated payment verification assistant for an Israeli app.
       Examine the provided screenshot from the Bit (ביט) payment app.
       Verify all of the following rules:
       1. Is it a valid Bit payment confirmation screen showing a successful transfer?
-      2. Is the payment amount 9.9 NIS (₪9.9 / ₪9.90 / 9.9 ש״ח / 9.90 ש״ח) OR 19.9 NIS (₪19.9 / ₪19.90) if the complete pack was purchased? Both amounts are valid.
+      2. Is the payment amount 10 NIS (₪10 / 10 ש״ח)?
       3. Is the recipient phone number or name matching '054-3554888' or '0543554888'?
       4. Is the screenshot recent and visually authentic (not a generic blank template)?
 

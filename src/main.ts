@@ -1,59 +1,99 @@
 // @ts-nocheck
-import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken, WRONG_CODE_MSG } from "./access/gate.js";
+import { initTemplateSelector } from "./templates/selector";
+import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken } from "./access/gate.js";
 import {
   CHECKOUT,
   REF_CODE_KEY,
   REF_FROM_KEY,
   bitAppOpenUrl,
-  bitPayUrl,
+  bitDeepLink,
   displayAmountValue,
   displayCompareValue,
+  isLikelyIsraeliMobile,
   isPackId,
   packAmount,
+  payboxAppOpenUrl,
+  payboxDeepLink,
   whatsappPdfShareUrl,
   whatsappReferralUrl,
-  whatsappUrl,
   type PackId,
 } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
-import { CODE_FAIL_MSG, verifyDownloadCode } from "./payment/verifyCode.js";
-import { createPayboxSession, waitForPayboxPayment, type PayboxMethod } from "./payment/paybox.js";
 import {
   createManualOrderSession,
   waitForManualOrderPaid,
 } from "./payment/manualOrder.js";
-import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
 const modal = () => document.getElementById("payment-modal");
 const feedback = () => document.getElementById("code-feedback");
-const codeInput = () => document.getElementById("download-code");
 const preview = () => document.getElementById("cv-preview-wrapper");
 const PACK_KEY = "quickcv.checkoutPack";
 const MANUAL_ORDER_KEY = "quickcv.manualOrderId";
+const MANUAL_ORDER_STATE_KEY = "quickcv.manualOrderState";
+const MANUAL_ORDER_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 let lastFocus = null;
 let selectedPack: PackId = "basic";
 let selectedPayMethod = "bit";
-let payboxPoll = null;
 let manualOrderPoll = null;
 let activeManualOrderId = "";
-let payboxSessionCache = { key: "", sessionId: "", payUrl: "" };
 
-function persistManualOrderId(orderId) {
-  activeManualOrderId = String(orderId || "").trim().toUpperCase();
+function normalizeStoredOrderId(value) {
+  const id = String(value || "")
+    .trim()
+    .toUpperCase();
+  return /^CV-\d{4}$/.test(id) ? id : "";
+}
+
+function persistManualOrderId(orderId, status = "PENDING") {
+  activeManualOrderId = normalizeStoredOrderId(orderId);
   try {
-    if (activeManualOrderId) sessionStorage.setItem(MANUAL_ORDER_KEY, activeManualOrderId);
-    else sessionStorage.removeItem(MANUAL_ORDER_KEY);
+    if (activeManualOrderId) {
+      const state = {
+        orderId: activeManualOrderId,
+        status: String(status || "PENDING").toUpperCase(),
+        updatedAt: Date.now(),
+      };
+      localStorage.setItem(MANUAL_ORDER_KEY, activeManualOrderId);
+      localStorage.setItem(MANUAL_ORDER_STATE_KEY, JSON.stringify(state));
+      // Migrate away from older session-only storage.
+      sessionStorage.removeItem(MANUAL_ORDER_KEY);
+    } else {
+      localStorage.removeItem(MANUAL_ORDER_KEY);
+      localStorage.removeItem(MANUAL_ORDER_STATE_KEY);
+      sessionStorage.removeItem(MANUAL_ORDER_KEY);
+    }
   } catch {
-    /* ignore */
+    /* private mode / quota */
   }
 }
 
 function readPersistedManualOrderId() {
   try {
-    return String(sessionStorage.getItem(MANUAL_ORDER_KEY) || "")
-      .trim()
-      .toUpperCase();
+    const fromStateRaw = localStorage.getItem(MANUAL_ORDER_STATE_KEY);
+    if (fromStateRaw) {
+      try {
+        const parsed = JSON.parse(fromStateRaw);
+        const id = normalizeStoredOrderId(parsed?.orderId);
+        const updatedAt = Number(parsed?.updatedAt) || 0;
+        if (id && updatedAt && Date.now() - updatedAt > MANUAL_ORDER_MAX_AGE_MS) {
+          persistManualOrderId("");
+          return "";
+        }
+        if (id) return id;
+      } catch {
+        /* fall through */
+      }
+    }
+    const fromLocal = normalizeStoredOrderId(localStorage.getItem(MANUAL_ORDER_KEY));
+    if (fromLocal) return fromLocal;
+    // One-time migration from sessionStorage.
+    const fromSession = normalizeStoredOrderId(sessionStorage.getItem(MANUAL_ORDER_KEY));
+    if (fromSession) {
+      persistManualOrderId(fromSession, "PENDING");
+      return fromSession;
+    }
+    return "";
   } catch {
     return "";
   }
@@ -74,7 +114,7 @@ function selectedAmount(): number {
 }
 
 function setSelectedPack(packId: PackId, persist = true) {
-  selectedPack = packId === "complete" ? "complete" : "basic";
+  selectedPack = "basic";
   if (persist) {
     try {
       sessionStorage.setItem(PACK_KEY, selectedPack);
@@ -83,66 +123,40 @@ function setSelectedPack(packId: PackId, persist = true) {
     }
   }
   applyPackUi();
-  payboxSessionCache = { key: "", sessionId: "", payUrl: "" };
-  if (selectedPayMethod === "paybox") void prefetchHostedPay("paybox");
 }
 
-function setScreenshotFeedback(text, ok) {
-  const el = document.getElementById("screenshot-feedback");
-  if (!el) return;
-  el.textContent = text;
-  el.className = `text-sm min-h-5 text-center font-semibold ${ok ? "text-emerald-300" : "text-rose-400"}`;
+function setVerifyOverlay(_on, _title, _sub) {
+  // Legacy overlay removed — status lives in `#pay-live-status`.
 }
 
-function setVerifyOverlay(on, title, sub) {
-  const el = document.getElementById("payment-verify-overlay");
-  if (!el) return;
-  el.classList.toggle("hidden", !on);
-  el.classList.toggle("flex", on);
-  const titleEl = document.getElementById("verify-overlay-title");
-  const subEl = document.getElementById("verify-overlay-sub");
-  if (titleEl && title) titleEl.textContent = title;
-  if (subEl && sub) subEl.textContent = sub;
-  const input = document.getElementById("payment-screenshot");
-  if (input) {
-    if (on) input.setAttribute("disabled", "true");
-    else input.removeAttribute("disabled");
-  }
+function updateWaitCopy() {
+  /* single-step checkout: amounts come from fillCheckoutUi / data-price */
 }
 
-async function onPaymentScreenshotChange(e) {
-  const input = e?.target;
-  const file = input && "files" in input ? input.files?.[0] : null;
-  if (!file) return;
+function showPayStep() {
+  document.getElementById("pay-step")?.classList.remove("hidden");
+  document.getElementById("pay-wait-step")?.classList.add("hidden");
+  document.getElementById("download-step")?.classList.add("hidden");
+}
 
-  const nameEl = document.getElementById("payment-screenshot-name");
-  if (nameEl) nameEl.textContent = file.name;
+function showWaitStep() {
+  // MVP: keep the pay step visible (spinner + "בודק סטטוס תשלום..." live there).
+  showPayStep();
+}
 
-  setScreenshotFeedback("", false);
-  setVerifyOverlay(true, "מאמת את צילום המסך...", "זה לוקח כמה שניות");
-  try {
-    const result = await verifyPaymentScreenshot(file);
-    if (result && result.is_valid === true) {
-      window.QCRateLimit?.reset();
-      window.QCLog?.add("auth_ok", "screenshot verified");
-      if (result.token) unlockWithPaymentToken(result.token);
-      else unlock();
-      setPaidUi(true);
-      setScreenshotFeedback("התשלום אומת בהצלחה. מוריד את ה-PDF...", true);
-      setFeedback("התשלום אומת בהצלחה.", true);
-      showDownloadStep();
-      void runHighResExport();
-      return;
-    }
-    window.QCLog?.add("auth_fail", "screenshot rejected");
-    window.QCRateLimit?.fail();
-    setScreenshotFeedback(result?.error || VERIFY_FAIL_MSG, false);
-  } catch {
-    setScreenshotFeedback(VERIFY_FAIL_MSG, false);
-  } finally {
-    setVerifyOverlay(false);
-    if (input && "value" in input) input.value = "";
-  }
+function showDownloadStep() {
+  document.getElementById("pay-step")?.classList.add("hidden");
+  document.getElementById("pay-wait-step")?.classList.add("hidden");
+  document.getElementById("download-step")?.classList.remove("hidden");
+  document.getElementById("download-complete-note")?.classList.toggle("hidden", selectedPack !== "complete");
+  document.querySelectorAll("[data-pack-extra]").forEach((el) => {
+    el.classList.toggle("hidden", selectedPack !== "complete");
+  });
+  setPaidUi(true);
+  fillReferralUi();
+  const phone = readCheckoutContact();
+  const waPhone = document.getElementById("wa-pdf-phone");
+  if (waPhone instanceof HTMLInputElement && phone && !waPhone.value) waPhone.value = phone;
 }
 
 function setFeedback(text, ok) {
@@ -158,25 +172,6 @@ function setPaidUi(paid) {
   document.body.classList.toggle("paid", paid);
   document.documentElement.classList.toggle("qc-paid", paid);
   document.documentElement.classList.toggle("qc-unpaid", !paid);
-}
-
-function showPayStep() {
-  document.getElementById("pay-step")?.classList.remove("hidden");
-  document.getElementById("download-step")?.classList.add("hidden");
-}
-
-function showDownloadStep() {
-  document.getElementById("pay-step")?.classList.add("hidden");
-  document.getElementById("download-step")?.classList.remove("hidden");
-  document.getElementById("download-complete-note")?.classList.toggle("hidden", selectedPack !== "complete");
-  document.querySelectorAll("[data-pack-extra]").forEach((el) => {
-    el.classList.toggle("hidden", selectedPack !== "complete");
-  });
-  setPaidUi(true);
-  fillReferralUi();
-  const phone = readCheckoutContact();
-  const waPhone = document.getElementById("wa-pdf-phone");
-  if (waPhone instanceof HTMLInputElement && phone && !waPhone.value) waPhone.value = phone;
 }
 
 function trapFocus(e) {
@@ -226,10 +221,7 @@ function closeModal() {
 }
 
 function stopPayboxPoll() {
-  if (payboxPoll) {
-    payboxPoll.abort();
-    payboxPoll = null;
-  }
+  /* hosted PayBox flow removed for MVP deep-link checkout */
 }
 
 function stopManualOrderPoll() {
@@ -255,11 +247,14 @@ function readCustomerName() {
   return String(el && "value" in el ? el.value : "").trim();
 }
 
-async function startManualOrderPolling(orderId) {
+async function startManualOrderPolling(orderId, options = {}) {
+  const quiet = Boolean(options.quiet);
   stopManualOrderPoll();
-  persistManualOrderId(orderId);
-  setManualOrderUi(orderId, "ממתינים לאישור תשלום בטלגרם…");
-  setVerifyOverlay(true, "ממתינים לאישור תשלום...", "אחרי שתשלמו, נאשר בטלגרם וההורדה תיפתח אוטומטית");
+  persistManualOrderId(orderId, "PENDING");
+  setManualOrderUi(orderId, "בודק סטטוס תשלום...");
+  if (!quiet || modal()?.classList.contains("flex")) {
+    showWaitStep();
+  }
   manualOrderPoll = new AbortController();
   try {
     const result = await waitForManualOrderPaid(orderId, {
@@ -273,41 +268,67 @@ async function startManualOrderPolling(orderId) {
       setManualOrderUi(orderId, "התשלום אושר — ההורדה נפתחה");
       return;
     }
+    if (result.status === "NOT_FOUND" || result.error === "order_not_found") {
+      persistManualOrderId("");
+      setManualOrderUi("", "ההזמנה לא נמצאה — פתחו הזמנה חדשה.");
+      showPayStep();
+      setFeedback("ההזמנה לא נמצאה. התחילו תשלום מחדש.", false);
+      return;
+    }
     if (result.error && result.error !== "cancelled") {
       setManualOrderUi(orderId, result.error);
       setFeedback(result.error, false);
     }
   } finally {
-    setVerifyOverlay(false);
     manualOrderPoll = null;
   }
 }
 
-async function proceedToPayment() {
+function resumePendingManualOrderIfNeeded() {
+  if (isUnlocked() || manualOrderPoll) return;
+  const existing = readPersistedManualOrderId();
+  if (!existing) return;
+  void startManualOrderPolling(existing, { quiet: true });
+}
+
+function requireCheckoutPhone() {
   const contact = readCheckoutContact();
-  if (!contact) {
-    setFeedback("נא למלא נייד או אימייל לפני המשך לתשלום.", false);
+  if (!contact || !isLikelyIsraeliMobile(contact)) {
+    setFeedback("נא למלא מספר טלפון תקין ב-Bit / PayBox לזיהוי ההעברה.", false);
     document.getElementById("checkout-contact")?.focus();
-    return null;
+    return "";
   }
-  if (activeManualOrderId && manualOrderPoll) {
-    setManualOrderUi(activeManualOrderId, "ממתינים לאישור תשלום בטלגרם…");
-    return { ok: true, order_id: activeManualOrderId };
+  return contact;
+}
+
+async function proceedToPayment(preferredMethod) {
+  const contact = requireCheckoutPhone();
+  if (!contact) return null;
+  if (preferredMethod === "paybox" || preferredMethod === "bit") {
+    selectedPayMethod = preferredMethod;
+  }
+  const existingId = activeManualOrderId || readPersistedManualOrderId();
+  if (existingId) {
+    showWaitStep();
+    if (!manualOrderPoll) void startManualOrderPolling(existingId);
+    setManualOrderUi(existingId, "בודק סטטוס תשלום...");
+    return { ok: true, order_id: existingId };
   }
   setFeedback("", false);
-  setManualOrderUi(activeManualOrderId || "…", "יוצרים הזמנה…");
+  setManualOrderUi("…", "יוצרים הזמנה…");
+  showWaitStep();
   const created = await createManualOrderSession({
-    pack: selectedPack,
+    pack: "basic",
     contact,
     paymentMethod: selectedPayMethod === "paybox" ? "paybox" : "bit",
     customerName: readCustomerName(),
-    amountIls: selectedAmount(),
+    amountIls: CHECKOUT.amountIls,
   });
   if (!created.ok || !created.order_id) {
     const message = created.error || "לא הצלחנו לפתוח הזמנה.";
     setFeedback(message, false);
     setManualOrderUi("", message);
-    document.getElementById("manual-order-panel")?.classList.add("hidden");
+    showPayStep();
     return null;
   }
   void startManualOrderPolling(created.order_id);
@@ -316,18 +337,10 @@ async function proceedToPayment() {
 
 function setPayMethod(method) {
   selectedPayMethod = method === "paybox" ? "paybox" : "bit";
-  document.querySelectorAll("[data-pay-method]").forEach((btn) => {
-    const on = btn.getAttribute("data-pay-method") === selectedPayMethod;
-    btn.setAttribute("aria-selected", on ? "true" : "false");
-  });
-  document.getElementById("pay-panel-bit")?.classList.toggle("hidden", selectedPayMethod !== "bit");
-  document.getElementById("pay-panel-paybox")?.classList.toggle("hidden", selectedPayMethod !== "paybox");
-  if (selectedPayMethod === "paybox") void prefetchHostedPay("paybox");
 }
 
-function setHostedPayStatus(text) {
-  const paybox = document.getElementById("paybox-poll-status");
-  if (paybox) paybox.textContent = selectedPayMethod === "paybox" ? text : "";
+function setHostedPayStatus(_text) {
+  /* unused in MVP */
 }
 
 function applyPaidUnlock(token, message) {
@@ -345,145 +358,20 @@ function prefersSameTabCheckout() {
   return /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
 }
 
-function isReadyPayUrl(url) {
-  const href = String(url || "").trim();
-  if (!href || href === "#" || href.endsWith("#")) return false;
-  try {
-    const parsed = new URL(href, window.location.href);
-    if (parsed.origin === window.location.origin && (parsed.pathname === "/" || parsed.pathname === window.location.pathname)) {
-      return false;
-    }
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-async function ensureHostedSession(method: PayboxMethod) {
-  const payMethod = "paybox";
-  const key = `${payMethod}:${selectedPack}:${readCheckoutContact()}`;
-  if (payboxSessionCache.key === key && payboxSessionCache.sessionId && payboxSessionCache.payUrl) {
-    return payboxSessionCache;
-  }
-  const created = await createPayboxSession({
-    pack: selectedPack,
-    contact: readCheckoutContact(),
-    method: payMethod,
-  });
-  if (!created.ok || !created.session_id) {
-    throw new Error(created.error || "session_failed");
-  }
-  payboxSessionCache = {
-    key,
-    sessionId: created.session_id,
-    payUrl: created.pay_url || CHECKOUT.payboxPayUrl,
-  };
-  return payboxSessionCache;
-}
-
-function bindHostedPayLink(id, url) {
-  const el = document.getElementById(id);
-  if (!(el instanceof HTMLAnchorElement) || !url) return;
-  el.href = url;
-  el.target = prefersSameTabCheckout() ? "_self" : "paybox_checkout";
-  el.rel = "noopener noreferrer";
-}
-
-function openCheckoutUrl(url, popup) {
+function openDeepLink(url) {
   if (!url) return;
-  if (prefersSameTabCheckout()) {
-    window.location.assign(url);
+  // Deep links (bitapp:// / paybox://) must use location — window.open is unreliable.
+  if (/^(bitapp|paybox):/i.test(url) || prefersSameTabCheckout()) {
+    window.location.href = url;
     return;
   }
-  if (popup && !popup.closed) {
-    popup.location.replace(url);
-    return;
-  }
-  const opened = window.open(url, "paybox_checkout");
-  if (!opened) window.location.assign(url);
-}
-
-async function prefetchHostedPay(method: PayboxMethod) {
-  try {
-    const session = await ensureHostedSession(method);
-    bindHostedPayLink("btn-open-paybox", session.payUrl);
-  } catch {
-    /* click handler retries */
-  }
-}
-
-async function startHostedPayment(method: PayboxMethod) {
-  stopPayboxPoll();
-  setHostedPayStatus("ממתינים לאישור PayBox...");
-  try {
-    const session = await ensureHostedSession(method);
-    bindHostedPayLink("btn-open-paybox", session.payUrl);
-    setVerifyOverlay(
-      true,
-      "ממתינים לאישור PayBox...",
-      "אפשר לחזור לכאן אחרי התשלום — נזהה אותו אוטומטית",
-    );
-    payboxPoll = new AbortController();
-    const result = await waitForPayboxPayment(session.sessionId, { signal: payboxPoll.signal });
-    if (result.paid === true && result.token) {
-      window.QCLog?.add("auth_ok", "paybox webhook");
-      applyPaidUnlock(result.token, "התשלום אומת. מוריד את ה-PDF...");
-      return;
-    }
-    if (result.error && result.error !== "cancelled") {
-      setHostedPayStatus(result.error);
-      setFeedback(result.error, false);
-    }
-  } catch (err) {
-    const message = err instanceof Error && err.message ? err.message : "לא הצלחנו לפתוח את PayBox.";
-    setHostedPayStatus(message);
-    setFeedback(message, false);
-  } finally {
-    setVerifyOverlay(false);
-    payboxPoll = null;
-  }
-}
-
-async function onHostedPayClick(e, method: PayboxMethod) {
-  e?.preventDefault?.();
-  const orderId = await ensureManualOrderForCheckout();
-  if (!orderId) return;
-
-  const sameTab = prefersSameTabCheckout();
-  const popup = sameTab ? null : window.open("about:blank", "paybox_checkout");
-  setHostedPayStatus("פותחים את PayBox...");
-  try {
-    const session = await ensureHostedSession(method);
-    bindHostedPayLink("btn-open-paybox", session.payUrl);
-    if (session.payUrl) openCheckoutUrl(session.payUrl, popup);
-    else {
-      try {
-        popup?.close();
-      } catch {
-        /* ignore */
-      }
-      throw new Error("לא קיבלנו קישור תשלום מ-PayBox.");
-    }
-    // Keep PayBox webhook polling as a secondary unlock path.
-    void startHostedPayment(method);
-  } catch (err) {
-    try {
-      popup?.close();
-    } catch {
-      /* ignore */
-    }
-    const message = err instanceof Error && err.message ? err.message : "לא הצלחנו לפתוח את PayBox.";
-    setHostedPayStatus(message);
-    setFeedback(message, false);
-  }
+  window.open(url, "_blank", "noopener");
 }
 
 function dismissCheckout(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
-  stopPayboxPoll();
   stopManualOrderPoll();
-  setVerifyOverlay(false);
   closeModal();
 }
 
@@ -502,32 +390,40 @@ function copyBitPhone(e) {
   void navigator.clipboard.writeText(CHECKOUT.bitPhoneCopy).then(flashCopyButton, flashCopyButton);
 }
 
-async function ensureManualOrderForCheckout() {
+async function ensureManualOrderForCheckout(method) {
   if (activeManualOrderId && manualOrderPoll) return activeManualOrderId;
-  const created = await proceedToPayment();
+  const created = await proceedToPayment(method);
   return created?.order_id || null;
+}
+
+function bindDeepLinkAnchor(id, url) {
+  const el = document.getElementById(id);
+  if (!(el instanceof HTMLAnchorElement) || !url) return;
+  el.href = url;
 }
 
 function openBitApp(e) {
   e?.preventDefault?.();
   void (async () => {
-    const orderId = await ensureManualOrderForCheckout();
+    const orderId = await ensureManualOrderForCheckout("bit");
     if (!orderId) return;
-    const url = bitAppOpenUrl(selectedAmount());
-    const el = e?.currentTarget;
-    if (el instanceof HTMLAnchorElement) {
-      el.href = url;
-      // Prefer a new tab so polling can keep running on this page.
-      el.target = "_blank";
-      el.rel = "noopener noreferrer";
-    }
-    window.open(url, "_blank", "noopener");
+    const amount = CHECKOUT.amountIls;
+    const url = prefersSameTabCheckout() ? bitDeepLink(amount) : bitAppOpenUrl(amount);
+    bindDeepLinkAnchor("btn-open-bit", url);
+    openDeepLink(url);
   })();
 }
 
-function openWhatsApp(e) {
+function openPayboxApp(e) {
   e?.preventDefault?.();
-  window.open(whatsappUrl(selectedAmount()), "_blank", "noopener");
+  void (async () => {
+    const orderId = await ensureManualOrderForCheckout("paybox");
+    if (!orderId) return;
+    const amount = CHECKOUT.amountIls;
+    const url = prefersSameTabCheckout() ? payboxDeepLink(amount) : payboxAppOpenUrl(amount);
+    bindDeepLinkAnchor("btn-open-paybox", url);
+    openDeepLink(url);
+  })();
 }
 
 function blobToBase64(blob) {
@@ -697,8 +593,7 @@ function downloadCoverLetter(e) {
 }
 
 function onOrderBumpChange() {
-  const el = document.getElementById("order-bump");
-  setSelectedPack(el instanceof HTMLInputElement && el.checked ? "complete" : "basic");
+  setSelectedPack("basic");
 }
 
 async function runHighResExport() {
@@ -712,15 +607,6 @@ async function runHighResExport() {
   }
 }
 
-function readAccessCode() {
-  const primary = document.getElementById("download-code") || document.getElementById("code-input");
-  return String(primary && "value" in primary ? primary.value : "")
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 6);
-}
-
 function readCheckoutContact() {
   const el = document.getElementById("checkout-contact");
   return String(el && "value" in el ? el.value : "").trim();
@@ -728,7 +614,7 @@ function readCheckoutContact() {
 
 function triggerPDFDownload() {
   if (!isUnlocked()) {
-    void verifyAndUnlock();
+    openCheckoutModal();
     return;
   }
 
@@ -739,35 +625,23 @@ function triggerPDFDownload() {
 
 function openCheckoutModal() {
   openModal();
-  showPayStep();
-  stopPayboxPoll();
   stopManualOrderPoll();
   setPayMethod("bit");
-  setVerifyOverlay(false);
-  setScreenshotFeedback("", false);
-  setHostedPayStatus("");
-  const shot = document.getElementById("payment-screenshot");
-  if (shot && "value" in shot) shot.value = "";
-  const nameEl = document.getElementById("payment-screenshot-name");
-  if (nameEl) nameEl.textContent = "קובץ תמונה עד 4MB · אימות מיידי";
-  const input = codeInput();
-  if (input) {
-    input.value = "";
-    input.removeAttribute("disabled");
-  }
-  document.getElementById("verify-btn")?.removeAttribute("disabled");
   setFeedback("", false);
+  selectedPack = "basic";
+  applyPackUi();
 
   const existing = readPersistedManualOrderId();
   if (existing && !isUnlocked()) {
     void startManualOrderPolling(existing);
   } else {
     persistManualOrderId("");
-    document.getElementById("manual-order-panel")?.classList.add("hidden");
+    showPayStep();
     const orderIdEl = document.getElementById("manual-order-id");
     if (orderIdEl) orderIdEl.textContent = "—";
     const orderStatusEl = document.getElementById("manual-order-status");
-    if (orderStatusEl) orderStatusEl.textContent = "ממתינים לאישור תשלום בטלגרם…";
+    if (orderStatusEl) orderStatusEl.textContent = "בודק סטטוס תשלום...";
+    document.getElementById("manual-order-panel")?.classList.add("hidden");
   }
 }
 
@@ -779,51 +653,6 @@ function onDownloadPdfClick(e) {
     return;
   }
   openCheckoutModal();
-}
-
-async function verifyAndUnlock(e) {
-  e?.preventDefault?.();
-  if (isUnlocked()) {
-    triggerPDFDownload();
-    return;
-  }
-
-  const limit = window.QCRateLimit?.status?.();
-  if (limit?.locked) {
-    setFeedback(WRONG_CODE_MSG, false);
-    return;
-  }
-
-  const userCode = readAccessCode();
-  if (userCode.length !== 6) {
-    setFeedback("נא להזין קוד בן 6 תווים מההודעה שקיבלתם.", false);
-    return;
-  }
-
-  const btn = document.getElementById("verify-btn");
-  btn?.setAttribute("disabled", "true");
-  setFeedback("מאמת את הקוד...", true);
-  try {
-    const result = await verifyDownloadCode(userCode, readCheckoutContact());
-    if (result && result.ok === true && result.download?.authorized !== false) {
-      window.QCRateLimit?.reset();
-      window.QCLog?.add("auth_ok", "code verified");
-      if (result.token) unlockWithPaymentToken(result.token);
-      else unlock();
-      setPaidUi(true);
-      setFeedback("הקוד אומת. מוריד את ה-PDF...", true);
-      showDownloadStep();
-      void runHighResExport();
-      return;
-    }
-    window.QCLog?.add("auth_fail", "bad code");
-    window.QCRateLimit?.fail();
-    setFeedback(result?.error || CODE_FAIL_MSG, false);
-  } catch {
-    setFeedback(CODE_FAIL_MSG, false);
-  } finally {
-    btn?.removeAttribute("disabled");
-  }
 }
 
 function downloadFormat(kind) {
@@ -855,40 +684,24 @@ function downloadFormat(kind) {
 }
 
 function applyPackUi() {
-  const amount = selectedAmount();
+  const amount = CHECKOUT.amountIls;
   const display = displayAmountValue(amount);
   document.querySelectorAll("[data-pay-amount]").forEach((el) => {
     el.textContent = display;
   });
-  document.querySelectorAll('input[name="checkout-pack"]').forEach((input) => {
-    if (!(input instanceof HTMLInputElement)) return;
-    const on = input.value === selectedPack;
-    input.checked = on;
-    input.closest(".pay-pack")?.classList.toggle("is-selected", on);
-  });
-  const openBit = document.getElementById("btn-open-bit");
-  if (openBit instanceof HTMLAnchorElement) {
-    openBit.href = bitAppOpenUrl(amount);
-    openBit.target = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "_self" : "_blank";
-    openBit.rel = "noopener";
-  }
-  const qr = document.getElementById("bit-qr");
-  if (qr instanceof HTMLImageElement) {
-    qr.src = bitPayUrl(amount);
-    qr.alt = `קוד QR לתשלום ${display} ₪ ב-Bit`;
-  }
+  bindDeepLinkAnchor("btn-open-bit", prefersSameTabCheckout() ? bitDeepLink(amount) : bitAppOpenUrl(amount));
+  bindDeepLinkAnchor(
+    "btn-open-paybox",
+    prefersSameTabCheckout() ? payboxDeepLink(amount) : payboxAppOpenUrl(amount),
+  );
   const saveEl = document.getElementById("pay-save-badge");
-  if (saveEl) {
-    const saved = Math.round(CHECKOUT.compareAtIls - amount);
-    saveEl.textContent =
-    selectedPack === "complete" ? "חבילה מלאה במחיר השקה" : `מחיר השקה — חיסכון של ${saved} ₪`;
-  }
-  const bump = document.getElementById("order-bump");
-  if (bump instanceof HTMLInputElement) bump.checked = selectedPack === "complete";
+  if (saveEl) saveEl.textContent = "מחיר השקה — 10 ₪ בלבד";
+  const nameEl = document.getElementById("mvp-pack-name");
+  if (nameEl) nameEl.textContent = CHECKOUT.packageName;
 }
 
 function fillCheckoutUi() {
-  selectedPack = readStoredPack();
+  selectedPack = "basic";
   const bitEl = document.getElementById("bit-number");
   if (bitEl) bitEl.textContent = CHECKOUT.bitPhoneDisplay;
   const launch = displayAmountValue(CHECKOUT.amountIls);
@@ -899,7 +712,7 @@ function fillCheckoutUi() {
     el.textContent = displayCompareValue();
   });
   document.querySelectorAll("[data-pack-complete-price]").forEach((el) => {
-    el.textContent = displayAmountValue(CHECKOUT.packCompleteIls);
+    el.textContent = launch;
   });
   applyPackUi();
 }
@@ -1047,41 +860,13 @@ function bind() {
   document.getElementById("btn-proceed-payment")?.addEventListener("click", () => {
     void proceedToPayment();
   });
+  resumePendingManualOrderIfNeeded();
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
-  document.getElementById("btn-open-paybox")?.addEventListener("click", (e) => {
-    void onHostedPayClick(e, "paybox");
-  });
-  document.querySelectorAll("[data-pay-method]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const method = btn.getAttribute("data-pay-method") || "bit";
-      stopPayboxPoll();
-      setVerifyOverlay(false);
-      setPayMethod(method);
-    });
-  });
-  document.getElementById("btn-whatsapp")?.addEventListener("click", openWhatsApp);
+  document.getElementById("btn-open-paybox")?.addEventListener("click", openPayboxApp);
   document.getElementById("btn-send-pdf-whatsapp")?.addEventListener("click", sendPdfToWhatsApp);
-  document.getElementById("order-bump")?.addEventListener("change", onOrderBumpChange);
   document.getElementById("cover-letter-download")?.addEventListener("click", downloadCoverLetter);
   document.getElementById("btn-copy-referral")?.addEventListener("click", copyReferralLink);
-  document.getElementById("verify-btn")?.addEventListener("click", verifyAndUnlock);
-  document.getElementById("payment-screenshot")?.addEventListener("change", onPaymentScreenshotChange);
-  document.querySelectorAll('input[name="checkout-pack"]').forEach((input) => {
-    input.addEventListener("change", onPackChange);
-  });
-
-  codeInput()?.addEventListener("input", (e) => {
-    const el = e.currentTarget;
-    if (!(el instanceof HTMLInputElement)) return;
-    el.value = el.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 6);
-  });
-  codeInput()?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      void verifyAndUnlock(e);
-    }
-  });
 
   document.querySelectorAll("[data-download]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
@@ -1095,8 +880,20 @@ function bind() {
   });
 }
 
+function bootTemplates() {
+  try {
+    initTemplateSelector();
+  } catch (err) {
+    console.error("template selector init failed", err);
+  }
+}
+
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", bind);
+  document.addEventListener("DOMContentLoaded", () => {
+    bootTemplates();
+    bind();
+  });
 } else {
+  bootTemplates();
   bind();
 }

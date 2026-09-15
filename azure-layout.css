@@ -4,7 +4,27 @@
     background: #fff;
 }
 
-#cv-target.layout-azure,
+#cv-target.layout-azure {
+    --azure-ink: #1a1a1a;
+    --azure-muted: #3f3f3f;
+    --azure-line: #d4d8dd;
+    --azure-head: #dce8f0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(10.5rem, 0.4fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "head head head"
+        "main rule side";
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    background: #fff;
+    color: var(--azure-ink);
+    font-family: 'Heebo', 'Rubik', sans-serif;
+    font-size: calc(0.78rem * var(--cv-scale));
+    line-height: 1.5;
+    overflow: visible;
+}
 #qc-print-host .cv-print-sheet.layout-azure {
     --azure-ink: #1a1a1a;
     --azure-muted: #3f3f3f;
@@ -16,7 +36,8 @@
     grid-template-areas:
         "head head head"
         "main rule side";
-    min-height: 1040px;
+    min-height: 297mm;
+    height: auto;
     background: #fff;
     color: var(--azure-ink);
     font-family: 'Heebo', 'Rubik', sans-serif;

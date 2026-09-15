@@ -122,7 +122,7 @@ async function statusText() {
   const hasWebhook = Boolean(envValue("PAYMENT_WEBHOOK_SECRET") || envValue("PAYBOX_WEBHOOK_SECRET"));
   const hasResend = Boolean(envValue("RESEND_API_KEY"));
   const hasOpenAi = Boolean(envValue("OPENAI_API_KEY"));
-  const amount = formatAmountIls(process.env.PAYMENT_AMOUNT_ILS || 9.9);
+  const amount = formatAmountIls(process.env.PAYMENT_AMOUNT_ILS || 10);
   return (
     "*סטטוס QuickCV*\n\n" +
     `*טוקן בוט:* ${hasToken ? "תקין" : "חסר"}\n` +
@@ -132,14 +132,14 @@ async function statusText() {
     `*סוד תשלום:* ${hasPaySecret ? "תקין" : "חסר"}\n` +
     `*Webhook תשלום:* ${hasWebhook ? "תקין" : "חסר"}\n` +
     `*אימות Bit:* ${hasOpenAi ? "תקין" : "חסר"}\n` +
-    `*מחיר בסיסי:* ${escapeTelegramMarkdown(amount)} ₪`
+    `*מחיר:* ${escapeTelegramMarkdown(amount)} ₪`
   );
 }
 
 function parseCodeArgs(args) {
   let phone = "";
   let email = "";
-  let amount = Number(process.env.PAYMENT_AMOUNT_ILS || 9.9);
+  let amount = Number(process.env.PAYMENT_AMOUNT_ILS || 10);
   let provider = "telegram_admin";
   for (const part of args) {
     if (part.includes("@")) email = normalizeContact(part);
@@ -235,12 +235,33 @@ async function handleRevoke(chatId, codeRaw) {
 }
 
 async function handleApprovePayment(chatId, orderId, messageId) {
-  const existing = await getManualOrder(orderId);
+  let existing;
+  try {
+    existing = await getManualOrder(orderId);
+  } catch (err) {
+    const code = err?.code || "";
+    await sendTelegramText(
+      chatId,
+      code === "KV_REQUIRED" || code === "KV_VERIFY_FAILED"
+        ? "Order storage (KV) is not configured on the server. Set KV_REST_API_URL + KV_REST_API_TOKEN."
+        : `Could not load order \`${escapeTelegramMarkdown(orderId)}\`.`,
+    );
+    return;
+  }
   if (!existing) {
     await sendTelegramText(chatId, `Order \`${escapeTelegramMarkdown(orderId)}\` not found.`);
     return;
   }
-  const result = await approveManualOrder(orderId);
+  let result;
+  try {
+    result = await approveManualOrder(orderId);
+  } catch (err) {
+    await sendTelegramText(
+      chatId,
+      `Could not approve \`${escapeTelegramMarkdown(orderId)}\` (${err?.code || err?.message || "error"}).`,
+    );
+    return;
+  }
   if (!result.ok) {
     await sendTelegramText(
       chatId,

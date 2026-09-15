@@ -91,6 +91,9 @@ export async function waitForManualOrderPaid(
     }
     const status = await fetchManualOrderStatus(orderId);
     if (status.paid === true && status.token) return status;
+    if (status.status === "NOT_FOUND" || status.error === "order_not_found") {
+      return { ok: false, paid: false, status: "NOT_FOUND", error: "order_not_found" };
+    }
     if (status.status === "CANCELLED") {
       return { ok: false, paid: false, error: "ההזמנה בוטלה." };
     }

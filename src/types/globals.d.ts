@@ -27,7 +27,32 @@ declare global {
       fromPath: (pathname: string) => { slug: string } | null;
     };
     updateCV?: () => void;
-    QCExperience?: { refresh: () => void; applyI18n: () => void };
+    renderTemplateGalleries?: () => void;
+    loadExample?: (key: string) => void;
+    applyCvTemplate?: (key: string, opts?: { forceContent?: boolean }) => void;
+    QCTemplates?: Record<string, unknown>;
+    QCTemplateOrder?: string[];
+    CV_SAMPLES?: Record<string, Record<string, string>>;
+    QCExample?: string;
+    QCCvLang?: string;
+    resetForm?: () => void;
+    clearCvForm?: () => void;
+    QCStrength?: {
+      update: () => { score: number; missing: string[] };
+      compute: () => { score: number; missing: string[] };
+    };
+    QCExperience?: {
+      refresh: () => void;
+      applyI18n: () => void;
+      addJob?: () => void;
+      openRawEditor?: () => void;
+    };
+    QCExperienceEditor?: {
+      refresh: () => void;
+      applyI18n: () => void;
+      addJob?: () => void;
+      openRawEditor?: () => void;
+    };
     QCPhotoDataUrl?: string;
     QCDraft?: {
       save: () => void;

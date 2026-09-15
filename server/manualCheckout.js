@@ -1,4 +1,5 @@
 import { clientIp, json, parseBody, rateLimited, readBody } from "./http.js";
+import { assertKvReadyForOrders, kvIsRemote } from "./kv.js";
 import { packAmount, isPackId } from "../src/config/checkout.js";
 import {
   approveManualOrder,
@@ -15,6 +16,18 @@ function parseContact(raw) {
   if (!contact) return { contact: "", phone: "", email: "" };
   if (contact.includes("@")) return { contact, phone: "", email: contact };
   return { contact, phone: contact, email: "" };
+}
+
+function kvErrorResponse(res, err) {
+  if (err?.code === "KV_REQUIRED" || err?.code === "KV_VERIFY_FAILED") {
+    json(res, 503, {
+      ok: false,
+      error: "אחסון ההזמנות לא מוגדר (KV). הגדירו KV_REST_API_URL ו-KV_REST_API_TOKEN ב-Vercel.",
+      code: err.code,
+    });
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -39,6 +52,13 @@ export async function handleOrderSessionRequest(req, res) {
     return;
   }
 
+  try {
+    assertKvReadyForOrders();
+  } catch (err) {
+    if (kvErrorResponse(res, err)) return;
+    throw err;
+  }
+
   let body;
   try {
     const raw = await readBody(req, MAX_BYTES);
@@ -48,12 +68,15 @@ export async function handleOrderSessionRequest(req, res) {
     return;
   }
 
-  const pack = isPackId(body.pack) ? body.pack : "basic";
+  const pack = "basic";
   const methodRaw = String(body.payment_method || body.method || "bit").toLowerCase();
   const paymentMethod = methodRaw === "paybox" ? "paybox" : "bit";
   const contacts = parseContact(body.contact || body.phone || body.email);
-  const amountIls =
-    Number(body.amount_ils) > 0 ? Number(body.amount_ils) : packAmount(pack);
+  if (!contacts.phone) {
+    json(res, 400, { ok: false, error: "נא למלא מספר טלפון לזיהוי ההעברה." });
+    return;
+  }
+  const amountIls = Number(process.env.PAYMENT_AMOUNT_ILS || 10) || packAmount(pack);
 
   try {
     const order = await createManualOrder({
@@ -78,8 +101,10 @@ export async function handleOrderSessionRequest(req, res) {
       amount_ils: order.amount_ils,
       pack: order.pack,
       telegram_sent: Boolean(notify.sent),
+      storage: kvIsRemote() ? "kv" : "memory",
     });
   } catch (err) {
+    if (kvErrorResponse(res, err)) return;
     console.error("[quickcv] order-session failed:", err?.message || err);
     json(res, 500, { ok: false, error: "לא הצלחנו לפתוח הזמנה. נסו שוב." });
   }
@@ -108,7 +133,21 @@ export async function handleOrderStatusRequest(req, res) {
     return;
   }
 
-  const order = await getManualOrder(orderId);
+  try {
+    assertKvReadyForOrders();
+  } catch (err) {
+    if (kvErrorResponse(res, err)) return;
+    throw err;
+  }
+
+  let order;
+  try {
+    order = await getManualOrder(orderId);
+  } catch (err) {
+    if (kvErrorResponse(res, err)) return;
+    throw err;
+  }
+
   if (!order) {
     json(res, 404, { ok: false, paid: false, status: "NOT_FOUND", error: "order_not_found" });
     return;

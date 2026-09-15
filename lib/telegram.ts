@@ -53,12 +53,12 @@ export function formatPaymentMethod(providerOrMethod: string): string {
 
 export function formatAmountIls(amount: number): string {
   const n = Number(amount);
-  if (!Number.isFinite(n) || n < 0) return "0.00";
-  return n.toFixed(2);
+  if (!Number.isFinite(n) || n < 0) return "0";
+  return Number.isInteger(n) ? String(n) : n.toFixed(2);
 }
 
-export function formatPackLabel(pack?: string): string {
-  return pack === "complete" ? "חבילה מלאה" : "חבילה בסיסית";
+export function formatPackLabel(_pack?: string): string {
+  return "הורדת PDF מלא";
 }
 
 function formatTimestamp(timestamp?: Date | string | number): string {
@@ -97,13 +97,15 @@ export function formatOrderNotificationMessage(orderData: OrderNotificationData)
   return (
     `🛒 *הזמנה חדשה ממתינה לאישור* ${escapeTelegramMarkdown(orderLabel)}\n\n` +
     optionalLine("לקוח", orderData.customerName) +
-    optionalLine("טלפון", orderData.phone) +
+    (String(orderData.phone || "").trim()
+      ? `*טלפון (זיהוי Bit/PayBox):* \`${escapeTelegramMarkdown(String(orderData.phone).trim())}\`\n`
+      : optionalLine("טלפון", orderData.phone)) +
     optionalLine("אימייל", orderData.email) +
     `*חבילה:* ${escapeTelegramMarkdown(pack)}\n` +
     `*תשלום:* ${escapeTelegramMarkdown(`${amount} ₪`)} ב-${escapeTelegramMarkdown(method)}\n` +
     `*קוד גישה:* \`${escapeTelegramMarkdown(code)}\`\n` +
     `*זמן:* ${escapeTelegramMarkdown(formatTimestamp(orderData.timestamp))}\n\n` +
-    `_אשרו כדי לשלוח מייל אישור ללקוח, או מחקו כדי לבטל את ההזמנה._`
+    `_התאימו את מספר הטלפון ב-Bit/PayBox ואשרו._`
   );
 }
 

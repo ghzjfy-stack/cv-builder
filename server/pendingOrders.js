@@ -67,9 +67,9 @@ export async function deletePendingOrder(orderId) {
 
 export function detectPackFromAmount(amountIls) {
   const amount = Number(amountIls);
-  const complete = Number(process.env.PAYMENT_PACK_COMPLETE_ILS || 19.9);
-  const bump = Number(process.env.COVER_LETTER_BUMP_ILS || 10);
-  const basic = Number(process.env.PAYMENT_AMOUNT_ILS || 9.9);
+  const complete = Number(process.env.PAYMENT_PACK_COMPLETE_ILS || 10);
+  const bump = Number(process.env.COVER_LETTER_BUMP_ILS || 0);
+  const basic = Number(process.env.PAYMENT_AMOUNT_ILS || 10);
   if (!Number.isFinite(amount)) return "basic";
   if (Math.abs(amount - complete) <= 0.51) return "complete";
   if (Math.abs(amount - (basic + bump)) <= 0.51) return "complete";

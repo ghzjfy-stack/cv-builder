@@ -1,9 +1,11 @@
 import { randomInt } from "node:crypto";
-import { kvGet, kvSet, kvSetNx } from "./kv.js";
+import { assertKvReadyForOrders, kvGet, kvIsRemote, kvSet, kvSetNx } from "./kv.js";
 import { signUnlockToken } from "./unlockToken.js";
-import { escapeTelegramMarkdown, formatAmountIls, formatPackLabel } from "../lib/telegram.js";
+import { escapeTelegramMarkdown, formatAmountIls } from "../lib/telegram.js";
 
-const ORDER_TTL_SEC = () => Math.max(3600, Number(process.env.CODE_TTL_SECONDS || 30 * 24 * 60 * 60));
+/** At least 24h so PENDING → Telegram approve → client poll survives cold starts. */
+const ORDER_TTL_SEC = () =>
+  Math.max(24 * 3600, Number(process.env.CODE_TTL_SECONDS || 30 * 24 * 60 * 60) || 24 * 3600);
 
 /** @typedef {'PENDING' | 'PAID' | 'CANCELLED'} ManualOrderStatus */
 
@@ -19,7 +21,20 @@ export function normalizeOrderId(value) {
   return raw;
 }
 
+async function writeOrderVerified(orderId, record) {
+  const key = orderKey(orderId);
+  await kvSet(key, record, ORDER_TTL_SEC());
+  const stored = await kvGet(key);
+  if (!stored || typeof stored !== "object" || stored.order_id !== orderId) {
+    const err = new Error("order_persist_failed");
+    err.code = "KV_VERIFY_FAILED";
+    throw err;
+  }
+  return stored;
+}
+
 export async function generateUniqueOrderId() {
+  assertKvReadyForOrders();
   for (let i = 0; i < 24; i += 1) {
     const id = `CV-${String(randomInt(1000, 10000))}`;
     const placeholder = { order_id: id, status: "PENDING", reserved: true };
@@ -31,7 +46,7 @@ export async function generateUniqueOrderId() {
 
 /**
  * @param {object} input
- * @param {string} input.orderId
+ * @param {string} [input.orderId]
  * @param {string} [input.customerName]
  * @param {string} [input.phone]
  * @param {string} [input.email]
@@ -41,6 +56,7 @@ export async function generateUniqueOrderId() {
  * @param {string} [input.pack]
  */
 export async function createManualOrder(input) {
+  assertKvReadyForOrders();
   const orderId = normalizeOrderId(input.orderId) || (await generateUniqueOrderId());
   const contact = String(input.contact || "").trim();
   let phone = String(input.phone || "").trim();
@@ -57,21 +73,22 @@ export async function createManualOrder(input) {
     phone: phone.slice(0, 40),
     email: email.slice(0, 120),
     payment_method: String(input.paymentMethod || "bit").trim().toLowerCase() || "bit",
-    amount_ils: Number.isFinite(amount) && amount > 0 ? amount : Number(process.env.PAYMENT_AMOUNT_ILS || 9.9),
-    pack: input.pack === "complete" ? "complete" : "basic",
+    amount_ils: Number.isFinite(amount) && amount > 0 ? amount : Number(process.env.PAYMENT_AMOUNT_ILS || 10),
+    pack: "basic",
     unlock_token: null,
     telegram_message_id: null,
+    storage: kvIsRemote() ? "kv" : "memory",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     paid_at: null,
   };
-  await kvSet(orderKey(orderId), record, ORDER_TTL_SEC());
-  return record;
+  return writeOrderVerified(orderId, record);
 }
 
 export async function getManualOrder(orderId) {
   const id = normalizeOrderId(orderId);
   if (!id) return null;
+  assertKvReadyForOrders();
   const record = await kvGet(orderKey(id));
   if (!record || typeof record !== "object" || record.reserved) return null;
   return record;
@@ -86,14 +103,14 @@ export async function updateManualOrder(orderId, patch) {
     order_id: current.order_id,
     updated_at: new Date().toISOString(),
   };
-  await kvSet(orderKey(current.order_id), next, ORDER_TTL_SEC());
-  return next;
+  return writeOrderVerified(current.order_id, next);
 }
 
 /**
  * Mark order PAID and attach unlock token for client polling.
  */
 export async function approveManualOrder(orderId) {
+  assertKvReadyForOrders();
   const current = await getManualOrder(orderId);
   if (!current) return { ok: false, reason: "not_found" };
   if (current.status === "PAID" && current.unlock_token) {
@@ -108,6 +125,9 @@ export async function approveManualOrder(orderId) {
     unlock_token: token,
     paid_at: new Date().toISOString(),
   });
+  if (!order || order.status !== "PAID" || !order.unlock_token) {
+    return { ok: false, reason: "persist_failed" };
+  }
   return { ok: true, already: false, order };
 }
 
@@ -119,17 +139,18 @@ function telegramConfig() {
 }
 
 export function formatManualOrderTelegramMessage(order) {
-  const amount = formatAmountIls(order.amount_ils);
+  const amount = formatAmountIls(order.amount_ils || 10);
   const method = String(order.payment_method || "bit").toLowerCase() === "paybox" ? "PayBox" : "Bit";
+  const phone = String(order.phone || "").trim() || "—";
   return (
     `🧾 *New checkout order* \`${escapeTelegramMarkdown(order.order_id)}\`\n\n` +
     `*Name:* ${escapeTelegramMarkdown(order.customer_name || "—")}\n` +
-    `*Phone:* ${escapeTelegramMarkdown(order.phone || order.email || "—")}\n` +
+    `*Phone (Bit/PayBox ID):* \`${escapeTelegramMarkdown(phone)}\`\n` +
     `*Amount:* ${escapeTelegramMarkdown(amount)} ILS\n` +
-    `*Pack:* ${escapeTelegramMarkdown(formatPackLabel(order.pack))}\n` +
+    `*Pack:* PDF Download\n` +
     `*Method:* ${escapeTelegramMarkdown(method)}\n` +
     `*Status:* PENDING\n\n` +
-    `_Approve after you verify the Bit/PayBox payment._`
+    `_Match this phone in Bit/PayBox, then Approve._`
   );
 }
 

@@ -11,7 +11,7 @@ function siteUrl() {
 }
 
 function packLabel(pack) {
-  return pack === "complete" ? "חבילה מלאה" : "חבילה בסיסית";
+  return pack === "complete" ? "הורדת PDF מלא" : "הורדת PDF מלא";
 }
 
 function packBenefits(pack) {

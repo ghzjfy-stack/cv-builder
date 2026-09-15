@@ -210,7 +210,8 @@ body.qc-doc-letter #cl-preview-wrapper { display: block; }
     font-family: var(--cv-font);
     font-size: calc(0.95rem * var(--cv-scale));
     line-height: var(--cv-leading);
-    min-height: 40rem;
+    min-height: 0;
+    height: auto;
 }
 .cl-rule {
     width: 3rem;

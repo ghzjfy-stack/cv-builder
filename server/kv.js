@@ -1,6 +1,7 @@
 /**
  * KV adapter for Vercel KV / Upstash Redis REST.
  * Falls back to in-memory storage for local `vite` / `node server`.
+ * On Vercel, remote KV is required for orders to survive across serverless invocations.
  */
 
 const memory = new Map();
@@ -29,23 +30,45 @@ function memorySet(key, value, ttlSec) {
   });
 }
 
-async function restCommand(cfg, command) {
-  const res = await fetch(cfg.url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${cfg.token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(command),
-  });
-  const data = await res.json().catch(() => null);
-  if (!res.ok) {
-    const err = new Error("kv_error");
-    err.code = "KV_ERROR";
-    err.status = res.status;
-    throw err;
+async function restCommandOnce(cfg, command) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(cfg.url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${cfg.token}`,
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+      body: JSON.stringify(command),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const err = new Error("kv_error");
+      err.code = "KV_ERROR";
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  } finally {
+    clearTimeout(timer);
   }
-  return data;
+}
+
+async function restCommand(cfg, command) {
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await restCommandOnce(cfg, command);
+    } catch (err) {
+      lastErr = err;
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 120 * (attempt + 1)));
+      }
+    }
+  }
+  throw lastErr || new Error("kv_error");
 }
 
 function encode(value) {
@@ -127,4 +150,23 @@ export async function kvIncr(key) {
 
 export function kvIsRemote() {
   return Boolean(restConfig());
+}
+
+/** True on Vercel / production where in-memory KV cannot persist across invocations. */
+export function kvRequiresRemote() {
+  return Boolean(process.env.VERCEL) || process.env.NODE_ENV === "production";
+}
+
+/**
+ * Ensure remote KV is configured when running in serverless/production.
+ * @throws {Error} with code KV_REQUIRED
+ */
+export function assertKvReadyForOrders() {
+  if (!kvRequiresRemote()) return;
+  if (kvIsRemote()) return;
+  const err = new Error(
+    "Order storage requires Vercel KV / Upstash Redis (KV_REST_API_URL + KV_REST_API_TOKEN).",
+  );
+  err.code = "KV_REQUIRED";
+  throw err;
 }

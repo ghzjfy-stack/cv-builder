@@ -10,7 +10,7 @@ The editor is a Vite SPA (`index.html` + `src/`). Category landing pages are a N
 - Template skins and role-based presets (sales, hi-tech, students, CS, marketing, education, and more)
 - Optional cover letter in the export pack
 - High-res / selectable PDF (html2canvas, jsPDF, html2pdf.js)
-- Checkout packs (basic ~₪9.90, complete ~₪19.90) with access codes
+- Checkout: single PDF package at a flat ₪10 (Bit / PayBox deep links + manual transfer)
 - Paid unlock via Telegram **Approve Payment** (client polls every 3s) + optional Resend email
 - Telegram order alerts with Approve button + admin bot (`/code`, `/status`, `/revoke`)
 
@@ -59,7 +59,7 @@ npm run build
 npm run preview   # Vite preview of dist, http://localhost:4173
 ```
 
-Deploy: Vercel uses `vercel.json` (`buildCommand: npm run build`, `outputDirectory: dist`). Set the same env vars in the Vercel project. Production unlock codes need Vercel KV / Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`) so they survive cold starts.
+Deploy: Vercel uses `vercel.json` (`buildCommand: npm run build`, `outputDirectory: dist`). Set the same env vars in the Vercel project. Production unlock codes **and** manual Bit/PayBox order status need Vercel KV / Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`) so they survive serverless cold starts.
 
 ## Environment
 
@@ -67,7 +67,7 @@ See `.env.example`. Groups:
 
 - **Bit screenshot verify:** `OPENAI_API_KEY` (vision)
 - **Payments:** `PAYMENT_TOKEN_SECRET`, webhook secrets, optional `PAYBOX_*` URLs and public key
-- **Prices:** `PAYMENT_AMOUNT_ILS`, `PAYMENT_PACK_COMPLETE_ILS`, `COVER_LETTER_BUMP_ILS`
+- **Prices:** `PAYMENT_AMOUNT_ILS=10` (single PDF package)
 - **Codes:** `CODE_TTL_SECONDS` (default 30 days), KV / Redis
 - **Notify / send:** WhatsApp Cloud API, Resend, Telegram
 - **Telegram admin:** `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, optional `TELEGRAM_ADMIN_IDS`, `TELEGRAM_WEBHOOK_SECRET`

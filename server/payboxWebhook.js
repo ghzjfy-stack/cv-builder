@@ -5,8 +5,8 @@ import { notifyPaidOrder } from "./orderNotify.js";
 import { extractSessionId, getCheckoutSession, markCheckoutPaid } from "./payboxSession.js";
 
 const MAX_BYTES = 64 * 1024;
-const EXPECTED_AMOUNT = Number(process.env.PAYMENT_AMOUNT_ILS || 9.9);
-const COMPLETE_AMOUNT = Number(process.env.PAYMENT_PACK_COMPLETE_ILS || 19.9);
+const EXPECTED_AMOUNT = Number(process.env.PAYMENT_AMOUNT_ILS || 10);
+const COMPLETE_AMOUNT = Number(process.env.PAYMENT_PACK_COMPLETE_ILS || 10);
 
 function safeEqual(a, b) {
   const left = Buffer.from(String(a || ""));

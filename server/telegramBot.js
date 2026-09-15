@@ -3,6 +3,7 @@ import { json, parseBody, readBody } from "./http.js";
 import { kvGet, kvSet } from "./kv.js";
 import { sendPurchaseConfirmationEmail } from "./notify.js";
 import { getPendingOrder, updatePendingOrder } from "./pendingOrders.js";
+import { approveManualOrder, getManualOrder } from "./manualOrders.js";
 import {
   escapeTelegramMarkdown,
   formatAmountIls,
@@ -108,8 +109,8 @@ function helpText() {
     "`/code 0501234567` — קוד מקושר לטלפון\n" +
     "`/lookup ABC123` — בדיקת קוד\n" +
     "`/revoke ABC123` — ביטול קוד\n\n" +
-    "הזמנות חדשות מגיעות לכאן עם כפתורי *אישור* / *מחיקה*.\n" +
-    "אישור שולח מייל Resend ללקוח לפי החבילה."
+    "הזמנות חדשות מגיעות לכאן עם כפתור *Approve Payment*.\n" +
+    "אישור משחרר הורדה ללקוח (polling) ושולח מייל Resend אם יש אימייל."
   );
 }
 
@@ -231,6 +232,56 @@ async function handleRevoke(chatId, codeRaw) {
     chatId,
     `לא ניתן לבטל \`${escapeTelegramMarkdown(code)}\` (${result.reason || "invalid"}).`,
   );
+}
+
+async function handleApprovePayment(chatId, orderId, messageId) {
+  const existing = await getManualOrder(orderId);
+  if (!existing) {
+    await sendTelegramText(chatId, `Order \`${escapeTelegramMarkdown(orderId)}\` not found.`);
+    return;
+  }
+  const result = await approveManualOrder(orderId);
+  if (!result.ok) {
+    await sendTelegramText(
+      chatId,
+      `Could not approve \`${escapeTelegramMarkdown(orderId)}\` (${result.reason || "error"}).`,
+    );
+    return;
+  }
+
+  const order = result.order;
+  if (order?.email && order?.unlock_token) {
+    // Optional receipt: issue a one-time code for email downloads when contact is email.
+    try {
+      const issued = await issuePaidCode({
+        userPhone: order.phone,
+        userEmail: order.email,
+        provider: order.payment_method || "manual",
+        transactionId: `manual-${order.order_id}`,
+      });
+      if (issued?.code) {
+        await sendPurchaseConfirmationEmail({
+          email: order.email,
+          code: issued.code,
+          pack: order.pack,
+          customerName: order.customer_name,
+          amountIls: order.amount_ils,
+        });
+      }
+    } catch (err) {
+      console.error("[quickcv] approve email failed:", err?.message || err);
+    }
+  }
+
+  const text =
+    `✅ Payment Approved & Download Released!\n\n` +
+    `*Order:* \`${escapeTelegramMarkdown(order.order_id)}\`\n` +
+    optionalLine("Name", order.customer_name) +
+    optionalLine("Phone", order.phone || order.email) +
+    `*Amount:* ${escapeTelegramMarkdown(formatAmountIls(order.amount_ils))} ILS\n` +
+    (result.already ? `_Already approved earlier._` : `_Client polling will unlock download now._`);
+
+  await editTelegramMessage(chatId, messageId, text);
 }
 
 async function handleConfirmOrder(chatId, orderId, messageId) {
@@ -409,6 +460,14 @@ export async function handleTelegramWebhookRequest(req, res) {
         return;
       }
 
+      if (data.startsWith("pay:")) {
+        await telegramApi("answerCallbackQuery", {
+          callback_query_id: cq.id,
+          text: "Approving payment...",
+        });
+        await handleApprovePayment(chatId, data.slice(4), messageId);
+        return;
+      }
       if (data.startsWith("ok:")) {
         await telegramApi("answerCallbackQuery", {
           callback_query_id: cq.id,

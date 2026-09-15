@@ -1,6 +1,7 @@
 import { handlePayboxSessionRequest, handlePayboxStatusRequest } from "./payboxSession.js";
 import { handlePayboxWebhookRequest } from "./payboxWebhook.js";
 import { handlePaymentWebhookRequest } from "./paymentWebhook.js";
+import { handleOrderSessionRequest, handleOrderStatusRequest } from "./manualCheckout.js";
 import { handleVerifyCodeAndDownloadRequest } from "./verifyCodeDownload.js";
 import { handleSendPdfWhatsappRequest } from "./sendPdfWhatsapp.js";
 import { handleTelegramWebhookRequest } from "./telegramBot.js";
@@ -13,6 +14,8 @@ const routes = {
   "/api/webhooks/paybox": handlePayboxWebhookRequest,
   "/api/paybox-session": handlePayboxSessionRequest,
   "/api/paybox-status": handlePayboxStatusRequest,
+  "/api/order-session": handleOrderSessionRequest,
+  "/api/order-status": handleOrderStatusRequest,
   "/api/verify-code-and-download": handleVerifyCodeAndDownloadRequest,
   "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,
   "/api/telegram-webhook": handleTelegramWebhookRequest,

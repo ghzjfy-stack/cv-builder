@@ -18,6 +18,10 @@ import {
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
 import { CODE_FAIL_MSG, verifyDownloadCode } from "./payment/verifyCode.js";
 import { createPayboxSession, waitForPayboxPayment, type PayboxMethod } from "./payment/paybox.js";
+import {
+  createManualOrderSession,
+  waitForManualOrderPaid,
+} from "./payment/manualOrder.js";
 import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
 const modal = () => document.getElementById("payment-modal");
@@ -25,12 +29,35 @@ const feedback = () => document.getElementById("code-feedback");
 const codeInput = () => document.getElementById("download-code");
 const preview = () => document.getElementById("cv-preview-wrapper");
 const PACK_KEY = "quickcv.checkoutPack";
+const MANUAL_ORDER_KEY = "quickcv.manualOrderId";
 
 let lastFocus = null;
 let selectedPack: PackId = "basic";
 let selectedPayMethod = "bit";
 let payboxPoll = null;
+let manualOrderPoll = null;
+let activeManualOrderId = "";
 let payboxSessionCache = { key: "", sessionId: "", payUrl: "" };
+
+function persistManualOrderId(orderId) {
+  activeManualOrderId = String(orderId || "").trim().toUpperCase();
+  try {
+    if (activeManualOrderId) sessionStorage.setItem(MANUAL_ORDER_KEY, activeManualOrderId);
+    else sessionStorage.removeItem(MANUAL_ORDER_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+function readPersistedManualOrderId() {
+  try {
+    return String(sessionStorage.getItem(MANUAL_ORDER_KEY) || "")
+      .trim()
+      .toUpperCase();
+  } catch {
+    return "";
+  }
+}
 
 function readStoredPack(): PackId {
   try {
@@ -205,6 +232,88 @@ function stopPayboxPoll() {
   }
 }
 
+function stopManualOrderPoll() {
+  if (manualOrderPoll) {
+    manualOrderPoll.abort();
+    manualOrderPoll = null;
+  }
+}
+
+function setManualOrderUi(orderId, statusText) {
+  const panel = document.getElementById("manual-order-panel");
+  const idEl = document.getElementById("manual-order-id");
+  const statusEl = document.getElementById("manual-order-status");
+  if (orderId) {
+    panel?.classList.remove("hidden");
+    if (idEl) idEl.textContent = orderId;
+  }
+  if (statusEl && statusText != null) statusEl.textContent = statusText;
+}
+
+function readCustomerName() {
+  const el = document.getElementById("in-name");
+  return String(el && "value" in el ? el.value : "").trim();
+}
+
+async function startManualOrderPolling(orderId) {
+  stopManualOrderPoll();
+  persistManualOrderId(orderId);
+  setManualOrderUi(orderId, "ממתינים לאישור תשלום בטלגרם…");
+  setVerifyOverlay(true, "ממתינים לאישור תשלום...", "אחרי שתשלמו, נאשר בטלגרם וההורדה תיפתח אוטומטית");
+  manualOrderPoll = new AbortController();
+  try {
+    const result = await waitForManualOrderPaid(orderId, {
+      signal: manualOrderPoll.signal,
+      intervalMs: 3000,
+    });
+    if (result.paid === true && result.token) {
+      window.QCLog?.add("auth_ok", "telegram approve");
+      persistManualOrderId("");
+      applyPaidUnlock(result.token, "התשלום אושר. מוריד את ה-PDF...");
+      setManualOrderUi(orderId, "התשלום אושר — ההורדה נפתחה");
+      return;
+    }
+    if (result.error && result.error !== "cancelled") {
+      setManualOrderUi(orderId, result.error);
+      setFeedback(result.error, false);
+    }
+  } finally {
+    setVerifyOverlay(false);
+    manualOrderPoll = null;
+  }
+}
+
+async function proceedToPayment() {
+  const contact = readCheckoutContact();
+  if (!contact) {
+    setFeedback("נא למלא נייד או אימייל לפני המשך לתשלום.", false);
+    document.getElementById("checkout-contact")?.focus();
+    return null;
+  }
+  if (activeManualOrderId && manualOrderPoll) {
+    setManualOrderUi(activeManualOrderId, "ממתינים לאישור תשלום בטלגרם…");
+    return { ok: true, order_id: activeManualOrderId };
+  }
+  setFeedback("", false);
+  setManualOrderUi(activeManualOrderId || "…", "יוצרים הזמנה…");
+  const created = await createManualOrderSession({
+    pack: selectedPack,
+    contact,
+    paymentMethod: selectedPayMethod === "paybox" ? "paybox" : "bit",
+    customerName: readCustomerName(),
+    amountIls: selectedAmount(),
+  });
+  if (!created.ok || !created.order_id) {
+    const message = created.error || "לא הצלחנו לפתוח הזמנה.";
+    setFeedback(message, false);
+    setManualOrderUi("", message);
+    document.getElementById("manual-order-panel")?.classList.add("hidden");
+    return null;
+  }
+  void startManualOrderPolling(created.order_id);
+  return created;
+}
+
 function setPayMethod(method) {
   selectedPayMethod = method === "paybox" ? "paybox" : "bit";
   document.querySelectorAll("[data-pay-method]").forEach((btn) => {
@@ -336,21 +445,11 @@ async function startHostedPayment(method: PayboxMethod) {
 }
 
 async function onHostedPayClick(e, method: PayboxMethod) {
-  const el = e?.currentTarget;
-  const sameTab = prefersSameTabCheckout();
-  const readyHref = el instanceof HTMLAnchorElement ? el.href : "";
-  const cachedReady =
-    payboxSessionCache.payUrl &&
-    payboxSessionCache.key.startsWith("paybox:") &&
-    isReadyPayUrl(payboxSessionCache.payUrl);
-
-  if (sameTab && cachedReady && isReadyPayUrl(readyHref)) {
-    bindHostedPayLink("btn-open-paybox", payboxSessionCache.payUrl);
-    void startHostedPayment(method);
-    return;
-  }
-
   e?.preventDefault?.();
+  const orderId = await ensureManualOrderForCheckout();
+  if (!orderId) return;
+
+  const sameTab = prefersSameTabCheckout();
   const popup = sameTab ? null : window.open("about:blank", "paybox_checkout");
   setHostedPayStatus("פותחים את PayBox...");
   try {
@@ -365,6 +464,7 @@ async function onHostedPayClick(e, method: PayboxMethod) {
       }
       throw new Error("לא קיבלנו קישור תשלום מ-PayBox.");
     }
+    // Keep PayBox webhook polling as a secondary unlock path.
     void startHostedPayment(method);
   } catch (err) {
     try {
@@ -382,6 +482,7 @@ function dismissCheckout(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
   stopPayboxPoll();
+  stopManualOrderPoll();
   setVerifyOverlay(false);
   closeModal();
 }
@@ -401,20 +502,27 @@ function copyBitPhone(e) {
   void navigator.clipboard.writeText(CHECKOUT.bitPhoneCopy).then(flashCopyButton, flashCopyButton);
 }
 
+async function ensureManualOrderForCheckout() {
+  if (activeManualOrderId && manualOrderPoll) return activeManualOrderId;
+  const created = await proceedToPayment();
+  return created?.order_id || null;
+}
+
 function openBitApp(e) {
-  const url = bitAppOpenUrl(selectedAmount());
-  const el = e?.currentTarget;
-  if (el instanceof HTMLAnchorElement) {
-    el.href = url;
-    el.target = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "_self" : "_blank";
-    return;
-  }
   e?.preventDefault?.();
-  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    window.location.href = url;
-    return;
-  }
-  window.open(url, "_blank", "noopener");
+  void (async () => {
+    const orderId = await ensureManualOrderForCheckout();
+    if (!orderId) return;
+    const url = bitAppOpenUrl(selectedAmount());
+    const el = e?.currentTarget;
+    if (el instanceof HTMLAnchorElement) {
+      el.href = url;
+      // Prefer a new tab so polling can keep running on this page.
+      el.target = "_blank";
+      el.rel = "noopener noreferrer";
+    }
+    window.open(url, "_blank", "noopener");
+  })();
 }
 
 function openWhatsApp(e) {
@@ -633,6 +741,7 @@ function openCheckoutModal() {
   openModal();
   showPayStep();
   stopPayboxPoll();
+  stopManualOrderPoll();
   setPayMethod("bit");
   setVerifyOverlay(false);
   setScreenshotFeedback("", false);
@@ -648,6 +757,18 @@ function openCheckoutModal() {
   }
   document.getElementById("verify-btn")?.removeAttribute("disabled");
   setFeedback("", false);
+
+  const existing = readPersistedManualOrderId();
+  if (existing && !isUnlocked()) {
+    void startManualOrderPolling(existing);
+  } else {
+    persistManualOrderId("");
+    document.getElementById("manual-order-panel")?.classList.add("hidden");
+    const orderIdEl = document.getElementById("manual-order-id");
+    if (orderIdEl) orderIdEl.textContent = "—";
+    const orderStatusEl = document.getElementById("manual-order-status");
+    if (orderStatusEl) orderStatusEl.textContent = "ממתינים לאישור תשלום בטלגרם…";
+  }
 }
 
 function onDownloadPdfClick(e) {
@@ -922,6 +1043,9 @@ function bind() {
   document.getElementById("btn-close-modal")?.addEventListener("click", dismissCheckout);
   document.querySelectorAll(".btn-back-checkout").forEach((btn) => {
     btn.addEventListener("click", dismissCheckout);
+  });
+  document.getElementById("btn-proceed-payment")?.addEventListener("click", () => {
+    void proceedToPayment();
   });
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);

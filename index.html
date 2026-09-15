@@ -950,6 +950,15 @@
                     <input type="text" id="checkout-contact" autocomplete="tel" inputmode="email" placeholder="054-0000000 או name@email.com" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
                 </div>
 
+                <button type="button" id="btn-proceed-payment" class="w-full min-h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-sm">
+                    המשך לתשלום
+                </button>
+                <div id="manual-order-panel" class="hidden rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-center space-y-1" aria-live="polite">
+                    <p class="text-xs text-emerald-200 font-bold">מזהה הזמנה</p>
+                    <p id="manual-order-id" class="text-lg font-black tracking-wide text-white" dir="ltr">—</p>
+                    <p id="manual-order-status" class="text-xs text-slate-300">ממתינים לאישור תשלום בטלגרם…</p>
+                </div>
+
                 <div class="pay-methods" role="tablist" aria-label="אמצעי תשלום">
                     <button type="button" class="pay-method-tab" role="tab" id="pay-tab-bit" data-pay-method="bit" aria-selected="true" aria-controls="pay-panel-bit">Bit</button>
                     <button type="button" class="pay-method-tab" role="tab" id="pay-tab-paybox" data-pay-method="paybox" aria-selected="false" aria-controls="pay-panel-paybox">PayBox</button>

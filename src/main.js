@@ -157,6 +157,12 @@ function openModal() {
   if (!el) return;
   lastFocus = document.activeElement;
   document.body.classList.add("qc-checkout-open");
+  if (typeof window.lockQcModalScroll === "function") {
+    window.lockQcModalScroll("payment");
+  } else {
+    document.documentElement.classList.add("qc-modal-open");
+    document.body.classList.add("qc-modal-open");
+  }
   el.classList.remove("hidden");
   el.classList.add("flex");
   el.style.display = "flex";
@@ -172,6 +178,12 @@ function closeModal() {
   const el = modal();
   if (!el) return;
   document.body.classList.remove("qc-checkout-open");
+  if (typeof window.unlockQcModalScroll === "function") {
+    window.unlockQcModalScroll("payment");
+  } else {
+    document.documentElement.classList.remove("qc-modal-open");
+    document.body.classList.remove("qc-modal-open");
+  }
   el.classList.add("hidden");
   el.classList.remove("flex");
   el.style.display = "none";

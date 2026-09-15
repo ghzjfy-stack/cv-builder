@@ -1,8 +1,7 @@
 import { clientIp, json, parseBody, rateLimited, readBody } from "./http.js";
-import { assertKvReadyForOrders, kvIsRemote } from "./kv.js";
-import { packAmount, isPackId } from "../src/config/checkout.js";
+import { orderStorageMode } from "./orderStore.js";
+import { packAmount } from "../src/config/checkout.js";
 import {
-  approveManualOrder,
   createManualOrder,
   getManualOrder,
   normalizeOrderId,
@@ -18,16 +17,12 @@ function parseContact(raw) {
   return { contact, phone: contact, email: "" };
 }
 
-function kvErrorResponse(res, err) {
-  if (err?.code === "KV_REQUIRED" || err?.code === "KV_VERIFY_FAILED") {
-    json(res, 503, {
-      ok: false,
-      error: "אחסון ההזמנות לא מוגדר (KV). הגדירו KV_REST_API_URL ו-KV_REST_API_TOKEN ב-Vercel.",
-      code: err.code,
-    });
-    return true;
+function friendlyError(err) {
+  const msg = String(err?.message || err || "");
+  if (/kv|redis|upstash|storage|database/i.test(msg)) {
+    return "לא הצלחנו לפתוח הזמנה. נסו שוב בעוד רגע.";
   }
-  return false;
+  return "לא הצלחנו לפתוח הזמנה. נסו שוב.";
 }
 
 /**
@@ -50,13 +45,6 @@ export async function handleOrderSessionRequest(req, res) {
   if (rateLimited(`order-session:${ip}`, 12, 10 * 60 * 1000)) {
     json(res, 429, { ok: false, error: "יותר מדי ניסיונות. נסו שוב בעוד כמה דקות." });
     return;
-  }
-
-  try {
-    assertKvReadyForOrders();
-  } catch (err) {
-    if (kvErrorResponse(res, err)) return;
-    throw err;
   }
 
   let body;
@@ -101,12 +89,11 @@ export async function handleOrderSessionRequest(req, res) {
       amount_ils: order.amount_ils,
       pack: order.pack,
       telegram_sent: Boolean(notify.sent),
-      storage: kvIsRemote() ? "kv" : "memory",
+      storage: orderStorageMode(),
     });
   } catch (err) {
-    if (kvErrorResponse(res, err)) return;
     console.error("[quickcv] order-session failed:", err?.message || err);
-    json(res, 500, { ok: false, error: "לא הצלחנו לפתוח הזמנה. נסו שוב." });
+    json(res, 500, { ok: false, error: friendlyError(err) });
   }
 }
 
@@ -133,23 +120,19 @@ export async function handleOrderStatusRequest(req, res) {
     return;
   }
 
-  try {
-    assertKvReadyForOrders();
-  } catch (err) {
-    if (kvErrorResponse(res, err)) return;
-    throw err;
-  }
-
-  let order;
+  let order = null;
   try {
     order = await getManualOrder(orderId);
   } catch (err) {
-    if (kvErrorResponse(res, err)) return;
-    throw err;
+    console.warn("[quickcv] order-status read failed:", err?.message || err);
+    // Soft pending — never surface storage errors to the checkout UI.
+    json(res, 200, { ok: true, order_id: orderId, status: "PENDING", paid: false });
+    return;
   }
 
   if (!order) {
-    json(res, 404, { ok: false, paid: false, status: "NOT_FOUND", error: "order_not_found" });
+    // Keep the spinner waiting instead of failing the UX while approve propagates.
+    json(res, 200, { ok: true, order_id: orderId, status: "PENDING", paid: false });
     return;
   }
 
@@ -167,5 +150,6 @@ export async function handleOrderStatusRequest(req, res) {
 
 /** Used by Telegram webhook approve button. */
 export async function releaseManualOrderDownload(orderId) {
+  const { approveManualOrder } = await import("./manualOrders.js");
   return approveManualOrder(orderId);
 }

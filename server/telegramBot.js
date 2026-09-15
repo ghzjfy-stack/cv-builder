@@ -3,7 +3,7 @@ import { json, parseBody, readBody } from "./http.js";
 import { kvGet, kvSet } from "./kv.js";
 import { sendPurchaseConfirmationEmail } from "./notify.js";
 import { getPendingOrder, updatePendingOrder } from "./pendingOrders.js";
-import { approveManualOrder, getManualOrder } from "./manualOrders.js";
+import { approveManualOrder } from "./manualOrders.js";
 import {
   escapeTelegramMarkdown,
   formatAmountIls,
@@ -127,7 +127,7 @@ async function statusText() {
     "*סטטוס QuickCV*\n\n" +
     `*טוקן בוט:* ${hasToken ? "תקין" : "חסר"}\n` +
     `*צ׳אט מנהל:* ${hasChat ? "תקין" : "חסר"}\n` +
-    `*KV / Redis:* ${hasKv ? "תקין" : "חסר (קודים עלולים להתאפס)"}\n` +
+    `*אחסון הזמנות:* ${hasKv ? "KV מחובר" : "זיכרון מקומי (ללא KV)"}\n` +
     `*Resend:* ${hasResend ? "תקין" : "חסר"}\n` +
     `*סוד תשלום:* ${hasPaySecret ? "תקין" : "חסר"}\n` +
     `*Webhook תשלום:* ${hasWebhook ? "תקין" : "חסר"}\n` +
@@ -160,7 +160,7 @@ async function handleIssueCode(chatId, args) {
     transactionId: `tg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
   });
   if (!issued?.code) {
-    return sendTelegramText(chatId, "לא הצלחנו להנפיק קוד. בדקו את משתני KV / Redis.");
+    return sendTelegramText(chatId, "לא הצלחנו להנפיק קוד. נסו שוב.");
   }
   try {
     await kvSet(
@@ -234,38 +234,23 @@ async function handleRevoke(chatId, codeRaw) {
   );
 }
 
-async function handleApprovePayment(chatId, orderId, messageId) {
-  let existing;
-  try {
-    existing = await getManualOrder(orderId);
-  } catch (err) {
-    const code = err?.code || "";
-    await sendTelegramText(
-      chatId,
-      code === "KV_REQUIRED" || code === "KV_VERIFY_FAILED"
-        ? "Order storage (KV) is not configured on the server. Set KV_REST_API_URL + KV_REST_API_TOKEN."
-        : `Could not load order \`${escapeTelegramMarkdown(orderId)}\`.`,
-    );
-    return;
-  }
-  if (!existing) {
-    await sendTelegramText(chatId, `Order \`${escapeTelegramMarkdown(orderId)}\` not found.`);
-    return;
-  }
+async function handleApprovePayment(chatId, orderId, messageId, messageText) {
   let result;
   try {
-    result = await approveManualOrder(orderId);
+    result = await approveManualOrder(orderId, { messageText: messageText || "" });
   } catch (err) {
     await sendTelegramText(
       chatId,
-      `Could not approve \`${escapeTelegramMarkdown(orderId)}\` (${err?.code || err?.message || "error"}).`,
+      `Could not approve \`${escapeTelegramMarkdown(orderId)}\`. Please try again.`,
     );
     return;
   }
   if (!result.ok) {
     await sendTelegramText(
       chatId,
-      `Could not approve \`${escapeTelegramMarkdown(orderId)}\` (${result.reason || "error"}).`,
+      result.reason === "not_found"
+        ? `Order \`${escapeTelegramMarkdown(orderId)}\` not found. Ask the customer to restart checkout.`
+        : `Could not approve \`${escapeTelegramMarkdown(orderId)}\` (${result.reason || "error"}).`,
     );
     return;
   }
@@ -486,7 +471,7 @@ export async function handleTelegramWebhookRequest(req, res) {
           callback_query_id: cq.id,
           text: "Approving payment...",
         });
-        await handleApprovePayment(chatId, data.slice(4), messageId);
+        await handleApprovePayment(chatId, data.slice(4), messageId, cq.message?.text || "");
         return;
       }
       if (data.startsWith("ok:")) {

@@ -23,9 +23,8 @@
     font-family: 'Heebo', 'Rubik', sans-serif;
     font-size: calc(0.78rem * var(--cv-scale));
     line-height: 1.5;
-    overflow: visible;
+    overflow: hidden;
 }
-#qc-print-host .cv-print-sheet.layout-azure {
     --azure-ink: #1a1a1a;
     --azure-muted: #3f3f3f;
     --azure-line: #d4d8dd;

@@ -600,11 +600,8 @@ export const CATEGORY_FILTERS = [
   { id: "all", labelHe: "הכל", labelEn: "All" },
   { id: "hi-tech", labelHe: "הייטק", labelEn: "High-Tech" },
   { id: "management", labelHe: "ניהול", labelEn: "Management" },
-  { id: "creative", labelHe: "יצירתי", labelEn: "Creative" },
   { id: "students", labelHe: "סטודנטים", labelEn: "Students" },
-  { id: "sales", labelHe: "מכירות", labelEn: "Sales" },
-  { id: "finance", labelHe: "פיננסים", labelEn: "Finance" },
-  { id: "healthcare", labelHe: "בריאות", labelEn: "Healthcare" },
+  { id: "ats", labelHe: "ATS", labelEn: "ATS" },
 ] as const;
 
 export const STYLE_FILTERS = [

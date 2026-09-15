@@ -29,7 +29,9 @@ declare global {
     updateCV?: () => void;
     renderTemplateGalleries?: () => void;
     loadExample?: (key: string) => void;
-    applyCvTemplate?: (key: string, opts?: { forceContent?: boolean }) => void;
+    applyCvTemplate?: (key: string) => void;
+    lockQcModalScroll?: (id: string) => void;
+    unlockQcModalScroll?: (id: string) => void;
     QCTemplates?: Record<string, unknown>;
     QCTemplateOrder?: string[];
     CV_SAMPLES?: Record<string, Record<string, string>>;

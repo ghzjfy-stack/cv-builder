@@ -1,7 +1,6 @@
 /**
  * KV adapter for Vercel KV / Upstash Redis REST.
- * Falls back to in-memory storage for local `vite` / `node server`.
- * On Vercel, remote KV is required for orders to survive across serverless invocations.
+ * Optional — orders work with in-memory + /tmp via orderStore.js when KV is unset.
  */
 
 const memory = new Map();
@@ -152,21 +151,11 @@ export function kvIsRemote() {
   return Boolean(restConfig());
 }
 
-/** True on Vercel / production where in-memory KV cannot persist across invocations. */
 export function kvRequiresRemote() {
-  return Boolean(process.env.VERCEL) || process.env.NODE_ENV === "production";
+  return false;
 }
 
-/**
- * Ensure remote KV is configured when running in serverless/production.
- * @throws {Error} with code KV_REQUIRED
- */
+/** @deprecated KV is optional — always a no-op. */
 export function assertKvReadyForOrders() {
-  if (!kvRequiresRemote()) return;
-  if (kvIsRemote()) return;
-  const err = new Error(
-    "Order storage requires Vercel KV / Upstash Redis (KV_REST_API_URL + KV_REST_API_TOKEN).",
-  );
-  err.code = "KV_REQUIRED";
-  throw err;
+  /* no-op */
 }

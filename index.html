@@ -414,10 +414,7 @@
             <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-6 shadow-xl">
                 <div class="flex items-center justify-between gap-2 flex-wrap">
                     <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
-                    <div class="flex items-center gap-2 flex-wrap justify-end">
-                        <button type="button" id="btn-quick-paste" class="shrink-0 text-[11px] font-semibold border border-emerald-500/40 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-200 px-3 py-2 rounded-xl min-h-10">הדבקה מהירה</button>
-                        <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
-                    </div>
+                    <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
                 </div>
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -457,28 +454,6 @@
                 <div class="space-y-2">
                     <label class="font-bold dynamic-text text-sm block" for="in-summary" id="label-summary">תקציר מקצועי</label>
                     <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full bg-slate-900 border border-slate-700 p-2.5 text-sm rounded-lg text-slate-100 outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
-                </div>
-
-                <div id="phrases-panel" class="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
-                    <h4 class="font-bold text-slate-200 text-sm" id="phrases-heading">משפטים מוכנים לפי תחום</h4>
-                    <div class="phrase-field-wrap">
-                        <label class="sr-only" for="phrase-field-trigger" id="phrase-field-label">תחום</label>
-                        <button type="button" id="phrase-field-trigger" class="phrase-field-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="phrase-field-menu">
-                            <span id="phrase-field-trigger-label">בחרו תחום…</span>
-                            <span class="phrase-field-caret" aria-hidden="true"></span>
-                        </button>
-                        <ul id="phrase-field-menu" class="phrase-field-menu" role="listbox" aria-labelledby="phrase-field-label" hidden></ul>
-                        <select id="phrase-field" class="sr-only" tabindex="-1" aria-hidden="true"></select>
-                    </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed" id="phrases-hint" dir="rtl">בחרו תחום ולחצו על משפט כדי להוסיף אותו לטקסט</p>
-                    <div id="phrase-chips" class="phrase-chips" role="list" aria-label="משפטים מוכנים" hidden></div>
-                    <div id="role-title-chips" class="hidden" aria-hidden="true"></div>
-                    <div id="phrase-bullets" class="hidden" aria-hidden="true"></div>
-                    <div id="phrases-actions" class="flex flex-wrap gap-2 hidden">
-                        <button type="button" id="btn-load-role-example" class="text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 px-3 py-2 rounded-lg font-semibold min-h-11">מלא שדות ריקים מדוגמה</button>
-                        <button type="button" id="btn-replace-role-example" class="text-[11px] bg-slate-800 border border-slate-600 text-slate-200 hover:border-emerald-400 px-3 py-2 rounded-lg font-semibold min-h-11">החלף בניסיון לדוגמה</button>
-                        <button type="button" id="btn-insert-skills" class="text-[11px] bg-blue-500/15 text-blue-300 hover:bg-blue-500/25 px-3 py-2 rounded-lg font-semibold min-h-11">+ הוסף כישורים מומלצים לתחום</button>
-                    </div>
                 </div>
 
                 <div class="space-y-2 relative">
@@ -682,7 +657,7 @@
             </div>
             <p id="cv-page-fit-banner" class="no-print" hidden></p>
 
-            <div id="cv-preview-wrapper" class="relative overflow-hidden p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white">
+            <div id="cv-preview-wrapper" class="relative overflow-hidden p-4 md:p-5 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white">
                 <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
                 <div id="cv-target" class="layout-classic" dir="rtl">
@@ -840,11 +815,11 @@
     </div>
     </div>
 
-    <div id="quick-paste-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="quick-paste-title" aria-hidden="true">
+    <div id="quick-paste-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="quick-paste-title" aria-hidden="true">
         <button type="button" class="examples-backdrop" onclick="closeQuickPaste()" aria-label="סגירה"></button>
-        <div class="relative bg-slate-900 text-slate-100 rounded-3xl max-w-xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
-            <button type="button" id="btn-quick-paste-close" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגירה">✕</button>
-            <h3 id="quick-paste-title" class="text-lg font-extrabold pe-10">הדבקה מהירה</h3>
+        <div class="qc-modal-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-xl w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
+            <button type="button" id="btn-quick-paste-close" class="qc-modal-close" aria-label="סגירה">✕</button>
+            <h3 id="quick-paste-title" class="text-lg font-extrabold pe-10 pr-12">הדבקה מהירה</h3>
             <p class="text-sm text-slate-300 leading-relaxed">הדביקו טקסט מקורות חיים או מ-LinkedIn. נמלא שם, ניסיון והשכלה.</p>
             <textarea id="quick-paste-text" rows="10" class="w-full bg-slate-950 border border-slate-700 p-3 text-sm rounded-xl text-slate-100 outline-none min-h-44" placeholder="שם מלא&#10;תפקיד&#10;&#10;Experience&#10;&#10;Education"></textarea>
             <p id="quick-paste-feedback" class="text-sm min-h-5 font-semibold" role="status"></p>
@@ -855,37 +830,34 @@
         </div>
     </div>
 
-        <div id="examples-modal" class="no-print fixed inset-0 hidden flex-col p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
+        <div id="examples-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
         <button type="button" class="examples-backdrop" onclick="closeExamplesModal()" aria-label="סגור דוגמאות"></button>
-        <div class="examples-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-5xl w-full my-auto mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
-            <button type="button" onclick="closeExamplesModal()" class="absolute top-4 left-4 text-slate-300 hover:text-white font-bold text-lg leading-none w-11 h-11" aria-label="סגור דוגמאות">✕</button>
-            <h3 id="examples-title" class="text-lg font-extrabold pe-10">תבניות מוכנות</h3>
-            <p class="text-xs text-slate-400" data-template-count-copy="modal">תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.</p>
-            <!-- Toolbar (categories / search / ATS help) injected by src/templates/selector.ts -->
+        <div class="examples-panel qc-modal-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-5xl w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
+            <button type="button" onclick="closeExamplesModal()" class="qc-modal-close" aria-label="סגור דוגמאות">✕</button>
+            <h3 id="examples-title" class="text-lg font-extrabold pe-10 pr-12">תבניות ודוגמאות מוכנות</h3>
+            <p class="text-xs text-slate-400">בחרו תבנית שמתאימה לכם והתחילו לערוך מיד – כל הפרטים ניתנים לשינוי.</p>
+            <!-- Toolbar (category filters) injected by src/templates/selector.ts -->
             <div class="template-grid canva-grid" data-template-gallery></div>
         </div>
     </div>
 
-    <div id="payment-modal" class="no-print fixed inset-0 hidden flex-col items-center justify-start p-3 sm:p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:10050;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
-        <button type="button" id="btn-close-modal" class="pay-close-btn" aria-label="חזרה לקורות החיים" onclick="closePaymentModal(event)">
-            <span aria-hidden="true">✕</span>
-            חזרה לקורות החיים
-        </button>
-        <div class="pay-card text-slate-100 rounded-3xl max-w-md w-full my-4 p-6 sm:p-7 text-center space-y-5 relative" style="z-index:10000;pointer-events:auto;">
-            <div id="pay-step" class="space-y-5">
-                <div class="pt-1 space-y-3">
+    <div id="payment-modal" class="qc-modal no-print fixed inset-0 hidden flex-col items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:10050;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
+        <div class="pay-card qc-modal-panel text-slate-100 rounded-3xl max-w-md w-full p-4 sm:p-7 text-center space-y-4 sm:space-y-5 relative" style="z-index:10000;pointer-events:auto;">
+            <button type="button" id="btn-close-modal" class="qc-modal-close" aria-label="סגור תשלום" onclick="closePaymentModal(event)">✕</button>
+            <div id="pay-step" class="space-y-3.5 sm:space-y-5">
+                <div class="space-y-2.5 sm:space-y-3">
                     <p class="mt-1 inline-flex items-center rounded-full bg-amber-300 text-slate-950 text-[11px] font-black px-3 py-1" id="pay-save-badge">מחיר השקה — 10 ₪ בלבד</p>
                     <h3 id="pay-title" class="text-xl font-extrabold text-white mt-1">תשלום חד־פעמי</h3>
                     <div class="mvp-pack rounded-2xl border border-emerald-400/35 bg-emerald-400/10 p-4 text-right space-y-3">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-base font-extrabold text-white leading-snug" id="mvp-pack-name">הורדת PDF מלא ופתוח לשינויים</p>
+                                <p class="text-base font-extrabold text-white leading-snug" id="mvp-pack-name">הורדת קובץ PDF מוכן להגשה</p>
                             </div>
                             <p class="shrink-0 text-2xl font-black text-emerald-300 tabular-nums"><span data-price>10</span> ₪</p>
                         </div>
                         <ul class="mvp-pack-features text-sm text-slate-200 space-y-1.5 leading-relaxed">
                             <li>קובץ PDF איכותי מוכן להגשה</li>
-                            <li>עריכה וגישה חופשית ל-30 יום</li>
+                            <li>גישה חופשית לעריכה ושינויים ל-24 שעות</li>
                             <li>תבניות נבדקו מול מערכות סינון (ATS)</li>
                         </ul>
                     </div>
@@ -932,7 +904,7 @@
                     </div>
                     <div class="flex flex-col items-center justify-center gap-2" role="status">
                         <div class="pay-wait-spinner h-12 w-12 rounded-full border-4 border-white/15 border-t-emerald-400 animate-spin" aria-hidden="true"></div>
-                        <p id="manual-order-status" class="text-sm font-extrabold text-white">בודק סטטוס תשלום...</p>
+                        <p id="manual-order-status" class="text-sm font-extrabold text-white">ממתין לאישור התשלום...</p>
                         <p class="text-[11px] text-slate-400">המתינו לאישור — ההורדה תתחיל אוטומטית</p>
                     </div>
                 </div>
@@ -2302,6 +2274,7 @@
             const el = document.getElementById('payment-modal');
             if (!el) return;
             document.body.classList.remove('qc-checkout-open');
+            unlockQcModalScroll('payment');
             el.classList.add('hidden');
             el.classList.remove('flex');
             el.style.display = 'none';
@@ -2312,6 +2285,7 @@
             const el = document.getElementById('payment-modal');
             if (!el) return;
             document.body.classList.add('qc-checkout-open');
+            lockQcModalScroll('payment');
             el.classList.remove('hidden');
             el.classList.add('flex');
             el.style.display = 'flex';
@@ -2424,9 +2398,32 @@
             }, true);
         }
 
+        var qcModalScrollLocks = Object.create(null);
+        var qcModalScrollY = 0;
+
+        function lockQcModalScroll(id) {
+            const wasLocked = Object.keys(qcModalScrollLocks).length > 0;
+            qcModalScrollLocks[id] = true;
+            if (wasLocked) return;
+            qcModalScrollY = window.scrollY || window.pageYOffset || 0;
+            document.documentElement.classList.add('qc-modal-open');
+            document.body.classList.add('qc-modal-open');
+            document.body.style.top = '-' + qcModalScrollY + 'px';
+        }
+
+        function unlockQcModalScroll(id) {
+            delete qcModalScrollLocks[id];
+            if (Object.keys(qcModalScrollLocks).length > 0) return;
+            document.documentElement.classList.remove('qc-modal-open');
+            document.body.classList.remove('qc-modal-open');
+            document.body.style.top = '';
+            window.scrollTo(0, qcModalScrollY || 0);
+        }
+
         function openExamplesModal() {
             closeMobilePreview();
             const modal = document.getElementById('examples-modal');
+            lockQcModalScroll('examples');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             modal.setAttribute('aria-hidden', 'false');
@@ -2437,6 +2434,7 @@
             document.getElementById('examples-modal').classList.add('hidden');
             document.getElementById('examples-modal').classList.remove('flex');
             document.getElementById('examples-modal').setAttribute('aria-hidden', 'true');
+            unlockQcModalScroll('examples');
         }
 
         function markTemplateCards(key) {
@@ -2501,13 +2499,11 @@
         function updateTemplateCountCopy(n, lang) {
             const he = {
                 home: n + ' תבניות מוכנות בסגנון Canva. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.',
-                studio: n + ' עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת',
-                modal: n + ' תבניות מוכנות בסגנון Canva. בחירה טוענת פריסה, צבעים ודוגמה — ואפשר לערוך הכל בזמן אמת.'
+                studio: n + ' עיצובים בסגנון Canva — בחירה ממלאת בזמן אמת'
             };
             const en = {
                 home: n + ' ready-made Canva-style templates. Pick a design, fill in your details, and the preview updates live.',
-                studio: n + ' Canva-style designs — selecting one fills the preview live',
-                modal: n + ' ready-made Canva-style templates. A pick loads layout, colors, and a sample you can edit live.'
+                studio: n + ' Canva-style designs — selecting one fills the preview live'
             };
             const pack = lang === 'en' ? en : he;
             document.querySelectorAll('[data-template-count-copy]').forEach((el) => {
@@ -2547,52 +2543,8 @@
             const tpl = (window.QCTemplates || {})[key];
             if (!tpl) return;
             const fromHome = document.body.classList.contains('on-home');
-            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
-            const pack = tpl[lang] || tpl.en || tpl.he;
-            if (!pack) return;
-            const samples = (CV_SAMPLES && CV_SAMPLES[lang]) || {};
-            let filled = 0;
-            let custom = 0;
-            (CV_SAMPLE_IDS || []).forEach((id) => {
-                const el = formField(id);
-                const val = el ? String(el.value || '').trim() : '';
-                if (!val) return;
-                filled += 1;
-                if (!samples[id] || val !== String(samples[id]).trim()) custom += 1;
-            });
-            const isDefault = filled === 0 || custom === 0;
-            const loadContent = isDefault || window.confirm(
-                lang === 'en'
-                    ? 'Replace your current text with this template’s sample content?'
-                    : 'להחליף את הטקסט הנוכחי בתוכן לדוגמה של התבנית?'
-            );
-            const map = {
-                'in-name': pack.name,
-                'in-title': pack.title,
-                'in-phone': pack.phone,
-                'in-email': pack.email,
-                'in-location': pack.location,
-                'in-linkedin': pack.linkedin,
-                'in-summary': pack.summary,
-                'in-experience': pack.experience,
-                'in-education': pack.education,
-                'in-military': pack.military,
-                'in-skills': pack.skills,
-                'in-languages': pack.languages,
-                'in-references': pack.references || ''
-            };
-            if (loadContent) {
-                Object.keys(map).forEach((id) => {
-                    const el = formField(id);
-                    if (el) el.value = map[id] == null ? '' : map[id];
-                });
-            }
-            if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
-            const phrase = document.getElementById('phrase-field');
-            if (phrase && tpl.field) phrase.value = tpl.field;
-            renderPhrases();
-            if (typeof renderRoleTitleChips === 'function') renderRoleTitleChips();
-            setCvLang(lang, { restore: true });
+            const lang = tpl.preferredLang || (window.QCCvLang === 'en' ? 'en' : 'he');
+            // Design/layout only — never overwrite the user's form text.
             if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
             setCvSkin(tpl.skin || '');
             if (tpl.accent) {
@@ -2601,7 +2553,7 @@
             }
             if (tpl.font) setCvFont(tpl.font);
             if (tpl.bg) setPreviewBg(tpl.bg);
-            if (loadContent) clearPhoto();
+            setCvLang(lang, { restore: true });
             markTemplateCards(key);
             updateCV();
             QCDraft.save();
@@ -3250,6 +3202,8 @@
         document.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') return;
             closeExamplesModal();
+            closePaymentModal();
+            if (typeof window.closeQuickPaste === 'function') window.closeQuickPaste();
             closeMobilePreview();
         });
 
@@ -3266,6 +3220,8 @@
         window.setCvSkin = setCvSkin;
         window.setCvLang = setCvLang;
         window.loadExample = loadExample;
+        window.lockQcModalScroll = lockQcModalScroll;
+        window.unlockQcModalScroll = unlockQcModalScroll;
         window.loadRoleExample = loadRoleExample;
         window.replaceRoleExample = replaceRoleExample;
         window.onRoleFieldChange = onRoleFieldChange;

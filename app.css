@@ -122,15 +122,26 @@
             isolation: isolate;
             contain: layout paint;
             flex: 0 0 auto;
-            /* Live preview: height follows content — no forced blank second page */
             min-height: 0;
             height: auto;
             padding-bottom: 0;
             --a4-ratio: 1.414285714; /* 297 / 210 */
+            --a4-page-height: calc(100% * 297 / 210);
+            --cv-fit-scale: 1;
         }
         #cv-preview-wrapper {
             container-type: inline-size;
             container-name: cv-preview;
+            /* Strict single A4 sheet — never grow into a blank second page */
+            max-height: calc(100cqw * 297 / 210);
+            aspect-ratio: 210 / 297;
+            height: auto;
+            overflow: hidden !important;
+        }
+        #cv-preview-wrapper:has(.layout-charcoal),
+        #cv-preview-wrapper:has(.layout-navy),
+        #cv-preview-wrapper:has(.layout-azure) {
+            padding: 0 !important;
         }
         #cv-preview-wrapper #cv-target {
             box-sizing: border-box;
@@ -140,15 +151,23 @@
             max-height: none;
             padding-bottom: 0;
             margin-bottom: 0;
-            page-break-before: auto;
-            page-break-after: auto;
-            break-before: auto;
-            break-after: auto;
+            page-break-before: avoid;
+            page-break-after: avoid;
+            break-before: avoid;
+            break-after: avoid;
+            transform: scale(var(--cv-fit-scale, 1));
+            transform-origin: top center;
+            overflow: hidden;
         }
-        /* When content truly overflows one A4 page, allow the sheet to grow and scroll */
+        /* Keep overflow clipped — do not open a scrollable second page in live preview */
         #cv-preview-wrapper.cv-over-one-page {
-            overflow-y: auto;
-            max-height: none;
+            overflow: hidden !important;
+            max-height: calc(100cqw * 297 / 210);
+        }
+        #cl-preview-wrapper {
+            max-height: calc(100cqw * 297 / 210);
+            aspect-ratio: 210 / 297;
+            overflow: hidden;
         }
 
         .home-view {
@@ -1033,7 +1052,7 @@
             font-family: 'Lato', 'Rubik', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: 1.45;
-            overflow: visible;
+            overflow: hidden;
         }
         #qc-print-host .cv-print-sheet.layout-charcoal {
             --charcoal: #4c4c4c;
@@ -1357,8 +1376,10 @@
             z-index: 10040;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
-        #examples-modal .examples-backdrop {
+        #examples-modal .examples-backdrop,
+        #quick-paste-modal .examples-backdrop {
             position: absolute;
             inset: 0;
             border: 0;
@@ -1471,7 +1492,7 @@
             font-family: 'Montserrat', 'Heebo', 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: 1.5;
-            overflow: visible;
+            overflow: hidden;
         }
         #qc-print-host .cv-print-sheet.layout-navy {
             --navy: #12192b;
@@ -2031,6 +2052,9 @@
             #preview-column.mobile-preview-open #cv-preview-wrapper {
                 min-height: 0;
                 padding: 0.85rem;
+                max-height: calc(100cqw * 297 / 210);
+                aspect-ratio: 210 / 297;
+                overflow: hidden !important;
             }
         }
 
@@ -2277,31 +2301,101 @@
         #payment-modal {
             z-index: 10050;
             pointer-events: auto;
-        }
-        #payment-modal .pay-close-btn {
-            position: sticky;
-            top: 0;
-            z-index: 10060;
-            pointer-events: auto !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            min-height: 2.75rem;
-            padding: 0 1rem;
-            margin: 0 auto 0.75rem;
-            border-radius: 9999px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-weight: 800;
-            font-size: 0.875rem;
-            cursor: pointer;
-            flex-shrink: 0;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
         }
         body.qc-checkout-open #studio-mobile-dock {
             display: none !important;
+        }
+        @media (max-width: 640px) {
+            #payment-modal #pay-live-status {
+                padding-block: 0.85rem;
+            }
+            #payment-modal .pay-wait-spinner {
+                height: 2.25rem;
+                width: 2.25rem;
+                border-width: 3px;
+            }
+        }
+        /* Shared mobile-safe modal shell: fixed overlay, internal panel scroll */
+        html.qc-modal-open,
+        body.qc-modal-open {
+            overflow: hidden !important;
+            overscroll-behavior: none;
+        }
+        body.qc-modal-open {
+            position: fixed;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
+        .qc-modal {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            max-height: 100dvh;
+            overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: auto;
+            padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+            padding-inline: max(0.75rem, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+            align-items: center;
+            justify-content: center;
+        }
+        .qc-modal.flex {
+            display: flex !important;
+        }
+        .qc-modal-panel {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-height: 90vh;
+            max-height: 90dvh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+            margin-block: 0;
+        }
+        .qc-modal-close {
+            position: sticky;
+            top: 0.5rem;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            margin-inline-start: auto;
+            margin-bottom: -2.75rem;
+            margin-top: 0;
+            float: right;
+            clear: both;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 9999px;
+            background: rgba(15, 23, 42, 0.95);
+            color: #f8fafc;
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            pointer-events: auto;
+        }
+        .qc-modal-close:hover,
+        .qc-modal-close:focus-visible {
+            color: #fff;
+            background: rgba(30, 41, 59, 0.98);
+            outline: 2px solid rgba(52, 211, 153, 0.55);
+            outline-offset: 2px;
+        }
+        #examples-modal .examples-panel > :not(.qc-modal-close),
+        #payment-modal .pay-card > :not(.qc-modal-close),
+        #quick-paste-modal .qc-modal-panel > :not(.qc-modal-close) {
+            clear: both;
         }
         body.qc-mobile-preview-open #studio-mobile-dock {
             visibility: visible;
@@ -2678,6 +2772,12 @@
         #cv-preview-wrapper {
             background: #ffffff;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            /* Reinforce single-page clip after other rules */
+            overflow: hidden !important;
+        }
+        #cv-preview-wrapper.cv-over-one-page,
+        #cv-preview-wrapper.cv-fit-scaled {
+            overflow: hidden !important;
         }
 
         #qc-print-host:not(.qc-capturing) {

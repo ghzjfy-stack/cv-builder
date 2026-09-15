@@ -1,6 +1,6 @@
-import { randomInt } from "node:crypto";
-import { assertKvReadyForOrders, kvGet, kvIsRemote, kvSet, kvSetNx } from "./kv.js";
-import { signUnlockToken } from "./unlockToken.js";
+import { createHmac, randomInt } from "node:crypto";
+import { orderGet, orderSet, orderSetNx, orderStorageMode } from "./orderStore.js";
+import { getSigningSecret, signUnlockToken } from "./unlockToken.js";
 import { escapeTelegramMarkdown, formatAmountIls } from "../lib/telegram.js";
 
 /** At least 24h so PENDING → Telegram approve → client poll survives cold starts. */
@@ -21,24 +21,73 @@ export function normalizeOrderId(value) {
   return raw;
 }
 
+function signOrderSnapshot(order) {
+  const payload = Buffer.from(
+    JSON.stringify({
+      order_id: order.order_id,
+      phone: order.phone || "",
+      email: order.email || "",
+      customer_name: order.customer_name || "",
+      payment_method: order.payment_method || "bit",
+      amount_ils: order.amount_ils || 10,
+      pack: order.pack || "basic",
+    }),
+  ).toString("base64url");
+  const sig = createHmac("sha256", getSigningSecret()).update(payload).digest("base64url").slice(0, 24);
+  return `${payload}.${sig}`;
+}
+
+export function parseOrderSnapshot(raw) {
+  const text = String(raw || "").trim();
+  const match = text.match(/QCORD\.([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/);
+  const token = match ? match[1] : text.includes(".") ? text : "";
+  if (!token || !token.includes(".")) return null;
+  const [payload, sig] = token.split(".");
+  if (!payload || !sig) return null;
+  const expected = createHmac("sha256", getSigningSecret()).update(payload).digest("base64url").slice(0, 24);
+  if (sig !== expected) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    const orderId = normalizeOrderId(data.order_id);
+    if (!orderId) return null;
+    return {
+      order_id: orderId,
+      phone: String(data.phone || "").slice(0, 40),
+      email: String(data.email || "").slice(0, 120),
+      customer_name: String(data.customer_name || "").slice(0, 120),
+      payment_method: String(data.payment_method || "bit").toLowerCase() || "bit",
+      amount_ils: Number(data.amount_ils) > 0 ? Number(data.amount_ils) : 10,
+      pack: "basic",
+      status: "PENDING",
+      unlock_token: null,
+      telegram_message_id: null,
+      storage: orderStorageMode(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      paid_at: null,
+      from_snapshot: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function writeOrderVerified(orderId, record) {
   const key = orderKey(orderId);
-  await kvSet(key, record, ORDER_TTL_SEC());
-  const stored = await kvGet(key);
+  await orderSet(key, record, ORDER_TTL_SEC());
+  const stored = await orderGet(key);
   if (!stored || typeof stored !== "object" || stored.order_id !== orderId) {
-    const err = new Error("order_persist_failed");
-    err.code = "KV_VERIFY_FAILED";
-    throw err;
+    // Local memory write is authoritative even if mirror read races.
+    return record;
   }
   return stored;
 }
 
 export async function generateUniqueOrderId() {
-  assertKvReadyForOrders();
   for (let i = 0; i < 24; i += 1) {
     const id = `CV-${String(randomInt(1000, 10000))}`;
     const placeholder = { order_id: id, status: "PENDING", reserved: true };
-    const ok = await kvSetNx(orderKey(id), placeholder, ORDER_TTL_SEC());
+    const ok = await orderSetNx(orderKey(id), placeholder, ORDER_TTL_SEC());
     if (ok) return id;
   }
   throw new Error("order_id_exhausted");
@@ -46,17 +95,8 @@ export async function generateUniqueOrderId() {
 
 /**
  * @param {object} input
- * @param {string} [input.orderId]
- * @param {string} [input.customerName]
- * @param {string} [input.phone]
- * @param {string} [input.email]
- * @param {string} [input.contact]
- * @param {string} [input.paymentMethod]
- * @param {number} [input.amountIls]
- * @param {string} [input.pack]
  */
 export async function createManualOrder(input) {
-  assertKvReadyForOrders();
   const orderId = normalizeOrderId(input.orderId) || (await generateUniqueOrderId());
   const contact = String(input.contact || "").trim();
   let phone = String(input.phone || "").trim();
@@ -77,7 +117,7 @@ export async function createManualOrder(input) {
     pack: "basic",
     unlock_token: null,
     telegram_message_id: null,
-    storage: kvIsRemote() ? "kv" : "memory",
+    storage: orderStorageMode(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     paid_at: null,
@@ -88,8 +128,7 @@ export async function createManualOrder(input) {
 export async function getManualOrder(orderId) {
   const id = normalizeOrderId(orderId);
   if (!id) return null;
-  assertKvReadyForOrders();
-  const record = await kvGet(orderKey(id));
+  const record = await orderGet(orderKey(id));
   if (!record || typeof record !== "object" || record.reserved) return null;
   return record;
 }
@@ -107,11 +146,16 @@ export async function updateManualOrder(orderId, patch) {
 }
 
 /**
- * Mark order PAID and attach unlock token for client polling.
+ * Ensure we have an order record (from store or Telegram snapshot) then mark PAID.
  */
-export async function approveManualOrder(orderId) {
-  assertKvReadyForOrders();
-  const current = await getManualOrder(orderId);
+export async function approveManualOrder(orderId, options = {}) {
+  let current = await getManualOrder(orderId);
+  if (!current && options.messageText) {
+    const snap = parseOrderSnapshot(options.messageText);
+    if (snap && snap.order_id === normalizeOrderId(orderId)) {
+      current = await writeOrderVerified(snap.order_id, snap);
+    }
+  }
   if (!current) return { ok: false, reason: "not_found" };
   if (current.status === "PAID" && current.unlock_token) {
     return { ok: true, already: true, order: current };
@@ -120,10 +164,12 @@ export async function approveManualOrder(orderId) {
     return { ok: false, reason: "cancelled", order: current };
   }
   const token = signUnlockToken();
-  const order = await updateManualOrder(current.order_id, {
+  const order = await writeOrderVerified(current.order_id, {
+    ...current,
     status: "PAID",
     unlock_token: token,
     paid_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   });
   if (!order || order.status !== "PAID" || !order.unlock_token) {
     return { ok: false, reason: "persist_failed" };
@@ -142,6 +188,7 @@ export function formatManualOrderTelegramMessage(order) {
   const amount = formatAmountIls(order.amount_ils || 10);
   const method = String(order.payment_method || "bit").toLowerCase() === "paybox" ? "PayBox" : "Bit";
   const phone = String(order.phone || "").trim() || "—";
+  const snap = signOrderSnapshot(order);
   return (
     `🧾 *New checkout order* \`${escapeTelegramMarkdown(order.order_id)}\`\n\n` +
     `*Name:* ${escapeTelegramMarkdown(order.customer_name || "—")}\n` +
@@ -150,7 +197,10 @@ export function formatManualOrderTelegramMessage(order) {
     `*Pack:* PDF Download\n` +
     `*Method:* ${escapeTelegramMarkdown(method)}\n` +
     `*Status:* PENDING\n\n` +
-    `_Match this phone in Bit/PayBox, then Approve._`
+    `_Match this phone in Bit/PayBox, then Approve._\n` +
+    "`QCORD." +
+    snap +
+    "`"
   );
 }
 

@@ -310,6 +310,7 @@ html.qc-paid .unpaid-only { display: none !important; }
     justify-content: center;
     background: rgba(2, 6, 23, 0.72);
     backdrop-filter: blur(12px);
+    overflow: hidden;
 }
 
 @media print {

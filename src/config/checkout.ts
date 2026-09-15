@@ -12,7 +12,7 @@ export const CHECKOUT = {
   payboxPayUrl: "https://www.paybox.co.il/",
   payboxCardUrl: "https://www.paybox.co.il/",
   whatsappMessage: 'היי, שילמתי 10 ש"ח ב-Bit עבור קורות החיים.',
-  packageName: "הורדת PDF מלא ופתוח לשינויים",
+  packageName: "הורדת קובץ PDF מוכן להגשה",
 } as const;
 
 /** Only one sellable pack in MVP (legacy "complete" still accepted from storage). */

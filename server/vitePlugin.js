@@ -48,8 +48,8 @@ export function paymentApiPlugin() {
     console.warn("[quickcv] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID missing. Order alerts and Telegram control panel are off.");
   }
   if (!process.env.KV_REST_API_URL && !process.env.UPSTASH_REDIS_REST_URL) {
-    console.warn(
-      "[quickcv] KV_REST_API_URL missing. On Vercel, manual orders cannot persist across serverless invocations until KV/Upstash is set.",
+    console.info(
+      "[quickcv] KV optional — orders use in-memory + /tmp store (Telegram approve + client poll).",
     );
   }
   if (!process.env.RESEND_API_KEY) {

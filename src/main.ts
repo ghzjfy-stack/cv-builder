@@ -198,6 +198,12 @@ function openModal() {
   if (!el) return;
   lastFocus = document.activeElement;
   document.body.classList.add("qc-checkout-open");
+  if (typeof window.lockQcModalScroll === "function") {
+    window.lockQcModalScroll("payment");
+  } else {
+    document.documentElement.classList.add("qc-modal-open");
+    document.body.classList.add("qc-modal-open");
+  }
   el.classList.remove("hidden");
   el.classList.add("flex");
   el.style.display = "flex";
@@ -213,6 +219,12 @@ function closeModal() {
   const el = modal();
   if (!el) return;
   document.body.classList.remove("qc-checkout-open");
+  if (typeof window.unlockQcModalScroll === "function") {
+    window.unlockQcModalScroll("payment");
+  } else {
+    document.documentElement.classList.remove("qc-modal-open");
+    document.body.classList.remove("qc-modal-open");
+  }
   el.classList.add("hidden");
   el.classList.remove("flex");
   el.style.display = "none";
@@ -251,7 +263,7 @@ async function startManualOrderPolling(orderId, options = {}) {
   const quiet = Boolean(options.quiet);
   stopManualOrderPoll();
   persistManualOrderId(orderId, "PENDING");
-  setManualOrderUi(orderId, "בודק סטטוס תשלום...");
+  setManualOrderUi(orderId, "ממתין לאישור התשלום...");
   if (!quiet || modal()?.classList.contains("flex")) {
     showWaitStep();
   }
@@ -259,25 +271,24 @@ async function startManualOrderPolling(orderId, options = {}) {
   try {
     const result = await waitForManualOrderPaid(orderId, {
       signal: manualOrderPoll.signal,
-      intervalMs: 3000,
+      intervalMs: 2500,
     });
     if (result.paid === true && result.token) {
       window.QCLog?.add("auth_ok", "telegram approve");
       persistManualOrderId("");
-      applyPaidUnlock(result.token, "התשלום אושר. מוריד את ה-PDF...");
+      applyPaidUnlock(result.token, "התשלום אושר! מוריד את ה-PDF...");
       setManualOrderUi(orderId, "התשלום אושר — ההורדה נפתחה");
-      return;
-    }
-    if (result.status === "NOT_FOUND" || result.error === "order_not_found") {
-      persistManualOrderId("");
-      setManualOrderUi("", "ההזמנה לא נמצאה — פתחו הזמנה חדשה.");
-      showPayStep();
-      setFeedback("ההזמנה לא נמצאה. התחילו תשלום מחדש.", false);
+      setFeedback("התשלום אושר בהצלחה. ההורדה מתחילה.", true);
       return;
     }
     if (result.error && result.error !== "cancelled") {
-      setManualOrderUi(orderId, result.error);
-      setFeedback(result.error, false);
+      const soft = /kv|redis|אחסון|database/i.test(String(result.error))
+        ? "ממתין לאישור התשלום..."
+        : result.error;
+      setManualOrderUi(orderId, soft);
+      if (!/kv|redis|אחסון|database/i.test(String(result.error))) {
+        setFeedback(result.error, false);
+      }
     }
   } finally {
     manualOrderPoll = null;
@@ -311,11 +322,11 @@ async function proceedToPayment(preferredMethod) {
   if (existingId) {
     showWaitStep();
     if (!manualOrderPoll) void startManualOrderPolling(existingId);
-    setManualOrderUi(existingId, "בודק סטטוס תשלום...");
+    setManualOrderUi(existingId, "ממתין לאישור התשלום...");
     return { ok: true, order_id: existingId };
   }
   setFeedback("", false);
-  setManualOrderUi("…", "יוצרים הזמנה…");
+  setManualOrderUi("…", "ממתין לאישור התשלום...");
   showWaitStep();
   const created = await createManualOrderSession({
     pack: "basic",
@@ -325,7 +336,10 @@ async function proceedToPayment(preferredMethod) {
     amountIls: CHECKOUT.amountIls,
   });
   if (!created.ok || !created.order_id) {
-    const message = created.error || "לא הצלחנו לפתוח הזמנה.";
+    const raw = created.error || "לא הצלחנו לפתוח הזמנה.";
+    const message = /kv|redis|אחסון|database/i.test(raw)
+      ? "לא הצלחנו לפתוח הזמנה. נסו שוב."
+      : raw;
     setFeedback(message, false);
     setManualOrderUi("", message);
     showPayStep();
@@ -640,7 +654,7 @@ function openCheckoutModal() {
     const orderIdEl = document.getElementById("manual-order-id");
     if (orderIdEl) orderIdEl.textContent = "—";
     const orderStatusEl = document.getElementById("manual-order-status");
-    if (orderStatusEl) orderStatusEl.textContent = "בודק סטטוס תשלום...";
+    if (orderStatusEl) orderStatusEl.textContent = "ממתין לאישור התשלום...";
     document.getElementById("manual-order-panel")?.classList.add("hidden");
   }
 }

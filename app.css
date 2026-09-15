@@ -3381,10 +3381,3 @@
                 color: #fff !important;
             }
         }
-t .layout-navy #cv-header,
-            html.qc-print-mode #qc-print-host .layout-navy .cv-photo-block,
-            html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar-inner {
-                background: var(--navy, #12192b) !important;
-                color: #fff !important;
-            }
-        }

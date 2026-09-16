@@ -86,19 +86,23 @@ function signCompactOrderSnapshot(order) {
   return id;
 }
 
-function parseCompactOrderSnapshot(token) {
+function parseCompactOrderSnapshot(token, requireSig = true) {
   const parts = String(token || "").split("|");
-  if (parts.length < 4) return null;
+  if (parts.length < 2) return null;
   const sig = parts[parts.length - 1];
   const payload = parts.slice(0, -1).join("|");
   const expected = createHmac("sha256", getSigningSecret())
     .update(`qccompact:${payload}`)
     .digest("base64url")
     .slice(0, 8);
-  if (sig !== expected) return null;
+  const sigOk = sig === expected;
+  if (requireSig && !sigOk) return null;
 
   const orderId = normalizeOrderId(parts[0]);
   if (!orderId) return null;
+  if (parts.length < 4) {
+    return snapshotRecord({ order_id: orderId });
+  }
 
   let phone = "";
   let email = "";
@@ -129,7 +133,7 @@ function parseCompactOrderSnapshot(token) {
     amount_ils = Number(parts[1]) || 10;
     payment_method = parts[2] === "p" ? "paybox" : "bit";
   } else {
-    return null;
+    return snapshotRecord({ order_id: orderId });
   }
 
   return snapshotRecord({
@@ -171,11 +175,129 @@ export function parseOrderSnapshot(raw) {
     const trimmed = line.trim();
     const token = trimmed.replace(/^(pay|deny):/i, "");
     if (!token.includes("|")) continue;
-    const compact = parseCompactOrderSnapshot(token);
+    const compact =
+      parseCompactOrderSnapshot(token, true) || parseCompactOrderSnapshot(token, false);
     if (compact) return compact;
+  }
+  return parseTelegramOrderMessage(text);
+}
+
+function unescapeTelegramMd(value) {
+  return String(value || "")
+    .replace(/\\([_*`\[])/g, "$1")
+    .trim();
+}
+
+/** Recover CV-XXXX + contact from the admin Telegram message body (no HMAC). */
+export function parseTelegramOrderMessage(raw) {
+  const text = unescapeTelegramMd(raw);
+  if (!text) return null;
+  const id = normalizeOrderId((text.match(/\bCV-\d{4}\b/i) || [])[0]);
+  if (!id) return null;
+  const blank = (v) => {
+    const s = unescapeTelegramMd(v);
+    return !s || s === "—" || s === "-" ? "" : s;
+  };
+  const name = blank((text.match(/\*Customer:\*\s*([^\n]+)/i) || [])[1]);
+  const phone = blank((text.match(/\*Phone:\*\s*`?([^`\n]+)`?/i) || [])[1]);
+  const amount = Number((text.match(/\*Amount:\*\s*([\d.]+)/i) || [])[1]);
+  return snapshotRecord({
+    order_id: id,
+    customer_name: name,
+    phone,
+    amount_ils: Number.isFinite(amount) && amount > 0 ? amount : 10,
+  });
+}
+
+function recordFromSupabase(sb, extras = {}) {
+  if (!sb?.order_id) return null;
+  const approved = sb.confirm === "yes" || sb.status === "approved";
+  const rejected = sb.status === "rejected";
+  return {
+    order_id: normalizeOrderId(sb.order_id) || String(sb.order_id).toUpperCase(),
+    status: approved ? "PAID" : rejected ? "CANCELLED" : "PENDING",
+    confirm: approved ? "yes" : "no",
+    customer_name: sb.name || extras.customer_name || "",
+    phone: sb.phone || extras.phone || "",
+    email: extras.email || "",
+    payment_method: extras.payment_method || "bit",
+    amount_ils: extras.amount_ils || Number(process.env.PAYMENT_AMOUNT_ILS || 10),
+    pack: "basic",
+    unlock_token: approved ? extras.unlock_token || null : null,
+    telegram_message_id: extras.telegram_message_id || null,
+    storage: orderStorageMode(),
+    created_at: sb.order_date || extras.created_at || new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    paid_at: approved ? extras.paid_at || new Date().toISOString() : null,
+    exp_date: sb.exp_date || extras.exp_date || addDaysIso(sb.order_date, 30),
+    from_supabase: true,
+  };
+}
+
+/**
+ * Locate an order across memory/KV, Telegram snapshot, and Supabase.
+ * Serverless checkout and the webhook often run on different instances.
+ */
+async function recoverOrderRecord(orderId, messageText) {
+  const snap = parseOrderSnapshot(messageText) || parseTelegramOrderMessage(messageText);
+  const id = normalizeOrderId(orderId) || snap?.order_id;
+  if (!id) return null;
+
+  const stored = await orderGet(orderKey(id));
+  if (stored && typeof stored === "object" && !stored.reserved) return stored;
+
+  let sb = null;
+  try {
+    sb = await getSupabaseOrder(id);
+  } catch (err) {
+    console.warn("[quickcv] supabase recover failed:", err?.message || err);
+  }
+  if (sb?.order_id) {
+    const extras = { ...(snap || {}), ...(stored && typeof stored === "object" ? stored : {}) };
+    const fromSb = recordFromSupabase(sb, extras);
+    if (fromSb.status === "PAID" && !fromSb.unlock_token) {
+      fromSb.unlock_token = extras.unlock_token || signUnlockToken();
+    }
+    return writeOrderVerified(id, fromSb);
+  }
+
+  if (snap && snap.order_id === id) {
+    console.warn("[quickcv] recovered order from telegram snapshot", id);
+    return writeOrderVerified(id, { ...snap, reserved: false });
+  }
+
+  if (stored?.reserved) {
+    const merged = snapshotRecord({
+      order_id: id,
+      phone: snap?.phone || "",
+      email: snap?.email || "",
+      customer_name: snap?.customer_name || "",
+      amount_ils: snap?.amount_ils || 10,
+      payment_method: snap?.payment_method || "bit",
+    });
+    if (merged) {
+      console.warn("[quickcv] hydrated reserved order placeholder", id);
+      return writeOrderVerified(id, merged);
+    }
+  }
+
+  const synthesized = snapshotRecord({
+    order_id: id,
+    phone: snap?.phone || "",
+    email: snap?.email || "",
+    customer_name: snap?.customer_name || "",
+    amount_ils: snap?.amount_ils || Number(process.env.PAYMENT_AMOUNT_ILS || 10),
+    payment_method: snap?.payment_method || "bit",
+  });
+  if (synthesized) {
+    console.warn("[quickcv] synthesized order from telegram callback", id);
+    return writeOrderVerified(id, synthesized);
   }
   return null;
 }
+
+const approveInflight = new Map();
+const rejectInflight = new Map();
 
 /** Build Approve callback_data; embeds a compact recovery snapshot when it fits. */
 export function buildPayCallbackData(order) {
@@ -263,9 +385,14 @@ export async function createManualOrder(input) {
     exp_date: addDaysIso(createdAt, 30),
   };
   const stored = await writeOrderVerified(orderId, record);
-  await upsertSupabaseOrder(stored, { confirm: "no", status: "pending" }).catch((err) => {
+  try {
+    const sb = await upsertSupabaseOrder(stored, { confirm: "no", status: "pending" });
+    if (!sb.ok && !sb.skipped) {
+      console.error("[quickcv] supabase insert failed:", sb.error);
+    }
+  } catch (err) {
     console.error("[quickcv] supabase insert failed:", err?.message || err);
-  });
+  }
   return stored;
 }
 
@@ -293,37 +420,18 @@ export async function updateManualOrder(orderId, patch) {
  * Ensure we have an order record (from store or Telegram snapshot) then mark PAID.
  */
 export async function approveManualOrder(orderId, options = {}) {
-  let current = await getManualOrder(orderId);
-  if (!current && options.messageText) {
-    const snap = parseOrderSnapshot(options.messageText);
-    const expectedId = normalizeOrderId(orderId);
-    if (snap && (!expectedId || snap.order_id === expectedId)) {
-      current = await writeOrderVerified(snap.order_id, snap);
-    }
-  }
-  if (!current) {
-    const sb = await getSupabaseOrder(orderId);
-    if (sb?.order_id) {
-      current = await writeOrderVerified(sb.order_id, {
-        order_id: sb.order_id,
-        status: "PENDING",
-        confirm: sb.confirm || "no",
-        customer_name: sb.name,
-        phone: sb.phone,
-        email: "",
-        payment_method: "bit",
-        amount_ils: Number(process.env.PAYMENT_AMOUNT_ILS || 10),
-        pack: "basic",
-        unlock_token: null,
-        telegram_message_id: null,
-        storage: orderStorageMode(),
-        created_at: sb.order_date || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        paid_at: null,
-        exp_date: sb.exp_date || addDaysIso(sb.order_date, 30),
-      });
-    }
-  }
+  const id = normalizeOrderId(orderId);
+  const key = id || String(orderId || "");
+  if (approveInflight.has(key)) return approveInflight.get(key);
+  const pending = approveManualOrderInner(orderId, options).finally(() => {
+    approveInflight.delete(key);
+  });
+  approveInflight.set(key, pending);
+  return pending;
+}
+
+async function approveManualOrderInner(orderId, options = {}) {
+  let current = await recoverOrderRecord(orderId, options.messageText || "");
   if (!current) return { ok: false, reason: "not_found" };
   if (current.status === "PAID" && current.unlock_token) {
     await setSupabaseConfirm(current, "yes").catch(() => {});
@@ -336,6 +444,7 @@ export async function approveManualOrder(orderId, options = {}) {
   const paidAt = new Date().toISOString();
   const order = await writeOrderVerified(current.order_id, {
     ...current,
+    reserved: false,
     status: "PAID",
     confirm: "yes",
     unlock_token: token,
@@ -356,37 +465,18 @@ export async function approveManualOrder(orderId, options = {}) {
  * Telegram No — confirm=no, block PDF download.
  */
 export async function rejectManualOrder(orderId, options = {}) {
-  let current = await getManualOrder(orderId);
-  if (!current && options.messageText) {
-    const snap = parseOrderSnapshot(options.messageText);
-    const expectedId = normalizeOrderId(orderId);
-    if (snap && (!expectedId || snap.order_id === expectedId)) {
-      current = await writeOrderVerified(snap.order_id, snap);
-    }
-  }
-  if (!current) {
-    const sb = await getSupabaseOrder(orderId);
-    if (sb?.order_id) {
-      current = await writeOrderVerified(sb.order_id, {
-        order_id: sb.order_id,
-        status: "PENDING",
-        confirm: "no",
-        customer_name: sb.name,
-        phone: sb.phone,
-        email: "",
-        payment_method: "bit",
-        amount_ils: Number(process.env.PAYMENT_AMOUNT_ILS || 10),
-        pack: "basic",
-        unlock_token: null,
-        telegram_message_id: null,
-        storage: orderStorageMode(),
-        created_at: sb.order_date || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        paid_at: null,
-        exp_date: sb.exp_date || addDaysIso(sb.order_date, 30),
-      });
-    }
-  }
+  const id = normalizeOrderId(orderId);
+  const key = id || String(orderId || "");
+  if (rejectInflight.has(key)) return rejectInflight.get(key);
+  const pending = rejectManualOrderInner(orderId, options).finally(() => {
+    rejectInflight.delete(key);
+  });
+  rejectInflight.set(key, pending);
+  return pending;
+}
+
+async function rejectManualOrderInner(orderId, options = {}) {
+  let current = await recoverOrderRecord(orderId, options.messageText || "");
   if (!current) return { ok: false, reason: "not_found" };
   if (current.status === "PAID" && current.unlock_token) {
     return { ok: false, reason: "already_paid", order: current };
@@ -397,6 +487,7 @@ export async function rejectManualOrder(orderId, options = {}) {
   }
   const order = await writeOrderVerified(current.order_id, {
     ...current,
+    reserved: false,
     status: "CANCELLED",
     confirm: "no",
     unlock_token: null,

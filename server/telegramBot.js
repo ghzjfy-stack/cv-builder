@@ -256,10 +256,18 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
     return;
   }
   if (!result.ok) {
+    if (result.reason === "cancelled") {
+      await editTelegramMessage(
+        chatId,
+        messageId,
+        `⚠️ Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` was already rejected — download stays blocked.`,
+      );
+      return;
+    }
     await sendTelegramText(
       chatId,
       result.reason === "not_found"
-        ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` not found. Ask the customer to restart checkout.`
+        ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` could not be recovered. Ask the customer to restart checkout.`
         : `Could not approve \`${escapeTelegramMarkdown(resolvedId || orderId)}\` (${result.reason || "error"}).`,
     );
     return;
@@ -315,13 +323,19 @@ async function handleRejectPayment(chatId, orderId, messageId, messageText) {
     return;
   }
   if (!result.ok) {
+    if (result.reason === "already_paid") {
+      await editTelegramMessage(
+        chatId,
+        messageId,
+        `✅ Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` was already approved — download stays open.`,
+      );
+      return;
+    }
     await sendTelegramText(
       chatId,
-      result.reason === "already_paid"
-        ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` was already approved — download stays open.`
-        : result.reason === "not_found"
-          ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` not found.`
-          : `Could not reject \`${escapeTelegramMarkdown(resolvedId || orderId)}\` (${result.reason || "error"}).`,
+      result.reason === "not_found"
+        ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` could not be recovered.`
+        : `Could not reject \`${escapeTelegramMarkdown(resolvedId || orderId)}\` (${result.reason || "error"}).`,
     );
     return;
   }

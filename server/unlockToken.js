@@ -7,6 +7,9 @@ let bootSecret = "";
 export function getSigningSecret() {
   const fromEnv = process.env.PAYMENT_TOKEN_SECRET || process.env.OPENAI_API_KEY;
   if (fromEnv && fromEnv.length >= 16) return fromEnv;
+  // Same bot token on every Vercel instance — HMAC snapshots must verify across cold starts.
+  const telegram = process.env.TELEGRAM_BOT_TOKEN;
+  if (telegram && telegram.length >= 16) return telegram;
   if (!bootSecret) bootSecret = randomBytes(32).toString("hex");
   return bootSecret;
 }

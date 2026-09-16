@@ -1,7 +1,6 @@
 #cv-preview-wrapper:has(.layout-azure) {
     padding: 0;
     overflow: hidden;
-    background: #fff;
 }
 
 #cv-target.layout-azure,

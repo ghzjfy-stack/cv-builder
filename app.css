@@ -992,14 +992,15 @@
         .dynamic-bg { background-color: var(--accent); }
         .dynamic-icon { color: var(--accent); }
 
-        .bg-preview-white { background-color: #ffffff; }
-        .bg-preview-slate { background-color: #f8fafc; }
-        .bg-preview-cream { background-color: #fafaf9; }
-        .bg-preview-linen { background-color: #f6f0e6; }
-        .bg-preview-mint { background-color: #f0fdf4; }
-        .bg-preview-blush { background-color: #fff1f2; }
+        .bg-preview-white { background-color: #ffffff; background-image: none; }
+        .bg-preview-slate { background-color: #f8fafc; background-image: none; }
+        .bg-preview-cream { background-color: #fafaf9; background-image: none; }
+        .bg-preview-linen { background-color: #f6f0e6; background-image: none; }
+        .bg-preview-mint { background-color: #f0fdf4; background-image: none; }
+        .bg-preview-blush { background-color: #fff1f2; background-image: none; }
         .bg-preview-pearl {
-            background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+            background-color: #f8fafc;
+            background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
         }
         .bg-preview-dots {
             background-color: #ffffff;
@@ -1240,7 +1241,6 @@
         #cv-preview-wrapper:has(.layout-charcoal) {
             padding: 0;
             overflow: hidden;
-            background: #fff;
         }
 
         #cv-target.layout-charcoal,
@@ -1685,7 +1685,6 @@
         #cv-preview-wrapper:has(.layout-navy) {
             padding: 0;
             overflow: hidden;
-            background: #fff;
         }
         #cv-target.layout-navy,
         #cv-target-page2.layout-navy {
@@ -2690,6 +2689,24 @@
             pointer-events: auto;
             overflow: hidden;
         }
+        #payment-modal .pay-card {
+            max-width: 28rem;
+            margin-inline: auto;
+            overflow-x: hidden;
+        }
+        @media (min-width: 768px) {
+            #payment-modal .pay-card {
+                max-width: 32rem;
+                max-height: min(92vh, 56rem);
+                padding-block: 1.35rem;
+            }
+            #payment-modal #pay-step > * + * {
+                margin-top: 0.9rem;
+            }
+            #payment-modal .mvp-pack {
+                padding-block: 0.85rem;
+            }
+        }
         body.qc-checkout-open #studio-mobile-dock {
             display: none !important;
         }
@@ -3119,19 +3136,17 @@
             border-radius: 999px;
             background: #34d399;
         }
-        /* Bit / PayBox deep-link CTAs — mobile only */
-        .pay-mobile-deeplinks {
-            display: none;
-        }
-        @media (max-width: 767px) {
-            .pay-mobile-deeplinks {
-                display: block;
-            }
+        .pay-app-actions {
+            display: block;
         }
         .pay-deeplink {
             text-decoration: none;
             border: 1px solid transparent;
-            transition: transform 0.12s ease, filter 0.12s ease;
+            transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+        }
+        .pay-deeplink:hover {
+            filter: brightness(1.06);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
         }
         .pay-deeplink:active {
             transform: scale(0.98);
@@ -3192,7 +3207,6 @@
 
         #cv-preview-wrapper,
         #cv-preview-page-2 {
-            background: #ffffff;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
             width: 100%;
             max-width: 100%;
@@ -3380,4 +3394,126 @@
                 background: var(--navy, #12192b) !important;
                 color: #fff !important;
             }
+        }
+
+        /* רקע הדף — ID+class beats #cv-preview-wrapper / layout paper fills */
+        #cv-preview-wrapper.bg-preview-white,
+        #cv-preview-page-2.bg-preview-white,
+        #cl-preview-wrapper.bg-preview-white,
+        #cv-target.bg-preview-white,
+        #cv-target.layout-charcoal.bg-preview-white,
+        #cv-target.layout-navy.bg-preview-white,
+        #cv-target.layout-azure.bg-preview-white,
+        #qc-print-host .cv-print-sheet.bg-preview-white {
+            background-color: #ffffff;
+            background-image: none;
+        }
+        #cv-preview-wrapper.bg-preview-slate,
+        #cv-preview-page-2.bg-preview-slate,
+        #cl-preview-wrapper.bg-preview-slate,
+        #cv-target.bg-preview-slate,
+        #cv-target.layout-charcoal.bg-preview-slate,
+        #cv-target.layout-navy.bg-preview-slate,
+        #cv-target.layout-azure.bg-preview-slate,
+        #qc-print-host .cv-print-sheet.bg-preview-slate {
+            background-color: #f8fafc;
+            background-image: none;
+        }
+        #cv-preview-wrapper.bg-preview-cream,
+        #cv-preview-page-2.bg-preview-cream,
+        #cl-preview-wrapper.bg-preview-cream,
+        #cv-target.bg-preview-cream,
+        #cv-target.layout-charcoal.bg-preview-cream,
+        #cv-target.layout-navy.bg-preview-cream,
+        #cv-target.layout-azure.bg-preview-cream,
+        #qc-print-host .cv-print-sheet.bg-preview-cream {
+            background-color: #fafaf9;
+            background-image: none;
+        }
+        #cv-preview-wrapper.bg-preview-linen,
+        #cv-preview-page-2.bg-preview-linen,
+        #cl-preview-wrapper.bg-preview-linen,
+        #cv-target.bg-preview-linen,
+        #cv-target.layout-charcoal.bg-preview-linen,
+        #cv-target.layout-navy.bg-preview-linen,
+        #cv-target.layout-azure.bg-preview-linen,
+        #qc-print-host .cv-print-sheet.bg-preview-linen {
+            background-color: #f6f0e6;
+            background-image: none;
+        }
+        #cv-preview-wrapper.bg-preview-mint,
+        #cv-preview-page-2.bg-preview-mint,
+        #cl-preview-wrapper.bg-preview-mint,
+        #cv-target.bg-preview-mint,
+        #cv-target.layout-charcoal.bg-preview-mint,
+        #cv-target.layout-navy.bg-preview-mint,
+        #cv-target.layout-azure.bg-preview-mint,
+        #qc-print-host .cv-print-sheet.bg-preview-mint {
+            background-color: #f0fdf4;
+            background-image: none;
+        }
+        #cv-preview-wrapper.bg-preview-blush,
+        #cv-preview-page-2.bg-preview-blush,
+        #cl-preview-wrapper.bg-preview-blush,
+        #cv-target.bg-preview-blush,
+        #cv-target.layout-charcoal.bg-preview-blush,
+        #cv-target.layout-navy.bg-preview-blush,
+        #cv-target.layout-azure.bg-preview-blush,
+        #qc-print-host .cv-print-sheet.bg-preview-blush {
+            background-color: #fff1f2;
+            background-image: none;
+        }
+        #cv-preview-wrapper.bg-preview-pearl,
+        #cv-preview-page-2.bg-preview-pearl,
+        #cl-preview-wrapper.bg-preview-pearl,
+        #cv-target.bg-preview-pearl,
+        #cv-target.layout-charcoal.bg-preview-pearl,
+        #cv-target.layout-navy.bg-preview-pearl,
+        #cv-target.layout-azure.bg-preview-pearl,
+        #qc-print-host .cv-print-sheet.bg-preview-pearl {
+            background-color: #f8fafc;
+            background-image: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+        }
+        #cv-preview-wrapper.bg-preview-dots,
+        #cv-preview-page-2.bg-preview-dots,
+        #cl-preview-wrapper.bg-preview-dots,
+        #cv-target.bg-preview-dots,
+        #cv-target.layout-charcoal.bg-preview-dots,
+        #cv-target.layout-navy.bg-preview-dots,
+        #cv-target.layout-azure.bg-preview-dots,
+        #qc-print-host .cv-print-sheet.bg-preview-dots {
+            background-color: #ffffff;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+        #cv-preview-wrapper.bg-preview-grid,
+        #cv-preview-page-2.bg-preview-grid,
+        #cl-preview-wrapper.bg-preview-grid,
+        #cv-target.bg-preview-grid,
+        #cv-target.layout-charcoal.bg-preview-grid,
+        #cv-target.layout-navy.bg-preview-grid,
+        #cv-target.layout-azure.bg-preview-grid,
+        #qc-print-host .cv-print-sheet.bg-preview-grid {
+            background-color: #ffffff;
+            background-image:
+                linear-gradient(#e2e8f0 1px, transparent 1px),
+                linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 22px 22px;
+        }
+        #cv-preview-wrapper.bg-preview-lines,
+        #cv-preview-page-2.bg-preview-lines,
+        #cl-preview-wrapper.bg-preview-lines,
+        #cv-target.bg-preview-lines,
+        #cv-target.layout-charcoal.bg-preview-lines,
+        #cv-target.layout-navy.bg-preview-lines,
+        #cv-target.layout-azure.bg-preview-lines,
+        #qc-print-host .cv-print-sheet.bg-preview-lines {
+            background-color: #fffdf8;
+            background-image: repeating-linear-gradient(
+                -18deg,
+                rgba(148, 163, 184, 0.18),
+                rgba(148, 163, 184, 0.18) 1px,
+                transparent 1px,
+                transparent 12px
+            );
         }

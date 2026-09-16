@@ -632,7 +632,7 @@
             <div id="cv-preview-wrapper" class="relative overflow-hidden p-4 md:p-5 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white">
                 <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
-                <div id="cv-target" class="layout-classic" dir="rtl">
+                <div id="cv-target" class="layout-classic bg-preview-white" dir="rtl">
                     <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
                         <h1 id="out-name" class="text-3xl font-bold dynamic-text">ישראל ישראלי</h1>
                         <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים ומכירות</p>
@@ -820,7 +820,7 @@
     </div>
 
     <div id="payment-modal" class="qc-modal no-print fixed inset-0 hidden flex-col items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:10050;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
-        <div class="pay-card qc-modal-panel text-slate-100 rounded-3xl max-w-md w-full p-4 sm:p-7 text-center space-y-4 sm:space-y-5 relative" style="z-index:10000;pointer-events:auto;">
+        <div class="pay-card qc-modal-panel text-slate-100 rounded-3xl w-full p-5 sm:p-7 text-center space-y-4 sm:space-y-5 relative" style="z-index:10000;pointer-events:auto;">
             <button type="button" id="btn-close-modal" class="qc-modal-close" aria-label="סגור תשלום" onclick="closePaymentModal(event)">✕</button>
             <div id="pay-step" class="space-y-3.5 sm:space-y-5">
                 <div class="space-y-2.5 sm:space-y-3">
@@ -847,16 +847,16 @@
                     <p id="code-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
                 </div>
 
-                <div class="pay-mobile-deeplinks space-y-3">
-                    <p class="text-sm font-extrabold text-white text-right">להעברה מהירה בלחיצת כפתור (מהנייד):</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <a id="btn-open-bit" href="#" class="pay-deeplink pay-deeplink-bit flex flex-col items-center justify-center gap-1 min-h-[4.5rem] rounded-2xl font-extrabold text-sm">
+                <div class="pay-app-actions space-y-3">
+                    <p class="text-sm font-extrabold text-white text-right">שלמו ב-Bit או PayBox</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <a id="btn-open-bit" href="https://www.bitpay.co.il/app/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit flex flex-col items-center justify-center gap-0.5 min-h-[3.5rem] sm:min-h-[4.25rem] rounded-2xl font-extrabold text-sm">
                             <span class="text-[11px] opacity-80">Bit</span>
-                            <span>להעברה ב-Bit</span>
+                            <span>שלמו ב-Bit</span>
                         </a>
-                        <a id="btn-open-paybox" href="#" class="pay-deeplink pay-deeplink-paybox flex flex-col items-center justify-center gap-1 min-h-[4.5rem] rounded-2xl font-extrabold text-sm">
+                        <a id="btn-open-paybox" href="https://www.payboxapp.com/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-paybox flex flex-col items-center justify-center gap-0.5 min-h-[3.5rem] sm:min-h-[4.25rem] rounded-2xl font-extrabold text-sm">
                             <span class="text-[11px] opacity-80">PayBox</span>
-                            <span>להעברה ב-PayBox</span>
+                            <span>שלמו ב-PayBox</span>
                         </a>
                     </div>
                 </div>
@@ -875,7 +875,7 @@
                     <p class="text-[11px] text-slate-400 leading-relaxed">אחרי ההעברה אל תסגרו את הדף — האימות אוטומטי וה-PDF יורד ברגע שהתשלום מאושר.</p>
                 </div>
 
-                <div id="pay-live-status" class="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-5 text-center space-y-3" aria-live="polite">
+                <div id="pay-live-status" class="hidden rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-4 text-center space-y-2" aria-live="polite">
                     <div id="manual-order-panel" class="hidden space-y-1">
                         <p class="text-xs text-emerald-200 font-bold">מזהה הזמנה</p>
                         <p id="manual-order-id" class="text-lg font-black tracking-wide text-white" dir="ltr">—</p>
@@ -2236,22 +2236,42 @@
             resetForm();
         }
 
-        function setPreviewBg(bgClass, btn) {
-            previewBgClass = bgClass;
-            const wrap = document.getElementById('cv-preview-wrapper');
-            BG_CLASSES.forEach((cls) => wrap.classList.remove(cls));
-            wrap.classList.add(bgClass);
+        function previewBgTargets() {
+            return [
+                document.getElementById('cv-preview-wrapper'),
+                document.getElementById('cv-preview-page-2'),
+                document.getElementById('cl-preview-wrapper'),
+                document.getElementById('cv-target'),
+                document.getElementById('cv-target-page2')
+            ].filter(Boolean);
+        }
+
+        function setPreviewBg(bgClass, btn, opts) {
+            const next = BG_CLASSES.indexOf(bgClass) >= 0 ? bgClass : 'bg-preview-white';
+            previewBgClass = next;
+            window.QCPreviewBg = next;
+            previewBgTargets().forEach((el) => {
+                BG_CLASSES.forEach((cls) => el.classList.remove(cls));
+                el.classList.add(next);
+                el.style.backgroundColor = '';
+                el.style.backgroundImage = '';
+                el.style.backgroundSize = '';
+            });
             document.querySelectorAll('.bg-swatch').forEach((el) => {
-                const on = el.getAttribute('data-bg') === bgClass;
+                const on = el.getAttribute('data-bg') === next;
                 el.setAttribute('aria-pressed', on ? 'true' : 'false');
                 el.classList.toggle('border-2', on);
                 el.classList.toggle('border-white', on);
+                el.classList.toggle('border-slate-600', !on);
             });
-            if (btn) btn.setAttribute('aria-pressed', 'true');
-            markStep(2);
-            window.QCPageFit?.updateSoon?.();
-            if (window.QCDraft) QCDraft.saveSoon();
+            if (btn && btn.setAttribute) btn.setAttribute('aria-pressed', 'true');
+            if (!opts || !opts.silent) {
+                try { markStep(2); } catch (err) { /* studio chrome optional */ }
+            }
+            try { window.QCPageFit?.updateSoon?.(); } catch (err) { /* ignore */ }
+            try { if (window.QCDraft) QCDraft.saveSoon(); } catch (err) { /* ignore */ }
         }
+        window.setPreviewBg = setPreviewBg;
 
         function markStep(n) {
             for (let i = 1; i <= 3; i++) {
@@ -3297,7 +3317,7 @@
             hydrateLanguagePicker();
             if (draft && draft.fontScale) setFontScale(draft.fontScale);
             if (draft && draft.lineHeight) setLineHeight(draft.lineHeight);
-            if (draft && draft.previewBg) setPreviewBg(draft.previewBg);
+            if (draft && draft.previewBg) setPreviewBg(draft.previewBg, null, { silent: true });
             if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
         } catch (err) {
             console.error('studio init failed', err);
@@ -3328,6 +3348,13 @@
         window.addEventListener('orientationchange', function () {
             window.setTimeout(syncNarrowStudio, 80);
         });
+        document.querySelectorAll('.bg-swatch[data-bg]').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                setPreviewBg(el.getAttribute('data-bg'), el);
+            });
+        });
+        setPreviewBg(previewBgClass, null, { silent: true });
     </script>
 </body>
 </html>

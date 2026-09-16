@@ -243,9 +243,11 @@ function stopManualOrderPoll() {
 
 function setManualOrderUi(orderId, statusText) {
   const panel = document.getElementById("manual-order-panel");
+  const live = document.getElementById("pay-live-status");
   const idEl = document.getElementById("manual-order-id");
   const statusEl = document.getElementById("manual-order-status");
   if (orderId) {
+    live?.classList.remove("hidden");
     panel?.classList.remove("hidden");
     if (idEl) idEl.textContent = orderId;
   }
@@ -707,6 +709,7 @@ function openCheckoutModal() {
     const orderStatusEl = document.getElementById("manual-order-status");
     if (orderStatusEl) orderStatusEl.textContent = "ממתין לאישור התשלום...";
     document.getElementById("manual-order-panel")?.classList.add("hidden");
+    document.getElementById("pay-live-status")?.classList.add("hidden");
   }
 }
 

@@ -166,10 +166,10 @@ export function parseOrderSnapshot(raw) {
   const legacy = parseLegacyQcordSnapshot(text);
   if (legacy) return legacy;
 
-  // Compact callback token: "pay:CV-…|…|sig" or bare "CV-…|…|sig"
+  // Compact callback token: "pay:CV-…|…|sig", "deny:…", or bare "CV-…|…|sig"
   for (const line of text.split(/\n+/)) {
     const trimmed = line.trim();
-    const token = trimmed.startsWith("pay:") ? trimmed.slice(4) : trimmed;
+    const token = trimmed.replace(/^(pay|deny):/i, "");
     if (!token.includes("|")) continue;
     const compact = parseCompactOrderSnapshot(token);
     if (compact) return compact;
@@ -189,10 +189,22 @@ export function buildPayCallbackData(order) {
   return `pay:${orderId}`;
 }
 
-/** Extract CV-XXXX from pay: callback_data (plain id or compact snapshot). */
+/** Build Reject callback_data; embeds a compact recovery snapshot when it fits. */
+export function buildDenyCallbackData(order) {
+  const orderId = normalizeOrderId(order?.order_id);
+  if (!orderId) return "deny:";
+  const compact = signCompactOrderSnapshot(order);
+  const withCompact = `deny:${compact || orderId}`;
+  if (Buffer.byteLength(withCompact, "utf8") <= CALLBACK_DATA_MAX_BYTES) {
+    return withCompact;
+  }
+  return `deny:${orderId}`;
+}
+
+/** Extract CV-XXXX from pay:/deny: callback_data (plain id or compact snapshot). */
 export function orderIdFromPayCallback(callbackData) {
   const raw = String(callbackData || "").trim();
-  const token = raw.startsWith("pay:") ? raw.slice(4) : raw;
+  const token = raw.replace(/^(pay|deny):/i, "");
   const head = token.split("|")[0] || "";
   return normalizeOrderId(head);
 }
@@ -284,7 +296,8 @@ export async function approveManualOrder(orderId, options = {}) {
   let current = await getManualOrder(orderId);
   if (!current && options.messageText) {
     const snap = parseOrderSnapshot(options.messageText);
-    if (snap && snap.order_id === normalizeOrderId(orderId)) {
+    const expectedId = normalizeOrderId(orderId);
+    if (snap && (!expectedId || snap.order_id === expectedId)) {
       current = await writeOrderVerified(snap.order_id, snap);
     }
   }
@@ -346,7 +359,8 @@ export async function rejectManualOrder(orderId, options = {}) {
   let current = await getManualOrder(orderId);
   if (!current && options.messageText) {
     const snap = parseOrderSnapshot(options.messageText);
-    if (snap && snap.order_id === normalizeOrderId(orderId)) {
+    const expectedId = normalizeOrderId(orderId);
+    if (snap && (!expectedId || snap.order_id === expectedId)) {
       current = await writeOrderVerified(snap.order_id, snap);
     }
   }
@@ -442,7 +456,7 @@ export async function sendManualOrderTelegram(order) {
               },
               {
                 text: "❌ No",
-                callback_data: `deny:${order.order_id}`,
+                callback_data: buildDenyCallbackData(order),
               },
             ],
           ],

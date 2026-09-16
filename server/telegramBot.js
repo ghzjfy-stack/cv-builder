@@ -3,7 +3,12 @@ import { json, parseBody, readBody } from "./http.js";
 import { kvGet, kvSet } from "./kv.js";
 import { sendPurchaseConfirmationEmail } from "./notify.js";
 import { getPendingOrder, updatePendingOrder } from "./pendingOrders.js";
-import { approveManualOrder, orderIdFromPayCallback, rejectManualOrder } from "./manualOrders.js";
+import {
+  approveManualOrder,
+  normalizeOrderId,
+  orderIdFromPayCallback,
+  rejectManualOrder,
+} from "./manualOrders.js";
 import { isSupabaseConfigured } from "./supabaseOrders.js";
 import {
   escapeTelegramMarkdown,
@@ -238,13 +243,15 @@ async function handleRevoke(chatId, codeRaw) {
 }
 
 async function handleApprovePayment(chatId, orderId, messageId, messageText) {
+  const resolvedId = normalizeOrderId(orderId) || orderIdFromMessageText(messageText);
   let result;
   try {
-    result = await approveManualOrder(orderId, { messageText: messageText || "" });
+    result = await approveManualOrder(resolvedId, { messageText: messageText || "" });
   } catch (err) {
+    console.error("[quickcv] approve payment failed:", err?.message || err);
     await sendTelegramText(
       chatId,
-      `Could not approve \`${escapeTelegramMarkdown(orderId)}\`. Please try again.`,
+      `Could not approve \`${escapeTelegramMarkdown(resolvedId || orderId)}\`. Please try again.`,
     );
     return;
   }
@@ -252,8 +259,8 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
     await sendTelegramText(
       chatId,
       result.reason === "not_found"
-        ? `Order \`${escapeTelegramMarkdown(orderId)}\` not found. Ask the customer to restart checkout.`
-        : `Could not approve \`${escapeTelegramMarkdown(orderId)}\` (${result.reason || "error"}).`,
+        ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` not found. Ask the customer to restart checkout.`
+        : `Could not approve \`${escapeTelegramMarkdown(resolvedId || orderId)}\` (${result.reason || "error"}).`,
     );
     return;
   }
@@ -295,13 +302,15 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
 }
 
 async function handleRejectPayment(chatId, orderId, messageId, messageText) {
+  const resolvedId = normalizeOrderId(orderId) || orderIdFromMessageText(messageText);
   let result;
   try {
-    result = await rejectManualOrder(orderId, { messageText: messageText || "" });
+    result = await rejectManualOrder(resolvedId, { messageText: messageText || "" });
   } catch (err) {
+    console.error("[quickcv] reject payment failed:", err?.message || err);
     await sendTelegramText(
       chatId,
-      `Could not reject \`${escapeTelegramMarkdown(orderId)}\`. Please try again.`,
+      `Could not reject \`${escapeTelegramMarkdown(resolvedId || orderId)}\`. Please try again.`,
     );
     return;
   }
@@ -309,10 +318,10 @@ async function handleRejectPayment(chatId, orderId, messageId, messageText) {
     await sendTelegramText(
       chatId,
       result.reason === "already_paid"
-        ? `Order \`${escapeTelegramMarkdown(orderId)}\` was already approved — download stays open.`
+        ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` was already approved — download stays open.`
         : result.reason === "not_found"
-          ? `Order \`${escapeTelegramMarkdown(orderId)}\` not found.`
-          : `Could not reject \`${escapeTelegramMarkdown(orderId)}\` (${result.reason || "error"}).`,
+          ? `Order \`${escapeTelegramMarkdown(resolvedId || orderId)}\` not found.`
+          : `Could not reject \`${escapeTelegramMarkdown(resolvedId || orderId)}\` (${result.reason || "error"}).`,
     );
     return;
   }
@@ -450,6 +459,171 @@ function verifyTelegramSecret(req) {
   return got === expected;
 }
 
+function orderIdFromMessageText(text) {
+  const match = String(text || "").match(/\bCV-\d{4}\b/i);
+  return match ? normalizeOrderId(match[0]) : "";
+}
+
+function normalizeCallbackLabel(raw) {
+  return String(raw || "")
+    .replace(/[\u2705\u274c\u2716\u2714\ufe0f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+/**
+ * Parse Inline Keyboard callback_data: pay:/deny: snapshots, ok:/no:, or Yes/No labels.
+ */
+function parseCallbackQueryData(data, messageText) {
+  const raw = String(data || "").trim();
+  const label = normalizeCallbackLabel(raw);
+  const fromMessage = orderIdFromMessageText(messageText);
+  const snapshotSource = [raw, messageText].filter(Boolean).join("\n");
+
+  if (/^pay:/i.test(raw) || label === "yes" || label === "approve" || label === "אישור") {
+    const orderId = orderIdFromPayCallback(raw) || fromMessage;
+    return { action: "approve", orderId, snapshotSource };
+  }
+  if (/^deny:/i.test(raw) || label === "no" || label === "reject" || label === "דחייה" || label === "סירוב") {
+    const orderId = orderIdFromPayCallback(raw) || fromMessage;
+    return { action: "reject", orderId, snapshotSource };
+  }
+  if (/^ok:/i.test(raw)) {
+    return { action: "confirm_email", orderId: raw.slice(3).trim(), snapshotSource };
+  }
+  if (/^no:/i.test(raw)) {
+    return { action: "delete", orderId: raw.slice(3).trim(), snapshotSource };
+  }
+  if (/^revoke:/i.test(raw)) {
+    return { action: "revoke", orderId: raw.slice(7).trim(), snapshotSource };
+  }
+  if (label === "help") {
+    return { action: "help", orderId: "", snapshotSource };
+  }
+  return { action: "unknown", orderId: fromMessage, snapshotSource };
+}
+
+function toastForCallbackAction(action) {
+  if (action === "approve") return "Approving payment...";
+  if (action === "reject") return "Rejecting payment...";
+  if (action === "confirm_email") return "מאשר ושולח מייל...";
+  if (action === "delete") return "מוחק הזמנה...";
+  if (action === "unauthorized") return "אין הרשאה";
+  return "";
+}
+
+/** Always ACK the spinner. Never throw. Retry without toast if Telegram rejects the payload. */
+async function answerCallbackQuery(callbackQueryId, extra = {}) {
+  const id = String(callbackQueryId || "").trim();
+  if (!id) return { ok: false, error: "missing_callback_query_id" };
+  const payload = { callback_query_id: id, ...extra };
+  try {
+    const result = await telegramApi("answerCallbackQuery", payload);
+    if (!result.ok && extra && Object.keys(extra).length) {
+      return await telegramApi("answerCallbackQuery", { callback_query_id: id });
+    }
+    return result;
+  } catch (err) {
+    console.error("[quickcv] answerCallbackQuery failed:", err?.message || err);
+    try {
+      return await telegramApi("answerCallbackQuery", { callback_query_id: id });
+    } catch (retryErr) {
+      console.error("[quickcv] answerCallbackQuery retry failed:", retryErr?.message || retryErr);
+      return { ok: false, error: retryErr instanceof Error ? retryErr.message : "answer_failed" };
+    }
+  }
+}
+
+async function handleCallbackQuery(update) {
+  const cq = update?.callback_query;
+  if (!cq?.id) {
+    console.error("[quickcv] callback_query missing id");
+    return;
+  }
+
+  let answered = false;
+  const answerOnce = async (extra = {}) => {
+    if (answered) return;
+    const result = await answerCallbackQuery(cq.id, extra);
+    if (result?.ok !== false) answered = true;
+    else if (!extra || !Object.keys(extra).length) answered = true;
+  };
+
+  const data = String(cq.data || "");
+  const chatId = cq.message?.chat?.id;
+  const messageId = cq.message?.message_id;
+  const messageText = cq.message?.text || "";
+
+  try {
+    if (!isAdmin(update)) {
+      await answerOnce({ text: toastForCallbackAction("unauthorized"), show_alert: true });
+      if (chatId != null) {
+        await sendTelegramText(chatId, "אין הרשאה. הבוט עונה רק לצ׳אט המנהל של QuickCV.");
+      }
+      return;
+    }
+
+    const parsed = parseCallbackQueryData(data, messageText);
+    const toast = toastForCallbackAction(parsed.action);
+    await answerOnce(toast ? { text: toast } : {});
+
+    console.info("[quickcv] telegram callback", {
+      action: parsed.action,
+      orderId: parsed.orderId || "",
+    });
+
+    if (chatId == null) {
+      console.error("[quickcv] callback_query missing chat id", { action: parsed.action });
+      return;
+    }
+
+    if (parsed.action === "approve") {
+      await handleApprovePayment(chatId, parsed.orderId, messageId, parsed.snapshotSource);
+      return;
+    }
+    if (parsed.action === "reject") {
+      await handleRejectPayment(chatId, parsed.orderId, messageId, parsed.snapshotSource);
+      return;
+    }
+    if (parsed.action === "confirm_email") {
+      await handleConfirmOrder(chatId, parsed.orderId, messageId);
+      return;
+    }
+    if (parsed.action === "delete") {
+      await handleDeleteOrder(chatId, parsed.orderId, messageId);
+      return;
+    }
+    if (parsed.action === "revoke") {
+      await handleRevoke(chatId, parsed.orderId);
+      return;
+    }
+    if (parsed.action === "help") {
+      await sendTelegramText(chatId, helpText());
+      return;
+    }
+
+    console.warn("[quickcv] unknown telegram callback_data", data.slice(0, 80));
+  } catch (err) {
+    console.error("[quickcv] callback query handler error:", err?.message || err);
+    try {
+      if (chatId != null) {
+        await sendTelegramText(
+          chatId,
+          "שגיאה בטיפול בכפתור Yes/No. נסו שוב, או בדקו את לוג השרת.",
+        );
+      }
+    } catch (notifyErr) {
+      console.error("[quickcv] callback error notify failed:", notifyErr?.message || notifyErr);
+    }
+  } finally {
+    try {
+      await answerOnce();
+    } catch (ackErr) {
+      console.error("[quickcv] callback ACK in finally failed:", ackErr?.message || ackErr);
+    }
+  }
+}
+
 /**
  * POST /api/telegram-webhook
  */
@@ -468,10 +642,6 @@ export async function handleTelegramWebhookRequest(req, res) {
     json(res, 503, { ok: false, error: "not_configured" });
     return;
   }
-  if (!verifyTelegramSecret(req)) {
-    json(res, 401, { ok: false, error: "unauthorized" });
-    return;
-  }
 
   let update;
   try {
@@ -482,86 +652,46 @@ export async function handleTelegramWebhookRequest(req, res) {
     return;
   }
 
-  json(res, 200, { ok: true });
+  if (!verifyTelegramSecret(req)) {
+    try {
+      if (update?.callback_query?.id) {
+        await answerCallbackQuery(update.callback_query.id, {
+          text: "אין הרשאה",
+          show_alert: true,
+        });
+      }
+    } catch (ackErr) {
+      console.error("[quickcv] unauthorized callback ACK failed:", ackErr?.message || ackErr);
+    }
+    json(res, 401, { ok: false, error: "unauthorized" });
+    return;
+  }
 
   try {
-    if (!isAdmin(update)) {
-      const chatId =
-        update?.message?.chat?.id ??
-        update?.callback_query?.message?.chat?.id;
+    if (update.callback_query) {
+      await handleCallbackQuery(update);
+    } else if (!isAdmin(update)) {
+      const chatId = update?.message?.chat?.id ?? update?.edited_message?.chat?.id;
       if (chatId != null) {
         await sendTelegramText(chatId, "אין הרשאה. הבוט עונה רק לצ׳אט המנהל של QuickCV.");
       }
-      return;
+    } else {
+      const message = update.message || update.edited_message;
+      if (message?.text && message.chat?.id != null) {
+        await handleCommand(message.chat.id, message.text);
+      }
     }
-
-    if (update.callback_query) {
-      const cq = update.callback_query;
-      const data = String(cq.data || "");
-      const chatId = cq.message?.chat?.id;
-      const messageId = cq.message?.message_id;
-      if (chatId == null) {
-        await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
-        return;
-      }
-
-      if (data.startsWith("pay:")) {
-        await telegramApi("answerCallbackQuery", {
-          callback_query_id: cq.id,
-          text: "Approving payment...",
-        });
-        const orderId = orderIdFromPayCallback(data);
-        // Prefer callback_data snapshot; keep message text for legacy QCORD bodies.
-        const snapshotSource = [data, cq.message?.text || ""].filter(Boolean).join("\n");
-        await handleApprovePayment(chatId, orderId, messageId, snapshotSource);
-        return;
-      }
-      if (data.startsWith("deny:")) {
-        await telegramApi("answerCallbackQuery", {
-          callback_query_id: cq.id,
-          text: "Rejecting payment...",
-        });
-        const orderId = orderIdFromPayCallback(data.replace(/^deny:/, "pay:"));
-        const snapshotSource = [data, cq.message?.text || ""].filter(Boolean).join("\n");
-        await handleRejectPayment(chatId, orderId, messageId, snapshotSource);
-        return;
-      }
-      if (data.startsWith("ok:")) {
-        await telegramApi("answerCallbackQuery", {
-          callback_query_id: cq.id,
-          text: "מאשר ושולח מייל...",
-        });
-        await handleConfirmOrder(chatId, data.slice(3), messageId);
-        return;
-      }
-      if (data.startsWith("no:")) {
-        await telegramApi("answerCallbackQuery", {
-          callback_query_id: cq.id,
-          text: "מוחק הזמנה...",
-        });
-        await handleDeleteOrder(chatId, data.slice(3), messageId);
-        return;
-      }
-      if (data.startsWith("revoke:")) {
-        await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
-        await handleRevoke(chatId, data.slice(7));
-        return;
-      }
-      if (data === "help") {
-        await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
-        await sendTelegramText(chatId, helpText());
-        return;
-      }
-      await telegramApi("answerCallbackQuery", { callback_query_id: cq.id });
-      return;
-    }
-
-    const message = update.message || update.edited_message;
-    if (!message?.text) return;
-    const chatId = message.chat?.id;
-    if (chatId == null) return;
-    await handleCommand(chatId, message.text);
   } catch (err) {
     console.error("[quickcv] telegram bot error:", err?.message || err);
+    try {
+      const cqId = update?.callback_query?.id;
+      if (cqId) await answerCallbackQuery(cqId);
+    } catch (ackErr) {
+      console.error("[quickcv] telegram fallback ACK failed:", ackErr?.message || ackErr);
+    }
+  }
+
+  if (!res.headersSent) {
+    json(res, 200, { ok: true });
   }
 }

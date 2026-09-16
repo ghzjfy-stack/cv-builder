@@ -27,7 +27,7 @@
       "memory": 1024
     },
     "api/telegram-webhook.js": {
-      "maxDuration": 15
+      "maxDuration": 30
     }
   },
   "rewrites": [

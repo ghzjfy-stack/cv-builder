@@ -598,19 +598,18 @@
                 </div>
                 <p class="text-[11px] text-slate-400">כוונו גודל וריווח כדי להתאים את קורות החיים לעמוד אחד.</p>
 
-                <div>
-                    <p class="block text-xs text-slate-300 mb-2" id="bg-legend">רקע הדף</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" role="group" aria-labelledby="bg-legend">
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border-2 border-white text-[10px] font-bold text-slate-800 bg-preview-white" data-bg="bg-preview-white" aria-pressed="true" onclick="setPreviewBg('bg-preview-white', this)">לבן</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-slate" data-bg="bg-preview-slate" aria-pressed="false" onclick="setPreviewBg('bg-preview-slate', this)">אפור</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-cream" data-bg="bg-preview-cream" aria-pressed="false" onclick="setPreviewBg('bg-preview-cream', this)">שמנת</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-linen" data-bg="bg-preview-linen" aria-pressed="false" onclick="setPreviewBg('bg-preview-linen', this)">פשתן</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-mint" data-bg="bg-preview-mint" aria-pressed="false" onclick="setPreviewBg('bg-preview-mint', this)">מנטה</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-blush" data-bg="bg-preview-blush" aria-pressed="false" onclick="setPreviewBg('bg-preview-blush', this)">ורוד</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-pearl" data-bg="bg-preview-pearl" aria-pressed="false" onclick="setPreviewBg('bg-preview-pearl', this)">פנינה</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-dots" data-bg="bg-preview-dots" aria-pressed="false" onclick="setPreviewBg('bg-preview-dots', this)">נקודות</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-grid" data-bg="bg-preview-grid" aria-pressed="false" onclick="setPreviewBg('bg-preview-grid', this)">רשת</button>
-                        <button type="button" class="bg-swatch min-h-11 rounded-xl border border-slate-600 text-[10px] font-bold text-slate-800 bg-preview-lines" data-bg="bg-preview-lines" aria-pressed="false" onclick="setPreviewBg('bg-preview-lines', this)">קווים</button>
+                <div class="bg-palette">
+                    <div class="bg-palette-head">
+                        <p class="block text-xs text-slate-300" id="bg-legend">רקע הדף</p>
+                        <p id="bg-palette-label" class="bg-palette-caption" aria-live="polite">לבן קלאסי</p>
+                    </div>
+                    <div class="bg-palette-row" role="radiogroup" aria-labelledby="bg-legend">
+                        <button type="button" class="bg-swatch" data-bg="bg-preview-white" data-bg-he="לבן קלאסי" data-bg-en="Classic White" data-tip="לבן קלאסי" style="--swatch:#ffffff" title="לבן קלאסי" aria-label="לבן קלאסי" aria-pressed="true"></button>
+                        <button type="button" class="bg-swatch" data-bg="bg-preview-cream" data-bg-he="שמנת חמה" data-bg-en="Warm Cream" data-tip="שמנת חמה" style="--swatch:#f7f1e6" title="שמנת חמה" aria-label="שמנת חמה" aria-pressed="false"></button>
+                        <button type="button" class="bg-swatch" data-bg="bg-preview-stone" data-bg-he="אפור רך" data-bg-en="Soft Gray" data-tip="אפור רך" style="--swatch:#f3f2f0" title="אפור רך" aria-label="אפור רך" aria-pressed="false"></button>
+                        <button type="button" class="bg-swatch" data-bg="bg-preview-navy" data-bg-he="נייבי עדין" data-bg-en="Navy Accent" data-tip="נייבי עדין" style="--swatch:#eef1f6" title="נייבי עדין" aria-label="נייבי עדין" aria-pressed="false"></button>
+                        <button type="button" class="bg-swatch" data-bg="bg-preview-slate" data-bg-he="צפחה" data-bg-en="Slate" data-tip="צפחה" style="--swatch:#f1f5f9" title="צפחה" aria-label="צפחה" aria-pressed="false"></button>
+                        <button type="button" class="bg-swatch" data-bg="bg-preview-sage" data-bg-he="מרווה" data-bg-en="Sage Green" data-tip="מרווה" style="--swatch:#f2f5f1" title="מרווה" aria-label="מרווה" aria-pressed="false"></button>
                     </div>
                 </div>
             </div>
@@ -624,7 +623,10 @@
                     <button type="button" id="doc-tab-cv" aria-pressed="true" onclick="setStudioDoc('cv')">קורות חיים</button>
                     <button type="button" id="doc-tab-letter" aria-pressed="false" onclick="setStudioDoc('letter')">מכתב מקדים</button>
                 </div>
-                <button type="button" onclick="closeMobilePreview()" class="preview-close items-center gap-2 text-sm font-extrabold bg-slate-900/95 border border-slate-500 text-white px-4 py-2.5 rounded-full min-h-11 shadow-lg">חזרה לעריכה</button>
+                <button type="button" id="btn-preview-close-top" onclick="closeMobilePreview()" class="preview-close preview-close-top">
+                    <span class="preview-close-x" aria-hidden="true">✕</span>
+                    <span class="preview-close-label">חזרה לעריכה</span>
+                </button>
             </div>
             <p id="cv-page-fit-banner" class="no-print" hidden></p>
 
@@ -772,25 +774,39 @@
                     <p id="cl-out-body" class="cl-body"></p>
                 </div>
             </div>
+            <button type="button" id="btn-preview-close-bottom" onclick="closeMobilePreview()" class="preview-close preview-close-bottom">
+                <span class="preview-close-x" aria-hidden="true">✕</span>
+                <span class="preview-close-label">חזרה לעריכה</span>
+            </button>
         </div>
 
     </div>
 
-    <div id="studio-mobile-dock" class="no-print lg:hidden fixed bottom-0 inset-x-0 z-[99] border-t border-slate-800 bg-slate-950/95 backdrop-blur px-3 py-2.5 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
-        <div class="flex gap-2 max-w-7xl mx-auto">
-            <button type="button" id="btn-mobile-preview-toggle" onclick="toggleMobilePreview()" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold py-3 rounded-xl text-sm min-h-12" aria-pressed="false" aria-controls="preview-column">
-                👁️ תצוגה מקדימה
+    <nav id="studio-mobile-dock" class="studio-mobile-nav no-print" dir="rtl" aria-label="ניווט סטודיו במובייל">
+        <div class="studio-mobile-nav-inner">
+            <button type="button" id="btn-mobile-preview-toggle" onclick="toggleMobilePreview()" class="studio-nav-preview has-pulse" aria-pressed="false" aria-controls="preview-column">
+                <span class="studio-nav-progress" aria-hidden="true">
+                    <svg class="studio-nav-ring" viewBox="0 0 36 36">
+                        <circle class="studio-nav-ring-track" cx="18" cy="18" r="15.5"></circle>
+                        <circle id="mobile-preview-ring" class="studio-nav-ring-fill" cx="18" cy="18" r="15.5"></circle>
+                    </svg>
+                    <span id="mobile-preview-pct">0%</span>
+                </span>
+                <span class="studio-nav-copy">
+                    <span id="mobile-preview-label">תצוגה מקדימה</span>
+                    <span id="mobile-preview-complete" class="studio-nav-complete">0% הושלם</span>
+                </span>
             </button>
-            <button type="button" id="btn-download-pdf-mobile" class="cta-download unpaid-only flex-[1.3] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 rounded-xl text-sm min-h-12">
+            <button type="button" id="btn-download-pdf-mobile" class="cta-download unpaid-only studio-nav-download">
                 הורד ב-<span data-price>10</span> ₪
             </button>
-            <div class="paid-only flex-[1.3] grid grid-cols-3 gap-1">
-                <button type="button" data-download="pdf" class="min-h-12 bg-emerald-500 text-slate-950 font-extrabold rounded-xl text-[11px]">PDF</button>
-                <button type="button" data-download="docx" class="min-h-12 bg-slate-800 border border-slate-600 text-white font-extrabold rounded-xl text-[11px]">Word</button>
-                <button type="button" data-download="txt" class="min-h-12 bg-slate-800 border border-slate-600 text-white font-extrabold rounded-xl text-[11px]">TXT</button>
+            <div class="paid-only studio-nav-paid">
+                <button type="button" data-download="pdf" class="studio-nav-file">PDF</button>
+                <button type="button" data-download="docx" class="studio-nav-file">Word</button>
+                <button type="button" data-download="txt" class="studio-nav-file">TXT</button>
             </div>
         </div>
-    </div>
+    </nav>
     </div>
 
     <div id="quick-paste-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="quick-paste-title" aria-hidden="true">
@@ -1003,7 +1019,8 @@
         const BG_CLASSES = [
             'bg-preview-white', 'bg-preview-slate', 'bg-preview-cream', 'bg-preview-linen',
             'bg-preview-mint', 'bg-preview-blush', 'bg-preview-pearl', 'bg-preview-dots',
-            'bg-preview-grid', 'bg-preview-lines'
+            'bg-preview-grid', 'bg-preview-lines', 'bg-preview-stone', 'bg-preview-navy',
+            'bg-preview-sage'
         ];
         const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal', 'azure', 'navy'];
 
@@ -1062,8 +1079,9 @@
                 strengthTitle: 'חוזק קורות החיים',
                 strengthTipDefault: 'רוצים להגיע ל-100%? בצעו את הפעולות הבאות:',
                 strengthDone: 'מצוין! קורות החיים שלך מוכנים לשליחה למגייסים.',
-                previewOpen: '👁️ תצוגה מקדימה',
-                previewClose: '✏️ חזרה לעריכה',
+                previewOpen: 'תצוגה מקדימה',
+                previewClose: 'חזרה לעריכה',
+                previewCompleted: 'הושלם',
                 studioSocial: 'עברית מיושרת לימין • תצוגה חיה • PDF להגשה',
                 studioAts: 'תבניות שנבדקו מול מערכות סינון (ATS)'
             },
@@ -1086,8 +1104,9 @@
                 strengthTitle: 'CV strength',
                 strengthTipDefault: 'Want to reach 100%? Do the following:',
                 strengthDone: 'Excellent! Your CV is ready to send to recruiters.',
-                previewOpen: '👁️ Preview',
-                previewClose: '✏️ Back to editing',
+                previewOpen: 'Preview',
+                previewClose: 'Back to editing',
+                previewCompleted: 'completed',
                 studioSocial: 'Left-aligned English • Live Preview • Ready PDF',
                 studioAts: 'Templates verified against ATS screening systems'
             }
@@ -1211,6 +1230,7 @@
                     : 'ATS-Friendly · נסרק בהצלחה במערכות סינון';
             });
             if (typeof applyCvI18nAi === 'function') applyCvI18nAi();
+            if (typeof syncBgPaletteI18n === 'function') syncBgPaletteI18n(lang);
             if (typeof syncMobilePreviewToggle === 'function') syncMobilePreviewToggle();
             if (typeof updateCvScore === 'function') updateCvScore();
             const langNameSel = document.getElementById('lang-pick-name');
@@ -1313,6 +1333,8 @@
                 design.setAttribute('dir', dir);
             }
             if (previewCol) previewCol.setAttribute('dir', dir);
+            const dock = document.getElementById('studio-mobile-dock');
+            if (dock) dock.setAttribute('dir', dir);
             if (printHost) printHost.setAttribute('dir', dir);
             if (clTarget) clTarget.setAttribute('dir', dir);
             if (social) social.setAttribute('dir', dir);
@@ -2246,6 +2268,32 @@
             ].filter(Boolean);
         }
 
+        function bgPaletteLabel(el) {
+            if (!el) return '';
+            const en = window.QCCvLang === 'en';
+            return (en ? el.getAttribute('data-bg-en') : el.getAttribute('data-bg-he')) || el.getAttribute('title') || '';
+        }
+
+        function syncBgPaletteI18n(lang) {
+            const en = lang === 'en';
+            const legend = document.getElementById('bg-legend');
+            if (legend) legend.textContent = en ? 'Page background' : 'רקע הדף';
+            document.querySelectorAll('.bg-palette .bg-swatch').forEach((el) => {
+                const name = bgPaletteLabel(el);
+                if (!name) return;
+                el.setAttribute('title', name);
+                el.setAttribute('data-tip', name);
+                el.setAttribute('aria-label', name);
+            });
+            const selected = document.querySelector('.bg-palette .bg-swatch[aria-pressed="true"]');
+            const caption = document.getElementById('bg-palette-label');
+            if (caption) {
+                caption.textContent = selected
+                    ? bgPaletteLabel(selected)
+                    : (en ? 'Custom' : 'מותאם');
+            }
+        }
+
         function setPreviewBg(bgClass, btn, opts) {
             const next = BG_CLASSES.indexOf(bgClass) >= 0 ? bgClass : 'bg-preview-white';
             previewBgClass = next;
@@ -2257,14 +2305,20 @@
                 el.style.backgroundImage = '';
                 el.style.backgroundSize = '';
             });
-            document.querySelectorAll('.bg-swatch').forEach((el) => {
+            let matched = null;
+            document.querySelectorAll('.bg-palette .bg-swatch').forEach((el) => {
                 const on = el.getAttribute('data-bg') === next;
                 el.setAttribute('aria-pressed', on ? 'true' : 'false');
-                el.classList.toggle('border-2', on);
-                el.classList.toggle('border-white', on);
-                el.classList.toggle('border-slate-600', !on);
+                if (on) matched = el;
             });
             if (btn && btn.setAttribute) btn.setAttribute('aria-pressed', 'true');
+            const caption = document.getElementById('bg-palette-label');
+            if (caption) {
+                const en = window.QCCvLang === 'en';
+                caption.textContent = matched
+                    ? bgPaletteLabel(matched)
+                    : (en ? 'Custom' : 'מותאם');
+            }
             if (!opts || !opts.silent) {
                 try { markStep(2); } catch (err) { /* studio chrome optional */ }
             }
@@ -2337,20 +2391,49 @@
         function openMobilePreview() {
             const col = document.getElementById('preview-column');
             if (!col) return;
+            if (col._qcPreviewCloseTimer) {
+                window.clearTimeout(col._qcPreviewCloseTimer);
+                col._qcPreviewCloseTimer = 0;
+            }
+            col.classList.remove('mobile-preview-leaving');
             col.classList.add('mobile-preview-open');
+            col.setAttribute('role', 'dialog');
             col.setAttribute('aria-modal', 'true');
+            col.setAttribute('aria-hidden', 'false');
             document.body.classList.add('qc-mobile-preview-open');
-            updateCV();
+            document.documentElement.classList.add('qc-mobile-preview-open');
             syncMobilePreviewToggle();
+            requestAnimationFrame(() => {
+                try { window.QCPageFit?.updateSoon?.(); } catch (err) { /* already live */ }
+                const closeBtn = document.getElementById('btn-preview-close-top');
+                if (closeBtn && typeof closeBtn.focus === 'function') closeBtn.focus();
+            });
         }
 
         function closeMobilePreview() {
             const col = document.getElementById('preview-column');
+            document.body.classList.remove('qc-mobile-preview-open');
+            document.documentElement.classList.remove('qc-mobile-preview-open');
+            syncMobilePreviewToggle();
             if (!col) return;
+            const wasOpen = col.classList.contains('mobile-preview-open') || col.classList.contains('mobile-preview-leaving');
             col.classList.remove('mobile-preview-open');
             col.removeAttribute('aria-modal');
-            document.body.classList.remove('qc-mobile-preview-open');
-            syncMobilePreviewToggle();
+            const finish = () => {
+                col.classList.remove('mobile-preview-leaving');
+                col.removeAttribute('role');
+                col.setAttribute('aria-hidden', isNarrowStudio() ? 'true' : 'false');
+                col._qcPreviewCloseTimer = 0;
+                const toggle = document.getElementById('btn-mobile-preview-toggle');
+                if (toggle && isNarrowStudio() && typeof toggle.focus === 'function') toggle.focus();
+            };
+            const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (wasOpen && !reduce) {
+                col.classList.add('mobile-preview-leaving');
+                col._qcPreviewCloseTimer = window.setTimeout(finish, 240);
+            } else {
+                finish();
+            }
         }
 
         function toggleMobilePreview() {
@@ -2358,13 +2441,63 @@
             else openMobilePreview();
         }
 
+        function previewI18n() {
+            return CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || CV_I18N.he;
+        }
+
+        function updateMobileStudioProgress() {
+            let score = 0;
+            try {
+                if (window.QCStrength && typeof QCStrength.compute === 'function') {
+                    score = Math.round(Number(QCStrength.compute().score) || 0);
+                }
+            } catch (err) { /* keep 0 */ }
+            score = Math.max(0, Math.min(100, score));
+            const en = window.QCCvLang === 'en';
+            const pack = previewI18n();
+            const pctEl = document.getElementById('mobile-preview-pct');
+            const completeEl = document.getElementById('mobile-preview-complete');
+            const ring = document.getElementById('mobile-preview-ring');
+            const btn = document.getElementById('btn-mobile-preview-toggle');
+            const open = document.body.classList.contains('qc-mobile-preview-open');
+            if (pctEl) pctEl.textContent = score + '%';
+            if (completeEl) {
+                completeEl.textContent = en
+                    ? score + '% ' + (pack.previewCompleted || 'completed')
+                    : score + '% ' + (pack.previewCompleted || 'הושלם');
+            }
+            if (ring) {
+                const circ = 2 * Math.PI * 15.5;
+                ring.style.strokeDasharray = String(circ);
+                ring.style.strokeDashoffset = String(circ * (1 - score / 100));
+            }
+            if (btn) {
+                btn.classList.toggle('has-pulse', score < 90 && !open);
+                btn.setAttribute('data-progress', String(score));
+            }
+        }
+
         function syncMobilePreviewToggle() {
             const open = document.body.classList.contains('qc-mobile-preview-open');
             const btn = document.getElementById('btn-mobile-preview-toggle');
-            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || CV_I18N.he;
-            if (!btn) return;
-            btn.setAttribute('aria-pressed', open ? 'true' : 'false');
-            btn.textContent = open ? (pack.previewClose || '✏️ חזרה לעריכה') : (pack.previewOpen || '👁️ תצוגה מקדימה');
+            const pack = previewI18n();
+            const label = open ? (pack.previewClose || 'חזרה לעריכה') : (pack.previewOpen || 'תצוגה מקדימה');
+            const labelEl = document.getElementById('mobile-preview-label');
+            if (labelEl) labelEl.textContent = label;
+            document.querySelectorAll('.preview-close-label').forEach((el) => {
+                el.textContent = pack.previewClose || 'חזרה לעריכה';
+            });
+            const closeAria = pack.previewClose || 'חזרה לעריכה';
+            ['btn-preview-close-top', 'btn-preview-close-bottom'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute('aria-label', closeAria);
+            });
+            if (btn) {
+                btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+                btn.setAttribute('aria-label', label);
+                btn.classList.toggle('is-close', open);
+            }
+            updateMobileStudioProgress();
         }
 
         function countExperienceEntries(text) {
@@ -2397,6 +2530,7 @@
                 QCStrength.update();
                 return;
             }
+            if (typeof updateMobileStudioProgress === 'function') updateMobileStudioProgress();
         }
 
         function isCvFormField(el) {
@@ -3044,7 +3178,13 @@
         }
 
         function syncNarrowStudio() {
-            document.documentElement.classList.toggle('qc-narrow', isNarrowStudio());
+            const narrow = isNarrowStudio();
+            document.documentElement.classList.toggle('qc-narrow', narrow);
+            const col = document.getElementById('preview-column');
+            if (!narrow) closeMobilePreview();
+            else if (col && !col.classList.contains('mobile-preview-open')) {
+                col.setAttribute('aria-hidden', 'true');
+            }
         }
 
         function applyView(mode) {
@@ -3280,6 +3420,7 @@
         window.onPhotoChange = onPhotoChange;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
+        window.updateMobileStudioProgress = updateMobileStudioProgress;
         if (!window.__qcExampleBound) {
             window.__qcExampleBound = true;
             document.addEventListener('click', function (e) {
@@ -3354,6 +3495,7 @@
                 setPreviewBg(el.getAttribute('data-bg'), el);
             });
         });
+        syncMobilePreviewToggle();
         setPreviewBg(previewBgClass, null, { silent: true });
     </script>
 </body>

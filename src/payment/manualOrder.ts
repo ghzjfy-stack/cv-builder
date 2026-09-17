@@ -1,3 +1,5 @@
+import { SUPABASE_ANON_KEY, SUPABASE_PUBLIC_URL } from "../config/supabasePublic.js";
+
 export type ManualOrderSessionResponse = {
   ok?: boolean;
   order_id?: string;
@@ -20,6 +22,24 @@ export type ManualOrderStatusResponse = {
 
 const FAIL_CREATE = "לא הצלחנו לפתוח הזמנה. נסו שוב.";
 const FAIL_STATUS = "עדיין ממתינים לאישור התשלום.";
+const POLL_MS = 2000;
+
+/** Exact status strings written after Telegram Yes. */
+const APPROVED_STATUSES = new Set(["paid", "approved", "confirmed"]);
+
+export function isExactApprovedStatus(status?: string | null): boolean {
+  return APPROVED_STATUSES.has(String(status || "").trim().toLowerCase());
+}
+
+export function isManualOrderApproved(status: ManualOrderStatusResponse, expectedOrderId?: string): boolean {
+  const expected = String(expectedOrderId || "").trim().toUpperCase();
+  const got = String(status.order_id || "").trim().toUpperCase();
+  if (expected && got && got !== expected) return false;
+  if (status.paid === true) return true;
+  if (isExactApprovedStatus(status.status)) return true;
+  const confirm = String(status.confirm || "").trim().toLowerCase();
+  return confirm === "yes";
+}
 
 export async function createManualOrderSession(input: {
   pack: string;
@@ -94,12 +114,79 @@ export async function fetchManualOrderStatus(orderId: string): Promise<ManualOrd
   return data;
 }
 
-/** Poll every 3s until PAID (or abort / timeout). */
+async function fetchSupabaseOrderStatus(orderId: string): Promise<ManualOrderStatusResponse | null> {
+  const id = String(orderId || "").trim().toUpperCase();
+  const url = String(SUPABASE_PUBLIC_URL || "").replace(/\/$/, "");
+  const key = String(SUPABASE_ANON_KEY || "").trim();
+  if (!id || !url || !key) return null;
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/orders?order_id=eq.${encodeURIComponent(id)}&select=order_id,status,confirm,exp_date&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      },
+    );
+    if (!res.ok) return null;
+    const rows = (await res.json()) as Array<{
+      order_id?: string;
+      status?: string;
+      confirm?: string;
+      exp_date?: string;
+    }>;
+    const row = Array.isArray(rows) ? rows[0] : null;
+    if (!row?.order_id) return null;
+    const expired = row.exp_date && Number.isFinite(Date.parse(row.exp_date)) && Date.parse(row.exp_date) <= Date.now();
+    const approved = isExactApprovedStatus(row.status) || String(row.confirm || "").toLowerCase() === "yes";
+    if (expired && approved) {
+      return { ok: true, order_id: String(row.order_id).toUpperCase(), status: "EXPIRED", paid: false, confirm: "yes" };
+    }
+    if (String(row.status || "").toLowerCase() === "rejected") {
+      return { ok: true, order_id: String(row.order_id).toUpperCase(), status: "CANCELLED", paid: false, confirm: "no" };
+    }
+    return {
+      ok: true,
+      order_id: String(row.order_id).toUpperCase(),
+      status: String(row.status || "pending"),
+      paid: approved,
+      confirm: approved ? "yes" : String(row.confirm || "no"),
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchCombinedOrderStatus(orderId: string): Promise<ManualOrderStatusResponse> {
+  const id = String(orderId || "").trim().toUpperCase();
+  const [api, supabase] = await Promise.all([
+    fetchManualOrderStatus(id).catch(() => ({ ok: false, paid: false, error: FAIL_STATUS }) as ManualOrderStatusResponse),
+    fetchSupabaseOrderStatus(id),
+  ]);
+  if (isManualOrderApproved(api, id)) return { ...api, paid: true, order_id: api.order_id || id };
+  if (supabase && isManualOrderApproved(supabase, id)) {
+    return { ...api, ...supabase, paid: true, token: api.token, order_id: id };
+  }
+  if (supabase?.status === "CANCELLED" || api.status === "CANCELLED") {
+    return { ok: true, order_id: id, status: "CANCELLED", paid: false };
+  }
+  if (supabase?.status === "EXPIRED" || api.status === "EXPIRED") {
+    return { ok: true, order_id: id, status: "EXPIRED", paid: false, confirm: "yes" };
+  }
+  return { ...api, order_id: api.order_id || id };
+}
+
+/** Poll every 2s until paid/approved/confirmed for this exact order_id. */
 export async function waitForManualOrderPaid(
   orderId: string,
   options: { signal?: AbortSignal; intervalMs?: number; timeoutMs?: number } = {},
 ): Promise<ManualOrderStatusResponse> {
-  const intervalMs = Math.max(1000, options.intervalMs || 3000);
+  const id = String(orderId || "").trim().toUpperCase();
+  const intervalMs = Math.max(1000, options.intervalMs || POLL_MS);
   const timeoutMs = Math.max(intervalMs, options.timeoutMs || 20 * 60 * 1000);
   const started = Date.now();
 
@@ -107,9 +194,10 @@ export async function waitForManualOrderPaid(
     if (options.signal?.aborted) {
       return { ok: false, paid: false, error: "cancelled" };
     }
-    const status = await fetchManualOrderStatus(orderId);
-    if (status.paid === true && status.token) return status;
-    // Soft-wait on missing/pending — never break the UX for storage lag.
+    const status = await fetchCombinedOrderStatus(id);
+    if (isManualOrderApproved(status, id)) {
+      return { ...status, paid: true, order_id: id };
+    }
     if (status.status === "CANCELLED") {
       return { ok: false, paid: false, status: "CANCELLED", error: "ההזמנה בוטלה." };
     }

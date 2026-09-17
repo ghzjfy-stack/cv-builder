@@ -211,7 +211,12 @@ export function parseTelegramOrderMessage(raw) {
 
 function recordFromSupabase(sb, extras = {}) {
   if (!sb?.order_id) return null;
-  const approved = sb.confirm === "yes" || sb.status === "approved";
+  const approved =
+    sb.confirm === "yes" ||
+    sb.status === "approved" ||
+    sb.status === "paid" ||
+    sb.status === "confirmed" ||
+    sb.status === "PAID";
   const rejected = sb.status === "rejected";
   return {
     order_id: normalizeOrderId(sb.order_id) || String(sb.order_id).toUpperCase(),

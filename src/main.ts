@@ -19,6 +19,7 @@ import {
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
 import {
   createManualOrderSession,
+  isManualOrderApproved,
   waitForManualOrderPaid,
 } from "./payment/manualOrder.js";
 
@@ -144,9 +145,20 @@ function showWaitStep() {
 }
 
 function showDownloadStep() {
+  document.getElementById("pay-live-status")?.classList.add("hidden");
+  modal()?.classList.remove("is-waiting");
   document.getElementById("pay-step")?.classList.add("hidden");
   document.getElementById("pay-wait-step")?.classList.add("hidden");
-  document.getElementById("download-step")?.classList.remove("hidden");
+  const step = document.getElementById("download-step");
+  step?.classList.remove("hidden");
+  const title = document.getElementById("pay-success-title");
+  if (title) title.textContent = "התשלום אושר בהצלחה!";
+  const mark = step?.querySelector(".pay-success-check");
+  if (mark instanceof HTMLElement) {
+    mark.style.animation = "none";
+    void mark.offsetWidth;
+    mark.style.animation = "";
+  }
   document.getElementById("download-complete-note")?.classList.toggle("hidden", selectedPack !== "complete");
   document.querySelectorAll("[data-pack-extra]").forEach((el) => {
     el.classList.toggle("hidden", selectedPack !== "complete");
@@ -294,14 +306,12 @@ async function startManualOrderPolling(orderId, options = {}) {
   try {
     const result = await waitForManualOrderPaid(orderId, {
       signal: manualOrderPoll.signal,
-      intervalMs: 2500,
+      intervalMs: 2000,
     });
-    if (result.paid === true && result.token) {
+    if (isManualOrderApproved(result, orderId) || result.paid === true) {
       window.QCLog?.add("auth_ok", "telegram approve");
       persistManualOrderId("");
-      applyPaidUnlock(result.token, "התשלום אושר! מוריד את ה-PDF...");
-      setManualOrderUi(orderId, "התשלום אושר — ההורדה נפתחה");
-      setFeedback("התשלום אושר בהצלחה. ההורדה מתחילה.", true);
+      applyPaidUnlock(result.token, "התשלום אושר בהצלחה!");
       return;
     }
     if (result.status === "CANCELLED") {
@@ -415,9 +425,24 @@ function applyPaidUnlock(token, message) {
   if (token) unlockWithPaymentToken(token);
   else unlock();
   setPaidUi(true);
-  setFeedback(message, true);
+  setTransferWaiting(false);
+  document.getElementById("pay-live-status")?.classList.add("hidden");
+  modal()?.classList.remove("is-waiting");
+  setFeedback(message || "התשלום אושר בהצלחה!", true);
   showDownloadStep();
-  void runHighResExport();
+  void attemptApprovedPdfDownload();
+}
+
+async function attemptApprovedPdfDownload() {
+  const status = document.getElementById("download-status");
+  if (status) {
+    status.textContent = "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.";
+  }
+  try {
+    await runHighResExport();
+  } catch {
+    if (status) status.textContent = "לחצו על הכפתור הירוק להורדת ה-PDF.";
+  }
 }
 
 function prefersSameTabCheckout() {
@@ -987,6 +1012,11 @@ function bind() {
   document.getElementById("btn-send-pdf-whatsapp")?.addEventListener("click", sendPdfToWhatsApp);
   document.getElementById("cover-letter-download")?.addEventListener("click", downloadCoverLetter);
   document.getElementById("btn-copy-referral")?.addEventListener("click", copyReferralLink);
+  document.getElementById("btn-download-cv-pdf")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    downloadFormat("pdf");
+  });
 
   document.querySelectorAll("[data-download]").forEach((btn) => {
     btn.addEventListener("click", (e) => {

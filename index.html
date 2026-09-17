@@ -914,12 +914,14 @@
             <div id="pay-wait-step" class="hidden" aria-hidden="true"></div>
 
             <div id="download-step" class="hidden space-y-4">
-                <div class="w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl">✓</div>
-                <h3 class="text-xl font-extrabold text-white">תודה! הגישה נפתחה</h3>
-                <p class="text-xs text-slate-300">הורידו לדפדפן או שלחו את ה-PDF לוואטסאפ.</p>
+                <div class="pay-success-check mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white text-3xl shadow-lg shadow-emerald-500/40" aria-hidden="true">✓</div>
+                <h3 id="pay-success-title" class="text-xl font-extrabold text-white">התשלום אושר בהצלחה!</h3>
+                <p class="text-xs text-slate-300">אם ההורדה לא מתחילה אוטומטית ב-Safari, לחצו על הכפתור הירוק.</p>
                 <p id="download-complete-note" class="hidden text-xs text-amber-200 font-semibold">נכלל מכתב מקדים — אפשר להוריד אותו למטה.</p>
+                <button type="button" id="btn-download-cv-pdf" class="btn-download-cv-pdf w-full min-h-14 bg-emerald-500 hover:bg-emerald-400 text-white font-black py-4 px-4 rounded-2xl text-base sm:text-lg">
+                    הורד קורות חיים ב-PDF
+                </button>
                 <div class="grid grid-cols-1 gap-2 text-right">
-                    <button type="button" data-download="pdf" class="w-full min-h-12 bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold py-3 px-4 rounded-xl text-sm">הורדת PDF לדפדפן</button>
                     <button type="button" id="btn-send-pdf-whatsapp" class="w-full min-h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold py-3 px-4 rounded-xl text-sm">שלח PDF לוואטסאפ שלי</button>
                     <label for="wa-pdf-phone" class="block text-[11px] font-bold text-slate-300">נייד לשליחה</label>
                     <input type="tel" id="wa-pdf-phone" inputmode="tel" autocomplete="tel" placeholder="054-0000000" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">

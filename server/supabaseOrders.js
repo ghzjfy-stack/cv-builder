@@ -36,22 +36,39 @@ export function addDaysIso(from, days = ACCESS_DAYS) {
   return d.toISOString();
 }
 
+/** Exact Telegram / checkout strings that mean the transfer was approved. */
+export function isApprovedPaymentStatus(value) {
+  const raw = String(value || "")
+    .trim()
+    .toLowerCase();
+  return raw === "paid" || raw === "approved" || raw === "confirmed" || raw === "yes" || raw === "true";
+}
+
 export function normalizeConfirm(value) {
   const raw = String(value || "")
     .trim()
     .toLowerCase();
-  if (raw === "yes" || raw === "true" || raw === "1" || raw === "approved") return "yes";
+  if (raw === "yes" || raw === "true" || raw === "1" || isApprovedPaymentStatus(raw)) return "yes";
   return "no";
 }
 
 function rowStatus(confirm, status) {
-  if (status === "rejected" || status === "CANCELLED") return "rejected";
-  if (confirm === "yes" || status === "approved" || status === "PAID") return "approved";
+  const raw = String(status || "")
+    .trim()
+    .toLowerCase();
+  if (raw === "rejected" || raw === "cancelled") return "rejected";
+  if (confirm === "yes" || isApprovedPaymentStatus(status)) {
+    if (raw === "paid" || raw === "confirmed" || raw === "approved") return raw;
+    return "approved";
+  }
   return "pending";
 }
 
 function mapRow(row) {
   if (!row || typeof row !== "object") return null;
+  const status = String(row.status || "pending");
+  const confirm =
+    normalizeConfirm(row.confirm) === "yes" || isApprovedPaymentStatus(status) ? "yes" : "no";
   return {
     id: row.id,
     order_id: String(row.order_id || "").trim(),
@@ -59,15 +76,16 @@ function mapRow(row) {
     name: String(row.name || "").trim(),
     order_date: row.order_date,
     exp_date: row.exp_date,
-    confirm: normalizeConfirm(row.confirm),
-    status: String(row.status || "pending"),
+    confirm,
+    status,
     updated_at: row.updated_at,
   };
 }
 
 export function isDownloadAllowed(row) {
   const mapped = mapRow(row);
-  if (!mapped || mapped.confirm !== "yes") return false;
+  if (!mapped) return false;
+  if (mapped.confirm !== "yes" && !isApprovedPaymentStatus(mapped.status)) return false;
   if (!mapped.exp_date) return true;
   const exp = Date.parse(mapped.exp_date);
   if (!Number.isFinite(exp)) return true;
@@ -76,7 +94,8 @@ export function isDownloadAllowed(row) {
 
 export function isAccessExpired(row) {
   const mapped = mapRow(row);
-  if (!mapped || mapped.confirm !== "yes") return false;
+  if (!mapped) return false;
+  if (mapped.confirm !== "yes" && !isApprovedPaymentStatus(mapped.status)) return false;
   const exp = Date.parse(mapped.exp_date);
   return Number.isFinite(exp) && exp <= Date.now();
 }

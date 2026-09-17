@@ -12,6 +12,7 @@ import {
 import {
   getSupabaseOrder,
   isAccessExpired,
+  isApprovedPaymentStatus,
   isDownloadAllowed,
   isRejectedRow,
   isSupabaseConfigured,
@@ -141,9 +142,18 @@ export async function handleOrderSessionRequest(req, res) {
   }
 }
 
+function publicOrderStatus(order, supabaseRow, paid) {
+  const raw = String(supabaseRow?.status || order?.status || "").trim();
+  if (paid) {
+    if (isApprovedPaymentStatus(raw)) return raw.toLowerCase();
+    return "approved";
+  }
+  return raw || "PENDING";
+}
+
 /**
  * GET /api/order-status?order=CV-8492
- * Client polls until status becomes PAID (unlock token included).
+ * Client polls this exact order_id until Telegram writes paid/approved/confirmed.
  */
 export async function handleOrderStatusRequest(req, res) {
   if (req.method === "OPTIONS") {
@@ -169,9 +179,6 @@ export async function handleOrderStatusRequest(req, res) {
     order = await getManualOrder(orderId);
   } catch (err) {
     console.warn("[quickcv] order-status read failed:", err?.message || err);
-    // Soft pending — never surface storage errors to the checkout UI.
-    json(res, 200, { ok: true, order_id: orderId, status: "PENDING", paid: false });
-    return;
   }
 
   let supabaseRow = null;
@@ -205,7 +212,8 @@ export async function handleOrderStatusRequest(req, res) {
     return;
   }
 
-  const confirmedYes = isDownloadAllowed(supabaseRow);
+  const confirmedYes =
+    isDownloadAllowed(supabaseRow) || isApprovedPaymentStatus(supabaseRow?.status);
   if (confirmedYes && order?.status !== "PAID") {
     try {
       const approved = await approveManualOrder(orderId);
@@ -215,23 +223,24 @@ export async function handleOrderStatusRequest(req, res) {
     }
   }
 
-  if (!order) {
-    // Keep the spinner waiting instead of failing the UX while approve propagates.
-    json(res, 200, { ok: true, order_id: orderId, status: "PENDING", paid: false });
+  const supabaseBlocks = isRejectedRow(supabaseRow) || isAccessExpired(supabaseRow);
+  const kvPaid = order?.status === "PAID" || isApprovedPaymentStatus(order?.status);
+  const paid = Boolean((confirmedYes || kvPaid) && !supabaseBlocks);
+
+  if (!order && !paid) {
+    json(res, 200, { ok: true, order_id: orderId, status: "PENDING", paid: false, confirm: "no" });
     return;
   }
 
-  const supabaseBlocks = isRejectedRow(supabaseRow) || isAccessExpired(supabaseRow);
-  const paid = Boolean((confirmedYes || order.status === "PAID") && !supabaseBlocks);
   json(res, 200, {
     ok: true,
-    order_id: order.order_id,
-    status: paid ? "PAID" : order.status,
+    order_id: order?.order_id || orderId,
+    status: publicOrderStatus(order, supabaseRow, paid),
     paid,
-    confirm: paid ? "yes" : supabaseRow?.confirm || order.confirm || "no",
-    amount_ils: order.amount_ils,
-    pack: order.pack,
-    ...(paid && order.unlock_token ? { token: order.unlock_token } : {}),
+    confirm: paid ? "yes" : supabaseRow?.confirm || order?.confirm || "no",
+    amount_ils: order?.amount_ils,
+    pack: order?.pack,
+    ...(paid && order?.unlock_token ? { token: order.unlock_token } : {}),
   });
 }
 

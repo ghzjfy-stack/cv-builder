@@ -40,11 +40,20 @@ function triggerBlobDownload(blob, filename) {
   a.href = url;
   a.download = filename;
   a.rel = "noopener";
+  a.target = "_blank";
   a.style.display = "none";
   document.body.appendChild(a);
   a.click();
+  const isiOS = /iP(hone|ad|od)/i.test(navigator.userAgent || "");
+  if (isiOS) {
+    try {
+      window.open(url, "_blank", "noopener");
+    } catch {
+      /* Safari may block this without a tap — the green button stays visible. */
+    }
+  }
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  setTimeout(() => URL.revokeObjectURL(url), 8000);
 }
 
 function bufferToBase64(buffer) {

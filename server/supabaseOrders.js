@@ -1,10 +1,17 @@
 /**
  * Persist checkout rows in Supabase and use confirm=yes/no as the PDF gate.
- * REST only (service role) — no extra npm client.
+ * Service role when available; otherwise signed confirm_manual_order RPC + anon reads.
  */
+
+import { createHmac } from "node:crypto";
+import { ORDER_CONFIRM_HMAC_SECRET } from "./orderConfirmSecret.js";
 
 const TABLE = "orders";
 const ACCESS_DAYS = 30;
+const PUBLIC_URL = "https://ywzylohuyppykhzfscnz.supabase.co";
+const PUBLIC_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3enlsb2h1eXBweWtoemZzY256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxOTA2NjksImV4cCI6MjEwNDc2NjY2OX0.h1g9JtmB6QTSlbFOPIuB9frDy6YOETArEVkLtkFh3ag";
+const PUBLIC_SELECT = "order_id,status,confirm,exp_date";
 
 function envValue(name) {
   try {
@@ -14,15 +21,50 @@ function envValue(name) {
   }
 }
 
+function supabaseUrl() {
+  return (envValue("SUPABASE_URL") || envValue("NEXT_PUBLIC_SUPABASE_URL") || PUBLIC_URL).replace(/\/$/, "");
+}
+
+function serviceRoleKey() {
+  return envValue("SUPABASE_SERVICE_ROLE_KEY") || envValue("SUPABASE_SERVICE_KEY");
+}
+
+function anonKey() {
+  return envValue("SUPABASE_ANON_KEY") || envValue("NEXT_PUBLIC_SUPABASE_ANON_KEY") || PUBLIC_ANON_KEY;
+}
+
 export function isSupabaseConfigured() {
-  return Boolean(supabaseConfig());
+  return Boolean(supabaseUrl() && (serviceRoleKey() || anonKey()));
+}
+
+function writeConfig() {
+  const url = supabaseUrl();
+  const key = serviceRoleKey();
+  if (!url || !key) return null;
+  return { url, key, role: "service" };
+}
+
+function readConfig() {
+  const privileged = writeConfig();
+  if (privileged) return privileged;
+  const url = supabaseUrl();
+  const key = anonKey();
+  if (!url || !key) return null;
+  return { url, key, role: "anon" };
 }
 
 function supabaseConfig() {
-  const url = (envValue("SUPABASE_URL") || envValue("NEXT_PUBLIC_SUPABASE_URL")).replace(/\/$/, "");
-  const key = envValue("SUPABASE_SERVICE_ROLE_KEY") || envValue("SUPABASE_SERVICE_KEY");
-  if (!url || !key) return null;
-  return { url, key };
+  return writeConfig() || readConfig();
+}
+
+function confirmHmacSecret() {
+  return envValue("QC_ORDER_HMAC_SECRET") || ORDER_CONFIRM_HMAC_SECRET;
+}
+
+export function confirmManualOrderSignature(orderId, approve) {
+  const id = String(orderId || "").trim().toUpperCase();
+  const decision = approve ? "yes" : "no";
+  return createHmac("sha256", confirmHmacSecret()).update(`${id}:${decision}`).digest("hex");
 }
 
 export function addDaysIso(from, days = ACCESS_DAYS) {
@@ -105,18 +147,18 @@ export function isRejectedRow(row) {
   return Boolean(mapped && mapped.status === "rejected");
 }
 
-async function supabaseRequest(path, { method = "GET", body, prefer } = {}) {
-  const cfg = supabaseConfig();
-  if (!cfg) return { ok: false, skipped: true, error: "not_configured" };
+async function supabaseRequest(path, { method = "GET", body, prefer, cfg } = {}) {
+  const auth = cfg || supabaseConfig();
+  if (!auth) return { ok: false, skipped: true, error: "not_configured" };
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 8000);
   try {
-    const res = await fetch(`${cfg.url}/rest/v1/${path}`, {
+    const res = await fetch(`${auth.url}/rest/v1/${path}`, {
       method,
       headers: {
-        apikey: cfg.key,
-        Authorization: `Bearer ${cfg.key}`,
+        apikey: auth.key,
+        Authorization: `Bearer ${auth.key}`,
         "Content-Type": "application/json",
         Prefer: prefer || "return=representation",
       },
@@ -167,9 +209,12 @@ function payloadFromOrder(order, patch = {}) {
 
 export async function getSupabaseOrder(orderId) {
   const id = String(orderId || "").trim().toUpperCase();
-  if (!id || !isSupabaseConfigured()) return null;
+  const cfg = readConfig();
+  if (!id || !cfg) return null;
+  const select = cfg.role === "anon" ? PUBLIC_SELECT : "*";
   const result = await supabaseRequest(
-    `${TABLE}?order_id=eq.${encodeURIComponent(id)}&select=*&limit=1`,
+    `${TABLE}?order_id=eq.${encodeURIComponent(id)}&select=${select}&limit=1`,
+    { cfg },
   );
   if (!result.ok || !Array.isArray(result.data) || !result.data[0]) return null;
   return mapRow(result.data[0]);
@@ -177,23 +222,82 @@ export async function getSupabaseOrder(orderId) {
 
 export async function getLatestSupabaseOrderByPhone(phone) {
   const value = String(phone || "").trim();
-  if (!value || !isSupabaseConfigured()) return null;
+  const cfg = writeConfig();
+  if (!value || !cfg) return null;
   const result = await supabaseRequest(
     `${TABLE}?phone=eq.${encodeURIComponent(value)}&select=*&order=order_date.desc&limit=1`,
+    { cfg },
   );
   if (!result.ok || !Array.isArray(result.data) || !result.data[0]) return null;
   return mapRow(result.data[0]);
+}
+
+async function confirmViaSignedRpc(order, approve) {
+  const url = supabaseUrl();
+  const key = anonKey();
+  const orderId = String(order?.order_id || "").trim().toUpperCase();
+  if (!url || !key || !orderId) return { ok: false, skipped: true, error: "not_configured" };
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(`${url}/rest/v1/rpc/confirm_manual_order`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        p_order_id: orderId,
+        p_sig: confirmManualOrderSignature(orderId, approve),
+        p_approve: Boolean(approve),
+        p_phone: String(order?.phone || "").slice(0, 40),
+        p_name: String(order?.customer_name || order?.name || "").slice(0, 120),
+      }),
+    });
+    const text = await res.text();
+    let data = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = text;
+      }
+    }
+    if (!res.ok) {
+      const hint =
+        typeof data === "object"
+          ? data?.message || data?.hint || data?.error
+          : String(data || "").slice(0, 200);
+      return { ok: false, error: hint || `rpc_http_${res.status}`, status: res.status };
+    }
+    return { ok: true, row: mapRow(data) || { order_id: orderId, confirm: approve ? "yes" : "no", status: approve ? "approved" : "rejected" }, rpc: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "rpc_failed" };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
  * Insert or merge the order row (phone, name, dates, confirm).
  */
 export async function upsertSupabaseOrder(order, patch = {}) {
-  if (!isSupabaseConfigured()) return { ok: false, skipped: true, error: "not_configured" };
   const payload = payloadFromOrder(order, patch);
   if (!payload.order_id) return { ok: false, error: "missing_order_id" };
 
+  const privileged = writeConfig();
+  if (!privileged) {
+    if (payload.confirm === "yes" || payload.status === "rejected") {
+      return confirmViaSignedRpc(order, payload.confirm === "yes");
+    }
+    return { ok: false, skipped: true, error: "not_configured" };
+  }
+
   const result = await supabaseRequest(`${TABLE}?on_conflict=order_id`, {
+    cfg: privileged,
     method: "POST",
     prefer: "resolution=merge-duplicates,return=representation",
     body: payload,
@@ -205,7 +309,7 @@ export async function upsertSupabaseOrder(order, patch = {}) {
 
   const patched = await supabaseRequest(
     `${TABLE}?order_id=eq.${encodeURIComponent(payload.order_id)}`,
-    { method: "PATCH", body: payload, prefer: "return=representation" },
+    { method: "PATCH", body: payload, prefer: "return=representation", cfg: privileged },
   );
   if (patched.ok) {
     const row = Array.isArray(patched.data) ? patched.data[0] : patched.data;
@@ -216,6 +320,7 @@ export async function upsertSupabaseOrder(order, patch = {}) {
     method: "POST",
     prefer: "return=representation",
     body: payload,
+    cfg: privileged,
   });
   if (inserted.ok) {
     const row = Array.isArray(inserted.data) ? inserted.data[0] : inserted.data;
@@ -234,6 +339,10 @@ export async function setSupabaseConfirm(order, confirmRaw) {
   const confirm = normalizeConfirm(confirmRaw);
   const orderId = String(order?.order_id || "").trim().toUpperCase();
   const phone = String(order?.phone || "").trim();
+
+  if (!writeConfig()) {
+    return confirmViaSignedRpc({ ...order, order_id: orderId, phone }, confirm === "yes");
+  }
 
   let existing = orderId ? await getSupabaseOrder(orderId) : null;
   if (!existing && phone) existing = await getLatestSupabaseOrderByPhone(phone);

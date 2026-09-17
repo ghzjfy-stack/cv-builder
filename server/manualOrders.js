@@ -477,6 +477,7 @@ async function approveManualOrderInner(orderId, options = {}) {
   if (!order.unlock_token) order.unlock_token = token;
   if (!sb.ok && !sb.skipped) {
     console.error("[quickcv] supabase confirm=yes failed:", sb.error);
+    return { ok: true, already: false, order, persistFailed: true, persistError: sb.error };
   }
   return { ok: true, already: false, order };
 }

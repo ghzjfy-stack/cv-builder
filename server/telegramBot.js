@@ -302,13 +302,14 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
     })();
   }
 
+  const persistOk = result.persistFailed !== true;
   const text =
     `✅ Payment Approved & Download Released!\n\n` +
     `*Order:* \`${escapeTelegramMarkdown(order.order_id)}\`\n` +
     optionalLine("Name", order.customer_name) +
     optionalLine("Phone", order.phone || order.email) +
     `*Amount:* ${escapeTelegramMarkdown(formatAmountIls(order.amount_ils))} ILS\n` +
-    `*Supabase confirm:* yes\n` +
+    `*Supabase confirm:* ${persistOk ? "yes" : "failed"}\n` +
     (result.already ? `_Already approved earlier._` : `_Client polling will unlock download now._`);
 
   const edited = await editTelegramMessage(chatId, messageId, text);
@@ -587,7 +588,18 @@ async function handleCallbackQuery(update, options = {}) {
 
     const parsed = parseCallbackQueryData(data, messageText);
     const toast = toastForCallbackAction(parsed.action);
-    await answerOnce(toast ? { text: toast } : {});
+    const ack = await answerCallbackQuery(cq.id, toast ? { text: toast } : {});
+    if (ack?.ok !== false) answered = true;
+    if (ack?.ok === false && (parsed.action === "approve" || parsed.action === "reject")) {
+      console.error("[quickcv] telegram ACK failed, not persisting", ack.error || "");
+      if (chatId != null) {
+        await sendTelegramText(
+          chatId,
+          "Telegram did not accept this button. Press Yes/No again.",
+        );
+      }
+      return;
+    }
 
     console.info("[quickcv] telegram callback", {
       action: parsed.action,

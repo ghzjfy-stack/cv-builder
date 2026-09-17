@@ -36,7 +36,7 @@ function adminChatId() {
 }
 
 function adminIds() {
-  const raw = envValue("TELEGRAM_ADMIN_IDS") || adminChatId();
+  const raw = [envValue("TELEGRAM_ADMIN_IDS"), adminChatId()].filter(Boolean).join(",");
   return new Set(
     raw
       .split(/[,\s]+/)
@@ -311,7 +311,10 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
     `*Supabase confirm:* yes\n` +
     (result.already ? `_Already approved earlier._` : `_Client polling will unlock download now._`);
 
-  await editTelegramMessage(chatId, messageId, text);
+  const edited = await editTelegramMessage(chatId, messageId, text);
+  if (!edited?.ok) {
+    await sendTelegramText(chatId, `✅ הזמנה \`${escapeTelegramMarkdown(order.order_id)}\` אושרה. ההורדה נפתחה אצל הלקוח.`);
+  }
 }
 
 async function handleRejectPayment(chatId, orderId, messageId, messageText) {
@@ -569,9 +572,9 @@ async function handleCallbackQuery(update, options = {}) {
   };
 
   const data = String(cq.data || "");
-  const chatId = cq.message?.chat?.id;
+  const chatId = cq.message?.chat?.id ?? cq.from?.id;
   const messageId = cq.message?.message_id;
-  const messageText = cq.message?.text || "";
+  const messageText = [cq.data, cq.message?.text, cq.message?.caption].filter(Boolean).join("\n");
 
   try {
     if (!isAdmin(update)) {
@@ -622,6 +625,12 @@ async function handleCallbackQuery(update, options = {}) {
     }
 
     console.warn("[quickcv] unknown telegram callback_data", data.slice(0, 80));
+    if (chatId != null) {
+      await sendTelegramText(
+        chatId,
+        "לא זוהה כפתור Yes/No. שלחו הזמנה חדשה מהאתר או נסו שוב.",
+      );
+    }
   } catch (err) {
     console.error("[quickcv] callback query handler error:", err?.message || err);
     try {
@@ -687,14 +696,9 @@ export async function handleTelegramWebhookRequest(req, res) {
   }
 
   const cq = update.callback_query;
-  if (cq?.id) {
-    await answerCallbackQuery(cq.id);
-  }
-  json(res, 200, { ok: true });
-
   try {
     if (cq) {
-      await handleCallbackQuery(update, { alreadyAnswered: true });
+      await handleCallbackQuery(update);
     } else if (!isAdmin(update)) {
       const chatId = update?.message?.chat?.id ?? update?.edited_message?.chat?.id;
       if (chatId != null) {
@@ -708,5 +712,14 @@ export async function handleTelegramWebhookRequest(req, res) {
     }
   } catch (err) {
     console.error("[quickcv] telegram bot error:", err?.message || err);
+    try {
+      if (cq?.id) await answerCallbackQuery(cq.id);
+    } catch (ackErr) {
+      console.error("[quickcv] telegram fallback ACK failed:", ackErr?.message || ackErr);
+    }
+  }
+
+  if (!res.headersSent) {
+    json(res, 200, { ok: true });
   }
 }

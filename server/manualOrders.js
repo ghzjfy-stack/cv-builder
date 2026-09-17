@@ -318,28 +318,16 @@ async function recoverOrderRecord(orderId, messageText) {
 const approveInflight = new Map();
 const rejectInflight = new Map();
 
-/** Build Approve callback_data; embeds a compact recovery snapshot when it fits. */
+/** Build Approve callback_data. Keep it tiny so Telegram always accepts the keyboard. */
 export function buildPayCallbackData(order) {
   const orderId = normalizeOrderId(order?.order_id);
-  if (!orderId) return "pay:";
-  const compact = signCompactOrderSnapshot(order);
-  const withCompact = `pay:${compact || orderId}`;
-  if (Buffer.byteLength(withCompact, "utf8") <= CALLBACK_DATA_MAX_BYTES) {
-    return withCompact;
-  }
-  return `pay:${orderId}`;
+  return orderId ? `pay:${orderId}` : "pay:";
 }
 
-/** Build Reject callback_data; embeds a compact recovery snapshot when it fits. */
+/** Build Reject callback_data. */
 export function buildDenyCallbackData(order) {
   const orderId = normalizeOrderId(order?.order_id);
-  if (!orderId) return "deny:";
-  const compact = signCompactOrderSnapshot(order);
-  const withCompact = `deny:${compact || orderId}`;
-  if (Buffer.byteLength(withCompact, "utf8") <= CALLBACK_DATA_MAX_BYTES) {
-    return withCompact;
-  }
-  return `deny:${orderId}`;
+  return orderId ? `deny:${orderId}` : "deny:";
 }
 
 /** Extract CV-XXXX from pay:/deny: callback_data (plain id or compact snapshot). */

@@ -35,6 +35,7 @@ let selectedPack: PackId = "basic";
 let selectedPayMethod = "bit";
 let manualOrderPoll = null;
 let activeManualOrderId = "";
+let checkoutInflight = null;
 
 function normalizeStoredOrderId(value) {
   const id = String(value || "")
@@ -241,17 +242,39 @@ function stopManualOrderPoll() {
   }
 }
 
-function setManualOrderUi(orderId, statusText) {
-  const panel = document.getElementById("manual-order-panel");
+function setTransferWaiting(on, orderId, statusText) {
   const live = document.getElementById("pay-live-status");
+  const panel = document.getElementById("manual-order-panel");
   const idEl = document.getElementById("manual-order-id");
   const statusEl = document.getElementById("manual-order-status");
-  if (orderId) {
+  const proceed = document.getElementById("btn-proceed-payment");
+  const root = modal();
+  root?.classList.toggle("is-waiting", Boolean(on));
+  if (on) {
     live?.classList.remove("hidden");
-    panel?.classList.remove("hidden");
-    if (idEl) idEl.textContent = orderId;
+    if (orderId) {
+      panel?.classList.remove("hidden");
+      if (idEl) idEl.textContent = orderId;
+    }
+    if (statusEl) {
+      statusEl.textContent = statusText || "ממתין לאישור ההעברה...";
+    }
+    if (proceed) {
+      proceed.setAttribute("disabled", "true");
+      proceed.textContent = "בודקים את התשלום...";
+    }
+  } else if (proceed) {
+    proceed.removeAttribute("disabled");
+    proceed.textContent = "התחל בדיקת תשלום";
   }
-  if (statusEl && statusText != null) statusEl.textContent = statusText;
+}
+
+function setManualOrderUi(orderId, statusText) {
+  if (orderId) setTransferWaiting(true, orderId, statusText);
+  else {
+    const statusEl = document.getElementById("manual-order-status");
+    if (statusEl && statusText != null) statusEl.textContent = statusText;
+  }
 }
 
 function readCustomerName() {
@@ -263,7 +286,7 @@ async function startManualOrderPolling(orderId, options = {}) {
   const quiet = Boolean(options.quiet);
   stopManualOrderPoll();
   persistManualOrderId(orderId, "PENDING");
-  setManualOrderUi(orderId, "ממתין לאישור התשלום...");
+  setManualOrderUi(orderId, "ממתין לאישור ההעברה...");
   if (!quiet || modal()?.classList.contains("flex")) {
     showWaitStep();
   }
@@ -283,19 +306,23 @@ async function startManualOrderPolling(orderId, options = {}) {
     }
     if (result.status === "CANCELLED") {
       persistManualOrderId("");
-      setManualOrderUi(orderId, "ההזמנה נדחתה.");
+      setTransferWaiting(false);
+      const statusEl = document.getElementById("manual-order-status");
+      if (statusEl) statusEl.textContent = "ההזמנה נדחתה.";
       setFeedback("ההזמנה לא אושרה. אפשר לפתוח הזמנה חדשה.", false);
       return;
     }
     if (result.status === "EXPIRED") {
       persistManualOrderId("");
-      setManualOrderUi(orderId, "פג תוקף הגישה.");
+      setTransferWaiting(false);
+      const statusEl = document.getElementById("manual-order-status");
+      if (statusEl) statusEl.textContent = "פג תוקף הגישה.";
       setFeedback(result.error || "פג תוקף הגישה. יש לבצע הזמנה חדשה.", false);
       return;
     }
     if (result.error && result.error !== "cancelled") {
       const soft = /kv|redis|אחסון|database/i.test(String(result.error))
-        ? "ממתין לאישור התשלום..."
+        ? "ממתין לאישור ההעברה..."
         : result.error;
       setManualOrderUi(orderId, soft);
       if (!/kv|redis|אחסון|database/i.test(String(result.error))) {
@@ -330,35 +357,49 @@ async function proceedToPayment(preferredMethod) {
   if (preferredMethod === "paybox" || preferredMethod === "bit") {
     selectedPayMethod = preferredMethod;
   }
-  const existingId = activeManualOrderId || readPersistedManualOrderId();
-  if (existingId) {
+  if (checkoutInflight) return checkoutInflight;
+
+  const run = (async () => {
+    const existingId = activeManualOrderId || readPersistedManualOrderId();
+    setFeedback("", false);
+    setTransferWaiting(true, existingId || "…", "ממתין לאישור ההעברה...");
     showWaitStep();
-    if (!manualOrderPoll) void startManualOrderPolling(existingId);
-    setManualOrderUi(existingId, "ממתין לאישור התשלום...");
-    return { ok: true, order_id: existingId };
-  }
-  setFeedback("", false);
-  setManualOrderUi("…", "ממתין לאישור התשלום...");
-  showWaitStep();
-  const created = await createManualOrderSession({
-    pack: "basic",
-    contact,
-    paymentMethod: selectedPayMethod === "paybox" ? "paybox" : "bit",
-    customerName: readCustomerName(),
-    amountIls: CHECKOUT.amountIls,
+    let created;
+    try {
+      created = await createManualOrderSession({
+        pack: "basic",
+        contact,
+        paymentMethod: selectedPayMethod === "paybox" ? "paybox" : "bit",
+        customerName: readCustomerName(),
+        amountIls: CHECKOUT.amountIls,
+        orderId: existingId || undefined,
+      });
+    } catch {
+      created = { ok: false, error: "לא הצלחנו לפתוח הזמנה. נסו שוב." };
+    }
+    if (!created.ok || !created.order_id) {
+      if (existingId) {
+        void startManualOrderPolling(existingId);
+        return { ok: true, order_id: existingId };
+      }
+      const raw = created.error || "לא הצלחנו לפתוח הזמנה.";
+      const message = /kv|redis|אחסון|database/i.test(raw)
+        ? "לא הצלחנו לפתוח הזמנה. נסו שוב."
+        : raw;
+      setFeedback(message, false);
+      setTransferWaiting(false);
+      document.getElementById("pay-live-status")?.classList.add("hidden");
+      showPayStep();
+      return null;
+    }
+    void startManualOrderPolling(created.order_id);
+    return created;
+  })();
+
+  checkoutInflight = run.finally(() => {
+    checkoutInflight = null;
   });
-  if (!created.ok || !created.order_id) {
-    const raw = created.error || "לא הצלחנו לפתוח הזמנה.";
-    const message = /kv|redis|אחסון|database/i.test(raw)
-      ? "לא הצלחנו לפתוח הזמנה. נסו שוב."
-      : raw;
-    setFeedback(message, false);
-    setManualOrderUi("", message);
-    showPayStep();
-    return null;
-  }
-  void startManualOrderPolling(created.order_id);
-  return created;
+  return checkoutInflight;
 }
 
 function setPayMethod(method) {
@@ -451,20 +492,18 @@ function copyBitPhone(e) {
 }
 
 async function ensureManualOrderForCheckout(method) {
-  if (activeManualOrderId && manualOrderPoll) return activeManualOrderId;
   const created = await proceedToPayment(method);
-  return created?.order_id || null;
+  return created?.order_id || activeManualOrderId || readPersistedManualOrderId() || null;
 }
 
 function bindDeepLinkAnchor(id, url) {
   const el = document.getElementById(id);
-  if (!(el instanceof HTMLAnchorElement) || !url) return;
-  el.href = url;
-  el.rel = "noopener";
-  if (prefersSameTabCheckout()) {
-    el.removeAttribute("target");
-  } else {
-    el.target = "_blank";
+  if (!el || !url) return;
+  if (el instanceof HTMLAnchorElement) {
+    el.href = url;
+    el.rel = "noopener";
+    if (prefersSameTabCheckout()) el.removeAttribute("target");
+    else el.target = "_blank";
   }
 }
 
@@ -679,6 +718,15 @@ function readCheckoutContact() {
   return String(el && "value" in el ? el.value : "").trim();
 }
 
+function prefillCheckoutContact() {
+  const el = document.getElementById("checkout-contact");
+  if (!(el instanceof HTMLInputElement)) return;
+  if (el.value.trim()) return;
+  const fromCv = document.getElementById("in-phone");
+  const value = String(fromCv && "value" in fromCv ? fromCv.value : "").trim();
+  if (value) el.value = value;
+}
+
 function triggerPDFDownload() {
   if (!isUnlocked()) {
     openCheckoutModal();
@@ -697,6 +745,7 @@ function openCheckoutModal() {
   setFeedback("", false);
   selectedPack = "basic";
   applyPackUi();
+  prefillCheckoutContact();
 
   const existing = readPersistedManualOrderId();
   if (existing && !isUnlocked()) {
@@ -707,9 +756,15 @@ function openCheckoutModal() {
     const orderIdEl = document.getElementById("manual-order-id");
     if (orderIdEl) orderIdEl.textContent = "—";
     const orderStatusEl = document.getElementById("manual-order-status");
-    if (orderStatusEl) orderStatusEl.textContent = "ממתין לאישור התשלום...";
+    if (orderStatusEl) orderStatusEl.textContent = "ממתין לאישור ההעברה...";
     document.getElementById("manual-order-panel")?.classList.add("hidden");
     document.getElementById("pay-live-status")?.classList.add("hidden");
+    modal()?.classList.remove("is-waiting");
+    const proceed = document.getElementById("btn-proceed-payment");
+    if (proceed) {
+      proceed.removeAttribute("disabled");
+      proceed.textContent = "התחל בדיקת תשלום";
+    }
   }
 }
 

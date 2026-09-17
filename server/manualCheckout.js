@@ -7,6 +7,7 @@ import {
   getManualOrder,
   normalizeOrderId,
   sendManualOrderTelegram,
+  updateManualOrder,
 } from "./manualOrders.js";
 import {
   getSupabaseOrder,
@@ -34,8 +35,9 @@ function friendlyError(err) {
 }
 
 /**
- * POST /api/order-session
- * Create a PENDING manual checkout order and notify Telegram.
+ * POST /api/order-session and POST /api/telegram-notify
+ * Create or reuse a PENDING manual checkout order and notify Telegram
+ * with order id, customer phone, and Bit/PayBox method.
  */
 export async function handleOrderSessionRequest(req, res) {
   if (req.method === "OPTIONS") {
@@ -73,21 +75,54 @@ export async function handleOrderSessionRequest(req, res) {
     return;
   }
   const amountIls = Number(process.env.PAYMENT_AMOUNT_ILS || 10) || packAmount(pack);
+  const requestedId = normalizeOrderId(body.order_id || body.orderId);
+  const customerName = String(body.customer_name || body.name || "").trim();
 
   try {
-    const order = await createManualOrder({
-      customerName: body.customer_name || body.name || "",
-      phone: contacts.phone || body.phone || "",
-      email: contacts.email || body.email || "",
-      contact: contacts.contact,
-      paymentMethod,
-      amountIls,
-      pack,
-    });
+    let order = requestedId ? await getManualOrder(requestedId) : null;
+    if (order && order.status === "PENDING") {
+      order = await updateManualOrder(order.order_id, {
+        customer_name: customerName || order.customer_name,
+        phone: contacts.phone || order.phone,
+        email: contacts.email || order.email,
+        contact: contacts.contact || order.contact,
+        payment_method: paymentMethod,
+        amount_ils: amountIls,
+        pack,
+      });
+    } else if (order && (order.status === "PAID" || order.status === "CANCELLED")) {
+      order = await createManualOrder({
+        customerName,
+        phone: contacts.phone || body.phone || "",
+        email: contacts.email || body.email || "",
+        contact: contacts.contact,
+        paymentMethod,
+        amountIls,
+        pack,
+      });
+    } else {
+      order = await createManualOrder({
+        orderId: requestedId || undefined,
+        customerName,
+        phone: contacts.phone || body.phone || "",
+        email: contacts.email || body.email || "",
+        contact: contacts.contact,
+        paymentMethod,
+        amountIls,
+        pack,
+      });
+    }
+    if (!order || !order.order_id) throw new Error("order_missing");
 
-    const notify = await sendManualOrderTelegram(order);
-    if (!notify.sent && notify.error && notify.error !== "not_configured") {
+    const shouldNotify = !order.telegram_message_id;
+    const notify = shouldNotify
+      ? await sendManualOrderTelegram(order)
+      : { sent: true };
+    if (shouldNotify && !notify.sent && notify.error && notify.error !== "not_configured") {
       console.error("[quickcv] manual order telegram failed:", notify.error);
+    }
+    if (shouldNotify && !notify.sent && notify.error === "not_configured") {
+      console.warn("[quickcv] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID missing. Order alert not sent.");
     }
 
     json(res, 200, {
@@ -96,6 +131,7 @@ export async function handleOrderSessionRequest(req, res) {
       status: order.status,
       amount_ils: order.amount_ils,
       pack: order.pack,
+      payment_method: order.payment_method,
       telegram_sent: Boolean(notify.sent),
       storage: orderStorageMode(),
     });

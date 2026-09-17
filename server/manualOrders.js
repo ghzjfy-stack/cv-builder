@@ -7,7 +7,7 @@ import {
   upsertSupabaseOrder,
 } from "./supabaseOrders.js";
 import { getSigningSecret, signUnlockToken } from "./unlockToken.js";
-import { escapeTelegramMarkdown, formatAmountIls } from "../lib/telegram.js";
+import { escapeTelegramMarkdown, formatAmountIls, formatPaymentMethod } from "../lib/telegram.js";
 
 /** At least 24h so PENDING → Telegram approve → client poll survives cold starts. */
 const ORDER_TTL_SEC = () =>
@@ -509,13 +509,18 @@ function telegramConfig() {
 export function formatManualOrderTelegramMessage(order) {
   const amount = formatAmountIls(order.amount_ils || 10);
   const phone = String(order.phone || "").trim() || "—";
-  const name = String(order.customer_name || "").trim() || "—";
+  const name = String(order.customer_name || "").trim();
+  const method = formatPaymentMethod(order.payment_method || "bit");
+  const orderId = String(order.order_id || "").trim() || "—";
+  const nameLine = name ? `*שם:* ${escapeTelegramMarkdown(name)}\n` : "";
   return (
-    `*Order:* \`${escapeTelegramMarkdown(order.order_id)}\`\n` +
-    `*Customer:* ${escapeTelegramMarkdown(name)}\n` +
-    `*Phone:* \`${escapeTelegramMarkdown(phone)}\`\n` +
-    `*Amount:* ${escapeTelegramMarkdown(amount)} ILS\n\n` +
-    `_Yes = confirm yes, release PDF. No = confirm no, block download._`
+    `🛒 *הזמנה חדשה ממתינה לאישור*\n\n` +
+    `*מזהה הזמנה:* \`${escapeTelegramMarkdown(orderId)}\`\n` +
+    nameLine +
+    `*טלפון:* \`${escapeTelegramMarkdown(phone)}\`\n` +
+    `*אמצעי תשלום:* ${escapeTelegramMarkdown(method)}\n` +
+    `*סכום:* ${escapeTelegramMarkdown(amount)} ₪\n\n` +
+    `_Yes = אישור והורדת PDF. No = דחייה._`
   );
 }
 

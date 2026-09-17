@@ -15,6 +15,7 @@ const routes = {
   "/api/paybox-session": handlePayboxSessionRequest,
   "/api/paybox-status": handlePayboxStatusRequest,
   "/api/order-session": handleOrderSessionRequest,
+  "/api/telegram-notify": handleOrderSessionRequest,
   "/api/order-status": handleOrderStatusRequest,
   "/api/verify-code-and-download": handleVerifyCodeAndDownloadRequest,
   "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,

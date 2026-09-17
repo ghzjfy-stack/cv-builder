@@ -27,18 +27,35 @@ export async function createManualOrderSession(input: {
   paymentMethod: "bit" | "paybox";
   customerName?: string;
   amountIls?: number;
+  orderId?: string;
 }): Promise<ManualOrderSessionResponse> {
-  const res = await fetch("/api/order-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      pack: input.pack,
-      contact: String(input.contact || "").trim(),
-      payment_method: input.paymentMethod,
-      customer_name: String(input.customerName || "").trim(),
-      amount_ils: input.amountIls,
-    }),
-  });
+  const payload = {
+    pack: input.pack,
+    contact: String(input.contact || "").trim(),
+    payment_method: input.paymentMethod,
+    customer_name: String(input.customerName || "").trim(),
+    amount_ils: input.amountIls,
+    order_id: String(input.orderId || "").trim(),
+  };
+  const tryNotify = async (url: string) =>
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  let res;
+  try {
+    res = await tryNotify("/api/telegram-notify");
+    if (!res.ok && (res.status === 404 || res.status === 405 || res.status === 501)) {
+      res = await tryNotify("/api/order-session");
+    }
+  } catch {
+    try {
+      res = await tryNotify("/api/order-session");
+    } catch {
+      return { ok: false, error: FAIL_CREATE };
+    }
+  }
   let data: ManualOrderSessionResponse | null = null;
   try {
     data = (await res.json()) as ManualOrderSessionResponse;

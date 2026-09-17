@@ -2964,6 +2964,10 @@
             color: #e2e8f0;
             font-size: 11px;
             font-weight: 700;
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
         }
         .experience-item-remove { min-width: 2.5rem; }
         #experience-items { display: grid; gap: 0.65rem; }
@@ -3015,14 +3019,18 @@
             position: fixed;
             inset: 0;
             z-index: 11000;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 1rem;
             background: rgba(2, 6, 23, 0.72);
             backdrop-filter: blur(10px);
+            pointer-events: auto;
         }
-        .experience-raw-modal.hidden { display: none; }
+        .experience-raw-modal.hidden { display: none !important; }
+        .experience-raw-modal.is-open {
+            display: flex !important;
+        }
         .experience-raw-dialog {
             width: min(40rem, 100%);
             max-height: min(90vh, 44rem);
@@ -3087,6 +3095,9 @@
         }
         .pay-wait-spinner {
             box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);
+        }
+        #payment-modal.is-waiting #btn-proceed-payment {
+            display: none;
         }
         #pay-wait-step {
             animation: pay-wait-in 0.35s ease;
@@ -3158,6 +3169,11 @@
         .pay-deeplink {
             text-decoration: none;
             border: 1px solid transparent;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            font: inherit;
+            color: inherit;
             transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
         }
         .pay-deeplink:hover {

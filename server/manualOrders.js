@@ -170,10 +170,14 @@ export function parseOrderSnapshot(raw) {
   const legacy = parseLegacyQcordSnapshot(text);
   if (legacy) return legacy;
 
-  // Compact callback token: "pay:CV-…|…|sig", "deny:…", or bare "CV-…|…|sig"
+  // Compact callback token: "pay:CV-…|…|sig", "deny:…", or bare "CV-…"
   for (const line of text.split(/\n+/)) {
     const trimmed = line.trim();
     const token = trimmed.replace(/^(pay|deny):/i, "");
+    const plainId = normalizeOrderId(token.split("|")[0]);
+    if (plainId && !token.includes("|")) {
+      return snapshotRecord({ order_id: plainId });
+    }
     if (!token.includes("|")) continue;
     const compact =
       parseCompactOrderSnapshot(token, true) || parseCompactOrderSnapshot(token, false);
@@ -192,15 +196,25 @@ function unescapeTelegramMd(value) {
 export function parseTelegramOrderMessage(raw) {
   const text = unescapeTelegramMd(raw);
   if (!text) return null;
-  const id = normalizeOrderId((text.match(/\bCV-\d{4}\b/i) || [])[0]);
+  const id = normalizeOrderId(
+    (text.match(/\bCV-\d{4}\b/i) || [])[0] ||
+      (text.match(/מזהה הזמנה[^\n]*`([^`]+)`/i) || [])[1] ||
+      (text.match(/\*Order:\*\s*`?([^`\n]+)`?/i) || [])[1],
+  );
   if (!id) return null;
   const blank = (v) => {
     const s = unescapeTelegramMd(v);
     return !s || s === "—" || s === "-" ? "" : s;
   };
-  const name = blank((text.match(/\*Customer:\*\s*([^\n]+)/i) || [])[1]);
-  const phone = blank((text.match(/\*Phone:\*\s*`?([^`\n]+)`?/i) || [])[1]);
-  const amount = Number((text.match(/\*Amount:\*\s*([\d.]+)/i) || [])[1]);
+  const name = blank(
+    (text.match(/\*שם:\*\s*([^\n]+)/i) || text.match(/\*Customer:\*\s*([^\n]+)/i) || [])[1],
+  );
+  const phone = blank(
+    (text.match(/\*טלפון:\*\s*`?([^`\n]+)`?/i) || text.match(/\*Phone:\*\s*`?([^`\n]+)`?/i) || [])[1],
+  );
+  const amount = Number(
+    (text.match(/\*סכום:\*\s*([\d.]+)/i) || text.match(/\*Amount:\*\s*([\d.]+)/i) || [])[1],
+  );
   return snapshotRecord({
     order_id: id,
     customer_name: name,
@@ -437,6 +451,13 @@ export async function approveManualOrder(orderId, options = {}) {
 
 async function approveManualOrderInner(orderId, options = {}) {
   let current = await recoverOrderRecord(orderId, options.messageText || "");
+  const id =
+    normalizeOrderId(orderId) ||
+    current?.order_id ||
+    parseTelegramOrderMessage(options.messageText || "")?.order_id;
+  if (!current && id) {
+    current = snapshotRecord({ order_id: id });
+  }
   if (!current) return { ok: false, reason: "not_found" };
   if (current.status === "PAID" && current.unlock_token) {
     await setSupabaseConfirm(current, "yes").catch(() => {});
@@ -445,9 +466,9 @@ async function approveManualOrderInner(orderId, options = {}) {
   if (current.status === "CANCELLED") {
     return { ok: false, reason: "cancelled", order: current };
   }
-  const token = signUnlockToken();
+  const token = current.unlock_token || signUnlockToken();
   const paidAt = new Date().toISOString();
-  const order = await writeOrderVerified(current.order_id, {
+  const next = {
     ...current,
     reserved: false,
     status: "PAID",
@@ -456,13 +477,19 @@ async function approveManualOrderInner(orderId, options = {}) {
     paid_at: paidAt,
     updated_at: paidAt,
     exp_date: current.exp_date || addDaysIso(current.created_at || paidAt, 30),
-  });
-  if (!order || order.status !== "PAID" || !order.unlock_token) {
-    return { ok: false, reason: "persist_failed" };
-  }
-  await setSupabaseConfirm(order, "yes").catch((err) => {
+  };
+  let sb = { ok: false };
+  try {
+    sb = await setSupabaseConfirm(next, "yes");
+  } catch (err) {
     console.error("[quickcv] supabase confirm=yes failed:", err?.message || err);
-  });
+  }
+  const order = (await writeOrderVerified(current.order_id, next)) || next;
+  if (order.status !== "PAID") order.status = "PAID";
+  if (!order.unlock_token) order.unlock_token = token;
+  if (!sb.ok && !sb.skipped) {
+    console.error("[quickcv] supabase confirm=yes failed:", sb.error);
+  }
   return { ok: true, already: false, order };
 }
 

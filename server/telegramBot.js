@@ -96,14 +96,18 @@ export async function sendTelegramText(chatId, text, extra = {}) {
 
 async function editTelegramMessage(chatId, messageId, text) {
   if (chatId == null || messageId == null) return { ok: false };
-  return telegramApi("editMessageText", {
+  const payload = {
     chat_id: chatId,
     message_id: messageId,
     text,
-    parse_mode: "Markdown",
     disable_web_page_preview: true,
     reply_markup: { inline_keyboard: [] },
-  });
+  };
+  const withMarkdown = await telegramApi("editMessageText", { ...payload, parse_mode: "Markdown" });
+  if (withMarkdown.ok) return withMarkdown;
+  const plain = await telegramApi("editMessageText", payload);
+  if (plain.ok) return plain;
+  return sendTelegramText(chatId, text);
 }
 
 function helpText() {
@@ -275,26 +279,27 @@ async function handleApprovePayment(chatId, orderId, messageId, messageText) {
 
   const order = result.order;
   if (order?.email && order?.unlock_token) {
-    // Optional receipt: issue a one-time code for email downloads when contact is email.
-    try {
-      const issued = await issuePaidCode({
-        userPhone: order.phone,
-        userEmail: order.email,
-        provider: order.payment_method || "manual",
-        transactionId: `manual-${order.order_id}`,
-      });
-      if (issued?.code) {
-        await sendPurchaseConfirmationEmail({
-          email: order.email,
-          code: issued.code,
-          pack: order.pack,
-          customerName: order.customer_name,
-          amountIls: order.amount_ils,
+    void (async () => {
+      try {
+        const issued = await issuePaidCode({
+          userPhone: order.phone,
+          userEmail: order.email,
+          provider: order.payment_method || "manual",
+          transactionId: `manual-${order.order_id}`,
         });
+        if (issued?.code) {
+          await sendPurchaseConfirmationEmail({
+            email: order.email,
+            code: issued.code,
+            pack: order.pack,
+            customerName: order.customer_name,
+            amountIls: order.amount_ils,
+          });
+        }
+      } catch (err) {
+        console.error("[quickcv] approve email failed:", err?.message || err);
       }
-    } catch (err) {
-      console.error("[quickcv] approve email failed:", err?.message || err);
-    }
+    })();
   }
 
   const text =
@@ -548,14 +553,14 @@ async function answerCallbackQuery(callbackQueryId, extra = {}) {
   }
 }
 
-async function handleCallbackQuery(update) {
+async function handleCallbackQuery(update, options = {}) {
   const cq = update?.callback_query;
   if (!cq?.id) {
     console.error("[quickcv] callback_query missing id");
     return;
   }
 
-  let answered = false;
+  let answered = Boolean(options.alreadyAnswered);
   const answerOnce = async (extra = {}) => {
     if (answered) return;
     const result = await answerCallbackQuery(cq.id, extra);
@@ -681,9 +686,15 @@ export async function handleTelegramWebhookRequest(req, res) {
     return;
   }
 
+  const cq = update.callback_query;
+  if (cq?.id) {
+    await answerCallbackQuery(cq.id);
+  }
+  json(res, 200, { ok: true });
+
   try {
-    if (update.callback_query) {
-      await handleCallbackQuery(update);
+    if (cq) {
+      await handleCallbackQuery(update, { alreadyAnswered: true });
     } else if (!isAdmin(update)) {
       const chatId = update?.message?.chat?.id ?? update?.edited_message?.chat?.id;
       if (chatId != null) {
@@ -697,15 +708,5 @@ export async function handleTelegramWebhookRequest(req, res) {
     }
   } catch (err) {
     console.error("[quickcv] telegram bot error:", err?.message || err);
-    try {
-      const cqId = update?.callback_query?.id;
-      if (cqId) await answerCallbackQuery(cqId);
-    } catch (ackErr) {
-      console.error("[quickcv] telegram fallback ACK failed:", ackErr?.message || ackErr);
-    }
-  }
-
-  if (!res.headersSent) {
-    json(res, 200, { ok: true });
   }
 }

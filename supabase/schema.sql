@@ -27,7 +27,7 @@ alter table public.orders enable row level security;
 -- Checkout polling: public may read status by order_id, not phone/name.
 revoke all on table public.orders from anon, authenticated;
 grant select (order_id, status, confirm, exp_date) on table public.orders to anon, authenticated;
-grant all on table public.orders to service_role;
+grant all on table public.orders to service_role, postgres;
 
 drop policy if exists orders_public_read_status on public.orders;
 create policy orders_public_read_status
@@ -35,6 +35,14 @@ on public.orders
 for select
 to anon, authenticated
 using (true);
+
+drop policy if exists orders_service_role_all on public.orders;
+create policy orders_service_role_all
+on public.orders
+for all
+to service_role
+using (true)
+with check (true);
 
 create or replace view public.order_status
   with (security_invoker = true)

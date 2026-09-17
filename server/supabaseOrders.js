@@ -198,12 +198,32 @@ export async function upsertSupabaseOrder(order, patch = {}) {
     prefer: "resolution=merge-duplicates,return=representation",
     body: payload,
   });
-  if (!result.ok) {
-    console.error("[quickcv] supabase upsert failed:", result.error);
-    return result;
+  if (result.ok) {
+    const row = Array.isArray(result.data) ? result.data[0] : result.data;
+    return { ok: true, row: mapRow(row) || payload };
   }
-  const row = Array.isArray(result.data) ? result.data[0] : result.data;
-  return { ok: true, row: mapRow(row) || payload };
+
+  const patched = await supabaseRequest(
+    `${TABLE}?order_id=eq.${encodeURIComponent(payload.order_id)}`,
+    { method: "PATCH", body: payload, prefer: "return=representation" },
+  );
+  if (patched.ok) {
+    const row = Array.isArray(patched.data) ? patched.data[0] : patched.data;
+    return { ok: true, row: mapRow(row) || payload, patched: true };
+  }
+
+  const inserted = await supabaseRequest(TABLE, {
+    method: "POST",
+    prefer: "return=representation",
+    body: payload,
+  });
+  if (inserted.ok) {
+    const row = Array.isArray(inserted.data) ? inserted.data[0] : inserted.data;
+    return { ok: true, row: mapRow(row) || payload, inserted: true };
+  }
+
+  console.error("[quickcv] supabase upsert failed:", result.error || patched.error || inserted.error);
+  return inserted.ok ? inserted : patched.ok ? patched : result;
 }
 
 /**

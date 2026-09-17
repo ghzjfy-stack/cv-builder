@@ -345,9 +345,10 @@ async function startManualOrderPolling(orderId, options = {}) {
 }
 
 function resumePendingManualOrderIfNeeded() {
-  if (isUnlocked() || manualOrderPoll) return;
+  if (isUnlocked()) return;
   const existing = readPersistedManualOrderId();
   if (!existing) return;
+  if (manualOrderPoll) return;
   void startManualOrderPolling(existing, { quiet: true });
 }
 
@@ -1006,6 +1007,15 @@ function bind() {
     void proceedToPayment();
   });
   resumePendingManualOrderIfNeeded();
+  window.addEventListener("pageshow", () => {
+    resumePendingManualOrderIfNeeded();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") resumePendingManualOrderIfNeeded();
+  });
+  window.addEventListener("focus", () => {
+    resumePendingManualOrderIfNeeded();
+  });
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
   document.getElementById("btn-open-paybox")?.addEventListener("click", openPayboxApp);

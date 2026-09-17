@@ -190,6 +190,30 @@ export async function waitForManualOrderPaid(
   const timeoutMs = Math.max(intervalMs, options.timeoutMs || 20 * 60 * 1000);
   const started = Date.now();
 
+  const sleepUntilWake = () =>
+    new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        document.removeEventListener("visibilitychange", onWake);
+        window.removeEventListener("focus", onWake);
+        window.removeEventListener("pageshow", onWake);
+        options.signal?.removeEventListener("abort", finish);
+        resolve(undefined);
+      };
+      const onWake = () => {
+        if (document.visibilityState === "hidden") return;
+        finish();
+      };
+      const timer = window.setTimeout(finish, intervalMs);
+      document.addEventListener("visibilitychange", onWake);
+      window.addEventListener("focus", onWake);
+      window.addEventListener("pageshow", onWake);
+      options.signal?.addEventListener("abort", finish, { once: true });
+    });
+
   while (Date.now() - started < timeoutMs) {
     if (options.signal?.aborted) {
       return { ok: false, paid: false, error: "cancelled" };
@@ -209,17 +233,7 @@ export async function waitForManualOrderPaid(
         error: "פג תוקף הגישה. יש לבצע הזמנה חדשה.",
       };
     }
-    await new Promise((resolve) => {
-      const timer = window.setTimeout(resolve, intervalMs);
-      options.signal?.addEventListener(
-        "abort",
-        () => {
-          window.clearTimeout(timer);
-          resolve(undefined);
-        },
-        { once: true },
-      );
-    });
+    await sleepUntilWake();
   }
   return { ok: false, paid: false, error: "לא קיבלנו אישור בזמן. אם שילמתם, פנו אלינו." };
 }

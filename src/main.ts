@@ -744,13 +744,19 @@ function readCheckoutContact() {
   return String(el && "value" in el ? el.value : "").trim();
 }
 
+function readCvFormPhone() {
+  const fromCv = document.getElementById("in-phone");
+  const value = String(fromCv && "value" in fromCv ? fromCv.value : "").trim();
+  const digits = value.replace(/\D/g, "");
+  if (!digits || digits === "0501234567" || digits === "0540000000") return "";
+  return value;
+}
+
 function prefillCheckoutContact() {
   const el = document.getElementById("checkout-contact");
   if (!(el instanceof HTMLInputElement)) return;
-  if (el.value.trim()) return;
-  const fromCv = document.getElementById("in-phone");
-  const value = String(fromCv && "value" in fromCv ? fromCv.value : "").trim();
-  if (value) el.value = value;
+  el.placeholder = "050-1234567";
+  el.value = readCvFormPhone();
 }
 
 function triggerPDFDownload() {

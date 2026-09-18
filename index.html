@@ -427,20 +427,20 @@
                     <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
-                <div class="space-y-2 relative">
+                <div class="space-y-2 relative" id="experience-section">
                     <div class="flex items-center justify-between gap-2 flex-wrap">
                         <label class="font-bold dynamic-text text-sm" for="in-experience" id="label-experience">ניסיון תעסוקתי</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button type="button" id="btn-experience-raw" onclick="openExperienceRawEditor(event)">עריכת טקסט מלא</button>
-                            <button type="button" id="btn-add-experience" onclick="addExperienceJob(event)">הוסף משרה</button>
-                        </div>
+                        <button type="button" id="btn-experience-raw" onclick="openExperienceRawEditor(event)">עריכת טקסט מלא</button>
                     </div>
                     <div id="experience-items"></div>
+                    <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="addExperienceJob(event)">+ הוסף משרה נוספת</button>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden">2021 - נוכחי | מנהל מכירות ארצי
+Verde Commerce
 • ניהול צוות עובדים והגדלת היעדים ב-35%.
 • הובלת הסכמים אסטרטגיים.
 
 2018 - 2021 | מנהל פרויקטים
+Shoreline B2B
 • ניהול תקציבים ומעקב אחר אבני דרך בארגון.</textarea>
                 </div>
 
@@ -614,6 +614,7 @@
                 </div>
             </div>
 
+            <div class="studio-form-end-spacer" aria-hidden="true"></div>
         </div>
 
         <div id="preview-column" class="preview-col space-y-3" role="region" aria-label="תצוגה מקדימה חיה של קורות החיים">
@@ -782,23 +783,19 @@
 
     </div>
 
-    <nav id="studio-mobile-dock" class="studio-mobile-nav no-print" dir="rtl" aria-label="ניווט סטודיו במובייל">
-        <div class="studio-mobile-nav-inner">
-            <button type="button" id="btn-mobile-preview-toggle" onclick="toggleMobilePreview()" class="studio-nav-preview has-pulse" aria-pressed="false" aria-controls="preview-column">
-                <span class="studio-nav-progress" aria-hidden="true">
-                    <svg class="studio-nav-ring" viewBox="0 0 36 36">
-                        <circle class="studio-nav-ring-track" cx="18" cy="18" r="15.5"></circle>
-                        <circle id="mobile-preview-ring" class="studio-nav-ring-fill" cx="18" cy="18" r="15.5"></circle>
-                    </svg>
-                    <span id="mobile-preview-pct">0%</span>
+    <nav id="studio-mobile-dock" class="studio-mobile-nav no-print" aria-label="ניווט סטודיו במובייל">
+        <div class="studio-mobile-nav-inner" dir="ltr">
+            <button type="button" id="btn-mobile-preview-toggle" onclick="toggleMobilePreview()" class="studio-nav-preview" aria-pressed="false" aria-controls="preview-column">
+                <span class="studio-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.6-7 9.5-7 9.5 7 9.5 7-3.6 7-9.5 7-9.5-7-9.5-7z"/><circle cx="12" cy="12" r="3.1"/></svg>
                 </span>
-                <span class="studio-nav-copy">
-                    <span id="mobile-preview-label">תצוגה מקדימה</span>
-                    <span id="mobile-preview-complete" class="studio-nav-complete">0% הושלם</span>
-                </span>
+                <span id="mobile-preview-label" dir="rtl">תצוגה מקדימה</span>
             </button>
-            <button type="button" id="btn-download-pdf-mobile" class="cta-download unpaid-only studio-nav-download">
-                הורד ב-<span data-price>10</span> ₪
+            <button type="button" id="btn-download-pdf-mobile" onclick="openPaymentModal()" class="cta-download unpaid-only studio-nav-download">
+                <span class="studio-nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
+                </span>
+                <span id="mobile-download-label" dir="rtl">הורד ב-<span data-price>10</span> ₪</span>
             </button>
             <div class="paid-only studio-nav-paid">
                 <button type="button" data-download="pdf" class="studio-nav-file">PDF</button>
@@ -859,7 +856,7 @@
 
                 <div class="text-right space-y-2">
                     <label for="checkout-contact" class="block text-xs font-bold text-slate-300">מספר הטלפון שלך ב-Bit / PayBox (לזיהוי ההעברה)</label>
-                    <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" placeholder="054-0000000" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
+                    <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" value="" placeholder="050-1234567" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
                     <p id="code-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
                 </div>
 
@@ -1047,7 +1044,7 @@
                 'in-location': 'תל אביב',
                 'in-linkedin': 'linkedin.com/in/israel',
                 'in-summary': 'מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.',
-                'in-experience': '2021 - נוכחי | מנהל מכירות ארצי\n• ניהול צוות עובדים והגדלת היעדים ב-35%.\n• הובלת הסכמים אסטרטגיים.\n\n2018 - 2021 | מנהל פרויקטים\n• ניהול תקציבים ומעקב אחר אבני דרך בארגון.',
+                'in-experience': '2021 - נוכחי | מנהל מכירות ארצי\nVerde Commerce\n• ניהול צוות עובדים והגדלת היעדים ב-35%.\n• הובלת הסכמים אסטרטגיים.\n\n2018 - 2021 | מנהל פרויקטים\nShoreline B2B\n• ניהול תקציבים ומעקב אחר אבני דרך בארגון.',
                 'in-education': '2015 - 2018 | BA במנהל עסקים\n2019 | קורס ניהול מוצר',
                 'in-military': '2012 - 2015 | שירות פיקודי בחיל האוויר',
                 'in-skills': 'ניהול צוותים, CRM, Excel מתקדם',
@@ -1061,7 +1058,7 @@
                 'in-location': 'Tel Aviv',
                 'in-linkedin': 'linkedin.com/in/israel',
                 'in-summary': 'Experienced project manager with a strong record of leading teams and growing sales.',
-                'in-experience': '2021 - Present | National Sales Manager\n• Led a team and grew targets by 35%.\n• Drove strategic agreements.\n\n2018 - 2021 | Project Manager\n• Managed budgets and tracked organizational milestones.',
+                'in-experience': '2021 - Present | National Sales Manager\nVerde Commerce\n• Led a team and grew targets by 35%.\n• Drove strategic agreements.\n\n2018 - 2021 | Project Manager\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
                 'in-education': '2015 - 2018 | BA in Business Administration\n2019 | Product Management Course',
                 'in-military': '2012 - 2015 | Command role in the Israeli Air Force',
                 'in-skills': 'Team leadership, CRM, Advanced Excel',
@@ -2382,6 +2379,21 @@
             el.setAttribute('aria-hidden', 'true');
         }
 
+        function readCvFormPhone() {
+            const fromCv = document.getElementById('in-phone');
+            const value = String(fromCv && 'value' in fromCv ? fromCv.value : '').trim();
+            const digits = value.replace(/\D/g, '');
+            if (!digits || digits === '0501234567' || digits === '0540000000') return '';
+            return value;
+        }
+
+        function prefillCheckoutContact() {
+            const el = document.getElementById('checkout-contact');
+            if (!(el instanceof HTMLInputElement)) return;
+            el.placeholder = '050-1234567';
+            el.value = readCvFormPhone();
+        }
+
         function openPaymentModal() {
             const el = document.getElementById('payment-modal');
             if (!el) return;
@@ -2395,6 +2407,7 @@
             document.getElementById('pay-step')?.classList.remove('hidden');
             document.getElementById('pay-wait-step')?.classList.add('hidden');
             document.getElementById('download-step')?.classList.add('hidden');
+            prefillCheckoutContact();
             window.setTimeout(() => document.getElementById('btn-close-modal')?.focus(), 30);
         }
 
@@ -2456,35 +2469,18 @@
         }
 
         function updateMobileStudioProgress() {
-            let score = 0;
-            try {
-                if (window.QCStrength && typeof QCStrength.compute === 'function') {
-                    score = Math.round(Number(QCStrength.compute().score) || 0);
-                }
-            } catch (err) { /* keep 0 */ }
-            score = Math.max(0, Math.min(100, score));
+            /* Percent ring removed from the mobile dock. */
+        }
+
+        function syncMobilePayLabel() {
+            const wrap = document.getElementById('mobile-download-label');
+            if (!wrap) return;
+            const priceEl = wrap.querySelector('[data-price]');
+            const price = (priceEl && priceEl.textContent) || '10';
             const en = window.QCCvLang === 'en';
-            const pack = previewI18n();
-            const pctEl = document.getElementById('mobile-preview-pct');
-            const completeEl = document.getElementById('mobile-preview-complete');
-            const ring = document.getElementById('mobile-preview-ring');
-            const btn = document.getElementById('btn-mobile-preview-toggle');
-            const open = document.body.classList.contains('qc-mobile-preview-open');
-            if (pctEl) pctEl.textContent = score + '%';
-            if (completeEl) {
-                completeEl.textContent = en
-                    ? score + '% ' + (pack.previewCompleted || 'completed')
-                    : score + '% ' + (pack.previewCompleted || 'הושלם');
-            }
-            if (ring) {
-                const circ = 2 * Math.PI * 15.5;
-                ring.style.strokeDasharray = String(circ);
-                ring.style.strokeDashoffset = String(circ * (1 - score / 100));
-            }
-            if (btn) {
-                btn.classList.toggle('has-pulse', score < 90 && !open);
-                btn.setAttribute('data-progress', String(score));
-            }
+            wrap.innerHTML = en
+                ? 'Download · <span data-price>' + price + '</span> ₪'
+                : 'הורד ב-<span data-price>' + price + '</span> ₪';
         }
 
         function syncMobilePreviewToggle() {
@@ -2493,7 +2489,12 @@
             const pack = previewI18n();
             const label = open ? (pack.previewClose || 'חזרה לעריכה') : (pack.previewOpen || 'תצוגה מקדימה');
             const labelEl = document.getElementById('mobile-preview-label');
-            if (labelEl) labelEl.textContent = label;
+            if (labelEl) {
+                labelEl.textContent = label;
+                labelEl.setAttribute('dir', window.QCCvLang === 'en' ? 'ltr' : 'rtl');
+            }
+            const payWrap = document.getElementById('mobile-download-label');
+            if (payWrap) payWrap.setAttribute('dir', window.QCCvLang === 'en' ? 'ltr' : 'rtl');
             document.querySelectorAll('.preview-close-label').forEach((el) => {
                 el.textContent = pack.previewClose || 'חזרה לעריכה';
             });
@@ -2507,7 +2508,7 @@
                 btn.setAttribute('aria-label', label);
                 btn.classList.toggle('is-close', open);
             }
-            updateMobileStudioProgress();
+            syncMobilePayLabel();
         }
 
         function countExperienceEntries(text) {

@@ -194,12 +194,14 @@ function applyTemplate(key: string): void {
   if (!tpl) return;
 
   const fromHome = document.body.classList.contains("on-home");
+  const stayOnDesign = document.body.classList.contains("on-studio") && (window as Window & { QCStudioStep?: number }).QCStudioStep === 2;
   const w = window as Window & {
     setCvLang?: (l: string, o?: { restore?: boolean }) => void;
     updateCV?: () => void;
     QCDraft?: { save?: () => void };
     closeExamplesModal?: () => void;
-    showStudio?: () => void;
+    showStudio?: (opts?: { keepStep?: boolean }) => void;
+    applyStudioStep?: (n: number, opts?: { silent?: boolean }) => void;
     markStep?: (n: number) => void;
     openMobilePreview?: () => void;
   };
@@ -213,8 +215,9 @@ function applyTemplate(key: string): void {
   w.updateCV?.();
   w.QCDraft?.save?.();
   w.closeExamplesModal?.();
-  w.showStudio?.();
-  w.markStep?.(1);
+  w.showStudio?.({ keepStep: stayOnDesign });
+  if (w.applyStudioStep) w.applyStudioStep(stayOnDesign ? 2 : 1, { silent: true });
+  else w.markStep?.(stayOnDesign ? 2 : 1);
   if (fromHome && window.matchMedia("(max-width: 1023px)").matches) w.openMobilePreview?.();
 }
 

@@ -20,7 +20,7 @@
     max-height: none;
     background: #fff;
     color: var(--azure-ink);
-    font-family: 'Heebo', 'Rubik', sans-serif;
+    font-family: var(--cv-font), 'Heebo', 'Rubik', sans-serif;
     font-size: calc(0.78rem * var(--cv-scale));
     line-height: 1.5;
     overflow: hidden;
@@ -40,7 +40,7 @@
     height: auto;
     background: #fff;
     color: var(--azure-ink);
-    font-family: 'Heebo', 'Rubik', sans-serif;
+    font-family: var(--cv-font), 'Heebo', 'Rubik', sans-serif;
     font-size: calc(0.78rem * var(--cv-scale));
     line-height: 1.5;
     overflow: hidden;

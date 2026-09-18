@@ -47,16 +47,13 @@ declare global {
       refresh: () => void;
       applyI18n: () => void;
       addJob?: (e?: Event) => void;
-      openRawEditor?: (e?: Event) => void;
     };
     QCExperienceEditor?: {
       refresh: () => void;
       applyI18n: () => void;
       addJob?: (e?: Event) => void;
-      openRawEditor?: (e?: Event) => void;
     };
     addExperienceJob?: (e?: Event) => void;
-    openExperienceRawEditor?: (e?: Event) => void;
     QCPhotoDataUrl?: string;
     QCDraft?: {
       save: () => void;

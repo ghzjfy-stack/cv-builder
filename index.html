@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" class="qc-unpaid">
+<html lang="he" dir="rtl" class="qc-unpaid" data-cv-density="regular">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css">
     <link rel="stylesheet" href="./app.css">
@@ -428,13 +428,10 @@
                 </div>
 
                 <div class="space-y-2 relative" id="experience-section">
-                    <div class="flex items-center justify-between gap-2 flex-wrap">
-                        <label class="font-bold dynamic-text text-sm" for="in-experience" id="label-experience">ניסיון תעסוקתי</label>
-                        <button type="button" id="btn-experience-raw" onclick="openExperienceRawEditor(event)">עריכת טקסט מלא</button>
-                    </div>
+                    <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
                     <div id="experience-items"></div>
                     <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="addExperienceJob(event)">+ הוסף משרה נוספת</button>
-                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden">2021 - נוכחי | מנהל מכירות ארצי
+                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2021 - נוכחי | מנהל מכירות ארצי
 Verde Commerce
 • ניהול צוות עובדים והגדלת היעדים ב-35%.
 • הובלת הסכמים אסטרטגיים.
@@ -481,20 +478,9 @@ Shoreline B2B
                     <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea>
                 </div>
 
-                <button type="button" id="btn-download-pdf" class="cta-download unpaid-only w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
-                    הורד PDF ב-<span data-price>10</span> ₪ בלבד
+                <button type="button" id="btn-continue-design" onclick="goStep(2)" class="studio-continue-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
+                    המשך לבחירת עיצוב ⬅️
                 </button>
-                <div id="paid-export-bar" class="paid-only space-y-2">
-                    <p class="text-xs text-slate-300 text-center" id="paid-export-hint">הגישה נפתחה — בחרו פורמט להורדה</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <button type="button" data-download="pdf" class="min-h-12 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-3 rounded-xl text-sm">PDF</button>
-                        <button type="button" data-download="docx" class="min-h-12 bg-slate-900 hover:bg-slate-800 border border-slate-600 text-white font-extrabold py-3 px-3 rounded-xl text-sm">Word</button>
-                        <button type="button" data-download="txt" class="min-h-12 bg-slate-900 hover:bg-slate-800 border border-slate-600 text-white font-extrabold py-3 px-3 rounded-xl text-sm">TXT</button>
-                    </div>
-                </div>
-                <p class="pay-microcopy w-full text-center text-[11px] sm:text-xs font-semibold text-slate-400 leading-snug" id="form-pay-guarantee" role="status" dir="rtl">
-                    תשלום חד-פעמי • ללא מנוי • הורדה מיידית
-                </p>
             </div>
 
             <div id="design-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-5 shadow-xl">
@@ -514,41 +500,46 @@ Shoreline B2B
 
                 <div>
                     <p class="block text-xs text-slate-300 mb-2" id="accent-legend">צבע הדגשה — כותרות ואייקונים</p>
-                    <div class="flex flex-wrap items-center gap-2" role="group" aria-labelledby="accent-legend">
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#4c4c4c]" data-color="#4c4c4c" aria-label="פחם" aria-pressed="true" onclick="setAccent('#4c4c4c', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#12192b]" data-color="#12192b" aria-label="נייבי" aria-pressed="false" onclick="setAccent('#12192b', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#3e342c]" data-color="#3e342c" aria-label="אספרסו" aria-pressed="false" onclick="setAccent('#3e342c', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#4d5d52]" data-color="#4d5d52" aria-label="מרווה" aria-pressed="false" onclick="setAccent('#4d5d52', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#3e4c58]" data-color="#3e4c58" aria-label="צפחה" aria-pressed="false" onclick="setAccent('#3e4c58', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#5a3640]" data-color="#5a3640" aria-label="יין" aria-pressed="false" onclick="setAccent('#5a3640', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#31443b]" data-color="#31443b" aria-label="יער" aria-pressed="false" onclick="setAccent('#31443b', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#6b5344]" data-color="#6b5344" aria-label="חול" aria-pressed="false" onclick="setAccent('#6b5344', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#2f6f6a]" data-color="#2f6f6a" aria-label="טורקיז" aria-pressed="false" onclick="setAccent('#2f6f6a', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#9a5b42]" data-color="#9a5b42" aria-label="טרקוטה" aria-pressed="false" onclick="setAccent('#9a5b42', this)"></button>
-                        <button type="button" class="theme-swatch w-11 h-11 rounded-full bg-[#7a6a55]" data-color="#7a6a55" aria-label="שמנת" aria-pressed="false" onclick="setAccent('#7a6a55', this)"></button>
-                        <label class="flex items-center gap-2 text-[11px] text-slate-200 mr-1">
-                            <span>מותאם</span>
-                            <input type="color" id="custom-accent" value="#4c4c4c" oninput="setCustomAccent(this.value)" class="w-11 h-11 rounded-lg border border-slate-600 bg-slate-900 cursor-pointer p-0" aria-label="בחירת צבע מותאם">
-                        </label>
+                    <div class="accent-chip-row" role="group" aria-labelledby="accent-legend">
+                        <div class="accent-chip-wrap">
+                            <button type="button" class="theme-swatch accent-chip bg-[#059669]" data-color="#059669" aria-label="אמרלד" aria-pressed="false" onclick="setAccent('#059669', this)"></button>
+                            <span class="accent-chip-name" data-accent-chip="emerald">אמרלד</span>
+                        </div>
+                        <div class="accent-chip-wrap">
+                            <button type="button" class="theme-swatch accent-chip bg-[#12192b]" data-color="#12192b" aria-label="נייבי" aria-pressed="false" onclick="setAccent('#12192b', this)"></button>
+                            <span class="accent-chip-name" data-accent-chip="navy">נייבי</span>
+                        </div>
+                        <div class="accent-chip-wrap">
+                            <button type="button" class="theme-swatch accent-chip bg-[#4c4c4c]" data-color="#4c4c4c" aria-label="פחם" aria-pressed="true" onclick="setAccent('#4c4c4c', this)"></button>
+                            <span class="accent-chip-name" data-accent-chip="charcoal">פחם</span>
+                        </div>
+                        <div class="accent-chip-wrap">
+                            <button type="button" class="theme-swatch accent-chip bg-[#0f766e]" data-color="#0f766e" aria-label="טורקיז" aria-pressed="false" onclick="setAccent('#0f766e', this)"></button>
+                            <span class="accent-chip-name" data-accent-chip="teal">טורקיז</span>
+                        </div>
+                        <div class="accent-chip-wrap">
+                            <button type="button" class="theme-swatch accent-chip bg-[#7f1d3a]" data-color="#7f1d3a" aria-label="בורדו" aria-pressed="false" onclick="setAccent('#7f1d3a', this)"></button>
+                            <span class="accent-chip-name" data-accent-chip="burgundy">בורדו</span>
+                        </div>
+                        <div class="accent-chip-wrap">
+                            <button type="button" class="theme-swatch accent-chip bg-[#3e4c58]" data-color="#3e4c58" aria-label="צפחה" aria-pressed="false" onclick="setAccent('#3e4c58', this)"></button>
+                            <span class="accent-chip-name" data-accent-chip="slate">צפחה</span>
+                        </div>
+                        <div class="accent-chip-wrap accent-chip-custom">
+                            <input type="color" id="custom-accent" value="#4c4c4c" oninput="setCustomAccent(this.value)" class="accent-chip custom-accent-input" aria-label="בחירת צבע מותאם">
+                            <span class="accent-chip-name" id="custom-accent-caption">מותאם</span>
+                        </div>
                     </div>
                     <p id="accent-label" class="text-[11px] text-slate-400 mt-2">פחם</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs text-white mb-1" for="font-select" id="font-select-label">טיפוגרפיה</label>
+                    <label class="block text-xs text-white mb-1" for="font-select" id="font-select-label">טיפוגרפיה עברית</label>
                     <select id="font-select" onchange="setCvFont(this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 text-sm rounded-lg p-2.5 text-white outline-none min-h-11">
                         <option value="Rubik">Rubik — ברור ומודרני</option>
                         <option value="Heebo">Heebo — חד ומקצועי</option>
-                        <option value="Inter">Inter — English / Latin</option>
-                        <option value="Lato">Lato — English classic</option>
-                        <option value="Montserrat">Montserrat — Canva / corporate</option>
                         <option value="Assistant">Assistant — רך וקריא</option>
-                        <option value="Noto Sans Hebrew">Noto Sans Hebrew — ניטרלי ונקי</option>
-                        <option value="Alef">Alef — קלאסי ישראלי</option>
-                        <option value="IBM Plex Sans Hebrew">IBM Plex Sans Hebrew — הייטק</option>
-                        <option value="Frank Ruhl Libre">Frank Ruhl Libre — סריף יוקרתי</option>
-                        <option value="David Libre">David Libre — מסורתי ומכובד</option>
-                        <option value="Secular One">Secular One — בולט וצעיר</option>
+                        <option value="Varela Round">Varela Round — ידידותי ועגול</option>
                     </select>
                 </div>
 
@@ -580,23 +571,19 @@ Shoreline B2B
                     </select>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <div class="flex justify-between text-xs text-slate-300 mb-1">
-                            <label for="font-scale">גודל גופן</label>
-                            <span id="font-scale-val">100%</span>
-                        </div>
-                        <input id="font-scale" type="range" min="85" max="118" value="100" oninput="setFontScale(this.value)" class="w-full" aria-valuemin="85" aria-valuemax="118" aria-valuenow="100">
+                <div>
+                    <p class="block text-xs text-slate-300 mb-2" id="density-legend">ריווח / צפיפות — התאמה לעמוד אחד</p>
+                    <div class="density-toggle" role="radiogroup" aria-labelledby="density-legend">
+                        <button type="button" class="density-chip" data-density="compact" aria-pressed="false" onclick="setCvDensity('compact')">צפוף</button>
+                        <button type="button" class="density-chip" data-density="regular" aria-pressed="true" onclick="setCvDensity('regular')">רגיל</button>
+                        <button type="button" class="density-chip" data-density="spacious" aria-pressed="false" onclick="setCvDensity('spacious')">מרווח</button>
                     </div>
-                    <div>
-                        <div class="flex justify-between text-xs text-slate-300 mb-1">
-                            <label for="line-height">ריווח שורות</label>
-                            <span id="line-height-val">1.55</span>
-                        </div>
-                        <input id="line-height" type="range" min="125" max="185" value="155" oninput="setLineHeight(this.value)" class="w-full" aria-valuemin="125" aria-valuemax="185" aria-valuenow="155">
-                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2" id="density-hint">צפוף דוחס לעמוד אחד, מרווח נושם יותר.</p>
+                    <input id="font-scale" type="range" min="85" max="118" value="100" oninput="setFontScale(this.value)" class="sr-only" tabindex="-1" aria-hidden="true" aria-valuemin="85" aria-valuemax="118" aria-valuenow="100">
+                    <input id="line-height" type="range" min="125" max="185" value="155" oninput="setLineHeight(this.value)" class="sr-only" tabindex="-1" aria-hidden="true" aria-valuemin="125" aria-valuemax="185" aria-valuenow="155">
+                    <span id="font-scale-val" class="sr-only">100%</span>
+                    <span id="line-height-val" class="sr-only">1.55</span>
                 </div>
-                <p class="text-[11px] text-slate-400">כוונו גודל וריווח כדי להתאים את קורות החיים לעמוד אחד.</p>
 
                 <div class="bg-palette">
                     <div class="bg-palette-head">
@@ -612,6 +599,13 @@ Shoreline B2B
                         <button type="button" class="bg-swatch" data-bg="bg-preview-sage" data-bg-he="מרווה" data-bg-en="Sage Green" data-tip="מרווה" style="--swatch:#f2f5f1" title="מרווה" aria-label="מרווה" aria-pressed="false"></button>
                     </div>
                 </div>
+
+                <button type="button" id="btn-download-pdf" onclick="openPaymentModal()" class="cta-download w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
+                    הורד PDF ב-<span data-price>10</span> ₪
+                </button>
+                <p class="pay-microcopy w-full text-center text-[11px] sm:text-xs font-semibold text-slate-400 leading-snug" id="form-pay-guarantee" role="status" dir="rtl">
+                    תשלום חד-פעמי • ללא מנוי • הורדה מיידית
+                </p>
             </div>
 
             <div class="studio-form-end-spacer" aria-hidden="true"></div>
@@ -791,17 +785,15 @@ Shoreline B2B
                 </span>
                 <span id="mobile-preview-label" dir="rtl">תצוגה מקדימה</span>
             </button>
-            <button type="button" id="btn-download-pdf-mobile" onclick="openPaymentModal()" class="cta-download unpaid-only studio-nav-download">
+            <button type="button" id="btn-mobile-continue" onclick="goStep(2)" class="studio-nav-download studio-nav-continue">
+                <span id="mobile-continue-label" dir="rtl">המשך לעיצוב ⬅️</span>
+            </button>
+            <button type="button" id="btn-download-pdf-mobile" onclick="openPaymentModal()" class="cta-download studio-nav-download">
                 <span class="studio-nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>
                 </span>
-                <span id="mobile-download-label" dir="rtl">הורד ב-<span data-price>10</span> ₪</span>
+                <span id="mobile-download-label" dir="rtl">הורד PDF ב-<span data-price>10</span> ₪</span>
             </button>
-            <div class="paid-only studio-nav-paid">
-                <button type="button" data-download="pdf" class="studio-nav-file">PDF</button>
-                <button type="button" data-download="docx" class="studio-nav-file">Word</button>
-                <button type="button" data-download="txt" class="studio-nav-file">TXT</button>
-            </div>
         </div>
     </nav>
     </div>
@@ -923,8 +915,6 @@ Shoreline B2B
                     <label for="wa-pdf-phone" class="block text-[11px] font-bold text-slate-300">נייד לשליחה</label>
                     <input type="tel" id="wa-pdf-phone" inputmode="tel" autocomplete="tel" placeholder="054-0000000" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
                     <button type="button" id="cover-letter-download" data-pack-extra data-download="cover" class="hidden w-full min-h-12 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-3 px-4 rounded-xl text-sm">הורד מכתב מקדים</button>
-                    <button type="button" data-download="docx" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">Word (.docx)</button>
-                    <button type="button" data-download="txt" class="w-full min-h-12 bg-white/10 hover:bg-white/15 text-white font-extrabold py-3 px-4 rounded-xl text-sm">טקסט (.txt)</button>
                 </div>
                 <div class="text-right rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
                     <p class="text-xs font-extrabold text-white">שתפו עם חברים</p>
@@ -979,17 +969,21 @@ Shoreline B2B
     <script src="lib/quickPaste.js"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
-        window.addExperienceJob = window.addExperienceJob || function (e) {
+        window.addExperienceJob = function (e) {
             if (e && e.preventDefault) e.preventDefault();
-            if (window.QCExperience && typeof QCExperience.addJob === 'function') QCExperience.addJob(e);
-        };
-        window.openExperienceRawEditor = window.openExperienceRawEditor || function (e) {
-            if (e && e.preventDefault) e.preventDefault();
-            if (window.QCExperience && typeof QCExperience.openRawEditor === 'function') QCExperience.openRawEditor(e);
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (window.QCExperience && typeof QCExperience.addJob === 'function') {
+                QCExperience.addJob(e);
+                return false;
+            }
+            return false;
         };
         let previewBgClass = 'bg-preview-white';
         const THEME_NAMES = {
             he: {
+                '#059669': 'אמרלד',
+                '#0f766e': 'טורקיז',
+                '#7f1d3a': 'בורדו',
                 '#4c4c4c': 'פחם',
                 '#12192b': 'נייבי',
                 '#3e342c': 'אספרסו',
@@ -1006,6 +1000,9 @@ Shoreline B2B
                 '#7a6a55': 'שמנת'
             },
             en: {
+                '#059669': 'Emerald',
+                '#0f766e': 'Teal',
+                '#7f1d3a': 'Burgundy',
                 '#4c4c4c': 'Charcoal',
                 '#12192b': 'Navy',
                 '#3e342c': 'Espresso',
@@ -1022,6 +1019,16 @@ Shoreline B2B
                 '#7a6a55': 'Cream'
             }
         };
+        const ACCENT_CHIP_I18N = {
+            he: { emerald: 'אמרלד', navy: 'נייבי', charcoal: 'פחם', teal: 'טורקיז', burgundy: 'בורדו', slate: 'צפחה' },
+            en: { emerald: 'Emerald', navy: 'Navy', charcoal: 'Charcoal', teal: 'Teal', burgundy: 'Burgundy', slate: 'Slate' }
+        };
+        const CV_DENSITY = {
+            compact: { scale: 92, leading: 132 },
+            regular: { scale: 100, leading: 155 },
+            spacious: { scale: 105, leading: 176 }
+        };
+        window.QCCvDensity = 'regular';
         const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush', 'mint', 'terracotta', 'cream', 'midnight', 'emerald'];
         const BG_CLASSES = [
             'bg-preview-white', 'bg-preview-slate', 'bg-preview-cream', 'bg-preview-linen',
@@ -1090,7 +1097,18 @@ Shoreline B2B
                 previewClose: 'חזרה לעריכה',
                 previewCompleted: 'הושלם',
                 studioSocial: 'עברית מיושרת לימין • תצוגה חיה • PDF להגשה',
-                studioAts: 'תבניות שנבדקו מול מערכות סינון (ATS)'
+                studioAts: 'תבניות שנבדקו מול מערכות סינון (ATS)',
+                continueDesign: 'המשך לבחירת עיצוב ⬅️',
+                continueDesignShort: 'המשך לעיצוב ⬅️',
+                downloadPdfCta: 'הורד PDF ב-',
+                fontSelectLabel: 'טיפוגרפיה עברית',
+                densityLegend: 'ריווח / צפיפות — התאמה לעמוד אחד',
+                densityHint: 'צפוף דוחס לעמוד אחד, מרווח נושם יותר.',
+                densityCompact: 'צפוף',
+                densityRegular: 'רגיל',
+                densitySpacious: 'מרווח',
+                customAccent: 'מותאם',
+                customColor: 'צבע מותאם'
             },
             en: {
                 nameFallback: 'Full name',
@@ -1115,7 +1133,18 @@ Shoreline B2B
                 previewClose: 'Back to editing',
                 previewCompleted: 'completed',
                 studioSocial: 'Left-aligned English • Live Preview • Ready PDF',
-                studioAts: 'Templates verified against ATS screening systems'
+                studioAts: 'Templates verified against ATS screening systems',
+                continueDesign: 'Continue to design →',
+                continueDesignShort: 'Continue →',
+                downloadPdfCta: 'Download PDF · ',
+                fontSelectLabel: 'Hebrew typography',
+                densityLegend: 'Spacing / density — fit to one page',
+                densityHint: 'Compact fits one page; spacious adds breathing room.',
+                densityCompact: 'Compact',
+                densityRegular: 'Regular',
+                densitySpacious: 'Spacious',
+                customAccent: 'Custom',
+                customColor: 'Custom color'
             }
         };
 
@@ -1170,28 +1199,54 @@ Shoreline B2B
         }
 
         function setAccent(color, btn) {
-            document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('custom-accent').value = color;
+            const next = String(color || '').trim();
+            if (!next) return;
+            document.documentElement.style.setProperty('--accent', next);
+            const picker = document.getElementById('custom-accent');
+            if (picker) picker.value = next;
             const names = THEME_NAMES[window.QCCvLang === 'en' ? 'en' : 'he'] || THEME_NAMES.he;
             const custom = window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם';
-            document.getElementById('accent-label').textContent = names[color.toLowerCase()] || custom;
+            const label = document.getElementById('accent-label');
+            if (label) label.textContent = names[next.toLowerCase()] || custom;
             document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
             if (btn) btn.setAttribute('aria-pressed', 'true');
-            markStep(2);
+            else {
+                const swatch = document.querySelector('.theme-swatch[data-color="' + next + '"]');
+                if (swatch) swatch.setAttribute('aria-pressed', 'true');
+            }
+            if (window.QCDraft) QCDraft.saveSoon();
         }
 
         function setCustomAccent(color) {
-            document.documentElement.style.setProperty('--accent', color);
-            document.getElementById('accent-label').textContent = window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם';
+            const next = String(color || '').trim();
+            if (!next) return;
+            document.documentElement.style.setProperty('--accent', next);
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'];
+            const label = document.getElementById('accent-label');
+            if (label) label.textContent = (pack && pack.customColor) || (window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם');
             document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
-            markStep(2);
+            if (window.QCDraft) QCDraft.saveSoon();
         }
 
         function setCvFont(name) {
-            document.documentElement.style.setProperty('--cv-font', "'" + name + "', sans-serif");
+            const fontName = String(name || '').trim();
+            if (!fontName) return;
+            document.documentElement.style.setProperty('--cv-font', "'" + fontName + "', sans-serif");
             const select = document.getElementById('font-select');
-            if (select && name) select.value = name;
-            markStep(2);
+            if (select) {
+                const has = Array.prototype.some.call(select.options, function (opt) {
+                    return opt.value === fontName;
+                });
+                if (!has) {
+                    const opt = document.createElement('option');
+                    opt.value = fontName;
+                    opt.textContent = fontName;
+                    select.appendChild(opt);
+                }
+                select.value = fontName;
+            }
+            window.QCPageFit?.updateSoon?.();
+            if (window.QCDraft) QCDraft.saveSoon();
         }
 
         function applyCvI18n(lang) {
@@ -1231,6 +1286,29 @@ Shoreline B2B
             setLabel('btn-quick-paste', pack.quickPaste || 'הדבקה מהירה');
             setLabel('studio-social-line', pack.studioSocial);
             setLabel('studio-social-ats', pack.studioAts);
+            setLabel('btn-continue-design', pack.continueDesign);
+            setLabel('mobile-continue-label', pack.continueDesignShort);
+            setLabel('font-select-label', pack.fontSelectLabel);
+            setLabel('density-legend', pack.densityLegend);
+            setLabel('density-hint', pack.densityHint);
+            setLabel('custom-accent-caption', pack.customAccent);
+            document.querySelectorAll('.density-chip').forEach((el) => {
+                const key = el.getAttribute('data-density');
+                if (key === 'compact') el.textContent = pack.densityCompact;
+                if (key === 'regular') el.textContent = pack.densityRegular;
+                if (key === 'spacious') el.textContent = pack.densitySpacious;
+            });
+            const chipNames = ACCENT_CHIP_I18N[lang] || ACCENT_CHIP_I18N.he;
+            document.querySelectorAll('[data-accent-chip]').forEach((el) => {
+                const key = el.getAttribute('data-accent-chip');
+                if (chipNames[key]) el.textContent = chipNames[key];
+            });
+            const downloadCta = document.getElementById('btn-download-pdf');
+            if (downloadCta) {
+                const price = downloadCta.querySelector('[data-price]');
+                const amount = (price && price.textContent) || '10';
+                downloadCta.innerHTML = (pack.downloadPdfCta || '') + '<span data-price>' + amount + '</span> ₪';
+            }
             document.querySelectorAll('[data-ats-badge]').forEach((el) => {
                 el.textContent = lang === 'en'
                     ? 'ATS-Friendly · Passes applicant tracking scans'
@@ -1355,13 +1433,11 @@ Shoreline B2B
             else if (!restore && typeof relabelLanguageField === 'function') relabelLanguageField();
             if (!restore && next === 'en') {
                 const font = document.getElementById('font-select');
-                if (font && (font.value === 'Alef' || font.value === 'David Libre' || font.value === 'Secular One')) {
-                    setCvFont('Inter');
-                }
+                const hebrewOnly = { Alef: 1, 'David Libre': 1, 'Secular One': 1, 'Frank Ruhl Libre': 1 };
+                if (font && hebrewOnly[font.value]) setCvFont('Rubik');
             }
             initPhrases();
             if (typeof renderTemplateGalleries === 'function') renderTemplateGalleries();
-            markStep(2);
             updateCV();
             if (window.QCDraft && !restore) QCDraft.saveSoon();
         }
@@ -1391,16 +1467,19 @@ Shoreline B2B
             if (btn) btn.setAttribute('aria-pressed', 'true');
             window.QCLayout = layout;
             applyCvI18n(window.QCCvLang === 'en' ? 'en' : 'he');
-            markStep(2);
             updateCV();
         }
 
         function setFontScale(val) {
             const scale = Number(val) / 100;
             document.documentElement.style.setProperty('--cv-scale', String(scale));
-            document.getElementById('font-scale-val').textContent = val + '%';
-            document.getElementById('font-scale').setAttribute('aria-valuenow', val);
-            markStep(2);
+            const label = document.getElementById('font-scale-val');
+            if (label) label.textContent = val + '%';
+            const input = document.getElementById('font-scale');
+            if (input) {
+                input.value = String(val);
+                input.setAttribute('aria-valuenow', val);
+            }
             window.QCPageFit?.updateSoon?.();
             if (window.QCDraft) QCDraft.saveSoon();
         }
@@ -1408,11 +1487,43 @@ Shoreline B2B
         function setLineHeight(val) {
             const lh = (Number(val) / 100).toFixed(2);
             document.documentElement.style.setProperty('--cv-leading', lh);
-            document.getElementById('line-height-val').textContent = lh;
-            document.getElementById('line-height').setAttribute('aria-valuenow', val);
-            markStep(2);
+            const label = document.getElementById('line-height-val');
+            if (label) label.textContent = lh;
+            const input = document.getElementById('line-height');
+            if (input) {
+                input.value = String(val);
+                input.setAttribute('aria-valuenow', val);
+            }
+            window.QCPageFit?.updateSoon?.();
             if (window.QCDraft) QCDraft.saveSoon();
         }
+
+        function densityFromScale(scale, leading) {
+            const s = Number(scale);
+            const lh = Number(leading);
+            if (s && s <= 95) return 'compact';
+            if (s && s >= 104) return 'spacious';
+            if (lh && lh <= 140) return 'compact';
+            if (lh && lh >= 168) return 'spacious';
+            return 'regular';
+        }
+
+        function setCvDensity(mode, opts) {
+            const next = CV_DENSITY[mode] ? mode : 'regular';
+            const pack = CV_DENSITY[next];
+            window.QCCvDensity = next;
+            document.documentElement.setAttribute('data-cv-density', next);
+            document.querySelectorAll('.density-chip').forEach((el) => {
+                el.setAttribute('aria-pressed', el.getAttribute('data-density') === next ? 'true' : 'false');
+            });
+            if (!(opts && opts.keepMetrics)) {
+                setFontScale(pack.scale);
+                setLineHeight(pack.leading);
+            }
+            window.QCPageFit?.updateSoon?.();
+            if (window.QCDraft) QCDraft.saveSoon();
+        }
+        window.setCvDensity = setCvDensity;
 
         function updateCV() {
             try {
@@ -2327,7 +2438,7 @@ Shoreline B2B
                     : (en ? 'Custom' : 'מותאם');
             }
             if (!opts || !opts.silent) {
-                try { markStep(2); } catch (err) { /* studio chrome optional */ }
+                /* stay on the current studio step */
             }
             try { window.QCPageFit?.updateSoon?.(); } catch (err) { /* ignore */ }
             try { if (window.QCDraft) QCDraft.saveSoon(); } catch (err) { /* ignore */ }
@@ -2351,17 +2462,40 @@ Shoreline B2B
             }
         }
 
+        function applyStudioStep(n, opts) {
+            const step = Math.max(1, Math.min(3, Number(n) || 1));
+            window.QCStudioStep = step;
+            const panelStep = step === 3 ? 2 : step;
+            document.body.classList.toggle('qc-studio-step-1', panelStep === 1);
+            document.body.classList.toggle('qc-studio-step-2', panelStep === 2);
+            markStep(step);
+            if (typeof syncStudioStepChrome === 'function') syncStudioStepChrome();
+            if (step === 3) {
+                openPaymentModal();
+                return;
+            }
+            closeMobilePreview();
+            const formCol = document.getElementById('studio-form-column');
+            if (formCol) formCol.scrollTop = 0;
+            if (opts && opts.silent) return;
+            const targetId = panelStep === 1 ? 'details-panel' : 'design-panel';
+            document.getElementById(targetId)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+
         function goStep(n) {
-            markStep(n);
-            if (n === 1) {
-                closeMobilePreview();
-                document.getElementById('details-panel')?.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }
-            if (n === 2) {
-                closeMobilePreview();
-                document.getElementById('design-panel')?.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }
-            if (n === 3) openPaymentModal();
+            applyStudioStep(n);
+        }
+        window.goStep = goStep;
+        window.applyStudioStep = applyStudioStep;
+
+        function syncStudioStepChrome() {
+            const step = window.QCStudioStep || 1;
+            const continueBtn = document.getElementById('btn-mobile-continue');
+            const downloadBtn = document.getElementById('btn-download-pdf-mobile');
+            const onDetails = step === 1;
+            if (continueBtn) continueBtn.hidden = !onDetails;
+            if (downloadBtn) downloadBtn.classList.toggle('qc-step-hidden', onDetails);
+            if (typeof syncMobilePayLabel === 'function') syncMobilePayLabel();
         }
 
         function closePaymentModal(e) {
@@ -2377,6 +2511,7 @@ Shoreline B2B
             el.classList.remove('flex');
             el.style.display = 'none';
             el.setAttribute('aria-hidden', 'true');
+            if (window.QCStudioStep === 3) applyStudioStep(2, { silent: true });
         }
 
         function readCvFormPhone() {
@@ -2479,8 +2614,8 @@ Shoreline B2B
             const price = (priceEl && priceEl.textContent) || '10';
             const en = window.QCCvLang === 'en';
             wrap.innerHTML = en
-                ? 'Download · <span data-price>' + price + '</span> ₪'
-                : 'הורד ב-<span data-price>' + price + '</span> ₪';
+                ? 'Download PDF · <span data-price>' + price + '</span> ₪'
+                : 'הורד PDF ב-<span data-price>' + price + '</span> ₪';
         }
 
         function syncMobilePreviewToggle() {
@@ -2736,6 +2871,7 @@ Shoreline B2B
             const tpl = (window.QCTemplates || {})[key];
             if (!tpl) return;
             const fromHome = document.body.classList.contains('on-home');
+            const stayOnDesign = document.body.classList.contains('on-studio') && window.QCStudioStep === 2;
             const lang = tpl.preferredLang || (window.QCCvLang === 'en' ? 'en' : 'he');
             // Design/layout only — never overwrite the user's form text.
             if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
@@ -2751,8 +2887,8 @@ Shoreline B2B
             updateCV();
             QCDraft.save();
             closeExamplesModal();
-            showStudio();
-            markStep(1);
+            showStudio({ keepStep: stayOnDesign });
+            applyStudioStep(stayOnDesign ? 2 : 1, { silent: true });
             if (fromHome && window.matchMedia('(max-width: 1023px)').matches) openMobilePreview();
         }
 
@@ -3027,7 +3163,7 @@ Shoreline B2B
             renderPhraseChips();
             updateCV();
             QCDraft.save();
-            markStep(1);
+            applyStudioStep(1, { silent: true });
         }
 
         function loadRoleExample() {
@@ -3225,6 +3361,12 @@ Shoreline B2B
             document.body.classList.toggle('on-landing', isLanding);
             document.body.classList.toggle('on-studio', isStudio);
             document.documentElement.classList.toggle('on-studio', isStudio);
+            if (isStudio) {
+                if (!window.QCStudioStep) applyStudioStep(1, { silent: true });
+            } else {
+                window.QCStudioStep = 0;
+                document.body.classList.remove('qc-studio-step-1', 'qc-studio-step-2');
+            }
             if (isStudio) window.scrollTo(0, 0);
             document.body.classList.toggle('bg-slate-900', isStudio);
             document.body.classList.toggle('text-slate-100', isStudio);
@@ -3328,7 +3470,7 @@ Shoreline B2B
             window.scrollTo(0, 0);
         }
 
-        function showStudio() {
+        function showStudio(opts) {
             applyView('studio');
             if (location.hash !== '#studio') {
                 history.replaceState(null, '', '/' + (location.search || '') + '#studio');
@@ -3336,6 +3478,7 @@ Shoreline B2B
             applySeoMeta(null);
             resetStudioScroll();
             window.setTimeout(resetStudioScroll, 60);
+            if (!opts || !opts.keepStep) applyStudioStep(1, { silent: true });
             updateCV();
         }
 
@@ -3408,6 +3551,7 @@ Shoreline B2B
 
         document.getElementById('details-panel').addEventListener('focusin', function () { markStep(1); });
         document.getElementById('design-panel').addEventListener('focusin', function () { markStep(2); });
+        document.getElementById('templates-panel').addEventListener('focusin', function () { markStep(2); });
 
         window.updateCV = updateCV;
         window.resetForm = resetForm;
@@ -3467,14 +3611,19 @@ Shoreline B2B
             renderPhrases();
             renderRoleTitleChips();
             hydrateLanguagePicker();
-            if (draft && draft.fontScale) setFontScale(draft.fontScale);
-            if (draft && draft.lineHeight) setLineHeight(draft.lineHeight);
+            if (draft && (draft.density === 'compact' || draft.density === 'regular' || draft.density === 'spacious')) {
+                setCvDensity(draft.density);
+            } else {
+                if (draft && draft.fontScale) setFontScale(draft.fontScale);
+                if (draft && draft.lineHeight) setLineHeight(draft.lineHeight);
+                setCvDensity(densityFromScale(draft && draft.fontScale, draft && draft.lineHeight), { keepMetrics: true });
+            }
             if (draft && draft.previewBg) setPreviewBg(draft.previewBg, null, { silent: true });
             if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
         } catch (err) {
             console.error('studio init failed', err);
         }
-        markStep(1);
+        applyStudioStep(1, { silent: true });
         syncNarrowStudio();
         var usedPreset = false;
         try {

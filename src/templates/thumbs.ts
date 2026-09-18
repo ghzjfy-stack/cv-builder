@@ -107,14 +107,8 @@ function salt(id: string): number {
   return n >>> 0;
 }
 
-function paperOf(tpl: CvTemplate): string {
-  const bg = tpl.bg || "";
-  if (bg.includes("cream")) return "#f7f3ec";
-  if (bg.includes("linen")) return "#f4eee4";
-  if (bg.includes("mint")) return "#f4faf8";
-  if (bg.includes("pearl")) return "#f5f2ed";
-  if (bg.includes("slate")) return "#eef1f4";
-  return hex(tpl.colorPalette?.background, "#ffffff");
+function paperOf(_tpl: CvTemplate): string {
+  return "#ffffff";
 }
 
 function inkOf(tpl: CvTemplate): string {

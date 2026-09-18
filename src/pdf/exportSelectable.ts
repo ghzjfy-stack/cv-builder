@@ -5,18 +5,75 @@ const PAGE_W = 210;
 const PAGE_H = 297;
 const MARGIN = 16;
 
-const FONT_URLS = {
-  regular: [
-    "https://cdn.jsdelivr.net/gh/googlefonts/rubik@main/fonts/ttf/Rubik-Regular.ttf",
-    "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
-  ],
-  bold: [
-    "https://cdn.jsdelivr.net/gh/googlefonts/rubik@main/fonts/ttf/Rubik-Bold.ttf",
-    "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
-  ],
+const FONT_ALIAS = {
+  "Frank Ruhl Hofshi": "Frank Ruhl Libre",
+  "Frank Ruhl": "Frank Ruhl Libre",
+  Varela: "Varela Round",
 };
 
-let fontCache = null;
+const FONT_FILES = {
+  Rubik: {
+    regular: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/rubik/Rubik%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
+    ],
+    bold: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/rubik/Rubik%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
+    ],
+  },
+  Heebo: {
+    regular: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/Heebo%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
+    ],
+    bold: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/Heebo%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
+    ],
+  },
+  Assistant: {
+    regular: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/assistant/Assistant%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
+    ],
+    bold: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/assistant/Assistant%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
+    ],
+  },
+  "Varela Round": {
+    regular: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/varelaround/VarelaRound-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
+    ],
+    bold: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/varelaround/VarelaRound-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
+    ],
+  },
+  "Frank Ruhl Libre": {
+    regular: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/frankruhllibre/FrankRuhlLibre%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
+    ],
+    bold: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/frankruhllibre/FrankRuhlLibre%5Bwght%5D.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
+    ],
+  },
+};
+
+let fontCache = Object.create(null);
+
+function selectedFontKey() {
+  const raw = document.documentElement.style.getPropertyValue("--cv-font")
+    || getComputedStyle(document.documentElement).getPropertyValue("--cv-font")
+    || "";
+  const name = raw.replace(/['"]/g, "").split(",")[0].trim();
+  const aliased = FONT_ALIAS[name] || name;
+  return FONT_FILES[aliased] ? aliased : "Rubik";
+}
 
 function getJsPdfCtor() {
   return window.jspdf?.jsPDF || window.jsPDF;
@@ -83,10 +140,12 @@ async function fetchFirst(urls) {
 }
 
 async function loadFonts() {
-  if (fontCache) return fontCache;
-  const [regular, bold] = await Promise.all([fetchFirst(FONT_URLS.regular), fetchFirst(FONT_URLS.bold)]);
-  fontCache = { regular, bold };
-  return fontCache;
+  const key = selectedFontKey();
+  if (fontCache[key]) return fontCache[key];
+  const urls = FONT_FILES[key] || FONT_FILES.Rubik;
+  const [regular, bold] = await Promise.all([fetchFirst(urls.regular), fetchFirst(urls.bold)]);
+  fontCache[key] = { regular, bold };
+  return fontCache[key];
 }
 
 function registerFonts(pdf, fonts) {

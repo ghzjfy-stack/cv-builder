@@ -178,13 +178,16 @@ function applyDesign(tpl: CvTemplate): void {
   }
   // CSS variables for live preview theming
   document.documentElement.style.setProperty("--accent", tpl.accent);
-  document.documentElement.style.setProperty("--cv-font", `'${tpl.font}', sans-serif`);
   document.documentElement.style.setProperty("--tpl-primary", tpl.colorPalette.primary);
   document.documentElement.style.setProperty("--tpl-secondary", tpl.colorPalette.secondary);
   document.documentElement.style.setProperty("--tpl-text", tpl.colorPalette.text);
-  document.documentElement.style.setProperty("--tpl-bg", tpl.colorPalette.background);
+  document.documentElement.style.setProperty("--tpl-bg", "#ffffff");
   if (tpl.font && w.setCvFont) w.setCvFont(tpl.font);
-  if (tpl.bg && w.setPreviewBg) w.setPreviewBg(tpl.bg);
+  else if (tpl.font) {
+    const serif = tpl.font === "Frank Ruhl Libre" || tpl.font === "Frank Ruhl Hofshi";
+    document.documentElement.style.setProperty("--cv-font", `'${tpl.font}', ${serif ? "serif" : "sans-serif"}`);
+  }
+  if (w.setPreviewBg) w.setPreviewBg("bg-preview-white");
 }
 
 function applyTemplate(key: string): void {

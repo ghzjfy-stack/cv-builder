@@ -71,11 +71,15 @@ declare global {
       close: () => void;
     };
     QCSamplePreview?: {
-      open: () => void;
-      close: () => void;
+      open: (e?: Event) => void;
+      close: (e?: Event) => void;
+      download?: (e?: Event) => void;
+      bind?: () => void;
     };
     QCCvImport?: {
-      importFile: (file: File) => void;
+      importFile: (file: File) => Promise<void> | void;
+      pick?: () => void;
+      bind?: () => void;
     };
     hydrateLanguagePicker?: () => void;
     closeHandoffModal?: () => void;

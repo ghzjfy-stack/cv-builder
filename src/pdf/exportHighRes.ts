@@ -28,9 +28,36 @@ function fileBase() {
 function copyCssVars(fromEl, toEl) {
   const cs = getComputedStyle(fromEl);
   ["--accent", "--cv-font", "--cv-scale", "--cv-leading"].forEach((name) => {
-    const v = cs.getPropertyValue(name);
-    if (v) toEl.style.setProperty(name, v);
+    const v = cs.getPropertyValue(name) || fromEl.style.getPropertyValue(name);
+    if (v) toEl.style.setProperty(name, v.trim());
   });
+  const stack = (cs.getPropertyValue("--cv-font") || fromEl.style.getPropertyValue("--cv-font") || "").trim();
+  if (stack) toEl.style.fontFamily = stack;
+}
+
+function selectedCvFontName() {
+  const raw = document.documentElement.style.getPropertyValue("--cv-font")
+    || getComputedStyle(document.documentElement).getPropertyValue("--cv-font")
+    || "";
+  return raw.replace(/['"]/g, "").split(",")[0].trim() || "Rubik";
+}
+
+async function waitForCvFonts() {
+  const name = selectedCvFontName();
+  const loads = [];
+  if (document.fonts?.load) {
+    ["400", "500", "700"].forEach((weight) => {
+      loads.push(document.fonts.load(`${weight} 16px "${name}"`));
+    });
+  }
+  if (document.fonts?.ready) loads.push(document.fonts.ready);
+  if (loads.length) {
+    try {
+      await Promise.all(loads);
+    } catch {
+      /* fallback glyphs are fine */
+    }
+  }
 }
 
 function setSpinner(on) {
@@ -341,6 +368,7 @@ async function captureToCanvas(el) {
   }
 
   try {
+    await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     let linkMeta = measureLinks(el);
     const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
@@ -427,6 +455,7 @@ export async function exportHighResPdf(opts = {}) {
 
   try {
     if (document.fonts?.ready) await document.fonts.ready;
+    await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     await new Promise((resolve) => setTimeout(resolve, 50));
 

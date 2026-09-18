@@ -19,7 +19,7 @@
 #qc-print-host .cv-print-sheet.layout-charcoal.skin-espresso {
     --charcoal: #3e342c;
     --charcoal-deep: #2f2822;
-    --charcoal-paper: #f7f3ec;
+    --charcoal-paper: #ffffff;
     --charcoal-ink: #2c2622;
     --charcoal-muted: #5a5148;
     --charcoal-photo: #d9cfc3;
@@ -33,7 +33,7 @@
 #qc-print-host .cv-print-sheet.layout-charcoal.skin-sage {
     --charcoal: #4d5d52;
     --charcoal-deep: #3c4a41;
-    --charcoal-paper: #f4f1ea;
+    --charcoal-paper: #ffffff;
     --charcoal-ink: #2c332f;
     --charcoal-muted: #4f5a54;
     --charcoal-photo: #d5d8d0;
@@ -47,7 +47,7 @@
 #qc-print-host .cv-print-sheet.layout-charcoal.skin-slate {
     --charcoal: #3e4c58;
     --charcoal-deep: #2f3b45;
-    --charcoal-paper: #f7f8f9;
+    --charcoal-paper: #ffffff;
     --charcoal-ink: #2a3138;
     --charcoal-muted: #4d5860;
     --charcoal-photo: #d4dae0;
@@ -61,7 +61,7 @@
 #qc-print-host .cv-print-sheet.layout-charcoal.skin-wine {
     --charcoal: #5a3640;
     --charcoal-deep: #472b33;
-    --charcoal-paper: #f8f3ef;
+    --charcoal-paper: #ffffff;
     --charcoal-ink: #322428;
     --charcoal-muted: #5c4a4e;
     --charcoal-photo: #e2d4d2;
@@ -75,7 +75,7 @@
 #qc-print-host .cv-print-sheet.layout-charcoal.skin-forest {
     --charcoal: #31443b;
     --charcoal-deep: #24332c;
-    --charcoal-paper: #f3f0e8;
+    --charcoal-paper: #ffffff;
     --charcoal-ink: #24302a;
     --charcoal-muted: #4a564f;
     --charcoal-photo: #d2d6cc;

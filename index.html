@@ -154,6 +154,12 @@
                         </figure>
                     </div>
                 </div>
+                <div class="sample-pdf-home-cta">
+                    <button type="button" id="btn-sample-pdf-home" class="sample-pdf-open-btn" data-sample-pdf-opener>
+                        צפו בדוגמת PDF מלאה
+                    </button>
+                    <p class="sample-pdf-home-hint" id="sample-pdf-home-hint">עמוד A4 באיכות הגשה — בלי סימן מים, לפני תשלום.</p>
+                </div>
             </section>
 
             <section class="home-section" aria-labelledby="home-craft" style="padding-top:0">
@@ -368,6 +374,16 @@
             <p id="studio-social-line" class="text-sm text-slate-100 font-medium">עברית מיושרת לימין • תצוגה חיה • PDF להגשה</p>
             <p id="studio-social-ats" class="text-slate-400 text-xs">תבניות שנבדקו מול מערכות סינון (ATS)</p>
         </div>
+        <div id="handoff-banner" class="handoff-banner" hidden aria-hidden="true" role="region" aria-labelledby="handoff-banner-title">
+            <div class="handoff-banner-copy">
+                <p id="handoff-banner-title" class="handoff-banner-title">מעדיפים לערוך במחשב?</p>
+                <p id="handoff-banner-lead" class="handoff-banner-lead">שלחו קישור מאגי לוואטסאפ או לאימייל והמשיכו בדיוק מאותה טיוטה.</p>
+            </div>
+            <div class="handoff-banner-actions">
+                <button type="button" id="btn-handoff-open" class="handoff-banner-cta">שלחו קישור להמשך</button>
+                <button type="button" id="btn-handoff-dismiss" class="handoff-banner-dismiss" aria-label="הסתרת ההצעה">לא עכשיו</button>
+            </div>
+        </div>
     </div>
 
     <div class="studio-workspace">
@@ -386,6 +402,17 @@
                 <div class="flex items-center justify-between gap-2 flex-wrap">
                     <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
                     <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
+                </div>
+                <div class="cv-import-card">
+                    <input type="file" id="cv-import-file" class="sr-only" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="העלאת קורות חיים קיימים">
+                    <button type="button" id="btn-cv-import" class="cv-import-btn">
+                        <span class="cv-import-ico" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
+                        </span>
+                        <span id="btn-cv-import-label">העלו קורות חיים קיימים</span>
+                    </button>
+                    <p id="cv-import-hint" class="cv-import-hint">PDF או Word (.docx) — נחלץ את הפרטים ונמלא את הטופס.</p>
+                    <p id="cv-import-status" class="cv-import-status" role="status" aria-live="polite"></p>
                 </div>
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -424,13 +451,15 @@
 
                 <div class="space-y-2">
                     <label class="font-bold dynamic-text text-sm block" for="in-summary" id="label-summary">תקציר מקצועי</label>
-                    <textarea id="in-summary" rows="2" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
+                    <textarea id="in-summary" rows="2" oninput="updateCV()" aria-describedby="tip-summary" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
+                    <p class="field-tip" id="tip-summary">טיפ: שלבו הישג מדיד — אחוזי צמיחה, גודל צוות או תקציב.</p>
                 </div>
 
                 <div class="space-y-2 relative" id="experience-section">
                     <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
-                    <div id="experience-items"></div>
-                    <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="addExperienceJob(event)">+ הוסף משרה נוספת</button>
+                    <div id="experience-items" aria-describedby="tip-experience"></div>
+                    <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="addExperienceJob(event); return false;">+ הוסף משרה נוספת</button>
+                    <p class="field-tip" id="tip-experience">טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.</p>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2021 - נוכחי | מנהל מכירות ארצי
 Verde Commerce
 • ניהול צוות עובדים והגדלת היעדים ב-35%.
@@ -444,8 +473,9 @@ Shoreline B2B
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education" id="label-education">השכלה</label>
-                        <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">2015 - 2018 | BA במנהל עסקים
+                        <textarea id="in-education" rows="3" oninput="updateCV()" aria-describedby="tip-education" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">2015 - 2018 | BA במנהל עסקים
 2019 | קורס ניהול מוצר</textarea>
+                        <p class="field-tip" id="tip-education">ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.</p>
                     </div>
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military" id="label-military">שירות צבאי / לאומי</label>
@@ -456,7 +486,8 @@ Shoreline B2B
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills" id="label-skills">כישורים</label>
-                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                        <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.</p>
                     </div>
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages">שפות</label>
@@ -614,6 +645,7 @@ Shoreline B2B
         <div id="preview-column" class="preview-col space-y-3" role="region" aria-label="תצוגה מקדימה חיה של קורות החיים">
             <div class="preview-toolbar no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="preview-heading">תצוגה מקדימה בזמן אמת</h2>
+                <button type="button" id="btn-sample-pdf-studio" class="sample-pdf-open-btn sample-pdf-open-btn-studio" data-sample-pdf-opener>צפו בדוגמת PDF מלאה</button>
                 <div class="doc-switch" role="tablist" aria-label="סוג מסמך">
                     <button type="button" id="doc-tab-cv" aria-pressed="true" onclick="setStudioDoc('cv')">קורות חיים</button>
                     <button type="button" id="doc-tab-letter" aria-pressed="false" onclick="setStudioDoc('letter')">מכתב מקדים</button>
@@ -813,6 +845,39 @@ Shoreline B2B
         </div>
     </div>
 
+    <div id="handoff-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="handoff-title" aria-hidden="true">
+        <button type="button" class="examples-backdrop" aria-label="סגירה"></button>
+        <div class="qc-modal-panel handoff-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-md w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
+            <button type="button" id="btn-handoff-close" class="qc-modal-close" aria-label="סגירה">✕</button>
+            <h3 id="handoff-title" class="text-lg font-extrabold pe-10">המשיכו במחשב בקישור מאגי</h3>
+            <p id="handoff-lead" class="text-sm text-slate-300 leading-relaxed">נשלח קישור ישיר לוואטסאפ או לאימייל. הטיוטה נשמרת ל-24 שעות — פותחים במחשב וממשיכים בדיוק מאותו מקום.</p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1" for="handoff-email" id="handoff-email-label">אימייל להמשך</label>
+                <input type="email" id="handoff-email" autocomplete="email" inputmode="email" dir="ltr" class="w-full studio-field bg-slate-950 border border-slate-700 p-2.5 text-sm rounded-xl text-white outline-none min-h-11" placeholder="name@email.com">
+            </div>
+            <p id="handoff-status" class="handoff-status" role="status" aria-live="polite"></p>
+            <div class="flex flex-col gap-2">
+                <button type="button" id="btn-handoff-whatsapp" class="handoff-action handoff-action-wa min-h-12">שלחו לוואטסאפ</button>
+                <button type="button" id="btn-handoff-email" class="handoff-action min-h-12">שלחו לאימייל</button>
+                <button type="button" id="btn-handoff-copy" class="handoff-action-ghost min-h-12">העתיקו קישור</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sample-pdf-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="sample-pdf-title" aria-hidden="true">
+        <button type="button" class="examples-backdrop" aria-label="סגירת דוגמת PDF"></button>
+        <div class="qc-modal-panel sample-pdf-panel relative bg-slate-900 text-slate-100 rounded-3xl w-full mx-auto p-4 sm:p-5 space-y-3 shadow-2xl border border-slate-700">
+            <button type="button" id="btn-sample-pdf-close" class="qc-modal-close" aria-label="סגירת דוגמת PDF">✕</button>
+            <div class="pe-10">
+                <h3 id="sample-pdf-title" class="text-lg font-extrabold">דוגמת PDF מוכנה להגשה</h3>
+                <p id="sample-pdf-lead" class="text-sm text-slate-300 mt-1">כך נראה קובץ A4 סופי מ-QuickCV — בלי סימן מים, ברזולוציה מלאה, לפני תשלום.</p>
+            </div>
+            <div class="sample-pdf-stage" tabindex="0" aria-label="תצוגת דוגמת PDF בעמוד A4">
+                <div id="sample-pdf-frame"></div>
+            </div>
+        </div>
+    </div>
+
         <div id="examples-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="examples-title" aria-hidden="true">
         <button type="button" class="examples-backdrop" onclick="closeExamplesModal()" aria-label="סגור דוגמאות"></button>
         <div class="examples-panel qc-modal-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-5xl w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
@@ -967,15 +1032,18 @@ Shoreline B2B
     <script src="lib/spellcheck.js"></script>
     <script src="lib/pageFit.js"></script>
     <script src="lib/quickPaste.js"></script>
+    <script src="lib/cvImport.js"></script>
+    <script src="lib/handoff.js"></script>
+    <script src="lib/samplePreview.js"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
         window.addExperienceJob = function (e) {
             if (e && e.preventDefault) e.preventDefault();
             if (e && e.stopPropagation) e.stopPropagation();
             if (window.QCExperience && typeof QCExperience.addJob === 'function') {
-                QCExperience.addJob(e);
-                return false;
+                return QCExperience.addJob(e);
             }
+            console.log('Add Experience Clicked!', { fallback: true });
             return false;
         };
         let previewBgClass = 'bg-preview-white';
@@ -1108,7 +1176,39 @@ Shoreline B2B
                 densityRegular: 'רגיל',
                 densitySpacious: 'מרווח',
                 customAccent: 'מותאם',
-                customColor: 'צבע מותאם'
+                customColor: 'צבע מותאם',
+                importCv: 'העלו קורות חיים קיימים',
+                importHint: 'PDF או Word (.docx) — נחלץ את הפרטים ונמלא את הטופס.',
+                importBusy: 'קוראים את הקובץ…',
+                importOk: 'השדות מולאו מקורות החיים שהעליתם. עברו על הפרטים ועדכנו לפי הצורך.',
+                importFail: 'לא הצלחנו לקרוא את הקובץ. נסו PDF, או הדביקו טקסט.',
+                importType: 'אפשר להעלות PDF או Word (.docx) בלבד.',
+                importTooBig: 'הקובץ גדול מדי (עד 8MB).',
+                importOldDoc: 'שמרו כ-Word (.docx) או PDF ואז העלו שוב.',
+                tipSummary: 'טיפ: שלבו הישג מדיד — אחוזי צמיחה, גודל צוות או תקציב.',
+                tipExperience: 'טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.',
+                tipEducation: 'ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.',
+                tipSkills: '3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.',
+                handoffBanner: 'מעדיפים לערוך במחשב?',
+                handoffBannerLead: 'שלחו קישור מאגי לוואטסאפ או לאימייל והמשיכו בדיוק מאותה טיוטה.',
+                handoffBannerCta: 'שלחו קישור להמשך',
+                handoffDismiss: 'לא עכשיו',
+                handoffTitle: 'המשיכו במחשב בקישור מאגי',
+                handoffLead: 'נשלח קישור ישיר לוואטסאפ או לאימייל. הטיוטה נשמרת ל-24 שעות — פותחים במחשב וממשיכים בדיוק מאותו מקום.',
+                handoffEmailLabel: 'אימייל להמשך',
+                handoffWhatsapp: 'שלחו לוואטסאפ',
+                handoffEmailBtn: 'שלחו לאימייל',
+                handoffCopy: 'העתיקו קישור',
+                handoffShareText: 'המשיכו לערוך את קורות החיים ב-QuickCV במחשב:',
+                handoffMailSubject: 'המשיכו לערוך ב-QuickCV במחשב',
+                handoffBusy: 'מכינים קישור מאגי…',
+                handoffCopied: 'הקישור הועתק. פתחו אותו במחשב תוך 24 שעות.',
+                handoffFail: 'לא הצלחנו ליצור קישור. נסו שוב או העתיקו ידנית.',
+                handoffEmailInvalid: 'כתובת האימייל לא תקינה.',
+                samplePdfCta: 'צפו בדוגמת PDF מלאה',
+                samplePdfHint: 'עמוד A4 באיכות הגשה — בלי סימן מים, לפני תשלום.',
+                samplePdfTitle: 'דוגמת PDF מוכנה להגשה',
+                samplePdfLead: 'כך נראה קובץ A4 סופי מ-QuickCV — בלי סימן מים, ברזולוציה מלאה, לפני תשלום.'
             },
             en: {
                 nameFallback: 'Full name',
@@ -1144,9 +1244,42 @@ Shoreline B2B
                 densityRegular: 'Regular',
                 densitySpacious: 'Spacious',
                 customAccent: 'Custom',
-                customColor: 'Custom color'
+                customColor: 'Custom color',
+                importCv: 'Upload existing CV',
+                importHint: 'PDF or Word (.docx) — we extract the details and fill the form.',
+                importBusy: 'Reading the file…',
+                importOk: 'Fields were filled from your CV. Review the details and tweak as needed.',
+                importFail: 'We could not read the file. Try a PDF, or paste the text.',
+                importType: 'Please upload a PDF or Word (.docx) file.',
+                importTooBig: 'The file is too large (up to 8MB).',
+                importOldDoc: 'Save as Word (.docx) or PDF and upload again.',
+                tipSummary: 'Pro tip: include a measurable win — % growth, team size, or budget.',
+                tipExperience: 'Pro tip: start each bullet with a verb (led, grew) and include a number.',
+                tipEducation: 'Add institution, degree and years. One relevant course beats a long list.',
+                tipSkills: '3–8 strong skills beat a long list. Match them to the role.',
+                handoffBanner: 'Prefer editing on desktop?',
+                handoffBannerLead: 'Send a magic link to WhatsApp or email and continue from the same draft.',
+                handoffBannerCta: 'Send a continue link',
+                handoffDismiss: 'Not now',
+                handoffTitle: 'Continue on desktop with a magic link',
+                handoffLead: 'We will send a direct link to WhatsApp or email. The draft is kept for 24 hours — open it on a computer and pick up exactly where you left off.',
+                handoffEmailLabel: 'Email to continue',
+                handoffWhatsapp: 'Send to WhatsApp',
+                handoffEmailBtn: 'Send to email',
+                handoffCopy: 'Copy link',
+                handoffShareText: 'Continue editing your CV on QuickCV from your computer:',
+                handoffMailSubject: 'Continue editing on QuickCV',
+                handoffBusy: 'Preparing a magic link…',
+                handoffCopied: 'Link copied. Open it on a computer within 24 hours.',
+                handoffFail: 'We could not create a link. Try again or copy it manually.',
+                handoffEmailInvalid: 'That email address is not valid.',
+                samplePdfCta: 'View full PDF sample',
+                samplePdfHint: 'A submission-quality A4 page — no watermark, before you pay.',
+                samplePdfTitle: 'Full submission-ready PDF sample',
+                samplePdfLead: 'This is the final A4 QuickCV file — no watermark, full resolution, before payment.'
             }
         };
+        window.CV_I18N = CV_I18N;
 
         function formField(id) {
             const form = document.getElementById('studio-form-column') || document.getElementById('details-panel');
@@ -1292,6 +1425,27 @@ Shoreline B2B
             setLabel('density-legend', pack.densityLegend);
             setLabel('density-hint', pack.densityHint);
             setLabel('custom-accent-caption', pack.customAccent);
+            setLabel('btn-cv-import-label', pack.importCv);
+            setLabel('cv-import-hint', pack.importHint);
+            setLabel('tip-summary', pack.tipSummary);
+            setLabel('tip-experience', pack.tipExperience);
+            setLabel('tip-education', pack.tipEducation);
+            setLabel('tip-skills', pack.tipSkills);
+            setLabel('handoff-banner-title', pack.handoffBanner);
+            setLabel('handoff-banner-lead', pack.handoffBannerLead);
+            setLabel('btn-handoff-open', pack.handoffBannerCta);
+            setLabel('btn-handoff-dismiss', pack.handoffDismiss);
+            setLabel('handoff-title', pack.handoffTitle);
+            setLabel('handoff-lead', pack.handoffLead);
+            setLabel('handoff-email-label', pack.handoffEmailLabel);
+            setLabel('btn-handoff-whatsapp', pack.handoffWhatsapp);
+            setLabel('btn-handoff-email', pack.handoffEmailBtn);
+            setLabel('btn-handoff-copy', pack.handoffCopy);
+            setLabel('btn-sample-pdf-home', pack.samplePdfCta);
+            setLabel('btn-sample-pdf-studio', pack.samplePdfCta);
+            setLabel('sample-pdf-home-hint', pack.samplePdfHint);
+            setLabel('sample-pdf-title', pack.samplePdfTitle);
+            setLabel('sample-pdf-lead', pack.samplePdfLead);
             document.querySelectorAll('.density-chip').forEach((el) => {
                 const key = el.getAttribute('data-density');
                 if (key === 'compact') el.textContent = pack.densityCompact;
@@ -3361,6 +3515,7 @@ Shoreline B2B
             document.body.classList.toggle('on-landing', isLanding);
             document.body.classList.toggle('on-studio', isStudio);
             document.documentElement.classList.toggle('on-studio', isStudio);
+            if (window.QCHandoff && typeof QCHandoff.sync === 'function') QCHandoff.sync();
             if (isStudio) {
                 if (!window.QCStudioStep) applyStudioStep(1, { silent: true });
             } else {
@@ -3527,7 +3682,7 @@ Shoreline B2B
         }
 
         function syncAppRoute() {
-            if (location.hash === '#studio') {
+            if (location.hash === '#studio' || (window.QCHandoff && QCHandoff.hasPending && QCHandoff.hasPending())) {
                 applyView('studio');
                 applySeoMeta(null);
                 return;
@@ -3546,6 +3701,8 @@ Shoreline B2B
             closeExamplesModal();
             closePaymentModal();
             if (typeof window.closeQuickPaste === 'function') window.closeQuickPaste();
+            if (typeof window.closeHandoffModal === 'function') window.closeHandoffModal();
+            if (typeof window.closeSamplePdfPreview === 'function') window.closeSamplePdfPreview();
             closeMobilePreview();
         });
 
@@ -3573,6 +3730,7 @@ Shoreline B2B
         window.applyRoleTitle = applyRoleTitle;
         window.applyIndustryPreset = applyIndustryPreset;
         window.onPhotoChange = onPhotoChange;
+        window.hydrateLanguagePicker = hydrateLanguagePicker;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
         window.updateMobileStudioProgress = updateMobileStudioProgress;
@@ -3632,6 +3790,39 @@ Shoreline B2B
             console.error('preset apply failed', presetErr);
         }
         if (!usedPreset) syncAppRoute();
+        if (window.QCHandoff && typeof QCHandoff.consume === 'function') {
+            QCHandoff.consume().then(function (applied) {
+                if (!applied) {
+                    if (typeof QCHandoff.sync === 'function') QCHandoff.sync();
+                    return;
+                }
+                const handoffDraft = QCDraft.read ? QCDraft.read() : null;
+                try {
+                    if (handoffDraft && (handoffDraft.cvLang === 'en' || handoffDraft.cvLang === 'he')) setCvLang(handoffDraft.cvLang, { restore: true });
+                    if (handoffDraft && handoffDraft.layout) setLayout(handoffDraft.layout, null, { keepSkin: true });
+                    if (handoffDraft && handoffDraft.skin) setCvSkin(handoffDraft.skin);
+                    if (handoffDraft && handoffDraft.accent) {
+                        const swatch = document.querySelector('.theme-swatch[data-color="' + String(handoffDraft.accent).trim() + '"]');
+                        setAccent(String(handoffDraft.accent).trim(), swatch);
+                    }
+                    if (handoffDraft && handoffDraft.font) {
+                        const match = String(handoffDraft.font).replace(/['"]/g, '').split(',')[0].trim();
+                        if (match) setCvFont(match);
+                    }
+                    markTemplateCards(handoffDraft && handoffDraft.example ? handoffDraft.example : '');
+                    hydrateLanguagePicker();
+                    if (handoffDraft && (handoffDraft.density === 'compact' || handoffDraft.density === 'regular' || handoffDraft.density === 'spacious')) {
+                        setCvDensity(handoffDraft.density);
+                    }
+                    if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+                } catch (handoffErr) {
+                    console.error('handoff restore failed', handoffErr);
+                }
+                applyView('studio');
+                updateCV();
+                if (typeof QCHandoff.sync === 'function') QCHandoff.sync();
+            });
+        }
         updateCV();
         window.QCPageFit?.bind?.();
         window.addEventListener('hashchange', syncAppRoute);

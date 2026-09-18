@@ -58,9 +58,29 @@ declare global {
     QCDraft?: {
       save: () => void;
       saveSoon: () => void;
+      apply?: (data: Record<string, unknown>) => boolean;
       restore: () => boolean;
       clear: () => void;
+      read?: () => Record<string, unknown> | null;
     };
+    QCHandoff?: {
+      consume: () => Promise<boolean>;
+      hasPending: () => boolean;
+      sync: () => void;
+      open: () => void;
+      close: () => void;
+    };
+    QCSamplePreview?: {
+      open: () => void;
+      close: () => void;
+    };
+    QCCvImport?: {
+      importFile: (file: File) => void;
+    };
+    hydrateLanguagePicker?: () => void;
+    closeHandoffModal?: () => void;
+    closeSamplePdfPreview?: () => void;
+    openSamplePdfPreview?: () => void;
     html2canvas?: (el: HTMLElement, opt?: Record<string, unknown>) => Promise<HTMLCanvasElement>;
     html2pdf?: {
       (): { set: (opt: Record<string, unknown>) => unknown };

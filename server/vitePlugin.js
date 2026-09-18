@@ -6,6 +6,7 @@ import { handleVerifyCodeAndDownloadRequest } from "./verifyCodeDownload.js";
 import { handleSendPdfWhatsappRequest } from "./sendPdfWhatsapp.js";
 import { handleTelegramWebhookRequest } from "./telegramBot.js";
 import { handleVerifyPaymentRequest } from "./verifyPayment.js";
+import { handleHandoffRequest } from "./handoff.js";
 import { loadEnv } from "./env.js";
 
 const routes = {
@@ -20,6 +21,7 @@ const routes = {
   "/api/verify-code-and-download": handleVerifyCodeAndDownloadRequest,
   "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,
   "/api/telegram-webhook": handleTelegramWebhookRequest,
+  "/api/handoff": handleHandoffRequest,
 };
 
 function attach(middlewares) {

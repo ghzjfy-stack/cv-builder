@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=typo1">
+    <link rel="stylesheet" href="./app.css?v=import-ui1">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -405,22 +405,17 @@
                     <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
                     <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
                 </div>
-                <div class="cv-import-card">
+                <div class="cv-import-card" id="cv-import-card">
                     <div class="cv-import-pick">
                         <input type="file" id="cv-import-file" class="cv-import-file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-labelledby="btn-cv-import-label">
                         <span class="cv-import-btn" id="btn-cv-import" aria-hidden="true">
                             <span class="cv-import-ico">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
                             </span>
-                            <span id="btn-cv-import-label">העלו קורות חיים קיימים</span>
+                            <span id="btn-cv-import-label">העלאת קובץ PDF / Word</span>
                         </span>
                     </div>
-                    <div class="cv-import-alt">
-                        <button type="button" id="btn-quick-paste" class="cv-import-alt-btn" onclick="openQuickPaste()">או הדביקו טקסט</button>
-                        <button type="button" id="btn-handoff-form" class="cv-import-alt-btn cv-import-handoff">המשיכו במחשב</button>
-                        <button type="button" id="btn-sample-pdf-form" class="cv-import-alt-btn" data-sample-pdf-opener onclick="openSamplePdfPreview(event); return false;">צפו בדוגמת PDF מלאה</button>
-                    </div>
-                    <p id="cv-import-hint" class="cv-import-hint">PDF או Word (.docx) — נחלץ את הפרטים ונמלא את הטופס.</p>
+                    <button type="button" id="btn-quick-paste" class="cv-import-paste" onclick="openQuickPaste()">או הדבקת טקסט</button>
                     <p id="cv-import-status" class="cv-import-status" role="status" aria-live="polite"></p>
                 </div>
                 <div class="space-y-3">
@@ -976,6 +971,8 @@ Shoreline B2B
         </div>
     </div>
 
+    <div id="qc-import-toast" class="qc-import-toast" role="status" aria-live="polite"></div>
+
     <div id="pdf-spinner" class="fixed inset-0 hidden items-center justify-center bg-slate-950/60 no-print" style="z-index:2147483646" aria-live="polite" aria-busy="true">
         <div class="bg-white text-slate-800 rounded-2xl px-6 py-5 text-center shadow-2xl max-w-xs w-[90%]">
             <div class="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"></div>
@@ -990,7 +987,7 @@ Shoreline B2B
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js"></script>
+    <script src="lib/experienceEditor.js?v=import4"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/templateThumbs.js?v=white1"></script>
@@ -1000,8 +997,8 @@ Shoreline B2B
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
     <script src="lib/pageFit.js?v=white1"></script>
-    <script src="lib/quickPaste.js?v=import3"></script>
-    <script src="lib/cvImport.js?v=import3"></script>
+    <script src="lib/quickPaste.js?v=import4"></script>
+    <script src="lib/cvImport.js?v=import4"></script>
     <script src="lib/handoff.js?v=import3"></script>
     <script src="lib/samplePreview.js?v=white1"></script>
     <script type="module" src="./src/main.ts"></script>
@@ -1158,16 +1155,16 @@ Shoreline B2B
                 densitySpacious: 'מרווח',
                 customAccent: 'מותאם',
                 customColor: 'צבע מותאם',
-                importCv: 'העלו קורות חיים קיימים',
+                importCv: 'העלאת קובץ PDF / Word',
                 importHint: 'PDF או Word (.docx) — נחלץ את הפרטים ונמלא את הטופס.',
                 importBusy: 'קוראים את הקובץ…',
-                importOk: 'השדות מולאו מקורות החיים שהעליתם. עברו על הפרטים ועדכנו לפי הצורך.',
+                importOk: 'הפרטים חולצו בהצלחה! אפשר לערוך אותם בטופס',
                 importFail: 'לא הצלחנו לקרוא את הקובץ. נסו PDF, או הדביקו טקסט.',
                 importType: 'אפשר להעלות PDF או Word (.docx) בלבד.',
                 importTooBig: 'הקובץ גדול מדי (עד 8MB).',
                 importOldDoc: 'שמרו כ-Word (.docx) או PDF ואז העלו שוב.',
                 importScanned: 'לא נמצא טקסט בקובץ (ייתכן שהוא סרוק). נסו Word או הדביקו טקסט.',
-                importPaste: 'או הדביקו טקסט',
+                importPaste: 'או הדבקת טקסט',
                 importHandoff: 'המשיכו במחשב',
                 importSample: 'צפו בדוגמת PDF',
                 quickPaste: 'הדבקה מהירה',
@@ -1233,10 +1230,10 @@ Shoreline B2B
                 densitySpacious: 'Spacious',
                 customAccent: 'Custom',
                 customColor: 'Custom color',
-                importCv: 'Upload existing CV',
+                importCv: 'Upload PDF / Word file',
                 importHint: 'PDF or Word (.docx) — we extract the details and fill the form.',
                 importBusy: 'Reading the file…',
-                importOk: 'Fields were filled from your CV. Review the details and tweak as needed.',
+                importOk: 'Details extracted successfully! You can edit them in the form',
                 importFail: 'We could not read the file. Try a PDF, or paste the text.',
                 importType: 'Please upload a PDF or Word (.docx) file.',
                 importTooBig: 'The file is too large (up to 8MB).',
@@ -1452,7 +1449,6 @@ Shoreline B2B
             setLabel('btn-insert-skills', pack.phrasesSkills);
             if (typeof syncPhraseTriggerLabel === 'function') syncPhraseTriggerLabel();
             setLabel('role-title-hint', pack.roleTitleHint);
-            setLabel('btn-quick-paste', pack.quickPaste || 'הדבקה מהירה');
             setLabel('studio-social-line', pack.studioSocial);
             setLabel('studio-social-ats', pack.studioAts);
             setLabel('btn-continue-design', pack.continueDesign);
@@ -1463,9 +1459,7 @@ Shoreline B2B
             setLabel('density-hint', pack.densityHint);
             setLabel('custom-accent-caption', pack.customAccent);
             setLabel('btn-cv-import-label', pack.importCv);
-            setLabel('cv-import-hint', pack.importHint);
-            setLabel('btn-quick-paste', pack.importPaste || pack.quickPaste || 'או הדביקו טקסט');
-            setLabel('btn-handoff-form', pack.importHandoff);
+            setLabel('btn-quick-paste', pack.importPaste || 'או הדבקת טקסט');
             setLabel('tip-summary', pack.tipSummary);
             setLabel('tip-experience', pack.tipExperience);
             setLabel('tip-education', pack.tipEducation);
@@ -1482,7 +1476,6 @@ Shoreline B2B
             setLabel('btn-handoff-copy', pack.handoffCopy);
             setLabel('btn-sample-pdf-home', pack.samplePdfCta);
             setLabel('btn-sample-pdf-studio', pack.samplePdfCta);
-            setLabel('btn-sample-pdf-form', pack.samplePdfCta);
             setLabel('sample-pdf-home-hint', pack.samplePdfHint);
             setLabel('sample-pdf-title', pack.samplePdfTitle);
             const sampleClose = document.getElementById('btn-sample-pdf-close');

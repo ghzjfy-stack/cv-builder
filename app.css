@@ -4012,11 +4012,16 @@
         }
         .cv-import-card {
             display: grid;
-            gap: 0.4rem;
-            padding: 0.85rem 0.95rem;
-            border-radius: 1rem;
-            border: 1px dashed rgba(45, 212, 191, 0.35);
-            background: rgba(15, 23, 42, 0.65);
+            gap: 0.15rem;
+            padding: 0.4rem 0.5rem 0.35rem;
+            margin-bottom: 0.15rem;
+            border-radius: 0.85rem;
+            border: 1px dashed rgba(45, 212, 191, 0.32);
+            background: rgba(15, 23, 42, 0.55);
+        }
+        .cv-import-card.is-drop {
+            border-color: #2dd4bf;
+            background: rgba(13, 148, 136, 0.18);
         }
         .cv-import-pick {
             position: relative;
@@ -4036,59 +4041,82 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.55rem;
-            min-height: 2.75rem;
+            gap: 0.45rem;
+            min-height: 2.35rem;
             width: 100%;
-            border-radius: 0.9rem;
+            border-radius: 0.7rem;
             border: 1px solid rgba(45, 212, 191, 0.45);
-            background: rgba(15, 118, 110, 0.2);
+            background: rgba(15, 118, 110, 0.22);
             color: #ecfeff;
             font-weight: 800;
-            font-size: 0.92rem;
+            font-size: 0.84rem;
+            line-height: 1.2;
             pointer-events: none;
         }
         .cv-import-pick:hover .cv-import-btn,
         .cv-import-file:focus-visible + .cv-import-btn {
-            background: rgba(13, 148, 136, 0.32);
+            background: rgba(13, 148, 136, 0.34);
             border-color: #2dd4bf;
         }
         .cv-import-ico {
             display: inline-flex;
-            width: 1.15rem;
-            height: 1.15rem;
+            width: 1.05rem;
+            height: 1.05rem;
+            flex: 0 0 auto;
         }
         .cv-import-ico svg { width: 100%; height: 100%; }
-        .cv-import-alt {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
+        .cv-import-paste {
+            justify-self: center;
+            min-height: 1.7rem;
+            padding: 0.05rem 0.4rem;
+            border: 0;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.74rem;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+            cursor: pointer;
         }
-        .cv-import-alt-btn {
-            min-height: 2.25rem;
-            padding: 0.35rem 0.7rem;
-            border-radius: 0.75rem;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(15, 23, 42, 0.55);
+        .cv-import-paste:hover,
+        .cv-import-paste:focus-visible {
             color: #e2e8f0;
-            font-size: 0.75rem;
-            font-weight: 700;
         }
-        .cv-import-alt-btn:hover,
-        .cv-import-alt-btn:focus-visible {
-            border-color: #94a3b8;
-            color: #fff;
-        }
-        html:not(.qc-narrow) .cv-import-handoff { display: none; }
-        .cv-import-hint,
         .cv-import-status {
             margin: 0;
-            font-size: 0.72rem;
-            line-height: 1.45;
+            font-size: 0.7rem;
+            line-height: 1.35;
             color: #94a3b8;
         }
+        .cv-import-status:empty { display: none; }
         .cv-import-status.is-ok { color: #6ee7b7; font-weight: 700; }
         .cv-import-status.is-error { color: #fda4af; font-weight: 700; }
         .cv-import-status.is-busy { color: #7dd3fc; }
+        .qc-import-toast {
+            position: fixed;
+            left: 50%;
+            bottom: max(1.15rem, env(safe-area-inset-bottom));
+            z-index: 13000;
+            max-width: min(92vw, 26rem);
+            padding: 0.75rem 1.15rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.96);
+            color: #ecfdf5;
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            box-shadow: 0 12px 40px rgba(2, 6, 23, 0.45);
+            font-size: 0.84rem;
+            font-weight: 800;
+            text-align: center;
+            line-height: 1.4;
+            transform: translate(-50%, 120%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.28s ease, opacity 0.28s ease;
+        }
+        .qc-import-toast.is-visible {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
 
         .handoff-banner {
             display: flex;
@@ -4435,6 +4463,7 @@
             #handoff-banner,
             #handoff-modal,
             #sample-pdf-modal,
+            #qc-import-toast,
             .cv-import-card,
             .field-tip,
             .sample-pdf-home-cta {

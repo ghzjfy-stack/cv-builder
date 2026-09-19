@@ -18,7 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=import-ui2">
+    <link rel="stylesheet" href="./app.css?v=import-ui3">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -410,15 +410,16 @@
                 </div>
                 <div class="cv-import-card" id="cv-import-card">
                     <div class="cv-import-pick">
-                        <input type="file" id="cv-import-file" class="cv-import-file" accept=".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="onCvImportFile(event)">
-                        <label for="cv-import-file" class="cv-import-btn" id="btn-cv-import">
+                        <input type="file" id="cv-import-file" class="cv-import-file hidden" accept=".pdf,.docx,.doc" onchange="handleFileUpload(event)">
+                        <button type="button" class="cv-import-btn" id="btn-cv-import" onclick="pickCvImport(event)">
                             <span class="cv-import-ico" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
                             </span>
+                            <span class="cv-import-spinner" aria-hidden="true"></span>
                             <span id="btn-cv-import-label">העלאת קובץ PDF / Word</span>
-                        </label>
+                        </button>
                     </div>
-                    <button type="button" id="btn-quick-paste" class="cv-import-paste" onclick="openQuickPaste()">או הדבקת טקסט</button>
+                    <button type="button" id="btn-quick-paste" class="cv-import-paste" onclick="openQuickPaste(event)">או הדבקת טקסט</button>
                     <p id="cv-import-status" class="cv-import-status" role="status" aria-live="polite"></p>
                 </div>
                 <div class="space-y-3">
@@ -1000,8 +1001,8 @@ Shoreline B2B
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
     <script src="lib/pageFit.js?v=white1"></script>
-    <script src="lib/quickPaste.js?v=import4"></script>
-    <script src="lib/cvImport.js?v=import6"></script>
+    <script src="lib/quickPaste.js?v=import7"></script>
+    <script src="lib/cvImport.js?v=import7"></script>
     <script src="lib/handoff.js?v=import3"></script>
     <script src="lib/samplePreview.js?v=white1"></script>
     <script type="module" src="./src/main.ts"></script>
@@ -1162,11 +1163,11 @@ Shoreline B2B
                 importHint: 'PDF או Word (.docx) — נחלץ את הפרטים ונמלא את הטופס.',
                 importBusy: 'מעבד את הקובץ...',
                 importOk: 'הנתונים חולצו בהצלחה!',
-                importFail: 'לא הצלחנו לקרוא את הקובץ, יש לנסות קובץ אחר או להדביק טקסט',
-                importType: 'לא הצלחנו לקרוא את הקובץ, יש לנסות קובץ אחר או להדביק טקסט',
+                importFail: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
+                importType: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
                 importTooBig: 'הקובץ גדול מדי (עד 8MB).',
-                importOldDoc: 'לא הצלחנו לקרוא את הקובץ, יש לנסות קובץ אחר או להדביק טקסט',
-                importScanned: 'לא הצלחנו לקרוא את הקובץ, יש לנסות קובץ אחר או להדביק טקסט',
+                importOldDoc: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
+                importScanned: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
                 importPaste: 'או הדבקת טקסט',
                 importHandoff: 'המשיכו במחשב',
                 importSample: 'צפו בדוגמת PDF',
@@ -1237,11 +1238,11 @@ Shoreline B2B
                 importHint: 'PDF or Word (.docx) — we extract the details and fill the form.',
                 importBusy: 'Processing the file...',
                 importOk: 'Data extracted successfully!',
-                importFail: 'We could not read the file. Try another file, or paste the text.',
-                importType: 'We could not read the file. Try another file, or paste the text.',
+                importFail: 'Error reading the file. Please try another file or paste the text.',
+                importType: 'Error reading the file. Please try another file or paste the text.',
                 importTooBig: 'The file is too large (up to 8MB).',
-                importOldDoc: 'We could not read the file. Try another file, or paste the text.',
-                importScanned: 'We could not read the file. Try another file, or paste the text.',
+                importOldDoc: 'Error reading the file. Please try another file or paste the text.',
+                importScanned: 'Error reading the file. Please try another file or paste the text.',
                 importPaste: 'Or paste text',
                 importHandoff: 'Continue on desktop',
                 importSample: 'View PDF sample',

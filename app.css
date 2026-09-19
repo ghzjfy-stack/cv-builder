@@ -4027,16 +4027,20 @@
         .cv-import-pick {
             position: relative;
         }
-        .cv-import-file {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
+        .cv-import-file,
+        #cv-import-file.hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+            opacity: 0 !important;
+            display: block !important;
+            pointer-events: none;
         }
         .cv-import-btn {
             display: inline-flex;
@@ -4070,9 +4074,18 @@
             flex: 0 0 auto;
         }
         .cv-import-ico svg { width: 100%; height: 100%; }
-        .cv-import-card.is-busy .cv-import-ico {
-            animation: qc-import-spin 0.8s linear infinite;
+        .cv-import-spinner {
+            display: none;
+            width: 1.05rem;
+            height: 1.05rem;
+            flex: 0 0 auto;
+            border: 2px solid rgba(125, 211, 252, 0.25);
+            border-top-color: #7dd3fc;
+            border-radius: 50%;
+            animation: qc-import-spin 0.7s linear infinite;
         }
+        .cv-import-card.is-busy .cv-import-ico { display: none; }
+        .cv-import-card.is-busy .cv-import-spinner { display: inline-block; }
         @keyframes qc-import-spin {
             to { transform: rotate(360deg); }
         }
@@ -4128,6 +4141,11 @@
         .qc-import-toast.is-visible {
             transform: translate(-50%, 0);
             opacity: 1;
+        }
+        .qc-import-toast.is-error {
+            color: #fff1f2;
+            border-color: rgba(251, 113, 133, 0.55);
+            background: rgba(76, 5, 25, 0.96);
         }
 
         .handoff-banner {

@@ -376,17 +376,7 @@ html.qc-paid .unpaid-only { display: none !important; }
     }
 }
 
-#quick-paste-modal {
-    z-index: 10045;
-    align-items: center;
-    justify-content: center;
-    background: rgba(2, 6, 23, 0.72);
-    backdrop-filter: blur(12px);
-    overflow: hidden;
-}
-
 @media print {
-    #quick-paste-modal,
     .cv-page-fit,
     #cv-page-fit-banner,
     .tpl-ats-tooltip {

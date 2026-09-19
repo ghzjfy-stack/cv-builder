@@ -1624,8 +1624,7 @@
             justify-content: center;
             overflow: hidden;
         }
-        #examples-modal .examples-backdrop,
-        #quick-paste-modal .examples-backdrop {
+        #examples-modal .examples-backdrop {
             position: absolute;
             inset: 0;
             border: 0;
@@ -3014,8 +3013,7 @@
             outline-offset: 2px;
         }
         #examples-modal .examples-panel > :not(.qc-modal-close),
-        #payment-modal .pay-card > :not(.qc-modal-close),
-        #quick-paste-modal .qc-modal-panel > :not(.qc-modal-close) {
+        #payment-modal .pay-card > :not(.qc-modal-close) {
             clear: both;
         }
         body.qc-mobile-preview-open #studio-mobile-dock {
@@ -3206,6 +3204,16 @@
             padding: 0.9rem;
             display: grid;
             gap: 0.7rem;
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+        }
+        .experience-card input,
+        .experience-card textarea,
+        .experience-card button {
+            pointer-events: auto;
+            position: relative;
+            z-index: 3;
         }
         .experience-card-toolbar {
             display: flex;
@@ -4010,143 +4018,6 @@
             line-height: 1.45;
             color: #94a3b8;
         }
-        .cv-import-card {
-            display: grid;
-            gap: 0.15rem;
-            padding: 0.4rem 0.5rem 0.35rem;
-            margin-bottom: 0.15rem;
-            border-radius: 0.85rem;
-            border: 1px dashed rgba(45, 212, 191, 0.32);
-            background: rgba(15, 23, 42, 0.55);
-        }
-        .cv-import-card.is-drop,
-        .cv-import-card.is-busy {
-            border-color: #2dd4bf;
-            background: rgba(13, 148, 136, 0.18);
-        }
-        .cv-import-pick {
-            position: relative;
-        }
-        .cv-import-file,
-        #cv-import-file.hidden {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-            opacity: 0 !important;
-            display: block !important;
-            pointer-events: none;
-        }
-        .cv-import-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.45rem;
-            min-height: 2.35rem;
-            width: 100%;
-            border-radius: 0.7rem;
-            border: 1px solid rgba(45, 212, 191, 0.45);
-            background: rgba(15, 118, 110, 0.22);
-            color: #ecfeff;
-            font-weight: 800;
-            font-size: 0.84rem;
-            line-height: 1.2;
-            cursor: pointer;
-        }
-        .cv-import-btn:hover,
-        .cv-import-file:focus-visible + .cv-import-btn {
-            background: rgba(13, 148, 136, 0.34);
-            border-color: #2dd4bf;
-        }
-        .cv-import-card.is-busy .cv-import-btn {
-            pointer-events: none;
-            cursor: wait;
-        }
-        .cv-import-ico {
-            display: inline-flex;
-            width: 1.05rem;
-            height: 1.05rem;
-            flex: 0 0 auto;
-        }
-        .cv-import-ico svg { width: 100%; height: 100%; }
-        .cv-import-spinner {
-            display: none;
-            width: 1.05rem;
-            height: 1.05rem;
-            flex: 0 0 auto;
-            border: 2px solid rgba(125, 211, 252, 0.25);
-            border-top-color: #7dd3fc;
-            border-radius: 50%;
-            animation: qc-import-spin 0.7s linear infinite;
-        }
-        .cv-import-card.is-busy .cv-import-ico { display: none; }
-        .cv-import-card.is-busy .cv-import-spinner { display: inline-block; }
-        @keyframes qc-import-spin {
-            to { transform: rotate(360deg); }
-        }
-        .cv-import-paste {
-            justify-self: center;
-            min-height: 1.7rem;
-            padding: 0.05rem 0.4rem;
-            border: 0;
-            background: transparent;
-            color: #94a3b8;
-            font-size: 0.74rem;
-            font-weight: 600;
-            text-decoration: underline;
-            text-underline-offset: 0.18em;
-            cursor: pointer;
-        }
-        .cv-import-paste:hover,
-        .cv-import-paste:focus-visible {
-            color: #e2e8f0;
-        }
-        .cv-import-status {
-            margin: 0;
-            font-size: 0.7rem;
-            line-height: 1.35;
-            color: #94a3b8;
-            text-align: center;
-        }
-        .cv-import-status:empty { display: none; }
-        .cv-import-status.is-ok { color: #6ee7b7; font-weight: 700; }
-        .cv-import-status.is-error { color: #fda4af; font-weight: 700; }
-        .cv-import-status.is-busy { color: #7dd3fc; font-weight: 700; }
-        .qc-import-toast {
-            position: fixed;
-            left: 50%;
-            bottom: max(1.15rem, env(safe-area-inset-bottom));
-            z-index: 13000;
-            max-width: min(92vw, 26rem);
-            padding: 0.75rem 1.15rem;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.96);
-            color: #ecfdf5;
-            border: 1px solid rgba(52, 211, 153, 0.5);
-            box-shadow: 0 12px 40px rgba(2, 6, 23, 0.45);
-            font-size: 0.84rem;
-            font-weight: 800;
-            text-align: center;
-            line-height: 1.4;
-            transform: translate(-50%, 120%);
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.28s ease, opacity 0.28s ease;
-        }
-        .qc-import-toast.is-visible {
-            transform: translate(-50%, 0);
-            opacity: 1;
-        }
-        .qc-import-toast.is-error {
-            color: #fff1f2;
-            border-color: rgba(251, 113, 133, 0.55);
-            background: rgba(76, 5, 25, 0.96);
-        }
 
         .handoff-banner {
             display: flex;
@@ -4255,12 +4126,6 @@
         .sample-pdf-open-btn:hover,
         .sample-pdf-open-btn:focus-visible {
             background: #0d9488;
-        }
-        .sample-pdf-open-btn-studio {
-            min-height: 2.25rem;
-            font-size: 0.72rem;
-            padding: 0 0.75rem;
-            background: #134e4a;
         }
         .sample-pdf-home-hint {
             margin: 0;
@@ -4493,8 +4358,6 @@
             #handoff-banner,
             #handoff-modal,
             #sample-pdf-modal,
-            #qc-import-toast,
-            .cv-import-card,
             .field-tip,
             .sample-pdf-home-cta {
                 display: none !important;

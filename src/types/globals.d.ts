@@ -76,11 +76,6 @@ declare global {
       download?: (e?: Event) => void;
       bind?: () => void;
     };
-    QCCvImport?: {
-      importFile: (file: File) => Promise<void> | void;
-      pick?: () => void;
-      bind?: () => void;
-    };
     hydrateLanguagePicker?: () => void;
     closeHandoffModal?: () => void;
     closeSamplePdfPreview?: () => void;

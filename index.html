@@ -10,15 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>if (window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=import-ui3">
+    <link rel="stylesheet" href="./app.css?v=jobs5">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -403,24 +400,10 @@
                 <div class="template-grid canva-grid" data-template-gallery role="group" aria-label="תבניות קורות חיים"></div>
             </div>
 
-            <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-6 shadow-xl">
+            <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between gap-2 flex-wrap">
                     <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
                     <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
-                </div>
-                <div class="cv-import-card" id="cv-import-card">
-                    <div class="cv-import-pick">
-                        <input type="file" id="cv-import-file" class="cv-import-file hidden" accept=".pdf,.docx,.doc" onchange="handleFileUpload(event)">
-                        <button type="button" class="cv-import-btn" id="btn-cv-import" onclick="pickCvImport(event)">
-                            <span class="cv-import-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/></svg>
-                            </span>
-                            <span class="cv-import-spinner" aria-hidden="true"></span>
-                            <span id="btn-cv-import-label">העלאת קובץ PDF / Word</span>
-                        </button>
-                    </div>
-                    <button type="button" id="btn-quick-paste" class="cv-import-paste" onclick="openQuickPaste(event)">או הדבקת טקסט</button>
-                    <p id="cv-import-status" class="cv-import-status" role="status" aria-live="polite"></p>
                 </div>
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -465,6 +448,7 @@
 
                 <div class="space-y-2 relative" id="experience-section">
                     <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
+                    <p class="field-tip" id="tip-experience-lead">מלאו תפקיד, חברה ושנים. אפשר גם ללחוץ על דוגמה מוכנה בתוך המשרה.</p>
                     <div id="experience-items" aria-describedby="tip-experience"></div>
                     <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="addExperienceJob(event); return false;">+ הוסף משרה נוספת</button>
                     <p class="field-tip" id="tip-experience">טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.</p>
@@ -611,7 +595,6 @@ Shoreline B2B
         <div id="preview-column" class="preview-col space-y-3" role="region" aria-label="תצוגה מקדימה חיה של קורות החיים">
             <div class="preview-toolbar no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="preview-heading">תצוגה מקדימה בזמן אמת</h2>
-                <button type="button" id="btn-sample-pdf-studio" class="sample-pdf-open-btn sample-pdf-open-btn-studio" data-sample-pdf-opener onclick="openSamplePdfPreview(event); return false;">צפו בדוגמת PDF מלאה</button>
                 <div class="doc-switch" role="tablist" aria-label="סוג מסמך">
                     <button type="button" id="doc-tab-cv" aria-pressed="true" onclick="setStudioDoc('cv')">קורות חיים</button>
                     <button type="button" id="doc-tab-letter" aria-pressed="false" onclick="setStudioDoc('letter')">מכתב מקדים</button>
@@ -796,21 +779,6 @@ Shoreline B2B
     </nav>
     </div>
 
-    <div id="quick-paste-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="quick-paste-title" aria-hidden="true">
-        <button type="button" class="examples-backdrop" onclick="closeQuickPaste()" aria-label="סגירה"></button>
-        <div class="qc-modal-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-xl w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
-            <button type="button" id="btn-quick-paste-close" class="qc-modal-close" aria-label="סגירה">✕</button>
-            <h3 id="quick-paste-title" class="text-lg font-extrabold pe-10 pr-12">הדבקה מהירה</h3>
-            <p class="text-sm text-slate-300 leading-relaxed">הדביקו טקסט מקורות חיים או מ-LinkedIn. נמלא שם, ניסיון והשכלה.</p>
-            <textarea id="quick-paste-text" rows="10" class="w-full bg-slate-950 border border-slate-700 p-3 text-sm rounded-xl text-slate-100 outline-none min-h-44" placeholder="שם מלא&#10;תפקיד&#10;&#10;Experience&#10;&#10;Education"></textarea>
-            <p id="quick-paste-feedback" class="text-sm min-h-5 font-semibold" role="status"></p>
-            <div class="flex flex-wrap gap-2">
-                <button type="button" id="btn-quick-paste-apply" class="flex-1 min-h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm">מלא שדות</button>
-                <button type="button" class="min-h-12 px-4 rounded-xl border border-slate-600 text-slate-200 font-bold text-sm" onclick="closeQuickPaste()">ביטול</button>
-            </div>
-        </div>
-    </div>
-
     <div id="handoff-modal" class="qc-modal no-print fixed inset-0 hidden flex-col p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="handoff-title" aria-hidden="true">
         <button type="button" class="examples-backdrop" aria-label="סגירה"></button>
         <div class="qc-modal-panel handoff-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-md w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
@@ -975,8 +943,6 @@ Shoreline B2B
         </div>
     </div>
 
-    <div id="qc-import-toast" class="qc-import-toast" role="status" aria-live="polite"></div>
-
     <div id="pdf-spinner" class="fixed inset-0 hidden items-center justify-center bg-slate-950/60 no-print" style="z-index:2147483646" aria-live="polite" aria-busy="true">
         <div class="bg-white text-slate-800 rounded-2xl px-6 py-5 text-center shadow-2xl max-w-xs w-[90%]">
             <div class="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"></div>
@@ -991,7 +957,7 @@ Shoreline B2B
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=import4"></script>
+    <script src="lib/experienceEditor.js?v=jobs6"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/templateThumbs.js?v=white1"></script>
@@ -1001,10 +967,8 @@ Shoreline B2B
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
     <script src="lib/pageFit.js?v=white1"></script>
-    <script src="lib/quickPaste.js?v=import7"></script>
-    <script src="lib/cvImport.js?v=import7"></script>
     <script src="lib/handoff.js?v=import3"></script>
-    <script src="lib/samplePreview.js?v=white1"></script>
+    <script src="lib/samplePreview.js?v=no-sample1"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
         window.addExperienceJob = function (e) {
@@ -1159,21 +1123,11 @@ Shoreline B2B
                 densitySpacious: 'מרווח',
                 customAccent: 'מותאם',
                 customColor: 'צבע מותאם',
-                importCv: 'העלאת קובץ PDF / Word',
-                importHint: 'PDF או Word (.docx) — נחלץ את הפרטים ונמלא את הטופס.',
-                importBusy: 'מעבד את הקובץ...',
-                importOk: 'הנתונים חולצו בהצלחה!',
-                importFail: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
-                importType: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
-                importTooBig: 'הקובץ גדול מדי (עד 8MB).',
-                importOldDoc: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
-                importScanned: 'שגיאה בקריאת הקובץ. אנא נסה קובץ אחר או השתמש בהדבקת טקסט',
-                importPaste: 'או הדבקת טקסט',
                 importHandoff: 'המשיכו במחשב',
                 importSample: 'צפו בדוגמת PDF',
-                quickPaste: 'הדבקה מהירה',
                 tipSummary: 'טיפ: שלבו הישג מדיד — אחוזי צמיחה, גודל צוות או תקציב.',
                 tipExperience: 'טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.',
+                tipExperienceLead: 'מלאו תפקיד, חברה ושנים. אפשר גם ללחוץ על דוגמה מוכנה בתוך המשרה.',
                 tipEducation: 'ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.',
                 tipSkills: '3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.',
                 handoffBanner: 'מעדיפים לערוך במחשב?',
@@ -1234,21 +1188,11 @@ Shoreline B2B
                 densitySpacious: 'Spacious',
                 customAccent: 'Custom',
                 customColor: 'Custom color',
-                importCv: 'Upload PDF / Word file',
-                importHint: 'PDF or Word (.docx) — we extract the details and fill the form.',
-                importBusy: 'Processing the file...',
-                importOk: 'Data extracted successfully!',
-                importFail: 'Error reading the file. Please try another file or paste the text.',
-                importType: 'Error reading the file. Please try another file or paste the text.',
-                importTooBig: 'The file is too large (up to 8MB).',
-                importOldDoc: 'Error reading the file. Please try another file or paste the text.',
-                importScanned: 'Error reading the file. Please try another file or paste the text.',
-                importPaste: 'Or paste text',
                 importHandoff: 'Continue on desktop',
                 importSample: 'View PDF sample',
-                quickPaste: 'Quick paste',
                 tipSummary: 'Pro tip: include a measurable win — % growth, team size, or budget.',
                 tipExperience: 'Pro tip: start each bullet with a verb (led, grew) and include a number.',
+                tipExperienceLead: 'Fill job title, company and dates. You can also tap a ready example on the job card.',
                 tipEducation: 'Add institution, degree and years. One relevant course beats a long list.',
                 tipSkills: '3–8 strong skills beat a long list. Match them to the role.',
                 handoffBanner: 'Prefer editing on desktop?',
@@ -1462,9 +1406,8 @@ Shoreline B2B
             setLabel('density-legend', pack.densityLegend);
             setLabel('density-hint', pack.densityHint);
             setLabel('custom-accent-caption', pack.customAccent);
-            setLabel('btn-cv-import-label', pack.importCv);
-            setLabel('btn-quick-paste', pack.importPaste || 'או הדבקת טקסט');
             setLabel('tip-summary', pack.tipSummary);
+            setLabel('tip-experience-lead', pack.tipExperienceLead);
             setLabel('tip-experience', pack.tipExperience);
             setLabel('tip-education', pack.tipEducation);
             setLabel('tip-skills', pack.tipSkills);
@@ -1479,7 +1422,6 @@ Shoreline B2B
             setLabel('btn-handoff-email', pack.handoffEmailBtn);
             setLabel('btn-handoff-copy', pack.handoffCopy);
             setLabel('btn-sample-pdf-home', pack.samplePdfCta);
-            setLabel('btn-sample-pdf-studio', pack.samplePdfCta);
             setLabel('sample-pdf-home-hint', pack.samplePdfHint);
             setLabel('sample-pdf-title', pack.samplePdfTitle);
             const sampleClose = document.getElementById('btn-sample-pdf-close');
@@ -1824,6 +1766,14 @@ Shoreline B2B
         }
 
         function parseDatedBlocks(text) {
+            if (window.QCExperience && typeof QCExperience.parse === 'function') {
+                return QCExperience.parse(text).map((job) => ({
+                    date: String((job && job.dates) || '').trim(),
+                    title: String((job && (job.role || job.title)) || '').trim(),
+                    role: String((job && (job.employer || job.company)) || '').trim(),
+                    bullets: Array.isArray(job && job.bullets) ? job.bullets.map((b) => String(b || '').trim()).filter(Boolean) : []
+                })).filter((job) => job.date || job.title || job.role || job.bullets.length);
+            }
             const lines = String(text || '').split('\n');
             const blocks = [];
             let current = null;
@@ -2838,7 +2788,7 @@ Shoreline B2B
 
         function isCvFormField(el) {
             if (!el || !(el instanceof Element)) return false;
-            if (el.closest('#payment-modal, #examples-modal, #quick-paste-modal, #download-code, #download-step')) return false;
+            if (el.closest('#payment-modal, #examples-modal, #download-code, #download-step')) return false;
             if (el.closest('#studio-form-column, #details-panel, #design-panel, #templates-panel')) {
                 return el.matches('input, textarea, select');
             }
@@ -3703,7 +3653,6 @@ Shoreline B2B
             if (e.key !== 'Escape') return;
             closeExamplesModal();
             closePaymentModal();
-            if (typeof window.closeQuickPaste === 'function') window.closeQuickPaste();
             if (typeof window.closeHandoffModal === 'function') window.closeHandoffModal();
             if (typeof window.closeSamplePdfPreview === 'function') window.closeSamplePdfPreview();
             closeMobilePreview();

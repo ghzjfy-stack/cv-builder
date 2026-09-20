@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=jobs8">
+    <link rel="stylesheet" href="./app.css?v=jobs9">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -450,7 +450,9 @@
                     <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
                     <p class="field-tip" id="tip-experience-lead">מלאו תפקיד, חברה, שנים ותיאור. לחצו + הוסף משרה נוספת לעוד תפקיד.</p>
                     <div id="experience-items" aria-describedby="tip-experience"></div>
-                    <button type="button" id="btn-add-experience" class="experience-add-job-btn">+ הוסף משרה נוספת</button>
+                    <div class="experience-add-wrap">
+                        <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="return addExperienceJob(event);">+ הוסף משרה נוספת</button>
+                    </div>
                     <p class="field-tip" id="tip-experience">טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.</p>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2021 - נוכחי | מנהל מכירות ארצי
 Verde Commerce
@@ -961,7 +963,7 @@ Shoreline B2B
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=jobs7"></script>
+    <script src="lib/experienceEditor.js?v=jobs9"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/templateThumbs.js?v=white1"></script>
@@ -979,6 +981,7 @@ Shoreline B2B
             if (window.QCExperience && typeof QCExperience.addJob === 'function') {
                 return QCExperience.addJob(e);
             }
+            console.log('Add Job clicked', Date.now());
             return false;
         };
         let previewBgClass = 'bg-preview-white';

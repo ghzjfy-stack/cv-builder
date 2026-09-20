@@ -3199,25 +3199,33 @@
         #experience-items { display: grid; gap: 0.85rem; }
         textarea.experience-raw-hidden,
         #in-experience.experience-raw-hidden {
-            position: absolute !important;
+            position: fixed !important;
             width: 1px !important;
             height: 1px !important;
             padding: 0 !important;
-            margin: -1px !important;
+            margin: 0 !important;
             overflow: hidden !important;
             clip: rect(0, 0, 0, 0) !important;
             clip-path: inset(50%) !important;
             white-space: nowrap !important;
             border: 0 !important;
             pointer-events: none !important;
-            left: 0 !important;
+            left: -10000px !important;
             top: 0 !important;
-            z-index: 0;
+            z-index: -1 !important;
             opacity: 0 !important;
         }
         #experience-section {
             overflow: visible;
-            isolation: isolate;
+            position: relative;
+            z-index: 6;
+            pointer-events: auto;
+            isolation: auto;
+        }
+        .experience-add-wrap {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
         }
         #in-experience:not(.experience-raw-hidden) {
             margin-top: 0.5rem;
@@ -3352,12 +3360,20 @@
             color: #e2e8f0;
             font-size: 0.875rem;
             font-weight: 700;
-            cursor: pointer;
+            cursor: pointer !important;
             pointer-events: auto !important;
             position: relative;
-            z-index: 5;
+            z-index: 10;
             touch-action: manipulation;
             scroll-margin-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+        }
+        .experience-add-job-btn[disabled],
+        #btn-add-experience[disabled],
+        .experience-add-job-btn[aria-disabled="true"],
+        #btn-add-experience[aria-disabled="true"] {
+            opacity: 1 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
         .experience-add-job-btn:hover,
         #btn-add-experience:hover {

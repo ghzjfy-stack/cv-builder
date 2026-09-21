@@ -9,6 +9,7 @@ export const CHECKOUT = {
   bitPhoneCopy: "0543554888",
   bitPhoneIntl: "972543554888",
   bitAppUrl: "https://www.bitpay.co.il/app/",
+  bitMeUrl: "https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F",
   payboxPayUrl: "https://www.payboxapp.com/",
   payboxCardUrl: "https://www.payboxapp.com/",
   whatsappMessage: 'היי, שילמתי 10 ש"ח ב-Bit עבור קורות החיים.',
@@ -44,20 +45,30 @@ export function bitAmountValue(total = CHECKOUT.amountIls) {
   return Number(total).toFixed(2);
 }
 
-export function bitSendPath(total = CHECKOUT.amountIls) {
-  const phone = CHECKOUT.bitPhoneCopy;
+export function bitAmountQuery(total = CHECKOUT.amountIls) {
   const amount = bitAmountValue(total);
+  return [
+    `sum=${encodeURIComponent(amount)}`,
+    `amount=${encodeURIComponent(amount)}`,
+  ].join("&");
+}
+
+export function bitSendPath(total = CHECKOUT.amountIls) {
+  const me = String(CHECKOUT.bitMeUrl || "").replace(/^https?:\/\//, "").replace(/\/?$/, "");
+  if (me) return `${me}?${bitAmountQuery(total)}`;
+  const phone = CHECKOUT.bitPhoneCopy;
   const query = [
     `phone=${encodeURIComponent(phone)}`,
     `phoneNumber=${encodeURIComponent(phone)}`,
-    `sum=${encodeURIComponent(amount)}`,
-    `amount=${encodeURIComponent(amount)}`,
+    bitAmountQuery(total),
   ].join("&");
   return `www.bitpay.co.il/app/?${query}`;
 }
 
-/** Safari-safe Bit https request / web bridge URL (never a custom scheme). */
+/** Safari-safe Bit https URL: personal payment page with 10 ₪ pre-filled. */
 export function bitWebPayUrl(total = CHECKOUT.amountIls) {
+  const me = String(CHECKOUT.bitMeUrl || "").replace(/\/?$/, "");
+  if (me) return `${me}?${bitAmountQuery(total)}`;
   return `https://${bitSendPath(total)}`;
 }
 

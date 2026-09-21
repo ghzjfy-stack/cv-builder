@@ -671,102 +671,254 @@
             display: grid;
             gap: 1.25rem;
         }
-        .ba-compare {
+        .home-ba-section {
+            padding-top: 3.25rem;
+            padding-bottom: 3.75rem;
+        }
+        .home-ba-head {
+            max-width: 40rem;
+            margin-bottom: 1.75rem;
+        }
+        .home-ba-head .home-section-lead {
+            max-width: 38rem;
+            margin-bottom: 0;
+            font-size: 1.02rem;
+        }
+        .home-ba-section .ba-compare {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 0.9rem;
+            gap: 1.1rem;
+            align-items: stretch;
+        }
+        .home-ba-section .ba-vs { display: none; }
+        .ba-vs {
+            display: none;
+            margin: 0;
+            align-self: center;
+            justify-self: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(45, 212, 191, 0.28);
+            color: #99f6e4;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
         }
         .ba-panel {
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 0.55rem;
+            gap: 0.65rem;
             min-width: 0;
         }
         .ba-caption {
+            display: inline-flex;
+            align-self: center;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0 auto;
+            padding: 0.28rem 0.75rem;
+            border-radius: 999px;
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.02em;
             color: #c5d0e0;
             text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(232, 238, 247, 0.1);
+        }
+        .ba-panel-before .ba-caption {
+            color: #cbd5e1;
+            background: rgba(71, 85, 105, 0.22);
+            border-color: rgba(148, 163, 184, 0.22);
+        }
+        .ba-panel-after .ba-caption {
+            color: #99f6e4;
+            background: rgba(13, 148, 136, 0.18);
+            border-color: rgba(45, 212, 191, 0.32);
         }
         .ba-doc {
-            border-radius: 0.75rem;
-            padding: 1rem 1.05rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.42rem;
-            min-height: 15.5rem;
+            border-radius: 0.85rem;
+            min-height: 22.5rem;
             box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
         }
         .ba-word {
-            background: #fff;
-            font-family: 'Times New Roman', Times, serif;
-            color: #222;
-            box-shadow: inset 0 0 0 1px #d0d0d0, 0 14px 32px rgba(0, 0, 0, 0.18);
-        }
-        .ba-word-head {
+            background: #f3f0e7;
+            color: #111;
+            font-family: 'Times New Roman', 'David Libre', 'David', serif;
+            padding: 0.55rem 0.58rem 0.6rem !important;
+            border-radius: 0.12rem;
+            box-shadow: inset 0 0 0 1px #c9c3b4, 0 10px 22px rgba(0, 0, 0, 0.18);
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.75rem;
-            direction: rtl;
+            flex-direction: column;
+            gap: 0;
+            line-height: 1.18;
+            letter-spacing: 0;
+            min-height: 22rem;
         }
-        .ba-word .ba-kicker {
-            font-family: Arial, sans-serif;
-            font-size: 0.62rem;
-            color: #1a5fb4;
+        .ba-word p {
+            margin: 0;
+            font-weight: 400;
+        }
+        .ba-w-doc-title {
+            font-size: 0.92rem;
+            font-weight: 700;
             text-decoration: underline;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            text-underline-offset: 2px;
+            margin-bottom: 0.12rem !important;
         }
-        .ba-word .ba-name {
-            font-family: Arial Black, Arial, sans-serif;
-            font-size: 1.15rem;
-            color: #000080;
-            line-height: 1.15;
-            margin-top: 0.15rem;
+        .ba-w-name {
+            font-size: 0.88rem;
+            font-family: Arial, 'Noto Sans Hebrew', sans-serif;
         }
-        .ba-word .ba-role {
-            font-size: 0.78rem;
-            color: #334155;
-            font-style: italic;
-            margin-top: 0.1rem;
+        .ba-w-meta {
+            font-size: 0.62rem;
+            line-height: 1.35;
+            margin: 0.08rem 0 0.28rem !important;
+            font-family: Arial, 'Noto Sans Hebrew', sans-serif;
         }
-        .ba-word .ba-clip {
-            width: 2.45rem;
-            height: 2.45rem;
-            border-radius: 0.2rem;
-            background: linear-gradient(#7cb3e0, #3d6ea0);
-            border: 2px solid #1a5fb4;
-            flex-shrink: 0;
+        .ba-w-link {
+            color: #0000ee;
+            text-decoration: underline;
         }
-        .ba-word .ba-line {
-            height: 7px;
-            background: #e4e4e4;
-            border-radius: 0;
+        .ba-w-block {
+            font-size: 0.68rem;
+            margin: 0.12rem 0 0 !important;
+            text-align: justify;
         }
-        .ba-word .ba-bullet {
-            font-size: 0.72rem;
-            color: #333;
-            font-family: Calibri, Arial, sans-serif;
-            line-height: 1.45;
+        .ba-w-h {
+            font-weight: 700;
+            text-decoration: underline;
         }
         .ba-pro {
-            background: #fbf8f2;
-            border: 1px solid rgba(184, 154, 106, 0.28);
-            font-family: 'Rubik', 'Heebo', sans-serif;
-            gap: 0.55rem;
+            background: #ffffff;
+            font-family: 'Heebo', 'Rubik', sans-serif;
+            padding: 1.35rem 1.3rem 1.4rem !important;
+            min-height: 22rem;
+            border-radius: 0.9rem;
+            border: 1px solid rgba(45, 212, 191, 0.22);
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(45, 212, 191, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            color: #0f172a;
         }
-        .ba-pro .home-paper-name {
-            font-size: 1.2rem;
-        }
-        .ba-pro .home-paper-line {
+        .ba-pro-name {
             margin: 0;
+            font-size: 1.32rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            color: #0f172a;
+        }
+        .ba-pro-role {
+            margin: 0.28rem 0 0;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #0f766e;
+        }
+        .ba-pro-rule {
+            width: 2.55rem;
+            height: 3px;
+            margin: 0.55rem 0 0.65rem;
+            background: #2dd4bf;
+            border-radius: 99px;
+        }
+        .ba-pro-contact {
+            margin: 0;
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 0.01em;
+        }
+        .ba-pro-h {
+            margin: 0.85rem 0 0.38rem;
+            padding-bottom: 0.22rem;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .ba-pro-p {
+            margin: 0;
+            font-size: 0.68rem;
+            line-height: 1.45;
+            color: #334155;
+            font-weight: 500;
+        }
+        .ba-pro-job {
+            margin-bottom: 0.55rem;
+        }
+        .ba-pro-job-top {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .ba-pro-job-title {
+            margin: 0;
+            font-size: 0.74rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        .ba-pro-job-dates {
+            margin: 0;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        .ba-pro-org {
+            margin: 0.08rem 0 0.18rem;
+            font-size: 0.64rem;
+            font-weight: 600;
+            color: #0f766e;
+        }
+        .ba-pro-li {
+            margin: 0.08rem 0 0;
+            padding-inline-start: 0.75rem;
+            font-size: 0.64rem;
+            line-height: 1.4;
+            color: #334155;
+            position: relative;
+        }
+        .ba-pro-li::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: 0.12rem;
+            top: 0.48em;
+            width: 0.28rem;
+            height: 0.28rem;
+            border-radius: 99px;
+            background: #2dd4bf;
+        }
+        .ba-pro-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.32rem;
+            margin: 0.15rem 0 0;
+        }
+        .ba-pro-skills span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 1.35rem;
+            padding: 0.12rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.08);
+            color: #115e59;
+            font-size: 0.58rem;
+            font-weight: 700;
         }
         .home-steps,
-        .home-cards,
-        .home-quotes {
+        .home-cards {
             display: grid;
             gap: 1rem;
         }
@@ -780,11 +932,13 @@
             box-shadow: none;
         }
         .home-step-num {
+            display: inline-block;
+            unicode-bidi: isolate;
             font-family: 'Secular One', 'Heebo', sans-serif;
             color: #2dd4bf;
-            font-size: 1.25rem;
+            font-size: 1.02rem;
             font-weight: 400;
-            margin-bottom: 0.35rem;
+            margin-inline-end: 0.15rem;
         }
         .home-step h3,
         .home-card h3 {
@@ -898,17 +1052,19 @@
         .home-price > * { position: relative; z-index: 1; }
         .home-price h2 { color: #f4f7fb; margin-bottom: 0.4rem; }
         .home-price p { color: #a8b6cc; font-size: 0.95rem; line-height: 1.7; }
-        .home-price-tag {
+        .home-price .home-price-tag {
             font-family: 'Secular One', 'Heebo', sans-serif;
             font-size: clamp(2.8rem, 7vw, 4.2rem);
             line-height: 1;
             color: #2dd4bf;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: flex-end;
+            justify-self: end;
             gap: 0.4rem;
+            margin: 0;
         }
-        .home-price-tag .home-price-was {
+        .home-price .home-price-tag .home-price-was {
             color: rgba(168, 182, 204, 0.72);
             font-size: 1.15rem;
         }
@@ -916,7 +1072,14 @@
             color: #7dd3c7 !important;
             font-size: 0.9rem !important;
             font-weight: 600;
-            max-width: 20rem;
+            max-width: 34rem;
+        }
+        .home-price-foot {
+            margin: 1rem 0 0;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #9aabc4;
+            letter-spacing: 0.01em;
         }
         .home-price-tag small {
             font-size: 0.35em;
@@ -954,10 +1117,14 @@
         @media (min-width: 640px) {
             .home-band-row { grid-template-columns: repeat(3, 1fr); }
             .home-steps { grid-template-columns: repeat(3, 1fr); }
-            .home-quotes { grid-template-columns: repeat(2, 1fr); }
             .home-ats-logos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
             .pay-packs { grid-template-columns: 1fr 1fr; }
-            .ba-compare { grid-template-columns: 1fr 1fr; gap: 1rem; }
+            .home-ba-section .ba-compare {
+                grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+                gap: 0.85rem;
+                align-items: stretch;
+            }
+            .home-ba-section .ba-vs { display: flex; }
             .home-cards--tools {
                 grid-template-columns: repeat(3, minmax(0, 22rem));
                 justify-content: center;
@@ -972,9 +1139,7 @@
             }
             .home-layouts { grid-template-columns: repeat(6, 1fr); }
             .home-price { grid-template-columns: 1.2fr 0.8fr; padding: 2.25rem 2.4rem; }
-            .home-quotes { grid-template-columns: repeat(3, 1fr); }
             .home-ats-logos { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-            .home-compare { grid-template-columns: 0.92fr 1.08fr; align-items: center; }
         }
         .skip-link {
             position: fixed;
@@ -3606,9 +3771,18 @@
         #experience-section {
             overflow: visible;
             position: relative;
-            z-index: 6;
+            z-index: 12;
             pointer-events: auto;
-            isolation: auto;
+            isolation: isolate;
+        }
+        #experience-items {
+            position: relative;
+            z-index: 4;
+        }
+        #experience-section > #btn-add-experience {
+            position: relative;
+            z-index: 30;
+            margin-top: 0.55rem;
         }
         #experience-section > .field-tip,
         #education-section > .field-tip,
@@ -4453,8 +4627,7 @@
             gap: 0.4rem;
         }
         .handoff-banner-cta,
-        .handoff-action,
-        .sample-pdf-open-btn {
+        .handoff-action {
             min-height: 2.75rem;
             padding: 0 1rem;
             border-radius: 0.85rem;
@@ -4512,27 +4685,6 @@
             padding: 0;
             background: rgba(2, 6, 23, 0.72);
             backdrop-filter: blur(14px);
-        }
-        .sample-pdf-home-cta {
-            margin-top: 1.1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.35rem;
-        }
-        .sample-pdf-open-btn {
-            background: #0f766e;
-            color: #ecfeff;
-            border: 1px solid rgba(45, 212, 191, 0.45);
-        }
-        .sample-pdf-open-btn:hover,
-        .sample-pdf-open-btn:focus-visible {
-            background: #0d9488;
-        }
-        .sample-pdf-home-hint {
-            margin: 0;
-            font-size: 0.78rem;
-            color: #9aabc4;
         }
         .sample-pdf-overlay .sample-pdf-panel {
             position: relative;
@@ -4760,8 +4912,7 @@
             #handoff-banner,
             #handoff-modal,
             #sample-pdf-modal,
-            .field-tip,
-            .sample-pdf-home-cta {
+            .field-tip {
                 display: none !important;
             }
         }

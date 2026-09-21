@@ -68,7 +68,7 @@ function cardHtml(tpl: CvTemplate): string {
 function updateCountCopy(_n: number): void {
   const L = lang();
   const he = {
-    home: "תבניות מעוצבות ומותאמות לסינון ATS. בחרו עיצוב, מלאו פרטים, והתצוגה מתעדכנת בזמן אמת.",
+    home: "תבניות מודרניות המותאמות למערכות סינון (ATS). ממלאים את הפרטים, רואים את התצוגה המקדימה בזמן אמת והקובץ מוכן להגשה.",
     studio: "בחרו עיצוב לקורות החיים",
   };
   const en = {

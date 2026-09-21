@@ -1,93 +1,17 @@
-.home-compare { display: grid; gap: 1.25rem; }
-@media (min-width: 900px) {
-    .home-compare { grid-template-columns: 0.92fr 1.08fr; align-items: center; }
-}
-.ba-compare {
+.home-ba-section .ba-compare {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0.9rem;
+    gap: 1.1rem;
 }
+.home-ba-section .ba-vs { display: none; }
 @media (min-width: 640px) {
-    .ba-compare { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .home-ba-section .ba-compare {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 0.85rem;
+        align-items: stretch;
+    }
+    .home-ba-section .ba-vs { display: flex; }
 }
-.ba-panel {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    min-width: 0;
-}
-.ba-caption {
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    color: #c5d0e0;
-    text-align: center;
-}
-.ba-doc {
-    border-radius: 0.75rem;
-    padding: 1rem 1.05rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.42rem;
-    min-height: 15.5rem;
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
-}
-.ba-word {
-    background: #fff;
-    font-family: 'Times New Roman', Times, serif;
-    color: #222;
-    box-shadow: inset 0 0 0 1px #d0d0d0, 0 14px 32px rgba(0, 0, 0, 0.18);
-}
-.ba-word-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    direction: rtl;
-}
-.ba-word .ba-kicker {
-    font-family: Arial, sans-serif;
-    font-size: 0.62rem;
-    color: #1a5fb4;
-    text-decoration: underline;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-.ba-word .ba-name {
-    font-family: Arial Black, Arial, sans-serif;
-    font-size: 1.15rem;
-    color: #000080;
-    line-height: 1.15;
-    margin-top: 0.15rem;
-}
-.ba-word .ba-role {
-    font-size: 0.78rem;
-    color: #334155;
-    font-style: italic;
-    margin-top: 0.1rem;
-}
-.ba-word .ba-clip {
-    width: 2.45rem; height: 2.45rem; border-radius: 0.2rem;
-    background: linear-gradient(#7cb3e0, #3d6ea0);
-    border: 2px solid #1a5fb4;
-    flex-shrink: 0;
-}
-.ba-word .ba-line { height: 7px; background: #e4e4e4; border-radius: 0; }
-.ba-word .ba-bullet {
-    font-size: 0.72rem;
-    color: #333;
-    font-family: Calibri, Arial, sans-serif;
-    line-height: 1.45;
-}
-.ba-pro {
-    background: #fbf8f2;
-    border: 1px solid rgba(184, 154, 106, 0.28);
-    font-family: 'Rubik', 'Heebo', sans-serif;
-    gap: 0.55rem;
-}
-.ba-pro .home-paper-name { font-size: 1.2rem; }
-.ba-pro .home-paper-line { margin: 0; }
 .guarantee-badge {
     display: inline-flex;
     align-items: center;

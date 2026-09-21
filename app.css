@@ -3326,68 +3326,146 @@
             z-index: 2;
         }
         .experience-item-remove { min-width: 2.5rem; }
-        #experience-items { display: grid; gap: 0.85rem; }
+        #experience-items { display: grid; gap: 0.6rem; }
         .section-editor-head {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             justify-content: space-between;
             gap: 0.75rem;
             position: relative;
             z-index: 12;
             pointer-events: auto !important;
+            margin-bottom: 0.15rem;
+        }
+        .section-editor-head .dynamic-text {
+            margin: 0;
         }
         .section-raw-toggle {
             flex: 0 0 auto;
-            min-height: 2.25rem;
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            border: 1px solid #475569;
-            background: #1e293b;
-            color: #e2e8f0;
-            font-size: 0.75rem;
-            font-weight: 800;
+            min-height: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            color: #64748b;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            line-height: 1.2;
             cursor: pointer !important;
             pointer-events: auto !important;
             position: relative;
             z-index: 20;
             white-space: nowrap;
+            text-decoration: none;
+            box-shadow: none;
         }
-        .section-raw-toggle:hover,
+        .section-raw-toggle:hover {
+            color: #94a3b8;
+            text-decoration: underline;
+            background: transparent;
+            border-color: transparent;
+        }
         .section-raw-toggle[aria-pressed="true"] {
-            border-color: #00E5FF;
-            color: #00E5FF;
-            background: rgba(0, 229, 255, 0.1);
+            color: #67e8f9;
+            background: transparent;
+            border-color: transparent;
+            text-decoration: underline;
         }
-        .section-add-btn {
+        .section-add-btn,
+        .experience-add-job-btn,
+        #btn-add-experience,
+        #btn-add-education,
+        #btn-add-military {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.45rem;
+            gap: 0.35rem;
             width: 100%;
-            min-height: 2.75rem;
-            padding: 0.65rem 1rem;
-            border: 0;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #5eead4 0%, #22d3ee 42%, #06b6d4 100%);
-            color: #082f49;
-            font-size: 0.875rem;
-            font-weight: 800;
+            min-height: 2.35rem;
+            margin-top: 0.35rem;
+            padding: 0.4rem 0.8rem;
+            border: 1px dashed #475569;
+            border-radius: 0.7rem;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            box-shadow: none;
             cursor: pointer !important;
             pointer-events: auto !important;
             position: relative;
             z-index: 20;
-            box-shadow: 0 8px 18px rgba(6, 182, 212, 0.28);
+            isolation: isolate;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            scroll-margin-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+            transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
         }
-        .section-add-btn * {
+        .section-add-btn *,
+        .experience-add-job-btn *,
+        #btn-add-experience * {
             pointer-events: none;
         }
-        .section-add-btn:hover {
-            filter: brightness(1.06);
-            transform: translateY(-1px);
+        .experience-add-icon {
+            display: inline;
+            width: auto;
+            height: auto;
+            background: none;
+            border-radius: 0;
+            color: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1;
         }
-        .section-add-btn:active {
-            transform: translateY(1px);
-            filter: brightness(0.96);
+        #btn-add-experience-label,
+        #btn-add-education-label,
+        #btn-add-military-label {
+            pointer-events: none;
+        }
+        .section-add-btn:hover,
+        .experience-add-job-btn:hover,
+        #btn-add-experience:hover,
+        #btn-add-education:hover,
+        #btn-add-military:hover {
+            border-color: #64748b;
+            color: #e2e8f0;
+            background: rgba(15, 23, 42, 0.55);
+            filter: none;
+            box-shadow: none;
+            transform: none;
+        }
+        .section-add-btn:active,
+        .experience-add-job-btn:active,
+        #btn-add-experience:active,
+        #btn-add-education:active,
+        #btn-add-military:active {
+            background: rgba(15, 23, 42, 0.85);
+            filter: none;
+            box-shadow: none;
+            transform: none;
+        }
+        .section-add-btn:focus-visible,
+        .experience-add-job-btn:focus-visible,
+        #btn-add-experience:focus-visible,
+        #btn-add-education:focus-visible,
+        #btn-add-military:focus-visible {
+            outline: 2px solid #64748b;
+            outline-offset: 2px;
+        }
+        .section-add-btn[disabled],
+        .experience-add-job-btn[disabled],
+        #btn-add-experience[disabled],
+        #btn-add-education[disabled],
+        #btn-add-military[disabled],
+        .section-add-btn[aria-disabled="true"],
+        .experience-add-job-btn[aria-disabled="true"],
+        #btn-add-experience[aria-disabled="true"] {
+            opacity: 1 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
         #education-section,
         #military-section,
@@ -3400,7 +3478,7 @@
         #education-items,
         #military-items {
             display: grid;
-            gap: 0.75rem;
+            gap: 0.6rem;
             pointer-events: auto !important;
         }
         textarea.experience-raw-hidden,
@@ -3458,10 +3536,10 @@
         .experience-card {
             border: 1px solid rgb(51 65 85);
             background: rgba(15, 23, 42, 0.72);
-            border-radius: 1rem;
-            padding: 0.9rem;
+            border-radius: 0.85rem;
+            padding: 0.7rem;
             display: grid;
-            gap: 0.7rem;
+            gap: 0.5rem;
             pointer-events: auto;
             position: relative;
             z-index: 2;
@@ -3480,10 +3558,10 @@
             gap: 0.5rem;
         }
         .experience-card-badge {
-            font-size: 0.72rem;
-            font-weight: 800;
+            font-size: 0.68rem;
+            font-weight: 700;
             letter-spacing: 0.04em;
-            color: #67e8f9;
+            color: #94a3b8;
             text-transform: uppercase;
         }
         .experience-card-actions {
@@ -3491,15 +3569,15 @@
             gap: 0.35rem;
         }
         .experience-icon-btn {
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 2rem;
+            height: 2rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.7rem;
+            border-radius: 0.55rem;
             border: 1px solid rgb(71 85 105);
             background: rgb(30 41 59);
-            color: #e2e8f0;
+            color: #cbd5e1;
             cursor: pointer !important;
             pointer-events: auto !important;
             position: relative;
@@ -3520,12 +3598,12 @@
         }
         .experience-field {
             display: grid;
-            gap: 0.35rem;
+            gap: 0.25rem;
         }
         .experience-field-label {
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #cbd5e1;
         }
         .experience-dates-row {
             display: grid;
@@ -3535,14 +3613,14 @@
         }
         .experience-present-btn,
         .experience-preset-chip {
-            min-height: 2.5rem;
-            padding: 0 0.8rem;
+            min-height: 2.1rem;
+            padding: 0 0.7rem;
             border-radius: 999px;
             border: 1px solid rgb(71 85 105);
             background: rgb(30 41 59);
             color: #e2e8f0;
-            font-size: 0.75rem;
-            font-weight: 800;
+            font-size: 0.72rem;
+            font-weight: 700;
             cursor: pointer !important;
             pointer-events: auto !important;
             white-space: nowrap;
@@ -3555,8 +3633,8 @@
             background: rgba(0, 229, 255, 0.1);
         }
         .experience-desc {
-            min-height: 7.5rem;
-            line-height: 1.55;
+            min-height: 6rem;
+            line-height: 1.5;
             resize: vertical;
         }
         .experience-presets {
@@ -3574,80 +3652,6 @@
             flex-wrap: wrap;
             gap: 0.4rem;
         }
-        .experience-add-job-btn,
-        #btn-add-experience {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            width: 100%;
-            min-height: 3.15rem;
-            margin-top: 0.55rem;
-            padding: 0.85rem 1.35rem;
-            border: 0;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #5eead4 0%, #22d3ee 42%, #06b6d4 100%);
-            color: #082f49;
-            font-size: 0.95rem;
-            font-weight: 800;
-            letter-spacing: 0.01em;
-            box-shadow: 0 10px 24px rgba(6, 182, 212, 0.32);
-            cursor: pointer !important;
-            pointer-events: auto !important;
-            position: relative;
-            z-index: 20;
-            isolation: isolate;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            scroll-margin-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
-            transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
-        }
-        .experience-add-job-btn *,
-        #btn-add-experience * {
-            pointer-events: none;
-        }
-        .experience-add-icon {
-            display: inline-flex;
-            width: 1.7rem;
-            height: 1.7rem;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            background: rgba(8, 47, 73, 0.18);
-            color: #082f49;
-            font-size: 1.2rem;
-            font-weight: 800;
-            line-height: 1;
-        }
-        #btn-add-experience-label {
-            pointer-events: none;
-        }
-        .experience-add-job-btn[disabled],
-        #btn-add-experience[disabled],
-        .experience-add-job-btn[aria-disabled="true"],
-        #btn-add-experience[aria-disabled="true"] {
-            opacity: 1 !important;
-            cursor: pointer !important;
-            pointer-events: auto !important;
-        }
-        .experience-add-job-btn:hover,
-        #btn-add-experience:hover {
-            filter: brightness(1.07);
-            box-shadow: 0 14px 30px rgba(6, 182, 212, 0.42);
-            transform: translateY(-1px);
-        }
-        .experience-add-job-btn:active,
-        #btn-add-experience:active {
-            filter: brightness(0.95);
-            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.28);
-            transform: translateY(1px);
-        }
-        .experience-add-job-btn:focus-visible,
-        #btn-add-experience:focus-visible {
-            outline: 2px solid #00E5FF;
-            outline-offset: 3px;
-        }
         @media (max-width: 640px) {
             .experience-dates-row {
                 grid-template-columns: 1fr;
@@ -3664,7 +3668,7 @@
         .experience-card-fields {
             flex: 1;
             display: grid;
-            gap: 0.7rem;
+            gap: 0.5rem;
         }
         .experience-remove-job {
             min-height: 2.5rem;

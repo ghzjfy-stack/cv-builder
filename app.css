@@ -248,7 +248,7 @@
             width: 100%;
             max-width: 100%;
             min-width: 0;
-            min-height: 0 !important;
+            min-height: 100%;
             height: auto;
             max-height: none;
             padding-bottom: 0;
@@ -260,7 +260,7 @@
             break-after: avoid;
             transform: scale(var(--cv-fit-scale, 1));
             transform-origin: top center;
-            overflow: hidden;
+            overflow: visible;
         }
         #cl-preview-wrapper #cl-target {
             box-sizing: border-box;
@@ -1402,6 +1402,28 @@
         .dynamic-bg { background-color: var(--accent); }
         .dynamic-icon { color: var(--accent); }
 
+        /* Candidate name stays classic dark ink — accent is for headers, rules, icons, skills. */
+        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
+        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
+        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
+        #cl-target #cl-out-name {
+            color: #1e293b;
+        }
+        #cv-target .cv-section-title,
+        #qc-print-host .cv-print-sheet .cv-section-title {
+            border-bottom-color: var(--accent);
+        }
+        #cv-target .cv-sec-ico,
+        #cv-target .cv-contact-ico,
+        #qc-print-host .cv-print-sheet .cv-sec-ico,
+        #qc-print-host .cv-print-sheet .cv-contact-ico {
+            color: var(--accent);
+        }
+        #cv-target .cv-skill-list li::marker,
+        #qc-print-host .cv-print-sheet .cv-skill-list li::marker {
+            color: var(--accent);
+        }
+
         .bg-preview-white,
         .bg-preview-slate,
         .bg-preview-cream,
@@ -1430,9 +1452,51 @@
             unicode-bidi: isolate;
             overflow: visible;
             word-wrap: break-word;
-            overflow-wrap: break-word;
-            word-break: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
             color: #1e293b;
+        }
+        #cv-target #out-name,
+        #cv-target #out-title,
+        #cv-target .cv-contact-row,
+        #cv-target .cv-contact-row span,
+        #cv-target .cv-contact-link,
+        #cv-target .cv-job-date,
+        #cv-target .cv-job-title,
+        #cv-target .cv-job-role,
+        #cv-target .cv-job-body,
+        #cv-target .cv-lang-row,
+        #cv-target .cv-lang-name,
+        #cv-target .cv-edu-school,
+        #cv-target .cv-edu-meta,
+        #cv-target-page2 #out-name,
+        #cv-target-page2 #out-title,
+        #cv-target-page2 .cv-contact-row,
+        #cv-target-page2 .cv-contact-link,
+        #qc-print-host .cv-print-sheet #out-name,
+        #qc-print-host .cv-print-sheet #out-title,
+        #qc-print-host .cv-print-sheet .cv-contact-row,
+        #qc-print-host .cv-print-sheet .cv-contact-link {
+            min-width: 0;
+            max-width: 100%;
+            overflow: visible;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            white-space: normal;
+        }
+        #cv-target .cv-contact-row,
+        #cv-target-page2 .cv-contact-row,
+        #qc-print-host .cv-print-sheet .cv-contact-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+        }
+        #cv-target .cv-contact-row > span:last-child,
+        #cv-target .cv-contact-link,
+        #cv-target-page2 .cv-contact-row > span:last-child,
+        #qc-print-host .cv-print-sheet .cv-contact-link {
+            flex: 1 1 auto;
+            min-width: 0;
         }
         html[data-cv-density="compact"] {
             --cv-density: 0.78;
@@ -1764,7 +1828,7 @@
 
         .layout-sidebar .cv-columns {
             display: grid;
-            grid-template-columns: 0.34fr 1fr;
+            grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
             grid-template-areas: "side main";
             gap: calc(1.25rem * var(--cv-scale));
             align-items: start;
@@ -1799,7 +1863,7 @@
 
         .layout-split .cv-columns {
             display: grid;
-            grid-template-columns: 1fr 0.34fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr);
             grid-template-areas: "main side";
             gap: calc(1.25rem * var(--cv-scale));
             align-items: start;
@@ -1893,8 +1957,8 @@
             --charcoal-deep: #3f3f3f;
             --charcoal-line: rgba(255, 255, 255, 0.55);
             display: grid;
-            grid-template-columns: 0.34fr 1fr;
-            grid-template-rows: auto auto;
+            grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
+            grid-template-rows: auto 1fr;
             grid-template-areas: "side head" "side main";
             min-height: 0;
             height: auto;
@@ -1905,14 +1969,14 @@
             font-family: var(--cv-font), 'Lato', 'Rubik', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
-            overflow: hidden;
+            overflow: visible;
         }
         #qc-print-host .cv-print-sheet.layout-charcoal {
             --charcoal: #4c4c4c;
             --charcoal-deep: #3f3f3f;
             --charcoal-line: rgba(255, 255, 255, 0.55);
             display: grid;
-            grid-template-columns: 0.34fr 1fr;
+            grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
             grid-template-rows: auto 1fr;
             grid-template-areas: "side head" "side main";
             min-height: 297mm;
@@ -1923,7 +1987,7 @@
             font-family: var(--cv-font), 'Lato', 'Rubik', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
-            overflow: hidden;
+            overflow: visible;
         }
         .layout-charcoal .cv-columns { display: contents; }
         .layout-charcoal .cv-sidebar {
@@ -2014,9 +2078,10 @@
             font-family: var(--cv-font), 'Playfair Display', 'Frank Ruhl Libre', serif;
             font-weight: 600;
             font-size: calc(2.15rem * var(--cv-scale));
-            letter-spacing: 0.08em;
+            letter-spacing: 0.04em;
             line-height: 1.15;
             text-transform: uppercase;
+            overflow-wrap: anywhere;
         }
         .layout-charcoal #out-title {
             margin-top: 0.7rem;
@@ -2050,7 +2115,7 @@
             border-bottom: 0;
             padding-bottom: 0.35rem;
             margin-bottom: 0.65rem;
-            color: var(--charcoal-title, #3f3f3f) !important;
+            color: var(--accent) !important;
             position: relative;
         }
         .layout-charcoal .cv-section-title::after,
@@ -2061,7 +2126,7 @@
             right: 0;
             bottom: 0;
             height: 1px;
-            background: #d4d4d4;
+            background: var(--accent);
         }
         .layout-charcoal .cv-sidebar .cv-section-title {
             justify-content: center;
@@ -2076,7 +2141,7 @@
             display: inline-flex;
             width: 1.05rem;
             height: 1.05rem;
-            color: var(--charcoal, #4c4c4c);
+            color: var(--accent);
             flex: none;
         }
         .layout-charcoal .cv-sec-ico svg {
@@ -2165,7 +2230,7 @@
         }
         .layout-charcoal .cv-job {
             display: grid;
-            grid-template-columns: 5.6rem 12px 1fr;
+            grid-template-columns: minmax(0, 5.6rem) 12px minmax(0, 1fr);
             column-gap: 0.15rem;
             margin-bottom: 0.85rem;
             direction: ltr;
@@ -2176,7 +2241,8 @@
             padding-top: 0.15rem;
             text-align: right;
             direction: ltr;
-            white-space: nowrap;
+            white-space: normal;
+            overflow-wrap: anywhere;
         }
         .layout-charcoal .cv-job-rule {
             width: 1px;
@@ -2335,8 +2401,8 @@
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
             display: grid;
-            grid-template-columns: 0.36fr 0.64fr;
-            grid-template-rows: auto auto auto;
+            grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+            grid-template-rows: auto auto 1fr;
             grid-template-areas:
                 "photo main"
                 "head main"
@@ -2350,14 +2416,14 @@
             font-family: var(--cv-font), 'Montserrat', 'Heebo', 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
-            overflow: hidden;
+            overflow: visible;
         }
         #qc-print-host .cv-print-sheet.layout-navy {
             --navy: #12192b;
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
             display: grid;
-            grid-template-columns: 0.36fr 0.64fr;
+            grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
             grid-template-rows: auto auto 1fr;
             grid-template-areas:
                 "photo main"
@@ -2371,7 +2437,7 @@
             font-family: var(--cv-font), 'Montserrat', 'Heebo', 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
-            overflow: hidden;
+            overflow: visible;
         }
         .layout-navy .cv-columns,
         .layout-navy .cv-sidebar {
@@ -2427,9 +2493,10 @@
         .layout-navy #out-name {
             font-weight: 700;
             font-size: calc(1.05rem * var(--cv-scale));
-            letter-spacing: 0.14em;
+            letter-spacing: 0.06em;
             line-height: 1.25;
             text-transform: uppercase;
+            overflow-wrap: anywhere;
         }
         .layout-navy #out-title {
             margin-top: 0.28rem;
@@ -2479,7 +2546,7 @@
             border-bottom: 0;
             padding-bottom: 0.42rem;
             margin-bottom: 0.7rem;
-            color: var(--navy) !important;
+            color: var(--accent) !important;
             position: relative;
         }
         .layout-navy .cv-section-title::after,
@@ -2489,7 +2556,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-bottom: 1px dashed #12192b;
+            border-bottom: 1px dashed var(--accent);
         }
         .layout-navy .cv-sidebar .cv-section-title {
             color: #fff !important;
@@ -4150,10 +4217,27 @@
             gap: 0.55rem;
             align-items: flex-start;
         }
+        .experience-card.is-open,
+        .experience-card {
+            display: grid !important;
+            gap: 0.5rem;
+            overflow: visible !important;
+        }
         .experience-card-fields {
             flex: 1;
-            display: grid;
+            display: grid !important;
             gap: 0.5rem;
+            visibility: visible !important;
+            opacity: 1 !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        .experience-card input,
+        .experience-card textarea {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            max-height: none !important;
         }
         .experience-remove-job {
             min-height: 2.5rem;
@@ -4338,20 +4422,51 @@
         #payment-modal .pay-feedback:empty {
             display: none;
         }
-        #payment-modal .pay-app-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.65rem;
+        #payment-modal .pay-bit-block {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.85rem;
+        }
+        #payment-modal .pay-qr-wrap {
+            margin: 0 auto;
+            padding: 0.65rem 0.65rem 0.5rem;
+            width: fit-content;
+            border-radius: 1.1rem;
+            background: #fff;
+            box-shadow: 0 10px 28px rgba(2, 6, 23, 0.28);
+        }
+        #payment-modal .pay-qr-wrap[hidden] {
+            display: none;
+        }
+        #payment-modal .pay-qr-wrap img {
+            display: block;
+            width: 168px;
+            height: 168px;
+            border-radius: 0.4rem;
+        }
+        #payment-modal .pay-qr-wrap figcaption {
+            margin: 0.4rem 0 0;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #475569;
+            letter-spacing: 0.01em;
         }
         #payment-modal .pay-deeplink {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 3.15rem;
+            width: 100%;
+            min-height: 3.25rem;
             border-radius: 0.95rem;
-            font-size: 0.98rem;
+            font-size: 1rem;
             font-weight: 800;
             letter-spacing: 0.01em;
+        }
+        @media (max-width: 767px) {
+            #payment-modal .pay-qr-wrap {
+                display: none;
+            }
         }
         #payment-modal .pay-verify-btn {
             width: 100%;
@@ -4408,9 +4523,6 @@
             border-radius: 999px;
             background: #34d399;
         }
-        .pay-app-actions {
-            display: block;
-        }
         .pay-deeplink {
             text-decoration: none;
             border: 1px solid transparent;
@@ -4431,11 +4543,6 @@
         .pay-deeplink-bit {
             background: #00c2c7;
             color: #0b1f3a;
-            border-color: rgba(255, 255, 255, 0.18);
-        }
-        .pay-deeplink-paybox {
-            background: #5b4dff;
-            color: #fff;
             border-color: rgba(255, 255, 255, 0.18);
         }
         .qc-pay-toast {
@@ -4601,7 +4708,7 @@
 
             html.qc-print-mode #qc-print-host .layout-charcoal {
                 display: grid !important;
-                grid-template-columns: 0.34fr 1fr !important;
+                grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
                 grid-template-rows: auto 1fr !important;
                 grid-template-areas: "side head" "side main" !important;
                 direction: ltr !important;

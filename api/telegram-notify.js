@@ -4,7 +4,7 @@ export const config = {
   maxDuration: 15,
 };
 
-/** POST /api/telegram-notify — create/reuse a pending order and notify Telegram (order id, phone, Bit/PayBox). */
+/** POST /api/telegram-notify — create/reuse a pending order and notify Telegram (order id, phone, Bit). */
 export default async function handler(req, res) {
   try {
     await handleOrderSessionRequest(req, res);

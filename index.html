@@ -13,9 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./azure-layout.css">
+    <link rel="stylesheet" href="./azure-layout.css?v=accent1">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=formux1">
+    <link rel="stylesheet" href="./app.css?v=formux2">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -121,7 +121,7 @@
             <div class="home-inner home-band-row">
                 <p><strong>עברית ואנגלית</strong>פריסה מיושרת לימין או לשמאל לפי שפת הקורות חיים</p>
                 <p><strong>תבניות מנצחות</strong>עיצובים נקיים, מקצועיים ומותאמים לסינון ATS</p>
-                <p><strong>הורדה מאובטחת</strong>תשלום מאובטח ב-Bit / PayBox • הורדה מיידית</p>
+                <p><strong>הורדה מאובטחת</strong>תשלום מאובטח ב-Bit • הורדה מיידית</p>
             </div>
         </div>
 
@@ -141,7 +141,7 @@
                     </article>
                     <article class="home-step">
                         <h3><span class="home-step-num">03 |</span> מורידים PDF</h3>
-                        <p>משלמים <span data-price>10</span> ₪ בלבד ב-Bit או PayBox ומורידים קובץ PDF מוכן להגשה למגייסים.</p>
+                        <p>משלמים <span data-price>10</span> ₪ בלבד ב-Bit ומורידים קובץ PDF מוכן להגשה למגייסים.</p>
                     </article>
                 </div>
             </section>
@@ -257,7 +257,7 @@
                     <div>
                         <p class="home-kicker" style="color:#e7c98a">מחיר השקה</p>
                         <h2 id="home-offer">קורות חיים מוכנים להגשה</h2>
-                        <p>תשלום מאובטח ב-Bit או PayBox, אישור מיידי במערכת והורדת קובץ PDF ישר למחשב. בלי מנוי ובלי הפתעות.</p>
+                        <p>תשלום מאובטח ב-Bit, אישור מיידי במערכת והורדת קובץ PDF ישר למחשב. בלי מנוי ובלי הפתעות.</p>
                         <p class="home-price-coffee">פורמט מקצועי המותאם למערכות סינון (ATS) ב-<span data-price>10</span> ₪ בלבד.</p>
                         <p class="home-price-foot" role="status">תשלום חד-פעמי • הורדה מיידית בדפדפן</p>
                         <button type="button" class="home-cta" onclick="showStudio()">יצירת קורות החיים</button>
@@ -335,7 +335,7 @@
                     <p class="text-sm sm:text-base font-extrabold leading-tight">קורות חיים מקצועיים ב-<span data-price>10</span> ₪ בלבד</p>
                 </div>
                 <div class="flex items-center justify-center gap-3">
-                    <p class="hidden sm:block text-xs font-semibold">תשלום מאובטח ב-Bit / PayBox • הורדה מיידית בדפדפן</p>
+                    <p class="hidden sm:block text-xs font-semibold">תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן</p>
                     <button type="button" onclick="openPaymentModal()" class="studio-pay min-h-11 px-4 rounded-full bg-slate-950 text-white font-black text-sm hover:bg-slate-800">
                         לשלם <span data-price>10</span>₪ ולהוריד
                     </button>
@@ -474,7 +474,7 @@
                         <div id="education-items"></div>
                         <button type="button" id="btn-add-education" class="section-add-btn" onclick="handleAddEducation(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
-                            <span id="btn-add-education-label">הוסף השכלה</span>
+                        <span id="btn-add-education-label">הוסף השכלה נוספת</span>
                         </button>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
@@ -656,7 +656,7 @@
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
                 <div id="cv-target" class="layout-classic bg-preview-white" dir="rtl">
                     <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
-                        <h1 id="out-name" class="text-3xl font-bold dynamic-text">ישראל ישראלי</h1>
+                        <h1 id="out-name" class="text-3xl font-bold">ישראל ישראלי</h1>
                         <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים ומכירות</p>
 
                         <div class="cv-contact-header flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-slate-500">
@@ -786,7 +786,7 @@
             <div id="cl-preview-wrapper" class="cv-document-container relative overflow-hidden p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 bg-preview-white">
                 <div id="cl-target" dir="rtl">
                     <p id="cl-out-date" class="text-[11px] text-slate-500"></p>
-                    <h1 id="cl-out-name" class="text-3xl font-bold dynamic-text mt-3"></h1>
+                    <h1 id="cl-out-name" class="text-3xl font-bold mt-3"></h1>
                     <p id="cl-out-title" class="text-sm font-semibold text-slate-600 mt-1"></p>
                     <p id="cl-out-contact" class="text-[11px] text-slate-500 mt-2"></p>
                     <div class="cl-rule" aria-hidden="true"></div>
@@ -875,17 +875,18 @@
             <div id="pay-step" class="pay-step-simple">
                 <div class="pay-head">
                     <h3 id="pay-title">תשלום ₪10 בלבד</h3>
-                    <p id="pay-subtitle">בחרו את האפליקציה המועדפת עליכם לתשלום:</p>
+                    <p id="pay-subtitle">סירקו את הקוד במחשב, או לחצו לפתיחת Bit בנייד.</p>
                 </div>
 
                 <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" value="" class="sr-only" tabindex="-1" aria-hidden="true" dir="ltr">
                 <p id="code-feedback" class="pay-feedback" role="status"></p>
 
-                <div class="pay-app-actions">
-                    <div class="pay-app-grid">
-                        <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">Bit</a>
-                        <a id="btn-open-paybox" href="https://www.payboxapp.com/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-paybox">PayBox</a>
-                    </div>
+                <div class="pay-bit-block">
+                    <figure class="pay-qr-wrap">
+                        <img id="bit-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https%3A%2F%2Fwww.bitpay.co.il%2Fapp%2Fme%2FE4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F%3Fsum%3D10.00%26amount%3D10.00&amp;ecc=M" alt="קוד QR לתשלום 10 ₪ ב-Bit" width="168" height="168">
+                        <figcaption>סריקה מהמחשב</figcaption>
+                    </figure>
+                    <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">שלמו ב-Bit (₪10)</a>
                 </div>
 
                 <div id="pay-live-status" class="hidden pay-live-status" aria-live="polite">
@@ -959,8 +960,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=formux1"></script>
-    <script src="lib/entryEditor.js?v=formux1"></script>
+    <script src="lib/experienceEditor.js?v=formux2"></script>
+    <script src="lib/entryEditor.js?v=formux2"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=tpl-he3"></script>
@@ -969,7 +970,7 @@
     <script src="lib/seoLandings.js"></script>
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
-    <script src="lib/pageFit.js?v=white1"></script>
+    <script src="lib/pageFit.js?v=fit1"></script>
     <script src="lib/handoff.js?v=import3"></script>
     <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
@@ -1095,7 +1096,7 @@
                 'in-linkedin': 'linkedin.com/in/israel',
                 'in-summary': 'מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.',
                 'in-experience': '2021 - נוכחי | מנהל מכירות ארצי\nVerde Commerce\n• ניהול צוות עובדים והגדלת היעדים ב-35%.\n• הובלת הסכמים אסטרטגיים.\n\n2018 - 2021 | מנהל פרויקטים\nShoreline B2B\n• ניהול תקציבים ומעקב אחר אבני דרך בארגון.',
-                'in-education': '2015 - 2018 | BA במנהל עסקים\n2019 | קורס ניהול מוצר',
+                'in-education': '2015 - 2018 | BA במנהל עסקים\n\n2019 | קורס ניהול מוצר',
                 'in-military': '2012 - 2015 | שירות פיקודי בחיל האוויר',
                 'in-skills': 'ניהול צוותים, CRM, Excel מתקדם',
                 'in-languages': 'עברית (שפת אם), אנגלית (מקצועית)'
@@ -1109,7 +1110,7 @@
                 'in-linkedin': 'linkedin.com/in/israel',
                 'in-summary': 'Experienced project manager with a strong record of leading teams and growing sales.',
                 'in-experience': '2021 - Present | National Sales Manager\nVerde Commerce\n• Led a team and grew targets by 35%.\n• Drove strategic agreements.\n\n2018 - 2021 | Project Manager\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
-                'in-education': '2015 - 2018 | BA in Business Administration\n2019 | Product Management Course',
+                'in-education': '2015 - 2018 | BA in Business Administration\n\n2019 | Product Management Course',
                 'in-military': '2012 - 2015 | Command role in the Israeli Air Force',
                 'in-skills': 'Team leadership, CRM, Advanced Excel',
                 'in-languages': 'Hebrew (native), English (professional)'
@@ -1607,6 +1608,13 @@
             return false;
         }
 
+        function refreshSectionEditors() {
+            if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+            if (window.QCEducation && typeof QCEducation.refresh === 'function') QCEducation.refresh();
+            if (window.QCMilitary && typeof QCMilitary.refresh === 'function') QCMilitary.refresh();
+        }
+        window.refreshSectionEditors = refreshSectionEditors;
+
         function fillCvSample(lang) {
             const sample = CV_SAMPLES[lang];
             CV_SAMPLE_IDS.forEach((id) => {
@@ -1614,7 +1622,7 @@
                 if (el) el.value = sample[id];
             });
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
-            if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+            refreshSectionEditors();
         }
 
         function phrasePack() {
@@ -3000,7 +3008,7 @@
                 if (input) input.value = '';
             }
             if (window.QCDraft && typeof QCDraft.clear === 'function') QCDraft.clear();
-            if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+            refreshSectionEditors();
             if (window.QCCoverLetter && typeof QCCoverLetter.render === 'function') QCCoverLetter.render();
             updateCV();
             if (window.QCDraft && typeof QCDraft.save === 'function') QCDraft.save();
@@ -3476,8 +3484,7 @@
             const tpl = (window.QCTemplates || {})[key];
             if (!tpl) return;
             const fromHome = document.body.classList.contains('on-home');
-            const lang = tpl.preferredLang || (window.QCCvLang === 'en' ? 'en' : 'he');
-            // Design/layout only — never overwrite the user's form text.
+            // Design/layout only — never overwrite the user's form text or language.
             if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
             setCvSkin(tpl.skin || '');
             if (tpl.accent) {
@@ -3486,7 +3493,6 @@
             }
             if (tpl.font) setCvFont(tpl.font);
             setPreviewBg('bg-preview-white', null, { silent: true });
-            setCvLang(lang, { restore: true });
             markTemplateCards(key);
             updateCV();
             QCDraft.save();
@@ -4237,7 +4243,7 @@
                 setCvDensity(densityFromScale(draft && draft.fontScale, draft && draft.lineHeight), { keepMetrics: true });
             }
             setPreviewBg('bg-preview-white', null, { silent: true });
-            if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+            refreshSectionEditors();
         } catch (err) {
             console.error('studio init failed', err);
         }
@@ -4275,6 +4281,8 @@
                         setCvDensity(handoffDraft.density);
                     }
                     if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+                    if (window.QCEducation && typeof QCEducation.refresh === 'function') QCEducation.refresh();
+                    if (window.QCMilitary && typeof QCMilitary.refresh === 'function') QCMilitary.refresh();
                 } catch (handoffErr) {
                     console.error('handoff restore failed', handoffErr);
                 }

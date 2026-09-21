@@ -10,8 +10,6 @@ export const CHECKOUT = {
   bitPhoneIntl: "972543554888",
   bitAppUrl: "https://www.bitpay.co.il/app/",
   bitMeUrl: "https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F",
-  payboxPayUrl: "https://www.payboxapp.com/",
-  payboxCardUrl: "https://www.payboxapp.com/",
   whatsappMessage: 'היי, שילמתי 10 ש"ח ב-Bit עבור קורות החיים.',
   packageName: "הורדת קובץ PDF מוכן להגשה",
 };
@@ -72,28 +70,9 @@ export function bitWebPayUrl(total = CHECKOUT.amountIls) {
   return `https://${bitSendPath(total)}`;
 }
 
-/** Safari-safe PayBox https URL with phone + amount hints. */
-export function payboxWebPayUrl(total = CHECKOUT.amountIls) {
-  const phone = CHECKOUT.bitPhoneCopy;
-  const amount = bitAmountValue(total);
-  const base = String(CHECKOUT.payboxPayUrl || "https://www.payboxapp.com/").replace(/\/?$/, "/");
-  const query = [
-    `phone=${encodeURIComponent(phone)}`,
-    `phoneNumber=${encodeURIComponent(phone)}`,
-    `sum=${encodeURIComponent(amount)}`,
-    `amount=${encodeURIComponent(amount)}`,
-  ].join("&");
-  return `${base}?${query}`;
-}
-
 /** Alias — always https Bit web URL (Safari rejects bitapp://). */
 export function bitDeepLink(total = CHECKOUT.amountIls) {
   return bitWebPayUrl(total);
-}
-
-/** Alias — always https PayBox URL (Safari rejects paybox://). */
-export function payboxDeepLink(total = CHECKOUT.amountIls) {
-  return payboxWebPayUrl(total);
 }
 
 export function bitQrPayload(total = CHECKOUT.amountIls) {
@@ -108,11 +87,6 @@ export function bitPayUrl(total = CHECKOUT.amountIls) {
 /** Always open Bit via https (web/app bridge). */
 export function bitAppOpenUrl(total = CHECKOUT.amountIls) {
   return bitWebPayUrl(total);
-}
-
-/** Always open PayBox via fully-qualified https URL. */
-export function payboxAppOpenUrl(total = CHECKOUT.amountIls) {
-  return payboxWebPayUrl(total);
 }
 
 export function whatsappPaymentMessage(total = CHECKOUT.amountIls) {

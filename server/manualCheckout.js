@@ -38,7 +38,7 @@ function friendlyError(err) {
 /**
  * POST /api/order-session and POST /api/telegram-notify
  * Create or reuse a PENDING manual checkout order and notify Telegram
- * with order id, customer phone, and Bit/PayBox method.
+ * with order id, customer phone, and Bit method.
  */
 export async function handleOrderSessionRequest(req, res) {
   if (req.method === "OPTIONS") {
@@ -68,8 +68,7 @@ export async function handleOrderSessionRequest(req, res) {
   }
 
   const pack = "basic";
-  const methodRaw = String(body.payment_method || body.method || "bit").toLowerCase();
-  const paymentMethod = methodRaw === "paybox" ? "paybox" : "bit";
+  const paymentMethod = "bit";
   const contacts = parseContact(body.contact || body.phone || body.email);
   if (!contacts.phone) {
     json(res, 400, { ok: false, error: "נא למלא מספר טלפון לזיהוי ההעברה." });

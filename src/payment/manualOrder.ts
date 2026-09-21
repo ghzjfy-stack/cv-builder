@@ -44,7 +44,7 @@ export function isManualOrderApproved(status: ManualOrderStatusResponse, expecte
 export async function createManualOrderSession(input: {
   pack: string;
   contact?: string;
-  paymentMethod: "bit" | "paybox";
+  paymentMethod: "bit";
   customerName?: string;
   amountIls?: number;
   orderId?: string;

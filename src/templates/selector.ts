@@ -196,7 +196,6 @@ function applyTemplate(key: string): void {
 
   const fromHome = document.body.classList.contains("on-home");
   const w = window as Window & {
-    setCvLang?: (l: string, o?: { restore?: boolean }) => void;
     updateCV?: () => void;
     QCDraft?: { save?: () => void };
     closeExamplesModal?: () => void;
@@ -206,11 +205,9 @@ function applyTemplate(key: string): void {
     openMobilePreview?: () => void;
   };
 
-  // Design/layout only — never overwrite the user's form text.
+  // Design/layout only — never overwrite the user's form text or language.
   applyDesign(tpl);
 
-  const preferred = tpl.preferredLang || "he";
-  if (w.setCvLang) w.setCvLang(preferred, { restore: true });
   markSelected(key);
   w.updateCV?.();
   w.QCDraft?.save?.();

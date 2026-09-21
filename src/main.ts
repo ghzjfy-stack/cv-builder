@@ -6,12 +6,12 @@ import {
   REF_CODE_KEY,
   REF_FROM_KEY,
   bitAppOpenUrl,
+  bitPayUrl,
   displayAmountValue,
   displayCompareValue,
   isLikelyIsraeliMobile,
   isPackId,
   packAmount,
-  payboxAppOpenUrl,
   whatsappPdfShareUrl,
   whatsappReferralUrl,
   type PackId,
@@ -33,7 +33,6 @@ const MANUAL_ORDER_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 let lastFocus = null;
 let selectedPack: PackId = "basic";
-let selectedPayMethod = "bit";
 let manualOrderPoll = null;
 let activeManualOrderId = "";
 let checkoutInflight = null;
@@ -243,10 +242,6 @@ function closeModal() {
   if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
 }
 
-function stopPayboxPoll() {
-  /* hosted PayBox flow removed for MVP deep-link checkout */
-}
-
 function stopManualOrderPoll() {
   if (manualOrderPoll) {
     manualOrderPoll.abort();
@@ -356,11 +351,8 @@ function requireCheckoutPhone() {
   return String(contact || "").trim();
 }
 
-async function proceedToPayment(preferredMethod) {
+async function proceedToPayment() {
   const contact = requireCheckoutPhone();
-  if (preferredMethod === "paybox" || preferredMethod === "bit") {
-    selectedPayMethod = preferredMethod;
-  }
   if (checkoutInflight) return checkoutInflight;
 
   const run = (async () => {
@@ -373,7 +365,7 @@ async function proceedToPayment(preferredMethod) {
       created = await createManualOrderSession({
         pack: "basic",
         contact,
-        paymentMethod: selectedPayMethod === "paybox" ? "paybox" : "bit",
+        paymentMethod: "bit",
         customerName: readCustomerName(),
         amountIls: CHECKOUT.amountIls,
         orderId: existingId || undefined,
@@ -404,10 +396,6 @@ async function proceedToPayment(preferredMethod) {
     checkoutInflight = null;
   });
   return checkoutInflight;
-}
-
-function setPayMethod(method) {
-  selectedPayMethod = method === "paybox" ? "paybox" : "bit";
 }
 
 function setHostedPayStatus(_text) {
@@ -480,7 +468,7 @@ function copyPayPhoneFallback() {
 
 function openDeepLink(url) {
   if (!url) return;
-  // https only — same-tab on mobile so Bit/PayBox can hand off from the web bridge.
+  // https only — same-tab on mobile so Bit can hand off from the web bridge.
   if (prefersSameTabCheckout()) {
     window.location.href = url;
     return;
@@ -510,8 +498,8 @@ function copyBitPhone(e) {
   void navigator.clipboard.writeText(CHECKOUT.bitPhoneCopy).then(flashCopyButton, flashCopyButton);
 }
 
-async function ensureManualOrderForCheckout(method) {
-  const created = await proceedToPayment(method);
+async function ensureManualOrderForCheckout() {
+  const created = await proceedToPayment();
   return created?.order_id || activeManualOrderId || readPersistedManualOrderId() || null;
 }
 
@@ -529,21 +517,10 @@ function bindDeepLinkAnchor(id, url) {
 function openBitApp(e) {
   e?.preventDefault?.();
   void (async () => {
-    const orderId = await ensureManualOrderForCheckout("bit");
+    const orderId = await ensureManualOrderForCheckout();
     if (!orderId) return;
     const url = bitAppOpenUrl(CHECKOUT.amountIls);
     bindDeepLinkAnchor("btn-open-bit", url);
-    openDeepLink(url);
-  })();
-}
-
-function openPayboxApp(e) {
-  e?.preventDefault?.();
-  void (async () => {
-    const orderId = await ensureManualOrderForCheckout("paybox");
-    if (!orderId) return;
-    const url = payboxAppOpenUrl(CHECKOUT.amountIls);
-    bindDeepLinkAnchor("btn-open-paybox", url);
     openDeepLink(url);
   })();
 }
@@ -763,7 +740,6 @@ function triggerPDFDownload() {
 function openCheckoutModal() {
   openModal();
   stopManualOrderPoll();
-  setPayMethod("bit");
   setFeedback("", false);
   selectedPack = "basic";
   applyPackUi();
@@ -835,7 +811,17 @@ function applyPackUi() {
     el.textContent = display;
   });
   bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(amount));
-  bindDeepLinkAnchor("btn-open-paybox", payboxAppOpenUrl(amount));
+  const bitBtn = document.getElementById("btn-open-bit");
+  if (bitBtn) bitBtn.textContent = `שלמו ב-Bit (₪${display})`;
+  const qr = document.getElementById("bit-qr");
+  if (qr instanceof HTMLImageElement) {
+    qr.src = bitPayUrl(amount);
+    qr.alt = `קוד QR לתשלום ${display} ₪ ב-Bit`;
+  }
+  const qrWrap = document.querySelector(".pay-qr-wrap");
+  if (qrWrap instanceof HTMLElement) {
+    qrWrap.hidden = prefersSameTabCheckout();
+  }
   const saveEl = document.getElementById("pay-save-badge");
   if (saveEl) saveEl.textContent = "מחיר השקה — 10 ₪ בלבד";
   const nameEl = document.getElementById("mvp-pack-name");
@@ -1014,7 +1000,6 @@ function bind() {
   });
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
-  document.getElementById("btn-open-paybox")?.addEventListener("click", openPayboxApp);
   document.getElementById("btn-send-pdf-whatsapp")?.addEventListener("click", sendPdfToWhatsApp);
   document.getElementById("cover-letter-download")?.addEventListener("click", downloadCoverLetter);
   document.getElementById("btn-copy-referral")?.addEventListener("click", copyReferralLink);

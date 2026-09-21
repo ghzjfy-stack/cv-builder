@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=jobs9">
+    <link rel="stylesheet" href="./app.css?v=langs2">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -448,11 +448,12 @@
 
                 <div class="space-y-2 relative" id="experience-section">
                     <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
-                    <p class="field-tip" id="tip-experience-lead">מלאו תפקיד, חברה, שנים ותיאור. לחצו + הוסף משרה נוספת לעוד תפקיד.</p>
+                    <p class="field-tip" id="tip-experience-lead">מלאו תפקיד, חברה, שנים ותיאור. לחצו הוסף משרה נוספת לעוד תפקיד.</p>
                     <div id="experience-items" aria-describedby="tip-experience"></div>
-                    <div class="experience-add-wrap">
-                        <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="return addExperienceJob(event);">+ הוסף משרה נוספת</button>
-                    </div>
+                    <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="handleAddJob(event); return false;">
+                        <span class="experience-add-icon" aria-hidden="true">+</span>
+                        <span id="btn-add-experience-label">הוסף משרה נוספת</span>
+                    </button>
                     <p class="field-tip" id="tip-experience">טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.</p>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2021 - נוכחי | מנהל מכירות ארצי
 Verde Commerce
@@ -483,21 +484,21 @@ Shoreline B2B
                         <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.</p>
                     </div>
-                    <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages">שפות</label>
+                    <div class="languages-section" id="languages-section">
+                        <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages" for="lang-pick-name">שפות</label>
                         <input type="hidden" id="in-languages" value="עברית (שפת אם), אנגלית (מקצועית)">
-                        <div id="lang-picker" class="space-y-2">
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <select id="lang-pick-name" class="lang-pick-select flex-1 studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" aria-label="בחר שפה...">
+                        <div id="lang-picker" class="lang-picker">
+                            <div class="lang-picker-controls">
+                                <select id="lang-pick-name" name="language" class="lang-pick-select studio-field" aria-label="בחר שפה..." onchange="onLangPickChange(event)">
                                     <option value="">בחר שפה...</option>
                                 </select>
-                                <select id="lang-pick-level" class="lang-pick-select sm:w-56 studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" aria-label="רמת שליטה...">
+                                <select id="lang-pick-level" name="proficiency" class="lang-pick-select studio-field" aria-label="רמת שליטה..." onchange="onLangPickChange(event)">
                                     <option value="">רמת שליטה...</option>
                                 </select>
-                                <button type="button" id="lang-pick-add" class="shrink-0 bg-slate-700 hover:bg-slate-600 border border-slate-500 text-slate-100 font-semibold text-sm px-3 rounded-lg min-h-11">הוסף</button>
+                                <button type="button" id="lang-pick-add" class="lang-pick-add-btn" onclick="handleAddLanguage(event); return false;">הוסף</button>
                             </div>
-                            <div id="lang-pick-list" class="space-y-2"></div>
-                            <p class="text-[11px] text-slate-400" id="lang-pick-hint">בחרו שפה ורמת שליטה מהרשימה — בלי להקליד.</p>
+                            <div id="lang-pick-list" class="lang-pick-list"></div>
+                            <p class="field-tip" id="lang-pick-hint">בחרו שפה ורמת שליטה, ואז לחצו הוסף.</p>
                         </div>
                     </div>
                 </div>
@@ -963,7 +964,7 @@ Shoreline B2B
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=jobs9"></script>
+    <script src="lib/experienceEditor.js?v=jobs10"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/templateThumbs.js?v=white1"></script>
@@ -977,13 +978,14 @@ Shoreline B2B
     <script src="lib/samplePreview.js?v=no-sample1"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
-        window.addExperienceJob = function (e) {
+        window.handleAddJob = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
             if (window.QCExperience && typeof QCExperience.addJob === 'function') {
                 return QCExperience.addJob(e);
             }
-            console.log('Add Job clicked', Date.now());
             return false;
         };
+        window.addExperienceJob = window.handleAddJob;
         let previewBgClass = 'bg-preview-white';
         const THEME_NAMES = {
             he: {
@@ -1096,7 +1098,7 @@ Shoreline B2B
                 nameFallback: 'שם מלא',
                 titleFallback: 'תפקיד',
                 detailsHeading: 'פרטים אישיים (שדה ריק לא יופיע)',
-                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה מהרשימה — בלי להקליד.', references: 'המלצות / References' },
+                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות / References' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
                 examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
                 phrasesHeading: 'משפטים מוכנים לפי תחום',
@@ -1131,7 +1133,7 @@ Shoreline B2B
                 importSample: 'צפו בדוגמת PDF',
                 tipSummary: 'טיפ: שלבו הישג מדיד — אחוזי צמיחה, גודל צוות או תקציב.',
                 tipExperience: 'טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.',
-                tipExperienceLead: 'מלאו תפקיד, חברה, שנים ותיאור. לחצו + הוסף משרה נוספת לעוד תפקיד.',
+                tipExperienceLead: 'מלאו תפקיד, חברה, שנים ותיאור. לחצו הוסף משרה נוספת לעוד תפקיד.',
                 tipEducation: 'ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.',
                 tipSkills: '3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.',
                 handoffBanner: 'מעדיפים לערוך במחשב?',
@@ -1161,7 +1163,7 @@ Shoreline B2B
                 nameFallback: 'Full name',
                 titleFallback: 'Job title',
                 detailsHeading: 'Personal details (empty fields stay hidden)',
-                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language...', languagesLevel: 'Proficiency...', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency from the list — no typing needed.', references: 'References' },
+                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language...', languagesLevel: 'Proficiency...', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency, then tap Add.', languagesPopular: 'Popular', languagesMore: 'More languages', references: 'References' },
                 i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
                 examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] },
                 phrasesHeading: 'Ready phrases by field',
@@ -1196,7 +1198,7 @@ Shoreline B2B
                 importSample: 'View PDF sample',
                 tipSummary: 'Pro tip: include a measurable win — % growth, team size, or budget.',
                 tipExperience: 'Pro tip: start each bullet with a verb (led, grew) and include a number.',
-                tipExperienceLead: 'Fill job title, company, dates and description. Tap + Add another job for another role.',
+                tipExperienceLead: 'Fill job title, company, dates and description. Tap Add another job for another role.',
                 tipEducation: 'Add institution, degree and years. One relevant course beats a long list.',
                 tipSkills: '3–8 strong skills beat a long list. Match them to the role.',
                 handoffBanner: 'Prefer editing on desktop?',
@@ -1813,8 +1815,11 @@ Shoreline B2B
             const pct = t.match(/(\d+)\s*%/);
             if (pct) return Math.max(8, Math.min(100, Number(pct[1])));
             const low = t.toLowerCase();
-            if (/אם|native|fluent|שוטפת|מלאה|רמה גבוהה/.test(low)) return 100;
-            if (/גבוה|high|professional|very good/.test(low)) return 82;
+            if (/שפת אם נוספת|bilingual/.test(low)) return 100;
+            if (/אם|native|mother tongue/.test(low)) return 100;
+            if (/מקצוע|full professional|c2/.test(low)) return 92;
+            if (/fluent|שוטפת|מלאה|רמה גבוהה/.test(low)) return 86;
+            if (/גבוה|high|professional|very good|advanced/.test(low)) return 82;
             if (/טוב|good/.test(low)) return 68;
             if (/בינונ|intermediate/.test(low)) return 52;
             if (/בסיס|basic/.test(low)) return 34;
@@ -1835,27 +1840,28 @@ Shoreline B2B
             return { name, levelLabel };
         }
 
-        const CV_POPULAR_LANGUAGES = ['עברית', 'אנגלית', 'ערבית', 'רוסית', 'ספרדית', 'צרפתית', 'גרמנית', 'סינית', 'איטלקית'];
-        const CV_LANGUAGE_LEVEL_PRESETS = ['שפת אם', 'רמה גבוהה (שוטף)', 'רמה בינונית', 'רמה בסיסית'];
+        const CV_POPULAR_LANGUAGE_IDS = ['he', 'en', 'ar', 'ru', 'fr', 'es', 'de', 'it', 'uk', 'am', 'zh', 'ja', 'pt', 'hi', 'th'];
         const CV_LANGUAGE_OPTIONS = [
             { id: 'he', he: 'עברית', en: 'Hebrew', aliases: ['עברית', 'hebrew'] },
             { id: 'en', he: 'אנגלית', en: 'English', aliases: ['אנגלית', 'english'] },
             { id: 'ar', he: 'ערבית', en: 'Arabic', aliases: ['ערבית', 'arabic'] },
             { id: 'ru', he: 'רוסית', en: 'Russian', aliases: ['רוסית', 'russian'] },
-            { id: 'es', he: 'ספרדית', en: 'Spanish', aliases: ['ספרדית', 'spanish'] },
             { id: 'fr', he: 'צרפתית', en: 'French', aliases: ['צרפתית', 'french'] },
+            { id: 'es', he: 'ספרדית', en: 'Spanish', aliases: ['ספרדית', 'spanish'] },
             { id: 'de', he: 'גרמנית', en: 'German', aliases: ['גרמנית', 'german'] },
-            { id: 'zh', he: 'סינית', en: 'Chinese', aliases: ['סינית', 'chinese', 'mandarin', 'מנדרינית'] },
             { id: 'it', he: 'איטלקית', en: 'Italian', aliases: ['איטלקית', 'italian'] },
-            { id: 'am', he: 'אמהרית', en: 'Amharic', aliases: ['אמהרית', 'amharic'] },
-            { id: 'yi', he: 'יידיש', en: 'Yiddish', aliases: ['יידיש', 'yiddish'] },
-            { id: 'pt', he: 'פורטוגזית', en: 'Portuguese', aliases: ['פורטוגזית', 'portuguese'] },
-            { id: 'pl', he: 'פולנית', en: 'Polish', aliases: ['פולנית', 'polish'] },
             { id: 'uk', he: 'אוקראינית', en: 'Ukrainian', aliases: ['אוקראינית', 'ukrainian'] },
-            { id: 'ro', he: 'רומנית', en: 'Romanian', aliases: ['רומנית', 'romanian'] },
+            { id: 'am', he: 'אמהרית', en: 'Amharic', aliases: ['אמהרית', 'amharic'] },
+            { id: 'zh', he: 'סינית', en: 'Chinese', aliases: ['סינית', 'chinese', 'mandarin', 'מנדרינית'] },
             { id: 'ja', he: 'יפנית', en: 'Japanese', aliases: ['יפנית', 'japanese'] },
-            { id: 'ko', he: 'קוריאנית', en: 'Korean', aliases: ['קוריאנית', 'korean'] },
+            { id: 'pt', he: 'פורטוגזית', en: 'Portuguese', aliases: ['פורטוגזית', 'portuguese'] },
             { id: 'hi', he: 'הינדי', en: 'Hindi', aliases: ['הינדי', 'hindi'] },
+            { id: 'th', he: 'תאילנדית', en: 'Thai', aliases: ['תאילנדית', 'thai'] },
+            { id: 'yi', he: 'יידיש', en: 'Yiddish', aliases: ['יידיש', 'yiddish'] },
+            { id: 'lad', he: 'לדינו', en: 'Ladino', aliases: ['לדינו', 'ladino'] },
+            { id: 'pl', he: 'פולנית', en: 'Polish', aliases: ['פולנית', 'polish'] },
+            { id: 'ro', he: 'רומנית', en: 'Romanian', aliases: ['רומנית', 'romanian'] },
+            { id: 'ko', he: 'קוריאנית', en: 'Korean', aliases: ['קוריאנית', 'korean'] },
             { id: 'tr', he: 'טורקית', en: 'Turkish', aliases: ['טורקית', 'turkish'] },
             { id: 'fa', he: 'פרסית', en: 'Persian', aliases: ['פרסית', 'persian', 'farsi'] },
             { id: 'nl', he: 'הולנדית', en: 'Dutch', aliases: ['הולנדית', 'dutch'] },
@@ -1863,24 +1869,61 @@ Shoreline B2B
             { id: 'el', he: 'יוונית', en: 'Greek', aliases: ['יוונית', 'greek'] },
             { id: 'hu', he: 'הונגרית', en: 'Hungarian', aliases: ['הונגרית', 'hungarian'] },
             { id: 'cs', he: 'צ׳כית', en: 'Czech', aliases: ['צ׳כית', "צ'כית", 'czech'] },
-            { id: 'th', he: 'תאילנדית', en: 'Thai', aliases: ['תאילנדית', 'thai'] },
+            { id: 'sk', he: 'סלובקית', en: 'Slovak', aliases: ['סלובקית', 'slovak'] },
+            { id: 'sl', he: 'סלובנית', en: 'Slovenian', aliases: ['סלובנית', 'slovenian'] },
+            { id: 'hr', he: 'קרואטית', en: 'Croatian', aliases: ['קרואטית', 'croatian'] },
+            { id: 'sr', he: 'סרבית', en: 'Serbian', aliases: ['סרבית', 'serbian'] },
+            { id: 'bs', he: 'בוסנית', en: 'Bosnian', aliases: ['בוסנית', 'bosnian'] },
+            { id: 'bg', he: 'בולגרית', en: 'Bulgarian', aliases: ['בולגרית', 'bulgarian'] },
             { id: 'vi', he: 'וייטנאמית', en: 'Vietnamese', aliases: ['וייטנאמית', 'vietnamese'] },
             { id: 'tl', he: 'פיליפינית', en: 'Filipino', aliases: ['פיליפינית', 'filipino', 'tagalog'] },
             { id: 'fi', he: 'פינית', en: 'Finnish', aliases: ['פינית', 'finnish'] },
             { id: 'no', he: 'נורווגית', en: 'Norwegian', aliases: ['נורווגית', 'norwegian'] },
             { id: 'da', he: 'דנית', en: 'Danish', aliases: ['דנית', 'danish'] },
+            { id: 'is', he: 'איסלנדית', en: 'Icelandic', aliases: ['איסלנדית', 'icelandic'] },
+            { id: 'ga', he: 'אירית', en: 'Irish', aliases: ['אירית', 'irish'] },
             { id: 'ka', he: 'גאורגית', en: 'Georgian', aliases: ['גאורגית', 'georgian'] },
             { id: 'hy', he: 'ארמנית', en: 'Armenian', aliases: ['ארמנית', 'armenian'] },
             { id: 'bn', he: 'בנגלית', en: 'Bengali', aliases: ['בנגלית', 'bengali'] },
-            { id: 'ur', he: 'אורדו', en: 'Urdu', aliases: ['אורדו', 'urdu'] }
+            { id: 'ur', he: 'אורדו', en: 'Urdu', aliases: ['אורדו', 'urdu'] },
+            { id: 'ta', he: 'טמילית', en: 'Tamil', aliases: ['טמילית', 'tamil'] },
+            { id: 'te', he: 'טלוגו', en: 'Telugu', aliases: ['טלוגו', 'telugu'] },
+            { id: 'mr', he: 'מרטהי', en: 'Marathi', aliases: ['מרטהי', 'marathi'] },
+            { id: 'pa', he: 'פנג׳אבי', en: 'Punjabi', aliases: ['פנג׳אבי', "פנג'אבי", 'punjabi'] },
+            { id: 'gu', he: 'גוג׳ראטית', en: 'Gujarati', aliases: ['גוג׳ראטית', "גוג'ראטית", 'gujarati'] },
+            { id: 'ml', he: 'מלאיאלאם', en: 'Malayalam', aliases: ['מלאיאלאם', 'malayalam'] },
+            { id: 'kn', he: 'קאנדה', en: 'Kannada', aliases: ['קאנדה', 'kannada'] },
+            { id: 'ne', he: 'נפאלית', en: 'Nepali', aliases: ['נפאלית', 'nepali'] },
+            { id: 'si', he: 'סינהלית', en: 'Sinhala', aliases: ['סינהלית', 'sinhala'] },
+            { id: 'id', he: 'אינדונזית', en: 'Indonesian', aliases: ['אינדונזית', 'indonesian'] },
+            { id: 'ms', he: 'מלאית', en: 'Malay', aliases: ['מלאית', 'malay'] },
+            { id: 'sw', he: 'סווהילי', en: 'Swahili', aliases: ['סווהילי', 'swahili'] },
+            { id: 'af', he: 'אפריקאנס', en: 'Afrikaans', aliases: ['אפריקאנס', 'afrikaans'] },
+            { id: 'sq', he: 'אלבנית', en: 'Albanian', aliases: ['אלבנית', 'albanian'] },
+            { id: 'lt', he: 'ליטאית', en: 'Lithuanian', aliases: ['ליטאית', 'lithuanian'] },
+            { id: 'lv', he: 'לטבית', en: 'Latvian', aliases: ['לטבית', 'latvian'] },
+            { id: 'et', he: 'אסטונית', en: 'Estonian', aliases: ['אסטונית', 'estonian'] },
+            { id: 'ca', he: 'קטלאנית', en: 'Catalan', aliases: ['קטלאנית', 'catalan'] },
+            { id: 'az', he: 'אזרית', en: 'Azerbaijani', aliases: ['אזרית', 'azerbaijani'] },
+            { id: 'kk', he: 'קזחית', en: 'Kazakh', aliases: ['קזחית', 'kazakh'] },
+            { id: 'uz', he: 'אוזבקית', en: 'Uzbek', aliases: ['אוזבקית', 'uzbek'] },
+            { id: 'mn', he: 'מונגולית', en: 'Mongolian', aliases: ['מונגולית', 'mongolian'] },
+            { id: 'my', he: 'בורמזית', en: 'Burmese', aliases: ['בורמזית', 'burmese'] },
+            { id: 'km', he: 'חמרית', en: 'Khmer', aliases: ['חמרית', 'khmer'] },
+            { id: 'lo', he: 'לאו', en: 'Lao', aliases: ['לאו', 'lao'] },
+            { id: 'isl', he: 'שפת סימנים', en: 'Sign language', aliases: ['שפת סימנים', 'sign language', 'isl'] }
         ];
         const CV_LANGUAGE_LEVELS = [
-            { id: 'native', he: CV_LANGUAGE_LEVEL_PRESETS[0], en: 'Native' },
-            { id: 'fluent', he: CV_LANGUAGE_LEVEL_PRESETS[1], en: 'High (fluent)' },
-            { id: 'intermediate', he: CV_LANGUAGE_LEVEL_PRESETS[2], en: 'Intermediate' },
-            { id: 'basic', he: CV_LANGUAGE_LEVEL_PRESETS[3], en: 'Basic' }
+            { id: 'native', he: 'שפת אם', en: 'Native' },
+            { id: 'bilingual', he: 'שפת אם נוספת', en: 'Bilingual' },
+            { id: 'professional', he: 'רמה מקצועית גבוהה', en: 'Full Professional' },
+            { id: 'fluent', he: 'רמה גבוהה', en: 'Fluent' },
+            { id: 'intermediate', he: 'רמה בינונית', en: 'Intermediate' },
+            { id: 'basic', he: 'רמה בסיסית', en: 'Basic' }
         ];
         let cvLangEntries = [];
+        let langPickState = { language: '', proficiency: '' };
+        let lastLangAddAt = 0;
 
         function cvUiLang() {
             return window.QCCvLang === 'en' ? 'en' : 'he';
@@ -1900,7 +1943,7 @@ Shoreline B2B
         }
 
         function findLangLevel(id) {
-            if (id === 'professional' || id === 'good') id = 'fluent';
+            if (id === 'good' || id === 'advanced' || id === 'high') id = 'fluent';
             return CV_LANGUAGE_LEVELS.find((lvl) => lvl.id === id) || null;
         }
 
@@ -1925,10 +1968,12 @@ Shoreline B2B
                 return 'basic';
             }
             const low = t.toLowerCase();
+            if (/שפת אם נוספת|bilingual/.test(low)) return 'bilingual';
             if (/שפת אם|native|mother tongue/.test(low)) return 'native';
             if (/בסיס|basic|beginner/.test(low)) return 'basic';
             if (/בינונ|intermediate/.test(low)) return 'intermediate';
-            if (/שוטפת|fluent|מלאה|רמה גבוהה|גבוה|high|professional|very good|מקצוע|advanced|טובה|\bgood\b/.test(low)) return 'fluent';
+            if (/מקצוע|full professional/.test(low)) return 'professional';
+            if (/שוטפת|fluent|מלאה|רמה גבוהה|גבוה|high|advanced|very good|\bgood\b/.test(low)) return 'fluent';
             return 'fluent';
         }
 
@@ -1959,12 +2004,14 @@ Shoreline B2B
             const level = levelId ? findLangLevel(levelId) : null;
             const ui = cvUiLang();
             const language = opt ? langOptionLabel(opt, ui) : String(customName || '').trim();
+            const proficiency = level ? langLevelLabel(level, ui) : '';
             return {
                 langId: opt ? opt.id : '',
                 customName: opt ? '' : language,
                 levelId: level ? level.id : '',
                 language: language,
-                level: level ? langLevelLabel(level, ui) : ''
+                proficiency: proficiency,
+                level: proficiency
             };
         }
 
@@ -1978,45 +2025,91 @@ Shoreline B2B
             return cvLangEntries.map((row) => row.langId).filter(Boolean);
         }
 
+        function languageSelectGroups() {
+            const popular = [];
+            const seen = {};
+            CV_POPULAR_LANGUAGE_IDS.forEach((id) => {
+                const opt = findLangOption(id);
+                if (!opt || seen[opt.id]) return;
+                seen[opt.id] = true;
+                popular.push(opt);
+            });
+            const rest = CV_LANGUAGE_OPTIONS.filter((opt) => !seen[opt.id]);
+            const lang = cvUiLang();
+            rest.sort((a, b) => langOptionLabel(a, lang).localeCompare(langOptionLabel(b, lang), lang === 'en' ? 'en' : 'he'));
+            return { popular: popular, rest: rest };
+        }
+
+        function optionSignature(sel) {
+            return Array.prototype.map.call(sel.options, (opt) => {
+                const group = opt.parentElement && opt.parentElement.tagName === 'OPTGROUP' ? opt.parentElement.label : '';
+                return [opt.value, opt.textContent, opt.disabled ? '1' : '0', group].join('\0');
+            }).join('|');
+        }
+
         function fillLanguageSelects() {
             const lang = cvUiLang();
             const pack = CV_I18N[lang] || CV_I18N.he;
             const nameSel = document.getElementById('lang-pick-name');
             const levelSel = document.getElementById('lang-pick-level');
+            const taken = selectedLangIds();
             if (nameSel) {
-                const taken = selectedLangIds();
-                const prev = nameSel.value;
-                nameSel.replaceChildren();
+                const keep = langPickState.language || nameSel.value;
+                const groups = languageSelectGroups();
+                const scratch = document.createElement('select');
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
                 placeholder.textContent = pack.labels.languagesSelect || 'בחר שפה...';
-                nameSel.appendChild(placeholder);
-                CV_POPULAR_LANGUAGES.forEach((heName) => {
-                    const opt = matchLangOption(heName);
-                    if (!opt) return;
-                    const el = document.createElement('option');
-                    el.value = opt.id;
-                    el.textContent = langOptionLabel(opt, lang);
-                    el.disabled = taken.indexOf(opt.id) >= 0;
-                    nameSel.appendChild(el);
-                });
-                if (prev && taken.indexOf(prev) < 0) nameSel.value = prev;
+                scratch.appendChild(placeholder);
+                function addGroup(label, items) {
+                    const group = document.createElement('optgroup');
+                    group.label = label;
+                    items.forEach((opt) => {
+                        const el = document.createElement('option');
+                        el.value = opt.id;
+                        el.textContent = langOptionLabel(opt, lang);
+                        el.disabled = taken.indexOf(opt.id) >= 0;
+                        group.appendChild(el);
+                    });
+                    scratch.appendChild(group);
+                }
+                addGroup(pack.labels.languagesPopular || 'נפוצות', groups.popular);
+                addGroup(pack.labels.languagesMore || 'עוד שפות', groups.rest);
+                if (optionSignature(nameSel) !== optionSignature(scratch)) {
+                    nameSel.replaceChildren();
+                    while (scratch.firstChild) nameSel.appendChild(scratch.firstChild);
+                }
+                nameSel.disabled = false;
+                nameSel.removeAttribute('disabled');
+                nameSel.style.pointerEvents = 'auto';
+                nameSel.style.cursor = 'pointer';
+                if (keep && taken.indexOf(keep) < 0 && findLangOption(keep)) nameSel.value = keep;
                 else nameSel.value = '';
+                langPickState.language = nameSel.value;
             }
             if (levelSel) {
-                const prevLevel = levelSel.value;
-                levelSel.replaceChildren();
+                const keepLevel = langPickState.proficiency || levelSel.value;
+                const scratch = document.createElement('select');
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
                 placeholder.textContent = pack.labels.languagesLevel || 'רמת שליטה...';
-                levelSel.appendChild(placeholder);
+                scratch.appendChild(placeholder);
                 CV_LANGUAGE_LEVELS.forEach((lvl) => {
                     const el = document.createElement('option');
                     el.value = lvl.id;
                     el.textContent = langLevelLabel(lvl, lang);
-                    levelSel.appendChild(el);
+                    scratch.appendChild(el);
                 });
-                levelSel.value = prevLevel && findLangLevel(prevLevel) ? prevLevel : '';
+                if (optionSignature(levelSel) !== optionSignature(scratch)) {
+                    levelSel.replaceChildren();
+                    while (scratch.firstChild) levelSel.appendChild(scratch.firstChild);
+                }
+                levelSel.disabled = false;
+                levelSel.removeAttribute('disabled');
+                levelSel.style.pointerEvents = 'auto';
+                levelSel.style.cursor = 'pointer';
+                levelSel.value = keepLevel && findLangLevel(keepLevel) ? keepLevel : '';
+                langPickState.proficiency = levelSel.value;
             }
         }
 
@@ -2038,8 +2131,9 @@ Shoreline B2B
                 title.className = 'lang-pick-title';
                 title.textContent = languageRowTitle(row, lang);
                 const levelSel = document.createElement('select');
-                levelSel.className = 'lang-pick-select studio-field bg-slate-900/60 border border-slate-600 p-2 text-sm rounded-lg text-white outline-none min-h-11';
+                levelSel.className = 'lang-pick-select studio-field';
                 levelSel.setAttribute('data-lang-level', String(index));
+                levelSel.setAttribute('name', 'proficiency-' + index);
                 levelSel.setAttribute('aria-label', pack.labels.languagesLevel);
                 const levelPh = document.createElement('option');
                 levelPh.value = '';
@@ -2054,10 +2148,10 @@ Shoreline B2B
                 levelSel.value = row.levelId && findLangLevel(row.levelId) ? row.levelId : '';
                 const remove = document.createElement('button');
                 remove.type = 'button';
-                remove.className = 'shrink-0 text-slate-300 hover:text-rose-300 border border-slate-600 rounded-lg px-2.5 min-h-11 text-sm';
+                remove.className = 'lang-pick-remove';
                 remove.setAttribute('data-lang-remove', String(index));
-                remove.setAttribute('aria-label', pack.labels.languagesRemove);
-                remove.textContent = '×';
+                remove.setAttribute('aria-label', pack.labels.languagesRemove || 'הסרה');
+                remove.innerHTML = '<span aria-hidden="true">×</span>';
                 wrap.append(title, levelSel, remove);
                 list.appendChild(wrap);
             });
@@ -2086,23 +2180,59 @@ Shoreline B2B
             updateCV();
         }
 
+        function onLangPickChange(e) {
+            const sel = e && e.target;
+            if (!sel) return;
+            if (sel.id === 'lang-pick-name') {
+                langPickState.language = String(sel.value || '');
+                sel.removeAttribute('aria-invalid');
+            }
+            if (sel.id === 'lang-pick-level') {
+                langPickState.proficiency = String(sel.value || '');
+                sel.removeAttribute('aria-invalid');
+            }
+        }
+
+        function handleAddLanguage(e) {
+            if (e && typeof e.preventDefault === 'function') e.preventDefault();
+            const now = Date.now();
+            if (now - lastLangAddAt < 250) return false;
+            lastLangAddAt = now;
+            return addCvLanguage();
+        }
+
         function addCvLanguage() {
             const nameSel = document.getElementById('lang-pick-name');
             const levelSel = document.getElementById('lang-pick-level');
-            const langId = nameSel ? String(nameSel.value || '').trim() : '';
+            const langId = (langPickState.language || (nameSel && nameSel.value) || '').trim();
+            const levelIdRaw = (langPickState.proficiency || (levelSel && levelSel.value) || '').trim();
+            let valid = true;
             if (!langId || !findLangOption(langId)) {
                 if (nameSel) {
                     nameSel.setAttribute('aria-invalid', 'true');
                     if (typeof nameSel.focus === 'function') nameSel.focus();
                 }
-                return false;
+                valid = false;
+            } else if (nameSel) {
+                nameSel.removeAttribute('aria-invalid');
             }
-            if (nameSel) nameSel.removeAttribute('aria-invalid');
-            const levelId = levelSel && levelSel.value ? (findLangLevel(levelSel.value) || {}).id : '';
-            const entry = makeLangEntry(langId, levelId, '');
+            const level = findLangLevel(levelIdRaw);
+            if (!level) {
+                if (levelSel) {
+                    levelSel.setAttribute('aria-invalid', 'true');
+                    if (valid && typeof levelSel.focus === 'function') levelSel.focus();
+                }
+                valid = false;
+            } else if (levelSel) {
+                levelSel.removeAttribute('aria-invalid');
+            }
+            if (!valid) return false;
+            const entry = makeLangEntry(langId, level.id, '');
             const existing = cvLangEntries.findIndex((row) => row.langId === langId);
             if (existing >= 0) cvLangEntries[existing] = entry;
             else cvLangEntries.push(entry);
+            langPickState.language = '';
+            langPickState.proficiency = '';
             if (nameSel) nameSel.value = '';
             if (levelSel) levelSel.value = '';
             commitLanguagePicker();
@@ -2128,16 +2258,24 @@ Shoreline B2B
             const addBtn = document.getElementById('lang-pick-add');
             if (addBtn) {
                 addBtn.type = 'button';
-                addBtn.addEventListener('click', function (e) {
+                addBtn.disabled = false;
+                addBtn.removeAttribute('disabled');
+                addBtn.onclick = function (e) {
                     if (e && e.preventDefault) e.preventDefault();
-                    addCvLanguage();
-                });
+                    handleAddLanguage(e);
+                };
             }
             const nameSel = document.getElementById('lang-pick-name');
             if (nameSel) {
-                nameSel.addEventListener('change', function () {
-                    nameSel.removeAttribute('aria-invalid');
-                });
+                nameSel.onchange = function (e) {
+                    onLangPickChange(e);
+                };
+            }
+            const levelSel = document.getElementById('lang-pick-level');
+            if (levelSel) {
+                levelSel.onchange = function (e) {
+                    onLangPickChange(e);
+                };
             }
             const list = document.getElementById('lang-pick-list');
             if (!list) return;
@@ -2149,10 +2287,13 @@ Shoreline B2B
             list.addEventListener('click', (e) => {
                 const btn = e.target && e.target.closest ? e.target.closest('[data-lang-remove]') : null;
                 if (!btn) return;
+                e.preventDefault();
                 removeCvLanguage(Number(btn.getAttribute('data-lang-remove')));
             });
         }
 
+        window.onLangPickChange = onLangPickChange;
+        window.handleAddLanguage = handleAddLanguage;
         window.addCvLanguage = addCvLanguage;
 
         function timelineMark(kind) {
@@ -3733,6 +3874,8 @@ Shoreline B2B
         window.applyIndustryPreset = applyIndustryPreset;
         window.onPhotoChange = onPhotoChange;
         window.hydrateLanguagePicker = hydrateLanguagePicker;
+        window.onLangPickChange = onLangPickChange;
+        window.handleAddLanguage = handleAddLanguage;
         window.openMobilePreview = openMobilePreview;
         window.closeMobilePreview = closeMobilePreview;
         window.updateMobileStudioProgress = updateMobileStudioProgress;

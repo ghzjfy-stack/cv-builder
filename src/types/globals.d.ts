@@ -46,14 +46,19 @@ declare global {
     QCExperience?: {
       refresh: () => void;
       applyI18n: () => void;
-      addJob?: (e?: Event) => void;
+      addJob?: (e?: Event) => boolean | void;
+      handleAddJob?: (e?: Event) => boolean | void;
+      getJobs?: () => unknown[];
     };
     QCExperienceEditor?: {
       refresh: () => void;
       applyI18n: () => void;
-      addJob?: (e?: Event) => void;
+      addJob?: (e?: Event) => boolean | void;
+      handleAddJob?: (e?: Event) => boolean | void;
+      getJobs?: () => unknown[];
     };
-    addExperienceJob?: (e?: Event) => void;
+    handleAddJob?: (e?: Event) => boolean | void;
+    addExperienceJob?: (e?: Event) => boolean | void;
     QCPhotoDataUrl?: string;
     QCDraft?: {
       save: () => void;
@@ -76,6 +81,9 @@ declare global {
       download?: (e?: Event) => void;
       bind?: () => void;
     };
+    handleAddLanguage?: (e?: Event) => boolean | void;
+    onLangPickChange?: (e?: Event) => void;
+    addCvLanguage?: () => boolean | void;
     hydrateLanguagePicker?: () => void;
     closeHandoffModal?: () => void;
     closeSamplePdfPreview?: () => void;

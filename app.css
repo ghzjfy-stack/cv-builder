@@ -1105,6 +1105,60 @@
             direction: ltr;
             text-align: left;
         }
+        .languages-section,
+        #languages-section,
+        #lang-picker {
+            position: relative;
+            z-index: 8;
+            overflow: visible;
+            pointer-events: auto !important;
+        }
+        #languages-section > .field-tip,
+        #lang-picker > .field-tip,
+        #lang-pick-hint {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .lang-picker-controls {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            gap: 0.45rem;
+            position: relative;
+            z-index: 20;
+            pointer-events: auto !important;
+        }
+        #lang-pick-name {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+        #lang-pick-level {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+        .lang-pick-add-btn,
+        #lang-pick-add {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+        @media (max-width: 420px) {
+            .lang-picker-controls {
+                flex-wrap: wrap;
+            }
+            #lang-pick-name,
+            #lang-pick-level {
+                flex: 1 1 8rem;
+            }
+        }
+        .lang-pick-list {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 12;
+            pointer-events: auto !important;
+        }
         .lang-pick-row {
             display: flex;
             align-items: center;
@@ -1113,6 +1167,9 @@
             border: 1px solid #334155;
             border-radius: 0.7rem;
             padding: 0.4rem 0.5rem;
+            position: relative;
+            z-index: 12;
+            pointer-events: auto !important;
         }
         .lang-pick-row .lang-pick-title {
             flex: 1 1 auto;
@@ -1125,6 +1182,76 @@
             flex: 0 1 12rem;
             width: auto;
             min-width: 10rem;
+        }
+        #lang-picker select,
+        #lang-pick-name,
+        #lang-pick-level,
+        .lang-pick-select,
+        .lang-pick-row select {
+            appearance: auto;
+            -webkit-appearance: menulist;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 20;
+            min-height: 2.75rem;
+            padding: 0.55rem 0.75rem;
+            border: 1px solid #64748b;
+            border-radius: 0.7rem;
+            background-color: #0f172a;
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+            color-scheme: dark;
+        }
+        .lang-pick-add-btn,
+        #lang-pick-add {
+            flex: 0 0 auto;
+            min-height: 2.75rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 0.7rem;
+            border: 1px solid #64748b;
+            background: #1e293b;
+            color: #f8fafc;
+            font-size: 0.875rem;
+            font-weight: 800;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 20;
+        }
+        .lang-pick-add-btn:hover,
+        #lang-pick-add:hover {
+            border-color: #00E5FF;
+            color: #00E5FF;
+            background: rgba(0, 229, 255, 0.1);
+        }
+        .lang-pick-add-btn:active,
+        #lang-pick-add:active {
+            transform: translateY(1px);
+        }
+        .lang-pick-remove {
+            width: 2.5rem;
+            height: 2.5rem;
+            min-width: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.7rem;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #e2e8f0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 20;
+        }
+        .lang-pick-remove:hover {
+            color: #fecaca;
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.14);
         }
         #cv-target #cv-header,
         #qc-print-host .cv-print-sheet #cv-header {
@@ -2742,10 +2869,13 @@
             background-color: #0f172a;
             color: #ffffff;
             -webkit-text-fill-color: #ffffff;
+            pointer-events: auto !important;
+            cursor: pointer !important;
         }
         #lang-picker select option,
         .lang-pick-row select option,
         .lang-pick-select option,
+        #lang-picker optgroup,
         #studio-form-column select option {
             background-color: #0f172a !important;
             color: #ffffff !important;
@@ -3222,10 +3352,10 @@
             pointer-events: auto;
             isolation: auto;
         }
-        .experience-add-wrap {
+        #experience-section > .field-tip {
             position: relative;
-            z-index: 10;
-            pointer-events: auto;
+            z-index: 1;
+            pointer-events: none;
         }
         #in-experience:not(.experience-raw-hidden) {
             margin-top: 0.5rem;
@@ -3350,22 +3480,49 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 0.6rem;
             width: 100%;
-            min-height: 2.75rem;
-            margin-top: 0.35rem;
-            padding: 0.65rem 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid rgb(71 85 105);
-            background: rgb(30 41 59);
-            color: #e2e8f0;
-            font-size: 0.875rem;
-            font-weight: 700;
+            min-height: 3.15rem;
+            margin-top: 0.55rem;
+            padding: 0.85rem 1.35rem;
+            border: 0;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #5eead4 0%, #22d3ee 42%, #06b6d4 100%);
+            color: #082f49;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            box-shadow: 0 10px 24px rgba(6, 182, 212, 0.32);
             cursor: pointer !important;
             pointer-events: auto !important;
             position: relative;
-            z-index: 10;
+            z-index: 20;
+            isolation: isolate;
             touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
             scroll-margin-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+            transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+        }
+        .experience-add-job-btn *,
+        #btn-add-experience * {
+            pointer-events: none;
+        }
+        .experience-add-icon {
+            display: inline-flex;
+            width: 1.7rem;
+            height: 1.7rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: rgba(8, 47, 73, 0.18);
+            color: #082f49;
+            font-size: 1.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        #btn-add-experience-label {
+            pointer-events: none;
         }
         .experience-add-job-btn[disabled],
         #btn-add-experience[disabled],
@@ -3377,14 +3534,20 @@
         }
         .experience-add-job-btn:hover,
         #btn-add-experience:hover {
-            border-color: #00E5FF;
-            color: #00E5FF;
-            background: rgba(0, 229, 255, 0.08);
+            filter: brightness(1.07);
+            box-shadow: 0 14px 30px rgba(6, 182, 212, 0.42);
+            transform: translateY(-1px);
+        }
+        .experience-add-job-btn:active,
+        #btn-add-experience:active {
+            filter: brightness(0.95);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.28);
+            transform: translateY(1px);
         }
         .experience-add-job-btn:focus-visible,
         #btn-add-experience:focus-visible {
             outline: 2px solid #00E5FF;
-            outline-offset: 2px;
+            outline-offset: 3px;
         }
         @media (max-width: 640px) {
             .experience-dates-row {

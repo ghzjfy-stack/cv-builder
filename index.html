@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=accent1">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=formux2">
+    <link rel="stylesheet" href="./app.css?v=payfix3">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -458,7 +458,31 @@
                     <div class="section-editor-head">
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
                     </div>
-                    <div id="experience-items"></div>
+                    <div id="experience-items">
+                        <article class="experience-card is-open" role="listitem" data-job-index="0">
+                            <div class="experience-card-toolbar">
+                                <span class="experience-card-badge">משרה 1</span>
+                            </div>
+                            <div class="experience-card-fields">
+                                <div class="experience-field">
+                                    <label class="experience-field-label" for="job-seed-company">שם חברה/ארגון</label>
+                                    <input id="job-seed-company" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: חברת דמו">
+                                </div>
+                                <div class="experience-field">
+                                    <label class="experience-field-label" for="job-seed-role">תפקיד</label>
+                                    <input id="job-seed-role" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מנהל פרויקטים">
+                                </div>
+                                <div class="experience-field">
+                                    <label class="experience-field-label" for="job-seed-dates">תאריכים/שנים</label>
+                                    <input id="job-seed-dates" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2021 - היום">
+                                </div>
+                                <div class="experience-field">
+                                    <label class="experience-field-label" for="job-seed-desc">תיאור תפקיד / הישגים</label>
+                                    <textarea id="job-seed-desc" rows="5" class="studio-field experience-desc w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none" placeholder="• הובלתי צוות והגדלתי יעדים ב-35%"></textarea>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
                     <button type="button" id="btn-add-experience" class="section-add-btn" onclick="handleAddJob(event); return false;">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה נוספת</span>
@@ -471,7 +495,27 @@
                         <div class="section-editor-head">
                             <p class="font-bold dynamic-text text-sm" id="label-education">השכלה</p>
                         </div>
-                        <div id="education-items"></div>
+                        <div id="education-items">
+                            <article class="experience-card entry-card is-open" role="listitem" data-entry-index="0">
+                                <div class="experience-card-toolbar">
+                                    <span class="experience-card-badge">השכלה 1</span>
+                                </div>
+                                <div class="experience-card-fields">
+                                    <div class="experience-field">
+                                        <label class="experience-field-label">מוסד לימודים</label>
+                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: אוניברסיטת תל אביב">
+                                    </div>
+                                    <div class="experience-field">
+                                        <label class="experience-field-label">תואר / תעודה / מגמה</label>
+                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: BA במנהל עסקים">
+                                    </div>
+                                    <div class="experience-field">
+                                        <label class="experience-field-label">שנים/שנת סיום</label>
+                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2015 - 2018">
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
                         <button type="button" id="btn-add-education" class="section-add-btn" onclick="handleAddEducation(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-education-label">הוסף השכלה נוספת</span>
@@ -482,7 +526,23 @@
                         <div class="section-editor-head">
                             <p class="font-bold dynamic-text text-sm" id="label-military">שירות צבאי / לאומי</p>
                         </div>
-                        <div id="military-items"></div>
+                        <div id="military-items">
+                            <article class="experience-card entry-card is-open" role="listitem" data-entry-index="0">
+                                <div class="experience-card-toolbar">
+                                    <span class="experience-card-badge">שירות 1</span>
+                                </div>
+                                <div class="experience-card-fields">
+                                    <div class="experience-field">
+                                        <label class="experience-field-label">תפקיד / מסגרת</label>
+                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
+                                    </div>
+                                    <div class="experience-field">
+                                        <label class="experience-field-label">פירוט קצר / שנים</label>
+                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
                         <button type="button" id="btn-add-military" class="section-add-btn" onclick="handleAddMilitary(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                             <span id="btn-add-military-label">הוסף שירות</span>
@@ -494,7 +554,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills" id="label-skills">כישורים</label>
-                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" placeholder="לדוגמה: ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה.</p>
                     </div>
                     <div class="languages-section" id="languages-section">
@@ -875,10 +935,14 @@
             <div id="pay-step" class="pay-step-simple">
                 <div class="pay-head">
                     <h3 id="pay-title">תשלום ₪10 בלבד</h3>
-                    <p id="pay-subtitle">סירקו את הקוד במחשב, או לחצו לפתיחת Bit בנייד.</p>
+                    <p id="pay-subtitle">
+                        <span class="pay-sub-desktop">סירקו את הקוד במחשב, או לחצו לפתיחת Bit בנייד.</span>
+                        <span class="pay-sub-mobile" aria-hidden="true">לחצו למעבר מאובטח לתשלום באפליקציית Bit</span>
+                    </p>
                 </div>
 
-                <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" value="" class="sr-only" tabindex="-1" aria-hidden="true" dir="ltr">
+                <label id="checkout-phone-label" class="sr-only" for="checkout-contact">מספר טלפון לזיהוי ההעברה</label>
+                <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" value="" class="sr-only pay-phone-input" tabindex="-1" aria-hidden="true" dir="ltr" placeholder="050-1234567">
                 <p id="code-feedback" class="pay-feedback" role="status"></p>
 
                 <div class="pay-bit-block">
@@ -887,21 +951,16 @@
                         <figcaption>סריקה מהמחשב</figcaption>
                     </figure>
                     <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">שלמו ב-Bit (₪10)</a>
-                </div>
-
-                <div id="pay-live-status" class="hidden pay-live-status" aria-live="polite">
-                    <div id="manual-order-panel" class="hidden" aria-hidden="true">
-                        <p id="manual-order-id" class="sr-only" dir="ltr">—</p>
+                    <div id="pay-live-status" class="pay-live-status" aria-live="polite">
+                        <div id="manual-order-panel" class="hidden" aria-hidden="true">
+                            <p id="manual-order-id" class="sr-only" dir="ltr">—</p>
+                        </div>
+                        <div class="pay-live-row" role="status">
+                            <div class="pay-wait-spinner animate-spin" aria-hidden="true"></div>
+                            <p id="manual-order-status">ממתין לאישור תשלום... (ההורדה תתחיל אוטומטית)</p>
+                        </div>
                     </div>
-                    <div class="pay-live-row" role="status">
-                        <div class="pay-wait-spinner animate-spin" aria-hidden="true"></div>
-                        <p id="manual-order-status">ממתין לאישור ההעברה...</p>
-                    </div>
                 </div>
-
-                <button type="button" id="btn-proceed-payment" class="pay-verify-btn">
-                    התחל בדיקת תשלום
-                </button>
             </div>
 
             <div id="pay-wait-step" class="hidden" aria-hidden="true"></div>
@@ -960,8 +1019,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=formux2"></script>
-    <script src="lib/entryEditor.js?v=formux2"></script>
+    <script src="lib/experienceEditor.js?v=formux3"></script>
+    <script src="lib/entryEditor.js?v=formux3"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=tpl-he3"></script>
@@ -1126,6 +1185,9 @@
                 phTitle: 'לדוגמה: מנהל פרויקטים',
                 phLocation: 'לדוגמה: תל אביב',
                 phSummary: 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור',
+                phSkills: 'לדוגמה: ניהול צוותים, CRM, Excel מתקדם',
+                phReferences: 'שם\nתפקיד / חברה\nטלפון\nאימייל',
+                phLinkedin: 'linkedin.com/in/...',
                 labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות / References' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
                 examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full-Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
@@ -1205,6 +1267,9 @@
                 phTitle: 'e.g. Project manager',
                 phLocation: 'e.g. Tel Aviv',
                 phSummary: 'e.g. Project manager experienced in leading teams and growing revenue',
+                phSkills: 'e.g. Team leadership, CRM, Advanced Excel',
+                phReferences: 'Name\nTitle / company\nPhone\nEmail',
+                phLinkedin: 'linkedin.com/in/...',
                 labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language...', languagesLevel: 'Proficiency...', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency, then tap Add.', languagesPopular: 'Popular', languagesMore: 'More languages', references: 'References' },
                 i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
                 examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] },
@@ -1456,6 +1521,42 @@
         }
         preloadCvFonts();
 
+        function patchSectionPlaceholders(lang) {
+            const en = lang === 'en';
+            const setPh = (sel, he, english) => {
+                document.querySelectorAll(sel).forEach((el) => {
+                    el.placeholder = en ? english : he;
+                });
+            };
+            setPh('#experience-items [data-job-employer], #job-seed-company', 'לדוגמה: חברת דמו', 'e.g. Demo Ltd');
+            setPh('#experience-items [data-job-role], #job-seed-role', 'לדוגמה: מנהל פרויקטים', 'e.g. Project manager');
+            setPh('#experience-items [data-job-dates], #job-seed-dates', 'לדוגמה: 2021 - היום', 'e.g. 2021 - Present');
+            setPh('#experience-items [data-job-desc], #job-seed-desc', '• הובלתי צוות והגדלתי יעדים ב-35%\n• בניתי תהליכי עבודה מול לקוחות מפתח', '• Led a team and grew targets by 35%\n• Built processes with key accounts');
+            setPh('#education-items [data-entry-org]', 'לדוגמה: אוניברסיטת תל אביב', 'e.g. Tel Aviv University');
+            setPh('#education-items [data-entry-title]', 'לדוגמה: BA במנהל עסקים', 'e.g. BA in Business Administration');
+            setPh('#education-items [data-entry-dates]', 'לדוגמה: 2015 - 2018', 'e.g. 2015 - 2018');
+            setPh('#military-items [data-entry-title]', 'לדוגמה: מפקד כיתה, חיל האוויר', 'e.g. Squad commander, Air Force');
+            setPh('#military-items [data-entry-dates]', 'לדוגמה: 2012 - 2015', 'e.g. 2012 - 2015');
+            document.querySelectorAll('#education-items .experience-card').forEach((card) => {
+                const inputs = card.querySelectorAll('input');
+                if (inputs[0] && !inputs[0].hasAttribute('data-entry-org') && !inputs[0].hasAttribute('data-entry-title')) {
+                    inputs[0].placeholder = en ? 'e.g. Tel Aviv University' : 'לדוגמה: אוניברסיטת תל אביב';
+                    if (inputs[1]) inputs[1].placeholder = en ? 'e.g. BA in Business Administration' : 'לדוגמה: BA במנהל עסקים';
+                    if (inputs[2]) inputs[2].placeholder = en ? 'e.g. 2015 - 2018' : 'לדוגמה: 2015 - 2018';
+                }
+            });
+            document.querySelectorAll('#military-items .experience-card').forEach((card) => {
+                const inputs = card.querySelectorAll('input');
+                if (inputs[0] && !inputs[0].hasAttribute('data-entry-title') && !inputs[0].hasAttribute('data-entry-dates')) {
+                    inputs[0].placeholder = en ? 'e.g. Squad commander, Air Force' : 'לדוגמה: מפקד כיתה, חיל האוויר';
+                    if (inputs[1]) inputs[1].placeholder = en ? 'e.g. 2012 - 2015' : 'לדוגמה: 2012 - 2015';
+                }
+            });
+            document.querySelectorAll('.experience-present-btn').forEach((btn) => {
+                btn.textContent = en ? 'Present' : 'נוכחי';
+            });
+        }
+
         function applyCvI18n(lang) {
             const pack = CV_I18N[lang] || CV_I18N.he;
             document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -1565,10 +1666,23 @@
             const titleEl = document.getElementById('in-title');
             const locEl = document.getElementById('in-location');
             const summaryEl = document.getElementById('in-summary');
+            const skillsEl = document.getElementById('in-skills');
+            const refsEl = document.getElementById('in-references');
+            const linkedinEl = document.getElementById('in-linkedin');
             if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Israel Israeli' : 'לדוגמה: ישראל ישראלי');
             if (titleEl) titleEl.placeholder = pack.phTitle || (lang === 'en' ? 'e.g. Project manager' : 'לדוגמה: מנהל פרויקטים');
             if (locEl) locEl.placeholder = pack.phLocation || (lang === 'en' ? 'e.g. Tel Aviv' : 'לדוגמה: תל אביב');
             if (summaryEl) summaryEl.placeholder = pack.phSummary || (lang === 'en' ? 'e.g. Project manager experienced in leading teams' : 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים');
+            if (skillsEl && pack.phSkills) skillsEl.placeholder = pack.phSkills;
+            if (refsEl && pack.phReferences) refsEl.placeholder = pack.phReferences;
+            if (linkedinEl && pack.phLinkedin) linkedinEl.placeholder = pack.phLinkedin;
+            ['QCExperience', 'QCEducation', 'QCMilitary'].forEach(function (key) {
+                try {
+                    const api = window[key];
+                    if (api && typeof api.applyI18n === 'function') api.applyI18n();
+                } catch (err) { /* keep switching language */ }
+            });
+            patchSectionPlaceholders(lang);
             const layoutName = window.QCLayout || (typeof currentLayoutName === 'function' && currentLayoutName()) || '';
             if (layoutName === 'charcoal' && lang === 'en') {
                 const short = { summary: 'Profile', experience: 'Experience', languages: 'Language', references: 'References', contact: 'Contact', skills: 'Skills', educationSide: 'Education', education: 'Education' };
@@ -1610,8 +1724,11 @@
 
         function refreshSectionEditors() {
             if (window.QCExperience && typeof QCExperience.refresh === 'function') QCExperience.refresh();
+            else if (window.QCExperience && typeof QCExperience.ensure === 'function') QCExperience.ensure();
             if (window.QCEducation && typeof QCEducation.refresh === 'function') QCEducation.refresh();
+            else if (window.QCEducation && typeof QCEducation.ensure === 'function') QCEducation.ensure();
             if (window.QCMilitary && typeof QCMilitary.refresh === 'function') QCMilitary.refresh();
+            else if (window.QCMilitary && typeof QCMilitary.ensure === 'function') QCMilitary.ensure();
         }
         window.refreshSectionEditors = refreshSectionEditors;
 
@@ -1678,6 +1795,7 @@
             applyCvI18n(next);
             if (swapSample) fillCvSample(next);
             else if (!restore && typeof relabelLanguageField === 'function') relabelLanguageField();
+            patchSectionPlaceholders(next);
             if (!restore && next === 'en') {
                 const font = document.getElementById('font-select');
                 const hebrewOnly = { Alef: 1, 'David Libre': 1, 'Secular One': 1 };
@@ -3127,19 +3245,69 @@
             if (window.QCStudioStep === 3) applyStudioStep(2, { silent: true });
         }
 
+        function phoneDigits(raw) {
+            return String(raw || '').replace(/\D/g, '');
+        }
+
+        function cleanPhoneSource(raw) {
+            return String(raw || '').replace(/^📞\s*/, '').trim();
+        }
+
         function readCvFormPhone() {
-            const fromCv = document.getElementById('in-phone');
-            const value = String(fromCv && 'value' in fromCv ? fromCv.value : '').trim();
-            const digits = value.replace(/\D/g, '');
-            if (!digits || digits === '0501234567' || digits === '0540000000') return '';
-            return value;
+            const candidates = [];
+            const form = document.getElementById('in-phone');
+            if (form && 'value' in form) candidates.push(form.value);
+            const preview = document.getElementById('out-phone');
+            if (preview) candidates.push(preview.textContent);
+            const side = document.getElementById('out-phone-side');
+            if (side) candidates.push(side.textContent);
+            try {
+                const draft = JSON.parse(localStorage.getItem('qc_cv_draft_v1') || 'null');
+                if (draft && draft['in-phone']) candidates.push(draft['in-phone']);
+            } catch (err) { /* ignore */ }
+            for (const raw of candidates) {
+                const value = cleanPhoneSource(raw);
+                if (phoneDigits(value).length >= 9) return value;
+            }
+            return '';
+        }
+
+        function applyMobilePayCopy() {
+            const modal = document.getElementById('payment-modal');
+            if (!modal) return;
+            const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+            const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(ua)
+                || window.matchMedia('(max-width: 767px)').matches
+                || document.documentElement.classList.contains('qc-narrow');
+            modal.classList.toggle('is-mobile-pay', mobile);
+            const desk = modal.querySelector('.pay-sub-desktop');
+            const mob = modal.querySelector('.pay-sub-mobile');
+            desk?.setAttribute('aria-hidden', mobile ? 'true' : 'false');
+            mob?.setAttribute('aria-hidden', mobile ? 'false' : 'true');
+            const qr = modal.querySelector('.pay-qr-wrap');
+            if (qr instanceof HTMLElement) qr.hidden = mobile;
+            const bit = document.getElementById('btn-open-bit');
+            bit?.removeAttribute('disabled');
+            bit?.removeAttribute('aria-disabled');
+            if (bit instanceof HTMLElement) bit.style.pointerEvents = 'auto';
         }
 
         function prefillCheckoutContact() {
             const el = document.getElementById('checkout-contact');
             if (!(el instanceof HTMLInputElement)) return;
-            el.placeholder = '050-1234567';
-            el.value = readCvFormPhone();
+            const phone = readCvFormPhone();
+            if (phone) el.value = phone;
+            const hasPhone = phoneDigits(el.value).length >= 9;
+            el.classList.toggle('sr-only', hasPhone);
+            el.classList.toggle('is-visible', !hasPhone);
+            if (hasPhone) {
+                el.setAttribute('tabindex', '-1');
+                el.setAttribute('aria-hidden', 'true');
+            } else {
+                el.removeAttribute('tabindex');
+                el.setAttribute('aria-hidden', 'false');
+                el.placeholder = 'מספר טלפון לזיהוי ההעברה';
+            }
         }
 
         function openPaymentModal() {
@@ -3155,7 +3323,13 @@
             document.getElementById('pay-step')?.classList.remove('hidden');
             document.getElementById('pay-wait-step')?.classList.add('hidden');
             document.getElementById('download-step')?.classList.add('hidden');
+            applyMobilePayCopy();
             prefillCheckoutContact();
+            document.getElementById('pay-live-status')?.classList.remove('hidden');
+            const bitBtn = document.getElementById('btn-open-bit');
+            bitBtn?.removeAttribute('disabled');
+            bitBtn?.removeAttribute('aria-disabled');
+            if (bitBtn instanceof HTMLElement) bitBtn.style.pointerEvents = 'auto';
             window.setTimeout(() => document.getElementById('btn-close-modal')?.focus(), 30);
         }
 

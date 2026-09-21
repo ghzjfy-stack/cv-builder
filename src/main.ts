@@ -9,7 +9,6 @@ import {
   bitPayUrl,
   displayAmountValue,
   displayCompareValue,
-  isLikelyIsraeliMobile,
   isPackId,
   packAmount,
   whatsappPdfShareUrl,
@@ -36,6 +35,9 @@ let selectedPack: PackId = "basic";
 let manualOrderPoll = null;
 let activeManualOrderId = "";
 let checkoutInflight = null;
+let checkoutPhoneTimer = 0;
+
+const WAIT_STATUS = "ממתין לאישור תשלום... (ההורדה תתחיל אוטומטית)";
 
 function normalizeStoredOrderId(value) {
   const id = String(value || "")
@@ -170,6 +172,11 @@ function showDownloadStep() {
 }
 
 function setFeedback(text, ok) {
+  if (!ok && /טלפון/.test(String(text || ""))) {
+    setCheckoutPhoneFieldVisible(phoneDigits(requireCheckoutPhone()).length < 9);
+    enableBitButton();
+    return;
+  }
   const el = feedback();
   if (!el) return;
   el.textContent = text;
@@ -249,29 +256,24 @@ function stopManualOrderPoll() {
   }
 }
 
+function showAutoVerifyStatus(statusText) {
+  const live = document.getElementById("pay-live-status");
+  live?.classList.remove("hidden");
+  const statusEl = document.getElementById("manual-order-status");
+  if (statusEl) statusEl.textContent = statusText || WAIT_STATUS;
+}
+
 function setTransferWaiting(on, orderId, statusText) {
   const live = document.getElementById("pay-live-status");
   const panel = document.getElementById("manual-order-panel");
   const idEl = document.getElementById("manual-order-id");
-  const statusEl = document.getElementById("manual-order-status");
-  const proceed = document.getElementById("btn-proceed-payment");
   const root = modal();
   root?.classList.toggle("is-waiting", Boolean(on));
-  if (on) {
-    live?.classList.remove("hidden");
-    panel?.classList.add("hidden");
-    if (idEl && orderId) idEl.textContent = orderId;
-    if (statusEl) {
-      statusEl.textContent = statusText || "ממתין לאישור ההעברה...";
-    }
-    if (proceed) {
-      proceed.setAttribute("disabled", "true");
-      proceed.textContent = "בודקים את התשלום...";
-    }
-  } else if (proceed) {
-    proceed.removeAttribute("disabled");
-    proceed.textContent = "התחל בדיקת תשלום";
-  }
+  live?.classList.remove("hidden");
+  panel?.classList.add("hidden");
+  if (idEl && orderId) idEl.textContent = orderId;
+  showAutoVerifyStatus(statusText || WAIT_STATUS);
+  enableBitButton();
 }
 
 function setManualOrderUi(orderId, statusText) {
@@ -291,7 +293,7 @@ async function startManualOrderPolling(orderId, options = {}) {
   const quiet = Boolean(options.quiet);
   stopManualOrderPoll();
   persistManualOrderId(orderId, "PENDING");
-  setManualOrderUi(orderId, "ממתין לאישור ההעברה...");
+  setManualOrderUi(orderId, WAIT_STATUS);
   if (!quiet || modal()?.classList.contains("flex")) {
     showWaitStep();
   }
@@ -325,7 +327,7 @@ async function startManualOrderPolling(orderId, options = {}) {
     }
     if (result.error && result.error !== "cancelled") {
       const soft = /kv|redis|אחסון|database/i.test(String(result.error))
-        ? "ממתין לאישור ההעברה..."
+        ? WAIT_STATUS
         : result.error;
       setManualOrderUi(orderId, soft);
       if (!/kv|redis|אחסון|database/i.test(String(result.error))) {
@@ -345,20 +347,107 @@ function resumePendingManualOrderIfNeeded() {
   void startManualOrderPolling(existing, { quiet: true });
 }
 
+function enableBitButton() {
+  const bitBtn = document.getElementById("btn-open-bit");
+  if (!bitBtn) return;
+  bitBtn.removeAttribute("disabled");
+  bitBtn.removeAttribute("aria-disabled");
+  if (bitBtn instanceof HTMLElement) bitBtn.style.pointerEvents = "auto";
+}
+
+function phoneDigits(raw) {
+  return String(raw || "").replace(/\D/g, "");
+}
+
+function cleanPhoneSource(raw) {
+  return String(raw || "").replace(/^📞\s*/, "").trim();
+}
+
+function isMobilePayView() {
+  return (
+    prefersSameTabCheckout() ||
+    (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) ||
+    document.documentElement.classList.contains("qc-narrow")
+  );
+}
+
+function applyMobilePayCopy() {
+  const root = modal();
+  const mobile = isMobilePayView();
+  root?.classList.toggle("is-mobile-pay", mobile);
+  const desk = document.querySelector(".pay-sub-desktop");
+  const mob = document.querySelector(".pay-sub-mobile");
+  desk?.setAttribute("aria-hidden", mobile ? "true" : "false");
+  mob?.setAttribute("aria-hidden", mobile ? "false" : "true");
+  const qrWrap = document.querySelector(".pay-qr-wrap");
+  if (qrWrap instanceof HTMLElement) qrWrap.hidden = mobile;
+  enableBitButton();
+}
+
 function requireCheckoutPhone() {
-  const contact = readCheckoutContact() || readCvFormPhone();
-  if (contact && isLikelyIsraeliMobile(contact)) return contact;
-  return String(contact || "").trim();
+  const form = readCvFormPhone();
+  const checkout = readCheckoutContact();
+  if (phoneDigits(form).length >= 9) return form;
+  if (phoneDigits(checkout).length >= 9) return checkout;
+  return String(form || checkout || "").trim();
+}
+
+function checkoutPhoneInput() {
+  const el = document.getElementById("checkout-contact");
+  return el instanceof HTMLInputElement ? el : null;
+}
+
+function setCheckoutPhoneFieldVisible(visible) {
+  const el = checkoutPhoneInput();
+  if (!el) return;
+  el.classList.toggle("sr-only", !visible);
+  el.classList.toggle("is-visible", Boolean(visible));
+  if (visible) {
+    el.removeAttribute("tabindex");
+    el.setAttribute("aria-hidden", "false");
+    el.placeholder = "מספר טלפון לזיהוי ההעברה";
+  } else {
+    el.setAttribute("tabindex", "-1");
+    el.setAttribute("aria-hidden", "true");
+  }
+}
+
+function syncCheckoutPhoneFromForm() {
+  const el = checkoutPhoneInput();
+  const fromForm = readCvFormPhone();
+  if (el && fromForm) el.value = fromForm;
+  const phone = requireCheckoutPhone();
+  setCheckoutPhoneFieldVisible(phoneDigits(phone).length < 9);
+  enableBitButton();
+  return phone;
+}
+
+function startCheckoutVerification() {
+  showPayStep();
+  showAutoVerifyStatus();
+  const contact = syncCheckoutPhoneFromForm();
+  if (phoneDigits(contact).length < 9) {
+    setCheckoutPhoneFieldVisible(true);
+    enableBitButton();
+    return;
+  }
+  void proceedToPayment();
 }
 
 async function proceedToPayment() {
-  const contact = requireCheckoutPhone();
+  const contact = syncCheckoutPhoneFromForm();
+  if (phoneDigits(contact).length < 9) {
+    setCheckoutPhoneFieldVisible(true);
+    showAutoVerifyStatus();
+    enableBitButton();
+    return null;
+  }
   if (checkoutInflight) return checkoutInflight;
 
   const run = (async () => {
     const existingId = activeManualOrderId || readPersistedManualOrderId();
     setFeedback("", false);
-    setTransferWaiting(true, existingId || "…", "ממתין לאישור ההעברה...");
+    setTransferWaiting(true, existingId || "…", WAIT_STATUS);
     showWaitStep();
     let created;
     try {
@@ -379,12 +468,17 @@ async function proceedToPayment() {
         return { ok: true, order_id: existingId };
       }
       const raw = created.error || "לא הצלחנו לפתוח הזמנה.";
+      if (/טלפון/.test(raw)) {
+        setCheckoutPhoneFieldVisible(true);
+        showAutoVerifyStatus();
+        enableBitButton();
+        return null;
+      }
       const message = /kv|redis|אחסון|database/i.test(raw)
         ? "לא הצלחנו לפתוח הזמנה. נסו שוב."
         : raw;
       setFeedback(message, false);
-      setTransferWaiting(false);
-      document.getElementById("pay-live-status")?.classList.add("hidden");
+      setTransferWaiting(true, "", WAIT_STATUS);
       showPayStep();
       return null;
     }
@@ -498,11 +592,6 @@ function copyBitPhone(e) {
   void navigator.clipboard.writeText(CHECKOUT.bitPhoneCopy).then(flashCopyButton, flashCopyButton);
 }
 
-async function ensureManualOrderForCheckout() {
-  const created = await proceedToPayment();
-  return created?.order_id || activeManualOrderId || readPersistedManualOrderId() || null;
-}
-
 function bindDeepLinkAnchor(id, url) {
   const el = document.getElementById(id);
   if (!el || !url) return;
@@ -515,14 +604,14 @@ function bindDeepLinkAnchor(id, url) {
 }
 
 function openBitApp(e) {
-  e?.preventDefault?.();
-  void (async () => {
-    const orderId = await ensureManualOrderForCheckout();
-    if (!orderId) return;
-    const url = bitAppOpenUrl(CHECKOUT.amountIls);
-    bindDeepLinkAnchor("btn-open-bit", url);
-    openDeepLink(url);
-  })();
+  const url = bitAppOpenUrl(CHECKOUT.amountIls);
+  bindDeepLinkAnchor("btn-open-bit", url);
+  void startCheckoutVerification();
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  openDeepLink(url);
 }
 
 function blobToBase64(blob) {
@@ -712,18 +801,31 @@ function readCheckoutContact() {
 }
 
 function readCvFormPhone() {
+  const candidates = [];
   const fromCv = document.getElementById("in-phone");
-  const value = String(fromCv && "value" in fromCv ? fromCv.value : "").trim();
-  const digits = value.replace(/\D/g, "");
-  if (!digits || digits === "0501234567" || digits === "0540000000") return "";
-  return value;
+  if (fromCv && "value" in fromCv) candidates.push(fromCv.value);
+  const preview = document.getElementById("out-phone");
+  if (preview) candidates.push(preview.textContent);
+  const side = document.getElementById("out-phone-side");
+  if (side) candidates.push(side.textContent);
+  try {
+    const draft = JSON.parse(localStorage.getItem("qc_cv_draft_v1") || "null");
+    if (draft && draft["in-phone"]) candidates.push(draft["in-phone"]);
+  } catch {
+    /* ignore */
+  }
+  for (const raw of candidates) {
+    const value = cleanPhoneSource(raw);
+    if (phoneDigits(value).length >= 9) return value;
+  }
+  return "";
 }
 
 function prefillCheckoutContact() {
-  const el = document.getElementById("checkout-contact");
-  if (!(el instanceof HTMLInputElement)) return;
+  const el = checkoutPhoneInput();
+  if (!el) return;
   el.placeholder = "050-1234567";
-  el.value = readCvFormPhone();
+  syncCheckoutPhoneFromForm();
 }
 
 function triggerPDFDownload() {
@@ -739,31 +841,22 @@ function triggerPDFDownload() {
 
 function openCheckoutModal() {
   openModal();
-  stopManualOrderPoll();
   setFeedback("", false);
   selectedPack = "basic";
   applyPackUi();
   prefillCheckoutContact();
+  showPayStep();
+  showAutoVerifyStatus();
 
   const existing = readPersistedManualOrderId();
   if (existing && !isUnlocked()) {
     void startManualOrderPolling(existing);
-  } else {
-    persistManualOrderId("");
-    showPayStep();
-    const orderIdEl = document.getElementById("manual-order-id");
-    if (orderIdEl) orderIdEl.textContent = "—";
-    const orderStatusEl = document.getElementById("manual-order-status");
-    if (orderStatusEl) orderStatusEl.textContent = "ממתין לאישור ההעברה...";
-    document.getElementById("manual-order-panel")?.classList.add("hidden");
-    document.getElementById("pay-live-status")?.classList.add("hidden");
-    modal()?.classList.remove("is-waiting");
-    const proceed = document.getElementById("btn-proceed-payment");
-    if (proceed) {
-      proceed.removeAttribute("disabled");
-      proceed.textContent = "התחל בדיקת תשלום";
-    }
+    return;
   }
+  persistManualOrderId("");
+  const orderIdEl = document.getElementById("manual-order-id");
+  if (orderIdEl) orderIdEl.textContent = "—";
+  startCheckoutVerification();
 }
 
 function onDownloadPdfClick(e) {
@@ -813,15 +906,13 @@ function applyPackUi() {
   bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(amount));
   const bitBtn = document.getElementById("btn-open-bit");
   if (bitBtn) bitBtn.textContent = `שלמו ב-Bit (₪${display})`;
+  enableBitButton();
   const qr = document.getElementById("bit-qr");
   if (qr instanceof HTMLImageElement) {
     qr.src = bitPayUrl(amount);
     qr.alt = `קוד QR לתשלום ${display} ₪ ב-Bit`;
   }
-  const qrWrap = document.querySelector(".pay-qr-wrap");
-  if (qrWrap instanceof HTMLElement) {
-    qrWrap.hidden = prefersSameTabCheckout();
-  }
+  applyMobilePayCopy();
   const saveEl = document.getElementById("pay-save-badge");
   if (saveEl) saveEl.textContent = "מחיר השקה — 10 ₪ בלבד";
   const nameEl = document.getElementById("mvp-pack-name");
@@ -963,6 +1054,7 @@ function bind() {
   window.closePaymentModal = dismissCheckout;
   window.onDownloadPdfClick = onDownloadPdfClick;
   window.triggerPDFDownload = triggerPDFDownload;
+  window.startCheckoutVerification = startCheckoutVerification;
 
   styleCta(document.getElementById("btn-download-pdf"));
   styleCta(document.getElementById("btn-download-pdf-mobile"));
@@ -985,8 +1077,16 @@ function bind() {
   document.querySelectorAll(".btn-back-checkout").forEach((btn) => {
     btn.addEventListener("click", dismissCheckout);
   });
-  document.getElementById("btn-proceed-payment")?.addEventListener("click", () => {
-    void proceedToPayment();
+  checkoutPhoneInput()?.addEventListener("input", () => {
+    window.clearTimeout(checkoutPhoneTimer);
+    checkoutPhoneTimer = window.setTimeout(() => {
+      const formPhone = document.getElementById("in-phone");
+      const typed = requireCheckoutPhone();
+      if (formPhone instanceof HTMLInputElement && phoneDigits(formPhone.value).length < 9 && typed) {
+        formPhone.value = typed;
+      }
+      startCheckoutVerification();
+    }, 400);
   });
   resumePendingManualOrderIfNeeded();
   window.addEventListener("pageshow", () => {

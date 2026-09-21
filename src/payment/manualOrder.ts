@@ -52,6 +52,7 @@ export async function createManualOrderSession(input: {
   const payload = {
     pack: input.pack,
     contact: String(input.contact || "").trim(),
+    phone: String(input.contact || "").trim(),
     payment_method: input.paymentMethod,
     customer_name: String(input.customerName || "").trim(),
     amount_ils: input.amountIls,

@@ -1129,13 +1129,109 @@
             z-index: 20;
             pointer-events: auto !important;
         }
-        #lang-pick-name {
+        .qc-combo {
+            position: relative;
             flex: 1 1 0;
             min-width: 0;
+            z-index: 21;
         }
-        #lang-pick-level {
-            flex: 1 1 0;
-            min-width: 0;
+        .qc-combo-btn {
+            width: 100%;
+            min-height: 2.75rem;
+            padding: 0.55rem 2.1rem 0.55rem 0.75rem;
+            border: 1px solid #64748b;
+            border-radius: 0.7rem;
+            background: #0f172a;
+            color: #f8fafc;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-align: start;
+            cursor: pointer;
+            pointer-events: auto !important;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .qc-combo-btn::after {
+            content: "";
+            position: absolute;
+            inset-inline-end: 0.75rem;
+            top: 50%;
+            width: 0.45rem;
+            height: 0.45rem;
+            border-inline-end: 2px solid #94a3b8;
+            border-bottom: 2px solid #94a3b8;
+            transform: translateY(-70%) rotate(45deg);
+            pointer-events: none;
+        }
+        .qc-combo-btn:hover {
+            border-color: #00E5FF;
+        }
+        .qc-combo:has(select[aria-invalid="true"]) .qc-combo-btn {
+            border-color: #f87171;
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.25);
+        }
+        .qc-combo-menu {
+            display: none;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #0b1220;
+            border: 1px solid #64748b;
+            border-radius: 0.75rem;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            padding: 0.3rem;
+            color: #f8fafc;
+        }
+        .qc-combo-menu:not([hidden]) {
+            display: block;
+        }
+        .qc-combo-heading {
+            padding: 0.4rem 0.7rem 0.25rem;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: #94a3b8;
+            letter-spacing: 0.04em;
+        }
+        .qc-combo-option {
+            display: block;
+            width: 100%;
+            text-align: start;
+            padding: 0.55rem 0.7rem;
+            background: transparent;
+            border: 0;
+            color: #f8fafc;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            line-height: 1.35;
+        }
+        .qc-combo-option:hover,
+        .qc-combo-option:focus {
+            background: rgba(0, 229, 255, 0.16);
+            color: #ffffff;
+            outline: none;
+        }
+        .qc-combo-option[aria-selected="true"] {
+            background: rgba(0, 229, 255, 0.24);
+        }
+        .qc-combo-option:disabled,
+        .qc-combo-option[aria-disabled="true"] {
+            opacity: 0.38;
+            cursor: not-allowed;
+        }
+        .lang-native-select {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
         .lang-pick-add-btn,
         #lang-pick-add {
@@ -1146,8 +1242,7 @@
             .lang-picker-controls {
                 flex-wrap: wrap;
             }
-            #lang-pick-name,
-            #lang-pick-level {
+            .qc-combo {
                 flex: 1 1 8rem;
             }
         }
@@ -1178,14 +1273,11 @@
             font-weight: 600;
             color: #e2e8f0;
         }
-        .lang-pick-row select {
+        .lang-pick-row .lang-row-level-btn {
             flex: 0 1 12rem;
             width: auto;
             min-width: 10rem;
         }
-        #lang-picker select,
-        #lang-pick-name,
-        #lang-pick-level,
         .lang-pick-select,
         .lang-pick-row select {
             appearance: auto;
@@ -1198,10 +1290,10 @@
             padding: 0.55rem 0.75rem;
             border: 1px solid #64748b;
             border-radius: 0.7rem;
-            background-color: #0f172a;
-            color: #ffffff;
-            -webkit-text-fill-color: #ffffff;
-            color-scheme: dark;
+            background-color: #ffffff;
+            color: #0f172a;
+            -webkit-text-fill-color: #0f172a;
+            color-scheme: light;
         }
         .lang-pick-add-btn,
         #lang-pick-add {
@@ -2857,31 +2949,23 @@
             background: #0F172A;
             color: #FFFFFF;
         }
-        #lang-picker,
-        #lang-picker select,
-        .lang-pick-row select {
-            color-scheme: dark;
-        }
-        #lang-picker select,
-        #lang-picker select.studio-field,
         .lang-pick-row select,
         .lang-pick-select {
-            background-color: #0f172a;
-            color: #ffffff;
-            -webkit-text-fill-color: #ffffff;
+            color-scheme: light;
+            background-color: #ffffff;
+            color: #0f172a;
+            -webkit-text-fill-color: #0f172a;
             pointer-events: auto !important;
             cursor: pointer !important;
         }
-        #lang-picker select option,
         .lang-pick-row select option,
         .lang-pick-select option,
-        #lang-picker optgroup,
-        #studio-form-column select option {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            -webkit-text-fill-color: #ffffff !important;
+        #studio-form-column .lang-pick-row select option {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            -webkit-text-fill-color: #0f172a !important;
         }
-        #lang-picker select[aria-invalid="true"] {
+        .qc-combo:has(select[aria-invalid="true"]) .qc-combo-btn {
             border-color: #f87171;
             box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.25);
         }

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=forms2">
+    <link rel="stylesheet" href="./app.css?v=langs5">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -504,16 +504,34 @@ Shoreline B2B
                         <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.</p>
                     </div>
                     <div class="languages-section" id="languages-section">
-                        <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages" for="lang-pick-name">שפות</label>
+                        <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages" for="lang-pick-name-btn">שפות</label>
                         <input type="hidden" id="in-languages" value="עברית (שפת אם), אנגלית (מקצועית)">
                         <div id="lang-picker" class="lang-picker">
                             <div class="lang-picker-controls">
-                                <select id="lang-pick-name" name="language" class="lang-pick-select studio-field" aria-label="בחר שפה..." onchange="onLangPickChange(event)">
-                                    <option value="">בחר שפה...</option>
-                                </select>
-                                <select id="lang-pick-level" name="proficiency" class="lang-pick-select studio-field" aria-label="רמת שליטה..." onchange="onLangPickChange(event)">
-                                    <option value="">רמת שליטה...</option>
-                                </select>
+                                <div class="qc-combo" id="lang-name-combo">
+                                    <button type="button" id="lang-pick-name-btn" class="qc-combo-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="lang-pick-name-menu">
+                                        <span id="lang-pick-name-label">בחר שפה...</span>
+                                    </button>
+                                    <div id="lang-pick-name-menu" class="qc-combo-menu" role="listbox" hidden></div>
+                                    <select id="lang-pick-name" name="language" class="lang-native-select" aria-hidden="true" tabindex="-1" onchange="onLangPickChange(event)">
+                                        <option value="">בחר שפה...</option>
+                                    </select>
+                                </div>
+                                <div class="qc-combo" id="lang-level-combo">
+                                    <button type="button" id="lang-pick-level-btn" class="qc-combo-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="lang-pick-level-menu">
+                                        <span id="lang-pick-level-label">רמת שליטה...</span>
+                                    </button>
+                                    <div id="lang-pick-level-menu" class="qc-combo-menu" role="listbox" hidden></div>
+                                    <select id="lang-pick-level" name="proficiency" class="lang-native-select" aria-hidden="true" tabindex="-1" onchange="onLangPickChange(event)">
+                                        <option value="">רמת שליטה...</option>
+                                        <option value="native">שפת אם</option>
+                                        <option value="bilingual">שפת אם נוספת</option>
+                                        <option value="professional">רמה מקצועית גבוהה</option>
+                                        <option value="fluent">רמה גבוהה</option>
+                                        <option value="intermediate">רמה בינונית</option>
+                                        <option value="basic">רמה בסיסית</option>
+                                    </select>
+                                </div>
                                 <button type="button" id="lang-pick-add" class="lang-pick-add-btn" onclick="handleAddLanguage(event); return false;">הוסף</button>
                             </div>
                             <div id="lang-pick-list" class="lang-pick-list"></div>
@@ -1509,6 +1527,10 @@ Shoreline B2B
             if (typeof applyCvI18nAi === 'function') applyCvI18nAi();
             if (typeof syncMobilePreviewToggle === 'function') syncMobilePreviewToggle();
             if (typeof updateCvScore === 'function') updateCvScore();
+            const langNameBtn = document.getElementById('lang-pick-name-btn');
+            const langLevelBtn = document.getElementById('lang-pick-level-btn');
+            if (langNameBtn && pack.labels.languagesSelect) langNameBtn.setAttribute('aria-label', pack.labels.languagesSelect);
+            if (langLevelBtn && pack.labels.languagesLevel) langLevelBtn.setAttribute('aria-label', pack.labels.languagesLevel);
             const langNameSel = document.getElementById('lang-pick-name');
             const langLevelSel = document.getElementById('lang-pick-level');
             if (langNameSel && pack.labels.languagesSelect) langNameSel.setAttribute('aria-label', pack.labels.languagesSelect);
@@ -2087,11 +2109,137 @@ Shoreline B2B
             return { popular: popular, rest: rest };
         }
 
-        function optionSignature(sel) {
-            return Array.prototype.map.call(sel.options, (opt) => {
-                const group = opt.parentElement && opt.parentElement.tagName === 'OPTGROUP' ? opt.parentElement.label : '';
-                return [opt.value, opt.textContent, opt.disabled ? '1' : '0', group].join('\0');
-            }).join('|');
+        function syncLangComboLabels() {
+            const pack = CV_I18N[cvUiLang()] || CV_I18N.he;
+            const nameSel = document.getElementById('lang-pick-name');
+            const levelSel = document.getElementById('lang-pick-level');
+            const nameLabel = document.getElementById('lang-pick-name-label');
+            const levelLabel = document.getElementById('lang-pick-level-label');
+            if (nameLabel) {
+                const opt = nameSel && nameSel.value ? findLangOption(nameSel.value) : null;
+                const nameText = opt ? langOptionLabel(opt, cvUiLang()) : (pack.labels.languagesSelect || 'בחר שפה...');
+                nameLabel.textContent = nameText;
+                const nameBtn = document.getElementById('lang-pick-name-btn');
+                if (nameBtn) nameBtn.setAttribute('aria-label', nameText);
+            }
+            if (levelLabel) {
+                const lvl = levelSel && levelSel.value ? findLangLevel(levelSel.value) : null;
+                const levelText = lvl ? langLevelLabel(lvl, cvUiLang()) : (pack.labels.languagesLevel || 'רמת שליטה...');
+                levelLabel.textContent = levelText;
+                const levelBtn = document.getElementById('lang-pick-level-btn');
+                if (levelBtn) levelBtn.setAttribute('aria-label', levelText);
+            }
+        }
+
+        function closeLangMenus() {
+            ['name', 'level'].forEach((kind) => {
+                const menu = document.getElementById(kind === 'name' ? 'lang-pick-name-menu' : 'lang-pick-level-menu');
+                const host = document.getElementById(kind === 'name' ? 'lang-name-combo' : 'lang-level-combo');
+                const btn = document.getElementById(kind === 'name' ? 'lang-pick-name-btn' : 'lang-pick-level-btn');
+                if (menu) {
+                    menu.hidden = true;
+                    if (host && menu.parentElement !== host) host.appendChild(menu);
+                }
+                if (btn) btn.setAttribute('aria-expanded', 'false');
+            });
+            const rowMenu = document.getElementById('lang-row-level-menu');
+            if (rowMenu) {
+                rowMenu.hidden = true;
+                if (rowMenu.parentElement && rowMenu.parentElement !== document.body) {
+                    document.body.appendChild(rowMenu);
+                }
+            }
+            document.querySelectorAll('[data-lang-level-open]').forEach((btn) => btn.setAttribute('aria-expanded', 'false'));
+        }
+
+        function placeLangMenu(btn, menu) {
+            const r = btn.getBoundingClientRect();
+            const width = Math.max(r.width, 220);
+            const maxH = Math.min(320, Math.max(180, window.innerHeight - 24));
+            menu.style.position = 'fixed';
+            menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8)) + 'px';
+            menu.style.width = width + 'px';
+            menu.style.maxHeight = maxH + 'px';
+            const below = r.bottom + 4;
+            if (below + Math.min(maxH, 240) > window.innerHeight - 8 && r.top > 200) {
+                menu.style.top = Math.max(8, r.top - Math.min(maxH, r.top - 8) - 4) + 'px';
+            } else {
+                menu.style.top = below + 'px';
+            }
+            menu.style.zIndex = '10060';
+        }
+
+        function openLangMenu(kind) {
+            const isName = kind === 'name';
+            const btn = document.getElementById(isName ? 'lang-pick-name-btn' : 'lang-pick-level-btn');
+            const menu = document.getElementById(isName ? 'lang-pick-name-menu' : 'lang-pick-level-menu');
+            if (!btn || !menu) return;
+            const alreadyOpen = !menu.hidden && menu.parentElement === document.body;
+            closeLangMenus();
+            if (alreadyOpen) return;
+            fillLanguageSelects();
+            document.body.appendChild(menu);
+            menu.hidden = false;
+            btn.setAttribute('aria-expanded', 'true');
+            placeLangMenu(btn, menu);
+            const selected = menu.querySelector('.qc-combo-option[aria-selected="true"]') || menu.querySelector('.qc-combo-option:not([disabled])');
+            if (selected && typeof selected.focus === 'function') selected.focus();
+        }
+
+        function placeLangMenu(btn, menu) {
+            const r = btn.getBoundingClientRect();
+            const width = Math.max(r.width, 180);
+            const maxH = Math.min(280, Math.max(160, window.innerHeight - r.bottom - 16));
+            menu.style.position = 'fixed';
+            menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - width - 8)) + 'px';
+            menu.style.width = width + 'px';
+            menu.style.maxHeight = maxH + 'px';
+            if (r.bottom + maxH > window.innerHeight - 8 && r.top > maxH) {
+                menu.style.top = Math.max(8, r.top - maxH - 4) + 'px';
+            } else {
+                menu.style.top = (r.bottom + 4) + 'px';
+            }
+            menu.style.zIndex = '10060';
+        }
+
+        function openLangMenu(kind) {
+            const isName = kind === 'name';
+            const btn = document.getElementById(isName ? 'lang-pick-name-btn' : 'lang-pick-level-btn');
+            const menu = document.getElementById(isName ? 'lang-pick-name-menu' : 'lang-pick-level-menu');
+            if (!btn || !menu) return;
+            const alreadyOpen = !menu.hidden;
+            closeLangMenus();
+            if (alreadyOpen) return;
+            fillLanguageSelects();
+            menu.hidden = false;
+            btn.setAttribute('aria-expanded', 'true');
+            placeLangMenu(btn, menu);
+        }
+
+        function fillComboMenu(menu, items) {
+            if (!menu) return;
+            menu.replaceChildren();
+            items.forEach((item) => {
+                if (item.heading) {
+                    const head = document.createElement('div');
+                    head.className = 'qc-combo-heading';
+                    head.textContent = item.heading;
+                    menu.appendChild(head);
+                    return;
+                }
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'qc-combo-option';
+                btn.setAttribute('role', 'option');
+                btn.setAttribute('data-value', item.value);
+                btn.textContent = item.label;
+                if (item.disabled) {
+                    btn.disabled = true;
+                    btn.setAttribute('aria-disabled', 'true');
+                }
+                if (item.selected) btn.setAttribute('aria-selected', 'true');
+                menu.appendChild(btn);
+            });
         }
 
         function fillLanguageSelects() {
@@ -2100,64 +2248,62 @@ Shoreline B2B
             const nameSel = document.getElementById('lang-pick-name');
             const levelSel = document.getElementById('lang-pick-level');
             const taken = selectedLangIds();
+            const groups = languageSelectGroups();
             if (nameSel) {
                 const keep = langPickState.language || nameSel.value;
-                const groups = languageSelectGroups();
-                const scratch = document.createElement('select');
+                nameSel.replaceChildren();
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
                 placeholder.textContent = pack.labels.languagesSelect || 'בחר שפה...';
-                scratch.appendChild(placeholder);
-                function addGroup(label, items) {
-                    const group = document.createElement('optgroup');
-                    group.label = label;
-                    items.forEach((opt) => {
-                        const el = document.createElement('option');
-                        el.value = opt.id;
-                        el.textContent = langOptionLabel(opt, lang);
-                        el.disabled = taken.indexOf(opt.id) >= 0;
-                        group.appendChild(el);
+                nameSel.appendChild(placeholder);
+                const menuItems = [{ heading: pack.labels.languagesPopular || 'נפוצות' }];
+                groups.popular.concat(groups.rest).forEach((opt, i) => {
+                    if (i === groups.popular.length) menuItems.push({ heading: pack.labels.languagesMore || 'עוד שפות' });
+                    const el = document.createElement('option');
+                    el.value = opt.id;
+                    el.textContent = langOptionLabel(opt, lang);
+                    el.disabled = taken.indexOf(opt.id) >= 0;
+                    nameSel.appendChild(el);
+                    menuItems.push({
+                        value: opt.id,
+                        label: langOptionLabel(opt, lang),
+                        disabled: taken.indexOf(opt.id) >= 0,
+                        selected: keep === opt.id
                     });
-                    scratch.appendChild(group);
-                }
-                addGroup(pack.labels.languagesPopular || 'נפוצות', groups.popular);
-                addGroup(pack.labels.languagesMore || 'עוד שפות', groups.rest);
-                if (optionSignature(nameSel) !== optionSignature(scratch)) {
-                    nameSel.replaceChildren();
-                    while (scratch.firstChild) nameSel.appendChild(scratch.firstChild);
-                }
+                });
                 nameSel.disabled = false;
                 nameSel.removeAttribute('disabled');
-                nameSel.style.pointerEvents = 'auto';
-                nameSel.style.cursor = 'pointer';
                 if (keep && taken.indexOf(keep) < 0 && findLangOption(keep)) nameSel.value = keep;
                 else nameSel.value = '';
                 langPickState.language = nameSel.value;
+                fillComboMenu(document.getElementById('lang-pick-name-menu'), menuItems);
             }
             if (levelSel) {
                 const keepLevel = langPickState.proficiency || levelSel.value;
-                const scratch = document.createElement('select');
+                levelSel.replaceChildren();
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
                 placeholder.textContent = pack.labels.languagesLevel || 'רמת שליטה...';
-                scratch.appendChild(placeholder);
+                levelSel.appendChild(placeholder);
+                const menuItems = [];
                 CV_LANGUAGE_LEVELS.forEach((lvl) => {
                     const el = document.createElement('option');
                     el.value = lvl.id;
                     el.textContent = langLevelLabel(lvl, lang);
-                    scratch.appendChild(el);
+                    levelSel.appendChild(el);
+                    menuItems.push({
+                        value: lvl.id,
+                        label: langLevelLabel(lvl, lang),
+                        selected: keepLevel === lvl.id
+                    });
                 });
-                if (optionSignature(levelSel) !== optionSignature(scratch)) {
-                    levelSel.replaceChildren();
-                    while (scratch.firstChild) levelSel.appendChild(scratch.firstChild);
-                }
                 levelSel.disabled = false;
                 levelSel.removeAttribute('disabled');
-                levelSel.style.pointerEvents = 'auto';
-                levelSel.style.cursor = 'pointer';
                 levelSel.value = keepLevel && findLangLevel(keepLevel) ? keepLevel : '';
                 langPickState.proficiency = levelSel.value;
+                fillComboMenu(document.getElementById('lang-pick-level-menu'), menuItems);
             }
+            syncLangComboLabels();
         }
 
         function languageRowTitle(row, lang) {
@@ -2177,31 +2323,66 @@ Shoreline B2B
                 const title = document.createElement('span');
                 title.className = 'lang-pick-title';
                 title.textContent = languageRowTitle(row, lang);
-                const levelSel = document.createElement('select');
-                levelSel.className = 'lang-pick-select studio-field';
-                levelSel.setAttribute('data-lang-level', String(index));
-                levelSel.setAttribute('name', 'proficiency-' + index);
-                levelSel.setAttribute('aria-label', pack.labels.languagesLevel);
-                const levelPh = document.createElement('option');
-                levelPh.value = '';
-                levelPh.textContent = pack.labels.languagesLevel || 'רמת שליטה...';
-                levelSel.appendChild(levelPh);
-                CV_LANGUAGE_LEVELS.forEach((lvl) => {
-                    const opt = document.createElement('option');
-                    opt.value = lvl.id;
-                    opt.textContent = langLevelLabel(lvl, lang);
-                    levelSel.appendChild(opt);
-                });
-                levelSel.value = row.levelId && findLangLevel(row.levelId) ? row.levelId : '';
+                const levelBtn = document.createElement('button');
+                levelBtn.type = 'button';
+                levelBtn.className = 'qc-combo-btn lang-row-level-btn';
+                levelBtn.setAttribute('data-lang-level-open', String(index));
+                levelBtn.setAttribute('aria-haspopup', 'listbox');
+                levelBtn.setAttribute('aria-expanded', 'false');
+                const current = row.levelId && findLangLevel(row.levelId);
+                const levelText = current ? langLevelLabel(current, lang) : (pack.labels.languagesLevel || 'רמת שליטה...');
+                levelBtn.setAttribute('aria-label', levelText);
+                const levelSpan = document.createElement('span');
+                levelSpan.textContent = levelText;
+                levelBtn.appendChild(levelSpan);
                 const remove = document.createElement('button');
                 remove.type = 'button';
                 remove.className = 'lang-pick-remove';
                 remove.setAttribute('data-lang-remove', String(index));
                 remove.setAttribute('aria-label', pack.labels.languagesRemove || 'הסרה');
                 remove.innerHTML = '<span aria-hidden="true">×</span>';
-                wrap.append(title, levelSel, remove);
+                wrap.append(title, levelBtn, remove);
                 list.appendChild(wrap);
             });
+        }
+
+        function ensureRowLevelMenu() {
+            let menu = document.getElementById('lang-row-level-menu');
+            if (menu) return menu;
+            menu = document.createElement('div');
+            menu.id = 'lang-row-level-menu';
+            menu.className = 'qc-combo-menu';
+            menu.setAttribute('role', 'listbox');
+            menu.hidden = true;
+            document.body.appendChild(menu);
+            menu.addEventListener('click', function (e) {
+                const opt = e.target && e.target.closest && e.target.closest('.qc-combo-option');
+                if (!opt || opt.disabled) return;
+                const idx = Number(menu.getAttribute('data-lang-index'));
+                setCvLanguageLevel(idx, opt.getAttribute('data-value'));
+                closeLangMenus();
+            });
+            return menu;
+        }
+
+        function openRowLevelMenu(index, btn) {
+            if (!btn || !cvLangEntries[index]) return;
+            const already = btn.getAttribute('aria-expanded') === 'true';
+            closeLangMenus();
+            if (already) return;
+            const lang = cvUiLang();
+            const menu = ensureRowLevelMenu();
+            const selectedId = cvLangEntries[index].levelId;
+            fillComboMenu(menu, CV_LANGUAGE_LEVELS.map((lvl) => ({
+                value: lvl.id,
+                label: langLevelLabel(lvl, lang),
+                selected: selectedId === lvl.id
+            })));
+            menu.setAttribute('data-lang-index', String(index));
+            document.body.appendChild(menu);
+            menu.hidden = false;
+            btn.setAttribute('aria-expanded', 'true');
+            placeLangMenu(btn, menu);
         }
 
         function refreshLanguagePicker() {
@@ -2238,6 +2419,7 @@ Shoreline B2B
                 langPickState.proficiency = String(sel.value || '');
                 sel.removeAttribute('aria-invalid');
             }
+            syncLangComboLabels();
         }
 
         function handleAddLanguage(e) {
@@ -2254,21 +2436,19 @@ Shoreline B2B
             const langId = (langPickState.language || (nameSel && nameSel.value) || '').trim();
             const levelIdRaw = (langPickState.proficiency || (levelSel && levelSel.value) || '').trim();
             let valid = true;
+            const nameBtn = document.getElementById('lang-pick-name-btn');
+            const levelBtn = document.getElementById('lang-pick-level-btn');
             if (!langId || !findLangOption(langId)) {
-                if (nameSel) {
-                    nameSel.setAttribute('aria-invalid', 'true');
-                    if (typeof nameSel.focus === 'function') nameSel.focus();
-                }
+                if (nameSel) nameSel.setAttribute('aria-invalid', 'true');
+                if (nameBtn && typeof nameBtn.focus === 'function') nameBtn.focus();
                 valid = false;
             } else if (nameSel) {
                 nameSel.removeAttribute('aria-invalid');
             }
             const level = findLangLevel(levelIdRaw);
             if (!level) {
-                if (levelSel) {
-                    levelSel.setAttribute('aria-invalid', 'true');
-                    if (valid && typeof levelSel.focus === 'function') levelSel.focus();
-                }
+                if (levelSel) levelSel.setAttribute('aria-invalid', 'true');
+                if (valid && levelBtn && typeof levelBtn.focus === 'function') levelBtn.focus();
                 valid = false;
             } else if (levelSel) {
                 levelSel.removeAttribute('aria-invalid');
@@ -2299,6 +2479,18 @@ Shoreline B2B
             commitLanguagePicker();
         }
 
+        function pickLangComboValue(kind, value) {
+            const isName = kind === 'name';
+            const sel = document.getElementById(isName ? 'lang-pick-name' : 'lang-pick-level');
+            if (!sel) return;
+            sel.value = value || '';
+            sel.removeAttribute('aria-invalid');
+            if (isName) langPickState.language = sel.value;
+            else langPickState.proficiency = sel.value;
+            syncLangComboLabels();
+            closeLangMenus();
+        }
+
         function bindLanguagePicker() {
             if (window.__qcLangPickerBound) return;
             window.__qcLangPickerBound = true;
@@ -2312,6 +2504,48 @@ Shoreline B2B
                     handleAddLanguage(e);
                 };
             }
+            const nameBtn = document.getElementById('lang-pick-name-btn');
+            if (nameBtn) {
+                nameBtn.onclick = function (e) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    openLangMenu('name');
+                };
+            }
+            const levelBtn = document.getElementById('lang-pick-level-btn');
+            if (levelBtn) {
+                levelBtn.onclick = function (e) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    openLangMenu('level');
+                };
+            }
+            const nameMenu = document.getElementById('lang-pick-name-menu');
+            if (nameMenu) {
+                nameMenu.addEventListener('click', function (e) {
+                    const opt = e.target && e.target.closest && e.target.closest('.qc-combo-option');
+                    if (!opt || opt.disabled) return;
+                    pickLangComboValue('name', opt.getAttribute('data-value'));
+                });
+            }
+            const levelMenu = document.getElementById('lang-pick-level-menu');
+            if (levelMenu) {
+                levelMenu.addEventListener('click', function (e) {
+                    const opt = e.target && e.target.closest && e.target.closest('.qc-combo-option');
+                    if (!opt || opt.disabled) return;
+                    pickLangComboValue('level', opt.getAttribute('data-value'));
+                });
+            }
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.closest && e.target.closest('.qc-combo, .qc-combo-menu, [data-lang-level-open]')) return;
+                closeLangMenus();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeLangMenus();
+            });
+            window.addEventListener('resize', closeLangMenus);
+            window.addEventListener('scroll', function (e) {
+                if (e.target && e.target.closest && e.target.closest('.qc-combo-menu')) return;
+                closeLangMenus();
+            }, true);
             const nameSel = document.getElementById('lang-pick-name');
             if (nameSel) {
                 nameSel.onchange = function (e) {
@@ -2326,12 +2560,13 @@ Shoreline B2B
             }
             const list = document.getElementById('lang-pick-list');
             if (!list) return;
-            list.addEventListener('change', (e) => {
-                const sel = e.target && e.target.closest ? e.target.closest('[data-lang-level]') : null;
-                if (!sel) return;
-                setCvLanguageLevel(Number(sel.getAttribute('data-lang-level')), sel.value);
-            });
             list.addEventListener('click', (e) => {
+                const levelBtn = e.target && e.target.closest ? e.target.closest('[data-lang-level-open]') : null;
+                if (levelBtn) {
+                    e.preventDefault();
+                    openRowLevelMenu(Number(levelBtn.getAttribute('data-lang-level-open')), levelBtn);
+                    return;
+                }
                 const btn = e.target && e.target.closest ? e.target.closest('[data-lang-remove]') : null;
                 if (!btn) return;
                 e.preventDefault();

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=langs2">
+    <link rel="stylesheet" href="./app.css?v=forms1">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -447,7 +447,10 @@
                 </div>
 
                 <div class="space-y-2 relative" id="experience-section">
-                    <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
+                    <div class="section-editor-head">
+                        <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
+                        <button type="button" id="btn-experience-raw" class="section-raw-toggle" onclick="toggleExperienceRaw(event); return false;" aria-pressed="false">עריכת טקסט מלא</button>
+                    </div>
                     <p class="field-tip" id="tip-experience-lead">מלאו תפקיד, חברה, שנים ותיאור. לחצו הוסף משרה נוספת לעוד תפקיד.</p>
                     <div id="experience-items" aria-describedby="tip-experience"></div>
                     <button type="button" id="btn-add-experience" class="experience-add-job-btn" onclick="handleAddJob(event); return false;">
@@ -466,15 +469,31 @@ Shoreline B2B
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-education" id="label-education">השכלה</label>
-                        <textarea id="in-education" rows="3" oninput="updateCV()" aria-describedby="tip-education" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">2015 - 2018 | BA במנהל עסקים
-2019 | קורס ניהול מוצר</textarea>
+                    <div class="space-y-2 relative section-editor" id="education-section">
+                        <div class="section-editor-head">
+                            <p class="font-bold dynamic-text text-sm" id="label-education">השכלה</p>
+                            <button type="button" id="btn-education-raw" class="section-raw-toggle" onclick="toggleEducationRaw(event); return false;" aria-pressed="false">עריכת טקסט מלא</button>
+                        </div>
+                        <div id="education-items" aria-describedby="tip-education"></div>
+                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="handleAddEducation(event); return false;">
+                            <span class="experience-add-icon" aria-hidden="true">+</span>
+                            <span id="btn-add-education-label">הוסף השכלה</span>
+                        </button>
                         <p class="field-tip" id="tip-education">ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.</p>
+                        <textarea id="in-education" rows="3" oninput="updateCV()" aria-describedby="tip-education" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2015 - 2018 | BA במנהל עסקים
+2019 | קורס ניהול מוצר</textarea>
                     </div>
-                    <div>
-                        <label class="font-bold dynamic-text text-sm mb-2 block" for="in-military" id="label-military">שירות צבאי / לאומי</label>
-                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
+                    <div class="space-y-2 relative section-editor" id="military-section">
+                        <div class="section-editor-head">
+                            <p class="font-bold dynamic-text text-sm" id="label-military">שירות צבאי / לאומי</p>
+                            <button type="button" id="btn-military-raw" class="section-raw-toggle" onclick="toggleMilitaryRaw(event); return false;" aria-pressed="false">עריכת טקסט מלא</button>
+                        </div>
+                        <div id="military-items"></div>
+                        <button type="button" id="btn-add-military" class="section-add-btn" onclick="handleAddMilitary(event); return false;">
+                            <span class="experience-add-icon" aria-hidden="true">+</span>
+                            <span id="btn-add-military-label">הוסף שירות</span>
+                        </button>
+                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
                     </div>
                 </div>
 
@@ -964,7 +983,8 @@ Shoreline B2B
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=jobs10"></script>
+    <script src="lib/experienceEditor.js?v=forms1"></script>
+    <script src="lib/entryEditor.js?v=forms1"></script>
     <script src="lib/phrases.js"></script>
     <script src="lib/templates.js"></script>
     <script src="lib/templateThumbs.js?v=white1"></script>
@@ -986,6 +1006,33 @@ Shoreline B2B
             return false;
         };
         window.addExperienceJob = window.handleAddJob;
+        window.toggleExperienceRaw = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCExperience && typeof QCExperience.toggleRaw === 'function') {
+                return QCExperience.toggleRaw(e);
+            }
+            return false;
+        };
+        window.handleAddEducation = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCEducation && typeof QCEducation.addItem === 'function') return QCEducation.addItem(e);
+            return false;
+        };
+        window.handleAddMilitary = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCMilitary && typeof QCMilitary.addItem === 'function') return QCMilitary.addItem(e);
+            return false;
+        };
+        window.toggleEducationRaw = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCEducation && typeof QCEducation.toggleRaw === 'function') return QCEducation.toggleRaw(e);
+            return false;
+        };
+        window.toggleMilitaryRaw = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCMilitary && typeof QCMilitary.toggleRaw === 'function') return QCMilitary.toggleRaw(e);
+            return false;
+        };
         let previewBgClass = 'bg-preview-white';
         const THEME_NAMES = {
             he: {

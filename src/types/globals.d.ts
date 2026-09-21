@@ -48,6 +48,7 @@ declare global {
       applyI18n: () => void;
       addJob?: (e?: Event) => boolean | void;
       handleAddJob?: (e?: Event) => boolean | void;
+      toggleRaw?: (e?: Event) => boolean | void;
       getJobs?: () => unknown[];
     };
     QCExperienceEditor?: {
@@ -55,10 +56,28 @@ declare global {
       applyI18n: () => void;
       addJob?: (e?: Event) => boolean | void;
       handleAddJob?: (e?: Event) => boolean | void;
+      toggleRaw?: (e?: Event) => boolean | void;
       getJobs?: () => unknown[];
     };
     handleAddJob?: (e?: Event) => boolean | void;
     addExperienceJob?: (e?: Event) => boolean | void;
+    toggleExperienceRaw?: (e?: Event) => boolean | void;
+    QCEducation?: {
+      refresh: () => void;
+      applyI18n: () => void;
+      addItem?: (e?: Event) => boolean | void;
+      toggleRaw?: (e?: Event) => boolean | void;
+    };
+    QCMilitary?: {
+      refresh: () => void;
+      applyI18n: () => void;
+      addItem?: (e?: Event) => boolean | void;
+      toggleRaw?: (e?: Event) => boolean | void;
+    };
+    handleAddEducation?: (e?: Event) => boolean | void;
+    handleAddMilitary?: (e?: Event) => boolean | void;
+    toggleEducationRaw?: (e?: Event) => boolean | void;
+    toggleMilitaryRaw?: (e?: Event) => boolean | void;
     QCPhotoDataUrl?: string;
     QCDraft?: {
       save: () => void;

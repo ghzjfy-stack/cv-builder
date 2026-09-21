@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=ba6">
+    <link rel="stylesheet" href="./app.css?v=formux1">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -59,20 +59,59 @@
                     <div class="home-paper">
                         <div class="home-paper-back"></div>
                         <div class="home-paper-mid"></div>
-                        <div class="home-paper-sheet">
-                            <div class="home-paper-rule"></div>
-                            <p class="home-paper-name">נועה כהן</p>
-                            <p class="home-paper-role">מנהלת מכירות ארצית</p>
-                            <div class="home-paper-line short"></div>
-                            <div class="home-paper-line w-94"></div>
-                            <div class="home-paper-line w-80"></div>
-                            <div class="home-paper-line w-62"></div>
-                            <div class="home-paper-line short"></div>
-                            <div class="home-paper-line w-94"></div>
-                            <div class="home-paper-line w-80"></div>
-                            <div class="home-paper-line w-62"></div>
-                        </div>
-                        <span class="home-ribbon">תצוגה חיה</span>
+                        <article class="home-paper-sheet home-cv">
+                            <aside class="home-cv-side">
+                                <div class="home-cv-mark">נ״כ</div>
+                                <p class="home-cv-side-h">יצירת קשר</p>
+                                <p class="home-cv-side-p">052-5554433</p>
+                                <p class="home-cv-side-p">noa.cohen@email.com</p>
+                                <p class="home-cv-side-p">תל אביב</p>
+                                <p class="home-cv-side-h">כישורים</p>
+                                <ul class="home-cv-tags">
+                                    <li>ניהול צוותים</li>
+                                    <li>CRM</li>
+                                    <li>Excel מתקדם</li>
+                                    <li>משא ומתן</li>
+                                </ul>
+                                <p class="home-cv-side-h">שפות</p>
+                                <p class="home-cv-side-p">עברית · שפת אם</p>
+                                <p class="home-cv-side-p">אנגלית · שוטפת</p>
+                            </aside>
+                            <div class="home-cv-main">
+                                <header class="home-cv-head">
+                                    <p class="home-paper-name">נועה כהן</p>
+                                    <p class="home-paper-role">מנהלת מכירות ארצית</p>
+                                </header>
+                                <p class="home-cv-h">תקציר מקצועי</p>
+                                <p class="home-cv-p">מנהלת מכירות עם ניסיון בהובלת צוותים, עמידה ביעדים והגדלת מחזור בשוק B2B.</p>
+                                <p class="home-cv-h">ניסיון תעסוקתי</p>
+                                <div class="home-cv-job">
+                                    <div class="home-cv-job-top">
+                                        <p class="home-cv-job-title">מנהלת מכירות ארצית</p>
+                                        <p class="home-cv-job-dates">2019 – היום</p>
+                                    </div>
+                                    <p class="home-cv-org">אלפא בע״מ</p>
+                                    <ul class="home-cv-bullets">
+                                        <li>הובלת צוות של 12 והגדלת היעדים ב-35%</li>
+                                        <li>בניית תהליכי מכירה ושימור לקוחות מפתח</li>
+                                        <li>ניהול משפך ומעקב CRM ברמת הנהלה</li>
+                                    </ul>
+                                </div>
+                                <div class="home-cv-job">
+                                    <div class="home-cv-job-top">
+                                        <p class="home-cv-job-title">נציגת מכירות פנים</p>
+                                        <p class="home-cv-job-dates">2016 – 2019</p>
+                                    </div>
+                                    <p class="home-cv-org">שורליין בע״מ</p>
+                                    <ul class="home-cv-bullets">
+                                        <li>סגירת עסקאות וטיפול בלקוחות גדולים</li>
+                                    </ul>
+                                </div>
+                                <p class="home-cv-h">השכלה</p>
+                                <p class="home-cv-p"><strong>B.A. כלכלה</strong> · אוניברסיטת תל אביב · 2012 – 2016</p>
+                            </div>
+                        </article>
+                        <span class="home-paper-badge">פורמט ATS מאושר</span>
                     </div>
                 </div>
             </section>
@@ -305,10 +344,10 @@
             </div>
         </div>
         <div class="studio-toolbar max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
-            <button type="button" onclick="showHome()" class="flex items-center gap-3 text-right">
-                <span class="w-9 h-9 rounded-xl dynamic-bg text-white flex items-center justify-center font-black text-sm shadow-lg shadow-blue-900/30" aria-hidden="true">QC</span>
+            <button type="button" onclick="showHome()" class="studio-brand flex items-center gap-3 text-right">
+                <span class="studio-mark" aria-hidden="true">QC</span>
                 <span>
-                    <span class="block text-base sm:text-lg font-bold leading-tight">QuickCV</span>
+                    <span class="studio-brand-name">QuickCV</span>
                     <span class="block text-[10px] text-slate-300 hidden sm:block">חזרה לדף הבית</span>
                 </span>
             </button>
@@ -316,17 +355,17 @@
             <nav class="order-last sm:order-none w-full sm:w-auto flex items-center justify-center gap-1 sm:gap-2" aria-label="שלבי יצירת קורות החיים">
                 <button type="button" id="step-1" onclick="goStep(1)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white min-h-10" aria-current="step">
                     <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]" aria-hidden="true">1</span>
-                    <span>פרטים</span>
+                    <span id="step-1-label">עיצוב</span>
                 </button>
                 <span class="text-slate-500 text-xs" aria-hidden="true">·</span>
                 <button type="button" id="step-2" onclick="goStep(2)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:text-slate-100 min-h-10">
                     <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]" aria-hidden="true">2</span>
-                    <span>עיצוב</span>
+                    <span id="step-2-label">פרטים</span>
                 </button>
                 <span class="text-slate-500 text-xs" aria-hidden="true">·</span>
                 <button type="button" id="step-3" onclick="goStep(3)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:text-slate-100 min-h-10">
                     <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]" aria-hidden="true">3</span>
-                    <span>הורדה</span>
+                    <span id="step-3-label">הורדה</span>
                 </button>
             </nav>
 
@@ -380,13 +419,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-name" id="label-name">שם מלא</label>
-                            <input type="text" id="in-name" name="name" autocomplete="name" value="ישראל ישראלי" placeholder="ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-name" name="name" autocomplete="name" value="ישראל ישראלי" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
-                            <input type="text" id="in-title" name="title" list="role-title-list" value="מנהל פרויקטים ומכירות" placeholder="מנהל פרויקטים" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-title" name="title" list="role-title-list" value="מנהל פרויקטים ומכירות" placeholder="לדוגמה: מנהל פרויקטים" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                             <datalist id="role-title-list"></datalist>
-                            <p class="text-[11px] text-slate-400 mt-1" id="role-title-hint">אפשר לבחור כותרת מוכנה מהרשימה או להקליד.</p>
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון</label>
@@ -398,7 +436,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-location" id="label-location">עיר מגורים</label>
-                            <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="תל אביב" placeholder="תל אביב" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="תל אביב" placeholder="לדוגמה: תל אביב" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-linkedin" id="label-linkedin">קישור ל-LinkedIn / אתר</label>
@@ -413,58 +451,43 @@
 
                 <div class="space-y-2">
                     <label class="font-bold dynamic-text text-sm block" for="in-summary" id="label-summary">תקציר מקצועי</label>
-                    <textarea id="in-summary" rows="2" oninput="updateCV()" aria-describedby="tip-summary" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
-                    <p class="field-tip" id="tip-summary">טיפ: שלבו הישג מדיד — אחוזי צמיחה, גודל צוות או תקציב.</p>
+                    <textarea id="in-summary" rows="2" oninput="updateCV()" placeholder="לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
                 </div>
 
                 <div class="space-y-2 relative" id="experience-section">
                     <div class="section-editor-head">
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
-                        <button type="button" id="btn-experience-raw" class="section-raw-toggle" onclick="toggleExperienceRaw(event); return false;" aria-pressed="false">עריכת טקסט מלא</button>
                     </div>
-                    <p class="field-tip" id="tip-experience-lead">מלאו את כרטיס המשרה הראשון. אחר כך אפשר להוסיף משרה נוספת.</p>
-                    <div id="experience-items" aria-describedby="tip-experience"></div>
+                    <div id="experience-items"></div>
                     <button type="button" id="btn-add-experience" class="section-add-btn" onclick="handleAddJob(event); return false;">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                     </button>
-                    <p class="field-tip" id="tip-experience">טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.</p>
-                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2021 - נוכחי | מנהל מכירות ארצי
-Verde Commerce
-• ניהול צוות עובדים והגדלת היעדים ב-35%.
-• הובלת הסכמים אסטרטגיים.
-
-2018 - 2021 | מנהל פרויקטים
-Shoreline B2B
-• ניהול תקציבים ומעקב אחר אבני דרך בארגון.</textarea>
+                    <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="space-y-4">
                     <div class="space-y-2 relative section-editor" id="education-section">
                         <div class="section-editor-head">
                             <p class="font-bold dynamic-text text-sm" id="label-education">השכלה</p>
-                            <button type="button" id="btn-education-raw" class="section-raw-toggle" onclick="toggleEducationRaw(event); return false;" aria-pressed="false">עריכת טקסט מלא</button>
                         </div>
-                        <div id="education-items" aria-describedby="tip-education"></div>
+                        <div id="education-items"></div>
                         <button type="button" id="btn-add-education" class="section-add-btn" onclick="handleAddEducation(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                             <span id="btn-add-education-label">הוסף השכלה</span>
                         </button>
-                        <p class="field-tip" id="tip-education">ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.</p>
-                        <textarea id="in-education" rows="3" oninput="updateCV()" aria-describedby="tip-education" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2015 - 2018 | BA במנהל עסקים
-2019 | קורס ניהול מוצר</textarea>
+                        <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
                     <div class="space-y-2 relative section-editor" id="military-section">
                         <div class="section-editor-head">
                             <p class="font-bold dynamic-text text-sm" id="label-military">שירות צבאי / לאומי</p>
-                            <button type="button" id="btn-military-raw" class="section-raw-toggle" onclick="toggleMilitaryRaw(event); return false;" aria-pressed="false">עריכת טקסט מלא</button>
                         </div>
                         <div id="military-items"></div>
                         <button type="button" id="btn-add-military" class="section-add-btn" onclick="handleAddMilitary(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                             <span id="btn-add-military-label">הוסף שירות</span>
                         </button>
-                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1">2012 - 2015 | שירות פיקודי בחיל האוויר</textarea>
+                        <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
                 </div>
 
@@ -472,7 +495,7 @@ Shoreline B2B
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills" id="label-skills">כישורים</label>
                         <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
-                        <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.</p>
+                        <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה.</p>
                     </div>
                     <div class="languages-section" id="languages-section">
                         <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages" for="lang-pick-name-btn">שפות</label>
@@ -516,8 +539,8 @@ Shoreline B2B
                     <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea>
                 </div>
 
-                <button type="button" id="btn-continue-design" onclick="goStep(2)" class="studio-continue-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
-                    המשך לבחירת עיצוב ⬅️
+                <button type="button" id="btn-continue-details" onclick="goStep(3)" class="studio-continue-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
+                    המשך להורדה ⬅️
                 </button>
             </div>
 
@@ -596,6 +619,9 @@ Shoreline B2B
                     <span id="line-height-val" class="sr-only">1.55</span>
                 </div>
 
+                <button type="button" id="btn-continue-design" onclick="goStep(2)" class="studio-continue-btn w-full bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
+                    המשך למילוי פרטים ⬅️
+                </button>
                 <button type="button" id="btn-download-pdf" onclick="openPaymentModal()" class="cta-download w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg transition text-base min-h-14">
                     הורד PDF ב-<span data-price>10</span> ₪
                 </button>
@@ -609,7 +635,10 @@ Shoreline B2B
 
         <div id="preview-column" class="preview-col space-y-3" role="region" aria-label="תצוגה מקדימה חיה של קורות החיים">
             <div class="preview-toolbar no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="preview-heading">תצוגה מקדימה בזמן אמת</h2>
+                <div class="preview-toolbar-start flex items-center gap-2 flex-wrap">
+                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="preview-heading">תצוגה מקדימה בזמן אמת</h2>
+                    <button type="button" id="btn-switch-template" class="preview-switch-tpl" onclick="goStep(1)">החלף תבנית</button>
+                </div>
                 <div class="doc-switch" role="tablist" aria-label="סוג מסמך">
                     <button type="button" id="doc-tab-cv" aria-pressed="true" onclick="setStudioDoc('cv')">קורות חיים</button>
                     <button type="button" id="doc-tab-letter" aria-pressed="false" onclick="setStudioDoc('letter')">מכתב מקדים</button>
@@ -621,7 +650,7 @@ Shoreline B2B
             </div>
             <p id="cv-page-fit-banner" class="no-print" hidden></p>
 
-            <div id="cv-preview-stack" class="cv-preview-stack">
+            <div id="cv-preview-stack" class="cv-preview-stack cv-document-container">
             <div id="cv-preview-wrapper" class="relative overflow-hidden p-4 md:p-5 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white">
                 <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
@@ -754,7 +783,7 @@ Shoreline B2B
                 </div>
             </div>
             </div>
-            <div id="cl-preview-wrapper" class="relative overflow-hidden p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 bg-preview-white">
+            <div id="cl-preview-wrapper" class="cv-document-container relative overflow-hidden p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 bg-preview-white">
                 <div id="cl-target" dir="rtl">
                     <p id="cl-out-date" class="text-[11px] text-slate-500"></p>
                     <h1 id="cl-out-name" class="text-3xl font-bold dynamic-text mt-3"></h1>
@@ -782,7 +811,7 @@ Shoreline B2B
                 <span id="mobile-preview-label" dir="rtl">תצוגה מקדימה</span>
             </button>
             <button type="button" id="btn-mobile-continue" onclick="goStep(2)" class="studio-nav-download studio-nav-continue">
-                <span id="mobile-continue-label" dir="rtl">המשך לעיצוב ⬅️</span>
+                <span id="mobile-continue-label" dir="rtl">המשך למילוי פרטים ⬅️</span>
             </button>
             <button type="button" id="btn-download-pdf-mobile" onclick="openPaymentModal()" class="cta-download studio-nav-download">
                 <span class="studio-nav-icon" aria-hidden="true">
@@ -834,85 +863,43 @@ Shoreline B2B
         <div class="examples-panel qc-modal-panel relative bg-slate-900 text-slate-100 rounded-3xl max-w-5xl w-full mx-auto p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-700">
             <button type="button" onclick="closeExamplesModal()" class="qc-modal-close" aria-label="סגור דוגמאות">✕</button>
             <h3 id="examples-title" class="text-lg font-extrabold pe-10 pr-12">תבניות ודוגמאות מוכנות</h3>
-            <p class="text-xs text-slate-400">בחרו תבנית שמתאימה לכם והתחילו לערוך מיד – כל הפרטים ניתנים לשינוי.</p>
+            <p id="examples-lead" class="text-xs text-slate-400">בחרו את התבנית המתאימה לתחום שלכם. ניתן לשנות את הצבעים והפונטים בכל שלב.</p>
             <!-- Toolbar (category filters) injected by src/templates/selector.ts -->
             <div class="template-grid canva-grid" data-template-gallery></div>
         </div>
     </div>
 
-    <div id="payment-modal" class="qc-modal no-print fixed inset-0 hidden flex-col items-center justify-center p-3 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:10050;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
-        <div class="pay-card qc-modal-panel text-slate-100 rounded-3xl w-full p-5 sm:p-7 text-center space-y-4 sm:space-y-5 relative" style="z-index:10000;pointer-events:auto;">
+    <div id="payment-modal" class="qc-modal qc-pay-modal no-print fixed inset-0 hidden flex-col items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="pay-title" aria-hidden="true" style="z-index:10050;pointer-events:auto;background:rgba(2,6,23,0.72);backdrop-filter:blur(14px);">
+        <div class="pay-card qc-modal-panel text-slate-100 rounded-3xl w-full text-center relative" style="z-index:10000;pointer-events:auto;">
             <button type="button" id="btn-close-modal" class="qc-modal-close" aria-label="סגור תשלום" onclick="closePaymentModal(event)">✕</button>
-            <div id="pay-step" class="space-y-3.5 sm:space-y-5">
-                <div class="space-y-2.5 sm:space-y-3">
-                    <p class="mt-1 inline-flex items-center rounded-full bg-amber-300 text-slate-950 text-[11px] font-black px-3 py-1" id="pay-save-badge">מחיר השקה — 10 ₪ בלבד</p>
-                    <h3 id="pay-title" class="text-xl font-extrabold text-white mt-1">תשלום חד־פעמי</h3>
-                    <div class="mvp-pack rounded-2xl border border-emerald-400/35 bg-emerald-400/10 p-4 text-right space-y-3">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-base font-extrabold text-white leading-snug" id="mvp-pack-name">הורדת קובץ PDF מוכן להגשה</p>
-                            </div>
-                            <p class="shrink-0 text-2xl font-black text-emerald-300 tabular-nums"><span data-price>10</span> ₪</p>
-                        </div>
-                        <ul class="mvp-pack-features text-sm text-slate-200 space-y-1.5 leading-relaxed">
-                            <li>קובץ PDF איכותי מוכן להגשה</li>
-                            <li>גישה חופשית לעריכה ושינויים ל-24 שעות</li>
-                            <li>תבניות נבדקו מול מערכות סינון (ATS)</li>
-                        </ul>
+            <div id="pay-step" class="pay-step-simple">
+                <div class="pay-head">
+                    <h3 id="pay-title">תשלום ₪10 בלבד</h3>
+                    <p id="pay-subtitle">בחרו את האפליקציה המועדפת עליכם לתשלום:</p>
+                </div>
+
+                <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" value="" class="sr-only" tabindex="-1" aria-hidden="true" dir="ltr">
+                <p id="code-feedback" class="pay-feedback" role="status"></p>
+
+                <div class="pay-app-actions">
+                    <div class="pay-app-grid">
+                        <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">Bit</a>
+                        <a id="btn-open-paybox" href="https://www.payboxapp.com/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-paybox">PayBox</a>
                     </div>
                 </div>
 
-                <div class="text-right space-y-2">
-                    <label for="checkout-contact" class="block text-xs font-bold text-slate-300">מספר הטלפון שלך ב-Bit / PayBox (לזיהוי ההעברה)</label>
-                    <input type="tel" id="checkout-contact" autocomplete="tel" inputmode="tel" value="" placeholder="050-1234567" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
-                    <p id="code-feedback" class="text-sm min-h-5 text-center font-semibold"></p>
-                </div>
-
-                <div class="pay-app-actions space-y-3">
-                    <p class="text-sm font-extrabold text-white text-right">שלמו ב-Bit או PayBox</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit flex flex-col items-center justify-center gap-0.5 min-h-[3.5rem] sm:min-h-[4.25rem] rounded-2xl font-extrabold text-sm">
-                            <span class="text-[11px] opacity-80">Bit</span>
-                            <span>שלמו ב-Bit</span>
-                        </a>
-                        <a id="btn-open-paybox" href="https://www.payboxapp.com/?phone=0543554888&amp;phoneNumber=0543554888&amp;sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-paybox flex flex-col items-center justify-center gap-0.5 min-h-[3.5rem] sm:min-h-[4.25rem] rounded-2xl font-extrabold text-sm">
-                            <span class="text-[11px] opacity-80">PayBox</span>
-                            <span>שלמו ב-PayBox</span>
-                        </a>
+                <div id="pay-live-status" class="hidden pay-live-status" aria-live="polite">
+                    <div id="manual-order-panel" class="hidden" aria-hidden="true">
+                        <p id="manual-order-id" class="sr-only" dir="ltr">—</p>
+                    </div>
+                    <div class="pay-live-row" role="status">
+                        <div class="pay-wait-spinner animate-spin" aria-hidden="true"></div>
+                        <p id="manual-order-status">ממתין לאישור ההעברה...</p>
                     </div>
                 </div>
 
-                <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3 text-right">
-                    <p class="text-xs font-bold text-slate-300">העברה ידנית (תמיד זמין)</p>
-                    <div class="flex items-center justify-between gap-3 flex-wrap">
-                        <div>
-                            <p class="text-[11px] text-slate-400">העבירו <span data-price>10</span> ₪ אל</p>
-                            <p class="text-2xl font-black tracking-wide text-white" id="bit-number" dir="ltr">054-3554888</p>
-                        </div>
-                        <button type="button" id="btn-copy-bit" class="inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-full bg-emerald-400/15 hover:bg-emerald-400/25 text-emerald-300 font-extrabold text-sm border border-emerald-400/30">
-                            העתק מספר
-                        </button>
-                    </div>
-                    <p class="text-[11px] text-slate-400 leading-relaxed">אחרי ההעברה אל תסגרו את הדף — האימות אוטומטי וה-PDF יורד ברגע שהתשלום מאושר.</p>
-                </div>
-
-                <div id="pay-live-status" class="hidden rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-4 text-center space-y-2" aria-live="polite">
-                    <div id="manual-order-panel" class="hidden space-y-1">
-                        <p class="text-xs text-emerald-200 font-bold">מזהה הזמנה</p>
-                        <p id="manual-order-id" class="text-lg font-black tracking-wide text-white" dir="ltr">—</p>
-                    </div>
-                    <div class="flex flex-col items-center justify-center gap-2" role="status">
-                        <div class="pay-wait-spinner h-12 w-12 rounded-full border-4 border-white/15 border-t-emerald-400 animate-spin" aria-hidden="true"></div>
-                        <p id="manual-order-status" class="text-sm font-extrabold text-white">ממתין לאישור ההעברה...</p>
-                        <p class="text-[11px] text-slate-400">אל תסגרו את הדף — ממתינים לאישור ההעברה וההורדה תתחיל אוטומטית</p>
-                    </div>
-                </div>
-
-                <button type="button" id="btn-proceed-payment" class="w-full min-h-12 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-sm">
+                <button type="button" id="btn-proceed-payment" class="pay-verify-btn">
                     התחל בדיקת תשלום
-                </button>
-                <button type="button" class="btn-back-checkout w-full min-h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/15" onclick="closePaymentModal(event)">
-                    חזרה לקורות החיים
                 </button>
             </div>
 
@@ -972,11 +959,11 @@ Shoreline B2B
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=exp2"></script>
-    <script src="lib/entryEditor.js?v=forms1"></script>
-    <script src="lib/phrases.js"></script>
-    <script src="lib/templates.js"></script>
-    <script src="lib/templateThumbs.js?v=white1"></script>
+    <script src="lib/experienceEditor.js?v=formux1"></script>
+    <script src="lib/entryEditor.js?v=formux1"></script>
+    <script src="lib/phrases.js?v=tpl-he3"></script>
+    <script src="lib/templates.js?v=tpl-he3"></script>
+    <script src="lib/templateThumbs.js?v=tpl-he3"></script>
     <script src="lib/export.js"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
     <script src="lib/seoLandings.js"></script>
@@ -984,7 +971,7 @@ Shoreline B2B
     <script src="lib/spellcheck.js"></script>
     <script src="lib/pageFit.js?v=white1"></script>
     <script src="lib/handoff.js?v=import3"></script>
-    <script src="lib/samplePreview.js?v=no-sample1"></script>
+    <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
         window.handleAddJob = function (e) {
@@ -1134,9 +1121,13 @@ Shoreline B2B
                 nameFallback: 'שם מלא',
                 titleFallback: 'תפקיד',
                 detailsHeading: 'פרטים אישיים (שדה ריק לא יופיע)',
+                phName: 'לדוגמה: ישראל ישראלי',
+                phTitle: 'לדוגמה: מנהל פרויקטים',
+                phLocation: 'לדוגמה: תל אביב',
+                phSummary: 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור',
                 labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות / References' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
-                examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
+                examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full-Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
                 phrasesHeading: 'משפטים מוכנים לפי תחום',
                 phrasesHint: 'בחרו תחום ולחצו על משפט כדי להוסיף אותו לטקסט',
                 phrasesField: 'תחום',
@@ -1145,7 +1136,7 @@ Shoreline B2B
                 phrasesLoad: 'מלא שדות ריקים מדוגמה',
                 phrasesReplace: 'החלף בניסיון לדוגמה',
                 phrasesSkills: '+ הוסף כישורים מומלצים לתחום',
-                roleTitleHint: 'אפשר לבחור כותרת מוכנה מהרשימה או להקליד.',
+                roleTitleHint: '',
                 strengthTitle: 'חוזק קורות החיים',
                 strengthTipDefault: 'רוצים להגיע ל-100%? בצעו את הפעולות הבאות:',
                 strengthDone: 'מצוין! קורות החיים שלך מוכנים לשליחה למגייסים.',
@@ -1154,8 +1145,13 @@ Shoreline B2B
                 previewCompleted: 'הושלם',
                 studioSocial: 'עברית מיושרת לימין • תצוגה חיה • PDF להגשה',
                 studioAts: 'תבניות שנבדקו מול מערכות סינון (ATS)',
-                continueDesign: 'המשך לבחירת עיצוב ⬅️',
-                continueDesignShort: 'המשך לעיצוב ⬅️',
+                stepDesign: 'עיצוב',
+                stepDetails: 'פרטים',
+                stepDownload: 'הורדה',
+                continueDesign: 'המשך למילוי פרטים ⬅️',
+                continueDesignShort: 'המשך לפרטים ⬅️',
+                continueDownload: 'המשך להורדה ⬅️',
+                switchTemplate: 'החלף תבנית',
                 downloadPdfCta: 'הורד PDF ב-',
                 fontSelectLabel: 'טיפוגרפיה עברית',
                 densityLegend: 'ריווח / צפיפות — התאמה לעמוד אחד',
@@ -1167,11 +1163,11 @@ Shoreline B2B
                 customColor: 'צבע מותאם',
                 importHandoff: 'המשיכו במחשב',
                 importSample: 'צפו בדוגמת PDF',
-                tipSummary: 'טיפ: שלבו הישג מדיד — אחוזי צמיחה, גודל צוות או תקציב.',
-                tipExperience: 'טיפ מקצועי: כל נקודה תתחיל בפעולה (הובלתי, הגדלתי) ותכלול מספר.',
-                tipExperienceLead: 'מלאו את כרטיס המשרה הראשון. אחר כך אפשר להוסיף משרה נוספת.',
-                tipEducation: 'ציינו מוסד, תואר ושנים. קורס רלוונטי מחזק את הפרופיל יותר מרשימה ארוכה.',
-                tipSkills: '3–8 כישורים חזקים עדיפים על רשימה ארוכה. התאימו למשרה שאליה מגישים.',
+                tipSummary: '',
+                tipExperience: '',
+                tipExperienceLead: '',
+                tipEducation: '',
+                tipSkills: '3–8 כישורים חזקים עדיפים על רשימה ארוכה.',
                 handoffBanner: 'מעדיפים לערוך במחשב?',
                 handoffBannerLead: 'שלחו קישור מאגי לוואטסאפ או לאימייל והמשיכו בדיוק מאותה טיוטה.',
                 handoffBannerCta: 'שלחו קישור להמשך',
@@ -1204,6 +1200,10 @@ Shoreline B2B
                 nameFallback: 'Full name',
                 titleFallback: 'Job title',
                 detailsHeading: 'Personal details (empty fields stay hidden)',
+                phName: 'e.g. Israel Israeli',
+                phTitle: 'e.g. Project manager',
+                phLocation: 'e.g. Tel Aviv',
+                phSummary: 'e.g. Project manager experienced in leading teams and growing revenue',
                 labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language...', languagesLevel: 'Proficiency...', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency, then tap Add.', languagesPopular: 'Popular', languagesMore: 'More languages', references: 'References' },
                 i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
                 examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] },
@@ -1215,7 +1215,7 @@ Shoreline B2B
                 phrasesLoad: 'Fill empty fields from a sample',
                 phrasesReplace: 'Replace with sample experience',
                 phrasesSkills: '+ Add recommended skills for this field',
-                roleTitleHint: 'Pick a ready-made title from the list, or type your own.',
+                roleTitleHint: '',
                 strengthTitle: 'CV strength',
                 strengthTipDefault: 'Want to reach 100%? Do the following:',
                 strengthDone: 'Excellent! Your CV is ready to send to recruiters.',
@@ -1224,8 +1224,13 @@ Shoreline B2B
                 previewCompleted: 'completed',
                 studioSocial: 'Left-aligned English • Live Preview • Ready PDF',
                 studioAts: 'Templates verified against ATS screening systems',
-                continueDesign: 'Continue to design →',
+                stepDesign: 'Design',
+                stepDetails: 'Details',
+                stepDownload: 'Download',
+                continueDesign: 'Continue to details →',
                 continueDesignShort: 'Continue →',
+                continueDownload: 'Continue to download →',
+                switchTemplate: 'Change template',
                 downloadPdfCta: 'Download PDF · ',
                 fontSelectLabel: 'Hebrew typography',
                 densityLegend: 'Spacing / density — fit to one page',
@@ -1237,11 +1242,11 @@ Shoreline B2B
                 customColor: 'Custom color',
                 importHandoff: 'Continue on desktop',
                 importSample: 'View PDF sample',
-                tipSummary: 'Pro tip: include a measurable win — % growth, team size, or budget.',
-                tipExperience: 'Pro tip: start each bullet with a verb (led, grew) and include a number.',
-                tipExperienceLead: 'Fill in the first job card. Then you can add another position.',
-                tipEducation: 'Add institution, degree and years. One relevant course beats a long list.',
-                tipSkills: '3–8 strong skills beat a long list. Match them to the role.',
+                tipSummary: '',
+                tipExperience: '',
+                tipExperienceLead: '',
+                tipEducation: '',
+                tipSkills: '3–8 strong skills beat a long list.',
                 handoffBanner: 'Prefer editing on desktop?',
                 handoffBannerLead: 'Send a magic link to WhatsApp or email and continue from the same draft.',
                 handoffBannerCta: 'Send a continue link',
@@ -1323,10 +1328,45 @@ Shoreline B2B
             return 'https://' + url.replace(/^\/+/, '');
         }
 
+        function cvAccentScopeEls() {
+            return [
+                document.getElementById('cv-preview-stack'),
+                document.getElementById('cv-preview-wrapper'),
+                document.getElementById('cv-preview-page-2'),
+                document.getElementById('cl-preview-wrapper')
+            ].filter(Boolean);
+        }
+
+        function applyCvAccentVar(color) {
+            const next = String(color || '').trim();
+            document.documentElement.style.removeProperty('--accent');
+            document.documentElement.style.removeProperty('--cv-accent-color');
+            cvAccentScopeEls().forEach(function (el) {
+                if (!next) {
+                    el.style.removeProperty('--accent');
+                    el.style.removeProperty('--cv-accent-color');
+                    return;
+                }
+                el.style.setProperty('--accent', next);
+                el.style.setProperty('--cv-accent-color', next);
+            });
+        }
+
+        function readCvAccentVar() {
+            const wrap = document.getElementById('cv-preview-wrapper') || document.getElementById('cv-preview-stack');
+            if (wrap) {
+                const inline = (wrap.style.getPropertyValue('--accent') || wrap.style.getPropertyValue('--cv-accent-color') || '').trim();
+                if (inline) return inline;
+                const computed = (getComputedStyle(wrap).getPropertyValue('--accent') || '').trim();
+                if (computed) return computed;
+            }
+            return (document.documentElement.style.getPropertyValue('--accent') || '').trim();
+        }
+
         function setAccent(color, btn) {
             const next = String(color || '').trim();
             if (!next) return;
-            document.documentElement.style.setProperty('--accent', next);
+            applyCvAccentVar(next);
             const picker = document.getElementById('custom-accent');
             if (picker) picker.value = next;
             const names = THEME_NAMES[window.QCCvLang === 'en' ? 'en' : 'he'] || THEME_NAMES.he;
@@ -1345,7 +1385,7 @@ Shoreline B2B
         function setCustomAccent(color) {
             const next = String(color || '').trim();
             if (!next) return;
-            document.documentElement.style.setProperty('--accent', next);
+            applyCvAccentVar(next);
             const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'];
             const label = document.getElementById('accent-label');
             if (label) label.textContent = (pack && pack.customColor) || (window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם');
@@ -1448,20 +1488,20 @@ Shoreline B2B
             setLabel('btn-replace-role-example', pack.phrasesReplace);
             setLabel('btn-insert-skills', pack.phrasesSkills);
             if (typeof syncPhraseTriggerLabel === 'function') syncPhraseTriggerLabel();
-            setLabel('role-title-hint', pack.roleTitleHint);
             setLabel('studio-social-line', pack.studioSocial);
             setLabel('studio-social-ats', pack.studioAts);
+            setLabel('step-1-label', pack.stepDesign);
+            setLabel('step-2-label', pack.stepDetails);
+            setLabel('step-3-label', pack.stepDownload);
             setLabel('btn-continue-design', pack.continueDesign);
+            setLabel('btn-continue-details', pack.continueDownload);
             setLabel('mobile-continue-label', pack.continueDesignShort);
+            setLabel('btn-switch-template', pack.switchTemplate);
             setLabel('font-select-label', pack.fontSelectLabel);
             syncCvFontSelectI18n(lang);
             setLabel('density-legend', pack.densityLegend);
             setLabel('density-hint', pack.densityHint);
             setLabel('custom-accent-caption', pack.customAccent);
-            setLabel('tip-summary', pack.tipSummary);
-            setLabel('tip-experience-lead', pack.tipExperienceLead);
-            setLabel('tip-experience', pack.tipExperience);
-            setLabel('tip-education', pack.tipEducation);
             setLabel('tip-skills', pack.tipSkills);
             setLabel('handoff-banner-title', pack.handoffBanner);
             setLabel('handoff-banner-lead', pack.handoffBannerLead);
@@ -1523,9 +1563,11 @@ Shoreline B2B
             const nameEl = document.getElementById('in-name');
             const titleEl = document.getElementById('in-title');
             const locEl = document.getElementById('in-location');
-            if (nameEl) nameEl.placeholder = pack.labels.name;
-            if (titleEl) titleEl.placeholder = pack.labels.title;
-            if (locEl) locEl.placeholder = pack.labels.location;
+            const summaryEl = document.getElementById('in-summary');
+            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Israel Israeli' : 'לדוגמה: ישראל ישראלי');
+            if (titleEl) titleEl.placeholder = pack.phTitle || (lang === 'en' ? 'e.g. Project manager' : 'לדוגמה: מנהל פרויקטים');
+            if (locEl) locEl.placeholder = pack.phLocation || (lang === 'en' ? 'e.g. Tel Aviv' : 'לדוגמה: תל אביב');
+            if (summaryEl) summaryEl.placeholder = pack.phSummary || (lang === 'en' ? 'e.g. Project manager experienced in leading teams' : 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים');
             const layoutName = window.QCLayout || (typeof currentLayoutName === 'function' && currentLayoutName()) || '';
             if (layoutName === 'charcoal' && lang === 'en') {
                 const short = { summary: 'Profile', experience: 'Experience', languages: 'Language', references: 'References', contact: 'Contact', skills: 'Skills', educationSide: 'Education', education: 'Education' };
@@ -3035,7 +3077,7 @@ Shoreline B2B
             if (formCol) {
                 formCol.scrollTop = 0;
                 if (!(opts && opts.silent)) {
-                    const targetId = panelStep === 1 ? 'details-panel' : 'design-panel';
+                    const targetId = panelStep === 1 ? 'templates-panel' : 'details-panel';
                     const target = document.getElementById(targetId);
                     if (target && formCol.contains(target) && panelStep === 2) {
                         const top = target.offsetTop - 12;
@@ -3434,7 +3476,6 @@ Shoreline B2B
             const tpl = (window.QCTemplates || {})[key];
             if (!tpl) return;
             const fromHome = document.body.classList.contains('on-home');
-            const stayOnDesign = document.body.classList.contains('on-studio') && window.QCStudioStep === 2;
             const lang = tpl.preferredLang || (window.QCCvLang === 'en' ? 'en' : 'he');
             // Design/layout only — never overwrite the user's form text.
             if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });
@@ -3450,8 +3491,8 @@ Shoreline B2B
             updateCV();
             QCDraft.save();
             closeExamplesModal();
-            showStudio({ keepStep: stayOnDesign });
-            applyStudioStep(stayOnDesign ? 2 : 1, { silent: true });
+            showStudio({ keepStep: true });
+            applyStudioStep(2, { silent: true });
             if (fromHome && window.matchMedia('(max-width: 1023px)').matches) openMobilePreview();
         }
 
@@ -3726,7 +3767,7 @@ Shoreline B2B
             renderPhraseChips();
             updateCV();
             QCDraft.save();
-            applyStudioStep(1, { silent: true });
+            applyStudioStep(2, { silent: true });
         }
 
         function loadRoleExample() {
@@ -3934,7 +3975,7 @@ Shoreline B2B
             if (isStudio) window.scrollTo(0, 0);
             document.body.classList.toggle('bg-slate-900', isStudio);
             document.body.classList.toggle('text-slate-100', isStudio);
-            if (skip) skip.setAttribute('href', isStudio ? '#details-panel' : '#home-cta');
+            if (skip) skip.setAttribute('href', isStudio ? '#templates-panel' : '#home-cta');
             document.documentElement.style.setProperty('--theme-color', isStudio ? '#020617' : '#f3ece1');
             const theme = document.querySelector('meta[name="theme-color"]');
             if (theme) theme.setAttribute('content', isStudio ? '#020617' : '#f3ece1');
@@ -4114,9 +4155,9 @@ Shoreline B2B
             closeMobilePreview();
         });
 
-        document.getElementById('details-panel').addEventListener('focusin', function () { markStep(1); });
-        document.getElementById('design-panel').addEventListener('focusin', function () { markStep(2); });
-        document.getElementById('templates-panel').addEventListener('focusin', function () { markStep(2); });
+        document.getElementById('templates-panel').addEventListener('focusin', function () { markStep(1); });
+        document.getElementById('design-panel').addEventListener('focusin', function () { markStep(1); });
+        document.getElementById('details-panel').addEventListener('focusin', function () { markStep(2); });
 
         window.updateCV = updateCV;
         window.resetForm = resetForm;
@@ -4135,6 +4176,12 @@ Shoreline B2B
         window.replaceRoleExample = replaceRoleExample;
         window.onRoleFieldChange = onRoleFieldChange;
         window.insertSkills = insertSkills;
+        window.setAccent = setAccent;
+        window.setCustomAccent = setCustomAccent;
+        window.readCvAccentVar = readCvAccentVar;
+        window.QCCvThemeRoot = function () {
+            return document.getElementById('cv-preview-wrapper') || document.getElementById('cv-preview-stack') || document.documentElement;
+        };
         window.insertBullet = insertBullet;
         window.applyRoleTitle = applyRoleTitle;
         window.applyIndustryPreset = applyIndustryPreset;

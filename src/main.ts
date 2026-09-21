@@ -264,10 +264,8 @@ function setTransferWaiting(on, orderId, statusText) {
   root?.classList.toggle("is-waiting", Boolean(on));
   if (on) {
     live?.classList.remove("hidden");
-    if (orderId) {
-      panel?.classList.remove("hidden");
-      if (idEl) idEl.textContent = orderId;
-    }
+    panel?.classList.add("hidden");
+    if (idEl && orderId) idEl.textContent = orderId;
     if (statusEl) {
       statusEl.textContent = statusText || "ממתין לאישור ההעברה...";
     }
@@ -353,18 +351,13 @@ function resumePendingManualOrderIfNeeded() {
 }
 
 function requireCheckoutPhone() {
-  const contact = readCheckoutContact();
-  if (!contact || !isLikelyIsraeliMobile(contact)) {
-    setFeedback("נא למלא מספר טלפון תקין ב-Bit / PayBox לזיהוי ההעברה.", false);
-    document.getElementById("checkout-contact")?.focus();
-    return "";
-  }
-  return contact;
+  const contact = readCheckoutContact() || readCvFormPhone();
+  if (contact && isLikelyIsraeliMobile(contact)) return contact;
+  return String(contact || "").trim();
 }
 
 async function proceedToPayment(preferredMethod) {
   const contact = requireCheckoutPhone();
-  if (!contact) return null;
   if (preferredMethod === "paybox" || preferredMethod === "bit") {
     selectedPayMethod = preferredMethod;
   }
@@ -535,8 +528,6 @@ function bindDeepLinkAnchor(id, url) {
 
 function openBitApp(e) {
   e?.preventDefault?.();
-  // Copy while the user gesture is fresh (before await); toast guides manual paste fallback.
-  copyPayPhoneFallback();
   void (async () => {
     const orderId = await ensureManualOrderForCheckout("bit");
     if (!orderId) return;
@@ -548,7 +539,6 @@ function openBitApp(e) {
 
 function openPayboxApp(e) {
   e?.preventDefault?.();
-  copyPayPhoneFallback();
   void (async () => {
     const orderId = await ensureManualOrderForCheckout("paybox");
     if (!orderId) return;

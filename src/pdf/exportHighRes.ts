@@ -25,13 +25,34 @@ function fileBase() {
   return (english ? "Resume_" : "קורות_חיים_") + (safe || "resume");
 }
 
+function cvThemeSource() {
+  if (typeof window.QCCvThemeRoot === "function") {
+    const root = window.QCCvThemeRoot();
+    if (root) return root;
+  }
+  return document.getElementById("cv-preview-wrapper")
+    || document.getElementById("cv-preview-stack")
+    || document.documentElement;
+}
+
 function copyCssVars(fromEl, toEl) {
-  const cs = getComputedStyle(fromEl);
-  ["--accent", "--cv-font", "--cv-scale", "--cv-leading"].forEach((name) => {
-    const v = cs.getPropertyValue(name) || fromEl.style.getPropertyValue(name);
-    if (v) toEl.style.setProperty(name, v.trim());
-  });
-  const stack = (cs.getPropertyValue("--cv-font") || fromEl.style.getPropertyValue("--cv-font") || "").trim();
+  const accentSrc = fromEl && fromEl !== document.documentElement ? fromEl : cvThemeSource();
+  const fontSrc = document.documentElement;
+  const copyNamed = (src, names) => {
+    const cs = getComputedStyle(src);
+    names.forEach((name) => {
+      const v = (src.style.getPropertyValue(name) || cs.getPropertyValue(name) || "").trim();
+      if (v) toEl.style.setProperty(name, v);
+    });
+  };
+  copyNamed(accentSrc, ["--accent", "--cv-accent-color"]);
+  copyNamed(fontSrc, ["--cv-font", "--cv-scale", "--cv-leading"]);
+  const accent = (toEl.style.getPropertyValue("--accent") || toEl.style.getPropertyValue("--cv-accent-color") || "").trim();
+  if (accent) {
+    toEl.style.setProperty("--accent", accent);
+    toEl.style.setProperty("--cv-accent-color", accent);
+  }
+  const stack = (fontSrc.style.getPropertyValue("--cv-font") || getComputedStyle(fontSrc).getPropertyValue("--cv-font") || "").trim();
   if (stack) toEl.style.fontFamily = stack;
 }
 

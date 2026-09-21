@@ -156,7 +156,17 @@ function registerFonts(pdf, fonts) {
 }
 
 function accentHex() {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#1e293b";
+  const src = (typeof window.QCCvThemeRoot === "function" && window.QCCvThemeRoot())
+    || document.getElementById("cv-preview-wrapper")
+    || document.getElementById("cv-preview-stack")
+    || document.documentElement;
+  const raw = (
+    src.style.getPropertyValue("--accent")
+    || src.style.getPropertyValue("--cv-accent-color")
+    || getComputedStyle(src).getPropertyValue("--accent")
+    || getComputedStyle(src).getPropertyValue("--cv-accent-color")
+    || "#1e293b"
+  ).trim();
   const hex = raw.replace("#", "");
   if (/^[0-9a-fA-F]{6}$/.test(hex)) return hex;
   return "1e293b";

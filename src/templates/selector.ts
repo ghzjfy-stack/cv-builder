@@ -176,8 +176,6 @@ function applyDesign(tpl: CvTemplate): void {
     const swatch = document.querySelector(`.theme-swatch[data-color="${tpl.accent}"]`);
     w.setAccent(tpl.accent, swatch);
   }
-  // CSS variables for live preview theming
-  document.documentElement.style.setProperty("--accent", tpl.accent);
   document.documentElement.style.setProperty("--tpl-primary", tpl.colorPalette.primary);
   document.documentElement.style.setProperty("--tpl-secondary", tpl.colorPalette.secondary);
   document.documentElement.style.setProperty("--tpl-text", tpl.colorPalette.text);
@@ -197,7 +195,6 @@ function applyTemplate(key: string): void {
   if (!tpl) return;
 
   const fromHome = document.body.classList.contains("on-home");
-  const stayOnDesign = document.body.classList.contains("on-studio") && (window as Window & { QCStudioStep?: number }).QCStudioStep === 2;
   const w = window as Window & {
     setCvLang?: (l: string, o?: { restore?: boolean }) => void;
     updateCV?: () => void;
@@ -218,9 +215,9 @@ function applyTemplate(key: string): void {
   w.updateCV?.();
   w.QCDraft?.save?.();
   w.closeExamplesModal?.();
-  w.showStudio?.({ keepStep: stayOnDesign });
-  if (w.applyStudioStep) w.applyStudioStep(stayOnDesign ? 2 : 1, { silent: true });
-  else w.markStep?.(stayOnDesign ? 2 : 1);
+  w.showStudio?.({ keepStep: true });
+  if (w.applyStudioStep) w.applyStudioStep(2, { silent: true });
+  else w.markStep?.(2);
   if (fromHome && window.matchMedia("(max-width: 1023px)").matches) w.openMobilePreview?.();
 }
 

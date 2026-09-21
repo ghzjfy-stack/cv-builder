@@ -34,8 +34,8 @@ type BadgeSpec = { kind: BadgeKind; he: string; en: string };
 
 const BADGES: Record<string, BadgeSpec> = {
   simple: { kind: "popular", he: "פופולרי", en: "Popular" },
-  ink: { kind: "minimal", he: "מינימלי", en: "Minimal" },
-  harvard: { kind: "ats", he: "ATS Friendly", en: "ATS Friendly" },
+  ink: { kind: "minimal", he: "נקי ומינימליסטי", en: "Minimal" },
+  harvard: { kind: "ats", he: "מותאם ל-ATS", en: "ATS Friendly" },
   swiss: { kind: "modern", he: "מודרני", en: "Modern" },
   compact: { kind: "compact", he: "עמוד אחד", en: "One Page" },
   intern: { kind: "student", he: "סטודנט", en: "Student" },
@@ -43,8 +43,8 @@ const BADGES: Record<string, BadgeSpec> = {
   pearl: { kind: "modern", he: "מודרני", en: "Modern" },
   cobalt: { kind: "tech", he: "הייטק", en: "Tech" },
   "entry-clean": { kind: "entry", he: "כניסה", en: "Entry" },
-  "heebo-ats": { kind: "ats", he: "ATS Friendly", en: "ATS Friendly" },
-  "assistant-ats": { kind: "minimal", he: "רך", en: "Soft" },
+  "heebo-ats": { kind: "ats", he: "מותאם ל-ATS", en: "ATS Friendly" },
+  "assistant-ats": { kind: "minimal", he: "נקי", en: "Soft" },
   "rubik-pro": { kind: "professional", he: "מקצועי", en: "Professional" },
   "finance-ats": { kind: "finance", he: "כספים", en: "Finance" },
   "legal-ats": { kind: "legal", he: "משפטים", en: "Legal" },
@@ -52,8 +52,8 @@ const BADGES: Record<string, BadgeSpec> = {
   "student-ats": { kind: "student", he: "סטודנט", en: "Student" },
   "mgmt-ats": { kind: "executive", he: "הנהלה", en: "Executive" },
   charcoal: { kind: "photo", he: "עם תמונה", en: "Photo" },
-  navy: { kind: "corporate", he: "תאגידי", en: "Corporate" },
-  petra: { kind: "timeline", he: "ציר־זמן", en: "Timeline" },
+  navy: { kind: "corporate", he: "עסקי", en: "Business" },
+  petra: { kind: "timeline", he: "כרונולוגי", en: "Chronological" },
   midnight: { kind: "executive", he: "הנהלה", en: "Executive" },
   emerald: { kind: "colorful", he: "צבעוני", en: "Colorful" },
   azure: { kind: "popular", he: "פופולרי", en: "Popular" },
@@ -65,14 +65,14 @@ const BADGES: Record<string, BadgeSpec> = {
   europass: { kind: "europe", he: "אירופה", en: "Europe" },
   ivory: { kind: "executive", he: "הנהלה", en: "Executive" },
   gold: { kind: "finance", he: "פיננסי", en: "Finance" },
-  espresso: { kind: "professional", he: "עורכי", en: "Editorial" },
+  espresso: { kind: "professional", he: "מקצועי", en: "Professional" },
   sage: { kind: "professional", he: "מקצועי", en: "Professional" },
-  slate: { kind: "tech", he: "דו־טורי", en: "Two-Column" },
+  slate: { kind: "tech", he: "הייטק", en: "Tech" },
   wine: { kind: "creative", he: "יצירתי", en: "Creative" },
   forest: { kind: "consulting", he: "ייעוץ", en: "Consulting" },
-  sand: { kind: "sidebar", he: "סרגל צד", en: "Sidebar" },
-  split: { kind: "split", he: "מפוצל", en: "Split" },
-  "teal-sidebar": { kind: "sidebar", he: "סרגל צד", en: "Sidebar" },
+  sand: { kind: "sidebar", he: "עיצוב פנים", en: "Interior" },
+  split: { kind: "split", he: "משפטים", en: "Legal" },
+  "teal-sidebar": { kind: "sidebar", he: "שירות", en: "Service" },
   "ink-exec": { kind: "executive", he: "הנהלה", en: "Executive" },
   "student-modern": { kind: "student", he: "סטודנט", en: "Student" },
   "dev-navy": { kind: "tech", he: "הייטק", en: "Tech" },
@@ -374,8 +374,8 @@ export function badgeOf(tpl: CvTemplate): BadgeSpec {
   if (BADGES[tpl.id]) return BADGES[tpl.id];
   if (tpl.styleTags.includes("executive")) return { kind: "executive", he: "הנהלה", en: "Executive" };
   if (tpl.styleTags.includes("creative")) return { kind: "creative", he: "יצירתי", en: "Creative" };
-  if (tpl.styleTags.includes("minimal")) return { kind: "minimal", he: "מינימלי", en: "Minimal" };
-  if (tpl.atsOptimized) return { kind: "ats", he: "ATS Friendly", en: "ATS Friendly" };
+  if (tpl.styleTags.includes("minimal")) return { kind: "minimal", he: "נקי ומינימליסטי", en: "Minimal" };
+  if (tpl.atsOptimized) return { kind: "ats", he: "מותאם ל-ATS", en: "ATS Friendly" };
   if (tpl.styleTags.includes("modern")) return { kind: "modern", he: "מודרני", en: "Modern" };
   if (tpl.styleTags.includes("colorful")) return { kind: "colorful", he: "צבעוני", en: "Colorful" };
   return { kind: "professional", he: "מקצועי", en: "Professional" };

@@ -6,7 +6,7 @@ import {
   registerQcTemplates,
   type CvTemplate,
 } from "../data/templates";
-import { badgeHtml, homeThumbHtml, thumbHtml } from "./thumbs";
+import { badgeHtml, badgeOf, homeThumbHtml, thumbHtml } from "./thumbs";
 
 type Lang = "he" | "en";
 
@@ -52,8 +52,12 @@ function filteredList(): CvTemplate[] {
 function cardHtml(tpl: CvTemplate): string {
   const L = lang();
   const useLabel = L === "en" ? "Use This Template" : "השתמש בתבנית זו";
+  const title = titleOf(tpl);
+  const badge = badgeOf(tpl);
+  const badgeLabel = L === "en" ? badge.en : badge.he;
+  const badgeMark = title.trim() === badgeLabel.trim() ? "" : badgeHtml(tpl, L);
   return `<article class="template-card" data-example="${esc(tpl.id)}" data-ats="${tpl.atsOptimized ? "1" : "0"}" aria-pressed="false">
-    ${badgeHtml(tpl, L)}
+    ${badgeMark}
     ${thumbHtml(tpl, L)}
     <div class="template-card-meta">
       <span class="template-card-title">${esc(titleOf(tpl))}</span>

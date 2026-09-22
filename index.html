@@ -14,9 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=accent1">
-    <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=live1">
-    <link rel="stylesheet" href="./cro.css">
+    <link rel="stylesheet" href="./template-skins.css?v=rtl1">
+    <link rel="stylesheet" href="./app.css?v=gate1">
+    <link rel="stylesheet" href="./cro.css?v=rtl1">
 </head>
 <body class="on-home" id="app-body">
     <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
@@ -31,7 +31,7 @@
                 </button>
                 <div class="home-nav-actions">
                     <button type="button" class="home-link hidden sm:inline-flex" onclick="openExamplesModal()">דוגמאות</button>
-                    <button type="button" class="home-nav-cta" onclick="showStudio()">הסטודיו</button>
+                    <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
                 </div>
             </header>
 
@@ -141,7 +141,7 @@
                     </article>
                     <article class="home-step">
                         <h3><span class="home-step-num">03 |</span> מורידים PDF</h3>
-                        <p>משלמים <span data-price>10</span> ₪ בלבד ב-Bit ומורידים קובץ PDF מוכן להגשה למגייסים.</p>
+                        <p id="home-step-3-copy">משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.</p>
                     </article>
                 </div>
             </section>
@@ -203,8 +203,8 @@
                 </div>
             </section>
 
-            <section class="home-section" aria-labelledby="home-craft" style="padding-top:0">
-                <p class="home-kicker">הסטודיו</p>
+            <section class="home-section home-section-templates" aria-labelledby="home-craft">
+                <p class="home-kicker" id="home-craft-kicker">תבניות ועיצובים</p>
                 <h2 id="home-craft">עיצוב מקצועי ברמת מעצב – בלי להסתבך</h2>
                 <p class="home-section-lead" data-template-count-copy="home">תבניות מודרניות המותאמות למערכות סינון (ATS). ממלאים את הפרטים, רואים את התצוגה המקדימה בזמן אמת והקובץ מוכן להגשה.</p>
                 <div class="home-ats-row">
@@ -227,7 +227,7 @@
                 </div>
             </section>
 
-            <section class="home-section" aria-labelledby="home-roles" style="padding-top:0">
+            <section class="home-section home-section-roles" aria-labelledby="home-roles">
                 <p class="home-kicker">לפי תפקיד</p>
                 <h2 id="home-roles">תבניות מוכנות למכירות, הייטק ועוד</h2>
                 <p class="home-section-lead">בחרו את התחום שלכם לקבלת תבנית מותאמת אישית עם ניסוחים מקצועיים מוכנים לשימוש.</p>
@@ -252,7 +252,7 @@
                 <p class="home-section-lead" style="margin-top:1rem"><a class="home-link" href="/templates/" style="padding:0">כל התחומים</a></p>
             </section>
 
-            <section class="home-section" aria-labelledby="home-offer" style="padding-top:0;padding-bottom:3.25rem">
+            <section class="home-section home-section-offer" aria-labelledby="home-offer">
                 <div class="home-price">
                     <div>
                         <p class="home-kicker" style="color:#e7c98a">מחיר השקה</p>
@@ -299,7 +299,7 @@
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/tech" data-seo-landing>הייטק</a>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/sales" data-seo-landing>מכירות</a>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/students" data-seo-landing>סטודנטים</a>
-                    <button type="button" class="home-nav-cta" onclick="showStudio()">הסטודיו</button>
+                    <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
                 </div>
             </header>
             <section class="home-hero" aria-labelledby="seo-landing-title">
@@ -952,7 +952,7 @@
                         <img id="bit-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https%3A%2F%2Fwww.bitpay.co.il%2Fapp%2Fme%2FE4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F%3Fsum%3D10.00%26amount%3D10.00&amp;ecc=M" alt="קוד QR לתשלום 10 ₪ ב-Bit" width="168" height="168">
                         <figcaption>סריקה מהמחשב</figcaption>
                     </figure>
-                    <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">שלמו ב-Bit (₪10)</a>
+                    <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">שלמו 10 ₪ ב-Bit</a>
                     <div id="pay-live-status" class="pay-live-status" aria-live="polite">
                         <div id="manual-order-panel" class="hidden" aria-hidden="true">
                             <p id="manual-order-id" class="sr-only" dir="ltr">—</p>
@@ -1270,7 +1270,13 @@
                 compareTitle: 'כך קורות החיים שלך ייראו מול המגייסים',
                 compareLead: 'במקום מסמך Word עמוס ומבולגן – קורות חיים קריאים, מותאמים למערכות סינון (ATS) ומשדרים מקצועיות מהשנייה הראשונה.',
                 compareBefore: 'לפני (Word)',
-                compareAfter: 'אחרי (QuickCV)'
+                compareAfter: 'אחרי (QuickCV)',
+                homeNavCta: 'צור קורות חיים',
+                craftKicker: 'תבניות ועיצובים',
+                step3: 'משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.',
+                bitCta: 'שלמו 10 ₪ ב-Bit',
+                selectedTpl: '✓ נבחר',
+                checkoutGateToast: 'יש להשלים פרטים אישיים ולבחור תבנית לפני המעבר לתשלום'
             },
             en: {
                 nameFallback: 'Full name',
@@ -1357,7 +1363,13 @@
                 compareTitle: 'This is how recruiters will see your CV',
                 compareLead: 'Instead of a crowded, messy Word file — a readable CV that passes ATS scans and looks professional from the first second.',
                 compareBefore: 'Before (Word)',
-                compareAfter: 'After (QuickCV)'
+                compareAfter: 'After (QuickCV)',
+                homeNavCta: 'Create CV',
+                craftKicker: 'Templates & designs',
+                step3: 'Pay only 10 ₪ in Bit and instantly download a professional PDF.',
+                bitCta: 'Pay 10 ₪ with Bit',
+                selectedTpl: '✓ Selected',
+                checkoutGateToast: 'Complete your personal details and choose a template before payment.'
             }
         };
         window.CV_I18N = CV_I18N;
@@ -1658,8 +1670,25 @@
             const chipNames = ACCENT_CHIP_I18N[lang] || ACCENT_CHIP_I18N.he;
             document.querySelectorAll('[data-accent-chip]').forEach((el) => {
                 const key = el.getAttribute('data-accent-chip');
-                if (chipNames[key]) el.textContent = chipNames[key];
+                if (!chipNames[key]) return;
+                el.textContent = chipNames[key];
+                const wrap = el.closest('.accent-chip-wrap');
+                const btn = wrap && wrap.querySelector('.accent-chip');
+                if (btn) btn.setAttribute('aria-label', chipNames[key]);
             });
+            const bitCta = document.getElementById('btn-open-bit');
+            if (bitCta) bitCta.textContent = pack.bitCta || (lang === 'en' ? 'Pay 10 ₪ with Bit' : 'שלמו 10 ₪ ב-Bit');
+            setLabel('home-step-3-copy', pack.step3);
+            setLabel('home-craft-kicker', pack.craftKicker);
+            document.querySelectorAll('.home-nav-cta').forEach((el) => {
+                if (pack.homeNavCta) el.textContent = pack.homeNavCta;
+            });
+            document.documentElement.style.setProperty('--qc-selected-tpl', JSON.stringify(pack.selectedTpl || '✓ נבחר'));
+            const themeNames = THEME_NAMES[lang] || THEME_NAMES.he;
+            const accentLabel = document.getElementById('accent-label');
+            const pressedChip = document.querySelector('.theme-swatch[aria-pressed="true"]');
+            const accentHex = ((pressedChip && pressedChip.getAttribute('data-color')) || (typeof readCvAccentVar === 'function' ? readCvAccentVar() : '') || '').trim().toLowerCase();
+            if (accentLabel && accentHex && themeNames[accentHex]) accentLabel.textContent = themeNames[accentHex];
             const downloadCta = document.getElementById('btn-download-pdf');
             if (downloadCta) {
                 const price = downloadCta.querySelector('[data-price]');
@@ -1674,6 +1703,7 @@
             if (typeof applyCvI18nAi === 'function') applyCvI18nAi();
             if (typeof syncMobilePreviewToggle === 'function') syncMobilePreviewToggle();
             if (typeof updateCvScore === 'function') updateCvScore();
+            if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
             const langNameBtn = document.getElementById('lang-pick-name-btn');
             const langLevelBtn = document.getElementById('lang-pick-level-btn');
             if (langNameBtn && pack.labels.languagesSelect) langNameBtn.setAttribute('aria-label', pack.labels.languagesSelect);
@@ -1783,6 +1813,7 @@
             const swapSample = !restore && shouldSwapCvSample(prev);
             const dir = next === 'en' ? 'ltr' : 'rtl';
             window.QCCvLang = next;
+            document.documentElement.lang = next;
             const target = document.getElementById('cv-target');
             const details = document.getElementById('details-panel');
             const formCol = document.getElementById('studio-form-column');
@@ -1995,6 +2026,9 @@
             try {
                 updateCvScore();
             } catch (err) { /* ignore score meter errors */ }
+            try {
+                if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
+            } catch (err) { /* ignore checkout gate */ }
             try {
                 window.QCPageFit?.updateSoon?.();
             } catch (err) { /* ignore page-fit */ }
@@ -3312,6 +3346,87 @@
         }
         window.setPreviewBg = setPreviewBg;
 
+        function checkoutGateMessage() {
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
+            return pack.checkoutGateToast || 'יש להשלים פרטים אישיים ולבחור תבנית לפני המעבר לתשלום';
+        }
+
+        function isPersonalInfoComplete() {
+            const name = getVal('in-name').trim();
+            const title = getVal('in-title').trim();
+            const phone = getVal('in-phone').replace(/\D/g, '');
+            const email = getVal('in-email').trim();
+            if (name.length < 2) return false;
+            if (title.length < 2) return false;
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (phone.length < 9 && !emailOk) return false;
+            return true;
+        }
+
+        function isTemplateSelected() {
+            const id = String(window.QCExample || '').trim();
+            if (!id) return false;
+            const bank = window.QCTemplates || {};
+            if (bank[id]) return true;
+            if (document.querySelector('.template-card[data-example="' + id.replace(/"/g, '') + '"][aria-pressed="true"]')) return true;
+            return true;
+        }
+
+        function isCheckoutReady() {
+            return isPersonalInfoComplete() && isTemplateSelected();
+        }
+
+        var qcStudioToastTimer = 0;
+        function showStudioToast(message) {
+            let el = document.getElementById('qc-pay-toast');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'qc-pay-toast';
+                el.className = 'qc-pay-toast';
+                el.setAttribute('role', 'status');
+                el.setAttribute('aria-live', 'polite');
+                document.body.appendChild(el);
+            }
+            el.textContent = message || checkoutGateMessage();
+            el.classList.add('is-visible');
+            window.clearTimeout(qcStudioToastTimer);
+            qcStudioToastTimer = window.setTimeout(function () {
+                el.classList.remove('is-visible');
+            }, 3600);
+        }
+
+        function checkoutGateTargets() {
+            const nodes = [
+                document.getElementById('step-3'),
+                document.getElementById('btn-continue-details'),
+                document.getElementById('btn-download-pdf'),
+                document.getElementById('btn-download-pdf-mobile'),
+                document.getElementById('btn-sample-pdf-download')
+            ];
+            document.querySelectorAll('.studio-pay').forEach(function (el) { nodes.push(el); });
+            return nodes.filter(Boolean);
+        }
+
+        function syncCheckoutGate() {
+            const ready = isCheckoutReady();
+            document.body.classList.toggle('qc-checkout-locked', !ready);
+            checkoutGateTargets().forEach(function (el) {
+                el.classList.toggle('is-locked', !ready);
+                if (!ready) el.setAttribute('aria-disabled', 'true');
+                else el.removeAttribute('aria-disabled');
+            });
+            return ready;
+        }
+
+        function guardCheckout(opts) {
+            syncCheckoutGate();
+            if (isCheckoutReady()) return true;
+            if (!(opts && opts.silent)) showStudioToast();
+            return false;
+        }
+        window.QCCheckoutGate = guardCheckout;
+        window.syncCheckoutGate = syncCheckoutGate;
+
         function markStep(n) {
             const step = Math.max(1, Math.min(3, Number(n) || 1));
             for (let i = 1; i <= 3; i++) {
@@ -3335,6 +3450,7 @@
 
         function applyStudioStep(n, opts) {
             const step = Math.max(1, Math.min(3, Number(n) || 1));
+            if (step === 3 && !guardCheckout(opts)) return;
             window.QCStudioStep = step;
             const panelStep = step === 3 ? 2 : step;
             document.body.classList.toggle('qc-studio-step-1', panelStep === 1);
@@ -3377,6 +3493,7 @@
             if (continueBtn) continueBtn.hidden = !onDetails;
             if (downloadBtn) downloadBtn.classList.toggle('qc-step-hidden', onDetails);
             if (typeof syncMobilePayLabel === 'function') syncMobilePayLabel();
+            if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
         }
 
         function closePaymentModal(e) {
@@ -3461,6 +3578,7 @@
         }
 
         function openPaymentModal() {
+            if (!guardCheckout()) return;
             const el = document.getElementById('payment-modal');
             if (!el) return;
             document.body.classList.add('qc-checkout-open');
@@ -3696,6 +3814,7 @@
             document.querySelectorAll('.template-card[data-example]').forEach((el) => {
                 el.setAttribute('aria-pressed', el.getAttribute('data-example') === key ? 'true' : 'false');
             });
+            if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
         }
 
         function onPhotoChange(e) {
@@ -4584,6 +4703,21 @@
             console.error('studio init failed', err);
         }
         applyStudioStep(1, { silent: true });
+        if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
+        if (!window.__qcCheckoutGateBound) {
+            window.__qcCheckoutGateBound = true;
+            document.addEventListener('click', function (e) {
+                const t = e.target && e.target.closest && e.target.closest(
+                    '#step-3, #btn-continue-details, #btn-download-pdf, #btn-download-pdf-mobile, .studio-pay, #btn-sample-pdf-download'
+                );
+                if (!t) return;
+                if (typeof isCheckoutReady === 'function' && isCheckoutReady()) return;
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                if (typeof guardCheckout === 'function') guardCheckout();
+            }, true);
+        }
         syncNarrowStudio();
         var usedPreset = false;
         try {

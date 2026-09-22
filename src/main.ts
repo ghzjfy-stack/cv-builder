@@ -829,6 +829,7 @@ function prefillCheckoutContact() {
 }
 
 function triggerPDFDownload() {
+  if (!assertCheckoutReady()) return;
   if (!isUnlocked()) {
     openCheckoutModal();
     return;
@@ -839,7 +840,14 @@ function triggerPDFDownload() {
   void runHighResExport();
 }
 
+function assertCheckoutReady(): boolean {
+  const gate = window.QCCheckoutGate;
+  if (typeof gate === "function") return gate();
+  return true;
+}
+
 function openCheckoutModal() {
+  if (!assertCheckoutReady()) return;
   openModal();
   setFeedback("", false);
   selectedPack = "basic";
@@ -862,6 +870,7 @@ function openCheckoutModal() {
 function onDownloadPdfClick(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
+  if (!assertCheckoutReady()) return;
   if (isUnlocked()) {
     triggerPDFDownload();
     return;
@@ -870,6 +879,7 @@ function onDownloadPdfClick(e) {
 }
 
 function downloadFormat(kind) {
+  if (!assertCheckoutReady()) return;
   if (!isUnlocked()) {
     openCheckoutModal();
     setFeedback("יש לאמת תשלום או קוד לפני ההורדה.", false);
@@ -905,7 +915,10 @@ function applyPackUi() {
   });
   bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(amount));
   const bitBtn = document.getElementById("btn-open-bit");
-  if (bitBtn) bitBtn.textContent = `שלמו ב-Bit (₪${display})`;
+  if (bitBtn) {
+    const en = (window as Window & { QCCvLang?: string }).QCCvLang === "en";
+    bitBtn.textContent = en ? "Pay 10 ₪ with Bit" : "שלמו 10 ₪ ב-Bit";
+  }
   enableBitButton();
   const qr = document.getElementById("bit-qr");
   if (qr instanceof HTMLImageElement) {

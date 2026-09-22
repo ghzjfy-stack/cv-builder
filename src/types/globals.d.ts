@@ -4,6 +4,7 @@ declare global {
   interface Window {
     openPaymentModal?: () => void;
     goStep?: (n: number) => void;
+    QCCheckoutGate?: (opts?: { silent?: boolean }) => boolean;
     triggerPDFDownload?: () => void;
     onDownloadPdfClick?: (e?: Event) => void;
     QCRateLimit?: {

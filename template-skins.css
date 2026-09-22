@@ -137,7 +137,7 @@
     gap: 0.7rem;
     max-height: min(36rem, 62vh);
     overflow-y: auto;
-    padding-bottom: 0.15rem;
+    padding-bottom: 32px;
 }
 @media (min-width: 640px) {
     .template-grid.canva-grid {

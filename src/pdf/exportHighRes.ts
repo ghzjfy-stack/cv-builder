@@ -154,6 +154,10 @@ function prepareCaptureClone(sourceId = "cv-target") {
   const clone = source.cloneNode(true);
   clone.removeAttribute("id");
   clone.classList.add("cv-print-sheet");
+  clone.querySelectorAll(".cv-skel").forEach((el) => el.remove());
+  clone.querySelectorAll(".cv-sec-skel").forEach((el) => {
+    el.style.display = "none";
+  });
   host.appendChild(clone);
 
   host.classList.add("qc-capturing");

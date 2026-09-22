@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=accent1">
     <link rel="stylesheet" href="./template-skins.css?v=white1">
-    <link rel="stylesheet" href="./app.css?v=payfix3">
+    <link rel="stylesheet" href="./app.css?v=live1">
     <link rel="stylesheet" href="./cro.css">
 </head>
 <body class="on-home" id="app-body">
@@ -329,18 +329,14 @@
     <div id="studio-view" hidden>
     <header class="studio-header no-print border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
         <div class="studio-promo bg-gradient-to-l from-emerald-500 via-teal-400 to-amber-300 text-slate-950">
-            <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <div class="flex items-center justify-center md:justify-start gap-3 flex-wrap">
-                    <span class="inline-flex items-center rounded-full bg-slate-950 text-amber-300 text-[11px] font-black px-2.5 py-1">מחיר השקה</span>
-                    <p class="text-sm sm:text-base font-extrabold leading-tight">קורות חיים מקצועיים ב-<span data-price>10</span> ₪ בלבד</p>
-                </div>
-                <div class="flex items-center justify-center gap-3">
-                    <p class="hidden sm:block text-xs font-semibold">תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן</p>
-                    <button type="button" onclick="openPaymentModal()" class="studio-pay min-h-11 px-4 rounded-full bg-slate-950 text-white font-black text-sm hover:bg-slate-800">
-                        לשלם <span data-price>10</span>₪ ולהוריד
-                    </button>
-                    <p class="pay-guarantee text-[11px] font-extrabold text-slate-950/90 max-w-[16rem] leading-snug text-center md:text-right" id="studio-pay-guarantee">תשלום חד-פעמי • ללא מנוי וללא התחייבות</p>
-                </div>
+            <div class="studio-promo-inner">
+                <span class="studio-promo-badge">מחיר השקה</span>
+                <p class="studio-promo-title">קורות חיים מקצועיים ב-<span data-price>10</span> ₪ בלבד</p>
+                <p class="studio-promo-bit">תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן</p>
+                <button type="button" onclick="openPaymentModal()" class="studio-pay">
+                    לשלם <span data-price>10</span>₪ ולהוריד
+                </button>
+                <p class="pay-guarantee" id="studio-pay-guarantee">תשלום חד-פעמי • ללא מנוי וללא התחייבות</p>
             </div>
         </div>
         <div class="studio-toolbar max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
@@ -354,25 +350,25 @@
 
             <nav class="order-last sm:order-none w-full sm:w-auto flex items-center justify-center gap-1 sm:gap-2" aria-label="שלבי יצירת קורות החיים">
                 <button type="button" id="step-1" onclick="goStep(1)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white min-h-10" aria-current="step">
-                    <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]" aria-hidden="true">1</span>
+                    <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]" data-step-num aria-hidden="true">1</span>
                     <span id="step-1-label">עיצוב</span>
                 </button>
                 <span class="text-slate-500 text-xs" aria-hidden="true">·</span>
                 <button type="button" id="step-2" onclick="goStep(2)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:text-slate-100 min-h-10">
-                    <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]" aria-hidden="true">2</span>
+                    <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]" data-step-num aria-hidden="true">2</span>
                     <span id="step-2-label">פרטים</span>
                 </button>
                 <span class="text-slate-500 text-xs" aria-hidden="true">·</span>
                 <button type="button" id="step-3" onclick="goStep(3)" class="step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:text-slate-100 min-h-10">
-                    <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]" aria-hidden="true">3</span>
+                    <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]" data-step-num aria-hidden="true">3</span>
                     <span id="step-3-label">הורדה</span>
                 </button>
             </nav>
 
             <div class="flex items-center gap-2">
-                <div class="flex items-center rounded-xl border border-slate-700 p-0.5 bg-slate-900" role="group" aria-label="שפת קורות החיים">
-                    <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip min-h-10 px-3 rounded-lg text-xs font-semibold" aria-pressed="true">עברית</button>
-                    <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip min-h-10 px-3 rounded-lg text-xs font-semibold text-slate-300" aria-pressed="false">English</button>
+                <div class="lang-switch" role="group" aria-label="שפת קורות החיים">
+                    <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
+                    <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
                 </div>
                 <button type="button" onclick="openExamplesModal()" class="text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11">
                     דוגמאות
@@ -412,46 +408,53 @@
 
             <div id="details-panel" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between gap-2 flex-wrap">
-                    <h4 class="font-bold text-sm dynamic-text" id="details-heading">פרטים אישיים (שדה ריק לא יופיע)</h4>
-                    <button type="button" onclick="clearCvForm()" class="shrink-0 text-[11px] font-semibold border border-slate-600 hover:border-rose-400 hover:text-rose-300 text-slate-300 px-3 py-2 rounded-xl min-h-10">נקה טופס</button>
+                    <h4 class="details-heading" id="details-heading">
+                        <span id="details-heading-title">פרטים אישיים</span>
+                        <span id="details-heading-hint">(שדה ריק לא יופיע)</span>
+                    </h4>
+                    <button type="button" id="btn-clear-form" onclick="clearCvForm()" class="form-clear-btn">נקה טופס</button>
                 </div>
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-name" id="label-name">שם מלא</label>
-                            <input type="text" id="in-name" name="name" autocomplete="name" value="ישראל ישראלי" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-name" name="name" autocomplete="name" value="" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
-                            <input type="text" id="in-title" name="title" list="role-title-list" value="מנהל פרויקטים ומכירות" placeholder="לדוגמה: מנהל פרויקטים" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-title" name="title" list="role-title-list" value="" placeholder="לדוגמה: מנהל פרויקטים" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                             <datalist id="role-title-list"></datalist>
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון</label>
-                            <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="050-1234567" placeholder="050-1234567" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="" placeholder="050-1234567" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-email" id="label-email">אימייל</label>
-                            <input type="email" id="in-email" name="email" autocomplete="email" value="israel@example.com" placeholder="israel@example.com" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="email" id="in-email" name="email" autocomplete="email" value="" placeholder="israel@example.com" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-location" id="label-location">עיר מגורים</label>
-                            <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="תל אביב" placeholder="לדוגמה: תל אביב" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-location" name="address-level2" autocomplete="address-level2" value="" placeholder="לדוגמה: תל אביב" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-linkedin" id="label-linkedin">קישור ל-LinkedIn / אתר</label>
-                            <input type="text" id="in-linkedin" name="url" inputmode="url" value="linkedin.com/in/israel" placeholder="linkedin.com/in/..." oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <input type="text" id="in-linkedin" name="url" inputmode="url" value="" placeholder="linkedin.com/in/..." oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
-                        <div>
-                            <label class="block text-xs text-white mb-1" for="in-photo">תמונת פרופיל</label>
-                            <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2 text-sm rounded-lg text-white outline-none min-h-11 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-700 file:px-3 file:py-1.5 file:text-xs file:text-white">
+                        <div class="photo-upload">
+                            <label class="block text-xs text-white mb-1" for="in-photo" id="label-photo">תמונת פרופיל</label>
+                            <div class="photo-upload-row">
+                                <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="photo-upload-input">
+                                <button type="button" id="btn-photo-pick" class="photo-upload-btn" onclick="document.getElementById('in-photo').click()">בחירת קובץ</button>
+                                <span id="photo-file-status" class="photo-upload-status">לא נבחר קובץ</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <label class="font-bold dynamic-text text-sm block" for="in-summary" id="label-summary">תקציר מקצועי</label>
-                    <textarea id="in-summary" rows="2" oninput="updateCV()" placeholder="לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none">מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.</textarea>
+                    <textarea id="in-summary" rows="2" oninput="updateCV()" placeholder="לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea>
                 </div>
 
                 <div class="space-y-2 relative" id="experience-section">
@@ -459,33 +462,33 @@
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
                     </div>
                     <div id="experience-items">
-                        <article class="experience-card is-open" role="listitem" data-job-index="0">
+                        <article class="experience-card is-open" role="listitem" data-job-id="job-seed-0" data-job-index="0">
                             <div class="experience-card-toolbar">
                                 <span class="experience-card-badge">משרה 1</span>
                             </div>
                             <div class="experience-card-fields">
                                 <div class="experience-field">
                                     <label class="experience-field-label" for="job-seed-company">שם חברה/ארגון</label>
-                                    <input id="job-seed-company" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: חברת דמו">
+                                    <input id="job-seed-company" data-job-employer="1" data-job-field="company" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: חברת דמו">
                                 </div>
                                 <div class="experience-field">
                                     <label class="experience-field-label" for="job-seed-role">תפקיד</label>
-                                    <input id="job-seed-role" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מנהל פרויקטים">
+                                    <input id="job-seed-role" data-job-role="1" data-job-field="position" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מנהל פרויקטים">
                                 </div>
                                 <div class="experience-field">
                                     <label class="experience-field-label" for="job-seed-dates">תאריכים/שנים</label>
-                                    <input id="job-seed-dates" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2021 - היום">
+                                    <input id="job-seed-dates" data-job-dates="1" data-job-field="dates" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2021 - היום">
                                 </div>
                                 <div class="experience-field">
                                     <label class="experience-field-label" for="job-seed-desc">תיאור תפקיד / הישגים</label>
-                                    <textarea id="job-seed-desc" rows="5" class="studio-field experience-desc w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none" placeholder="• הובלתי צוות והגדלתי יעדים ב-35%"></textarea>
+                                    <textarea id="job-seed-desc" data-job-desc="1" data-job-field="description" rows="5" class="studio-field experience-desc w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none" placeholder="• הובלתי צוות והגדלתי יעדים ב-35%"></textarea>
                                 </div>
                             </div>
                         </article>
                     </div>
                     <button type="button" id="btn-add-experience" class="section-add-btn" onclick="handleAddJob(event); return false;">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
-                        <span id="btn-add-experience-label">הוסף משרה נוספת</span>
+                        <span id="btn-add-experience-label">הוסף משרה</span>
                     </button>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                 </div>
@@ -518,7 +521,7 @@
                         </div>
                         <button type="button" id="btn-add-education" class="section-add-btn" onclick="handleAddEducation(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
-                        <span id="btn-add-education-label">הוסף השכלה נוספת</span>
+                        <span id="btn-add-education-label">הוסף השכלה</span>
                         </button>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
@@ -545,7 +548,7 @@
                         </div>
                         <button type="button" id="btn-add-military" class="section-add-btn" onclick="handleAddMilitary(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
-                            <span id="btn-add-military-label">הוסף שירות</span>
+                            <span id="btn-add-military-label">הוסף שירות צבאי / לאומי</span>
                         </button>
                         <textarea id="in-military" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
@@ -554,12 +557,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="font-bold dynamic-text text-sm mb-2 block" for="in-skills" id="label-skills">כישורים</label>
-                        <input type="text" id="in-skills" value="ניהול צוותים, CRM, Excel מתקדם" placeholder="לדוגמה: ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                        <input type="text" id="in-skills" value="" placeholder="לדוגמה: ניהול צוותים, CRM, Excel מתקדם" oninput="updateCV()" aria-describedby="tip-skills" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         <p class="field-tip" id="tip-skills">3–8 כישורים חזקים עדיפים על רשימה ארוכה.</p>
                     </div>
                     <div class="languages-section" id="languages-section">
                         <label class="font-bold dynamic-text text-sm mb-2 block" id="label-languages" for="lang-pick-name-btn">שפות</label>
-                        <input type="hidden" id="in-languages" value="עברית (שפת אם), אנגלית (מקצועית)">
+                        <input type="hidden" id="in-languages" value="">
                         <div id="lang-picker" class="lang-picker">
                             <div class="lang-picker-controls">
                                 <div class="qc-combo" id="lang-name-combo">
@@ -595,7 +598,7 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="font-bold dynamic-text text-sm" for="in-references" id="label-references">המלצות / References</label>
+                    <label class="font-bold dynamic-text text-sm" for="in-references" id="label-references">המלצות</label>
                     <textarea id="in-references" rows="4" oninput="updateCV()" placeholder="שם&#10;תפקיד / חברה&#10;טלפון&#10;אימייל" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea>
                 </div>
 
@@ -697,11 +700,10 @@
             <div class="preview-toolbar no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div class="preview-toolbar-start flex items-center gap-2 flex-wrap">
                     <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="preview-heading">תצוגה מקדימה בזמן אמת</h2>
-                    <button type="button" id="btn-switch-template" class="preview-switch-tpl" onclick="goStep(1)">החלף תבנית</button>
-                </div>
-                <div class="doc-switch" role="tablist" aria-label="סוג מסמך">
-                    <button type="button" id="doc-tab-cv" aria-pressed="true" onclick="setStudioDoc('cv')">קורות חיים</button>
-                    <button type="button" id="doc-tab-letter" aria-pressed="false" onclick="setStudioDoc('letter')">מכתב מקדים</button>
+                    <button type="button" id="btn-switch-template" class="preview-switch-tpl" onclick="goStep(1)">
+                        <svg class="preview-switch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.2 4.8 7.8v3.2c0 4.5 3.1 8.6 7.2 9.8 4.1-1.2 7.2-5.3 7.2-9.8V7.8L12 4.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.2" r="2.1" fill="currentColor"/><path d="M8.4 11.2h2.2M13.4 13.2h2.2M11.1 8.8v2.1M12.9 13.4v2.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                        <span id="btn-switch-template-label">החלף תבנית</span>
+                    </button>
                 </div>
                 <button type="button" id="btn-preview-close-top" onclick="closeMobilePreview()" class="preview-close preview-close-top">
                     <span class="preview-close-x" aria-hidden="true">✕</span>
@@ -1019,8 +1021,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=formux3"></script>
-    <script src="lib/entryEditor.js?v=formux3"></script>
+    <script src="lib/experienceEditor.js?v=live1"></script>
+    <script src="lib/entryEditor.js?v=live1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=tpl-he3"></script>
@@ -1036,10 +1038,16 @@
     <script>
         window.handleAddJob = function (e) {
             if (e && e.preventDefault) e.preventDefault();
+            if (e && e.stopPropagation) e.stopPropagation();
             if (window.QCExperience && typeof QCExperience.addJob === 'function') {
                 return QCExperience.addJob(e);
             }
             return false;
+        };
+        window.handleExperienceChange = function (id, field, value) {
+            if (window.QCExperience && typeof QCExperience.handleExperienceChange === 'function') {
+                return QCExperience.handleExperienceChange(id, field, value);
+            }
         };
         window.addExperienceJob = window.handleAddJob;
         window.toggleExperienceRaw = function (e) {
@@ -1180,7 +1188,8 @@
             he: {
                 nameFallback: 'שם מלא',
                 titleFallback: 'תפקיד',
-                detailsHeading: 'פרטים אישיים (שדה ריק לא יופיע)',
+                detailsHeading: 'פרטים אישיים',
+                detailsHeadingHint: '(שדה ריק לא יופיע)',
                 phName: 'לדוגמה: ישראל ישראלי',
                 phTitle: 'לדוגמה: מנהל פרויקטים',
                 phLocation: 'לדוגמה: תל אביב',
@@ -1188,7 +1197,7 @@
                 phSkills: 'לדוגמה: ניהול צוותים, CRM, Excel מתקדם',
                 phReferences: 'שם\nתפקיד / חברה\nטלפון\nאימייל',
                 phLinkedin: 'linkedin.com/in/...',
-                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות / References' },
+                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
                 examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full-Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
                 phrasesHeading: 'משפטים מוכנים לפי תחום',
@@ -1215,6 +1224,10 @@
                 continueDesignShort: 'המשך לפרטים ⬅️',
                 continueDownload: 'המשך להורדה ⬅️',
                 switchTemplate: 'החלף תבנית',
+                clearForm: 'נקה טופס',
+                clearFormConfirm: 'למחוק את כל השדות ולשחזר טופס ריק?',
+                photoChoose: 'בחירת קובץ',
+                photoNone: 'לא נבחר קובץ',
                 downloadPdfCta: 'הורד PDF ב-',
                 fontSelectLabel: 'טיפוגרפיה עברית',
                 densityLegend: 'ריווח / צפיפות — התאמה לעמוד אחד',
@@ -1262,7 +1275,8 @@
             en: {
                 nameFallback: 'Full name',
                 titleFallback: 'Job title',
-                detailsHeading: 'Personal details (empty fields stay hidden)',
+                detailsHeading: 'Personal details',
+                detailsHeadingHint: '(empty fields stay hidden)',
                 phName: 'e.g. Israel Israeli',
                 phTitle: 'e.g. Project manager',
                 phLocation: 'e.g. Tel Aviv',
@@ -1297,6 +1311,10 @@
                 continueDesignShort: 'Continue →',
                 continueDownload: 'Continue to download →',
                 switchTemplate: 'Change template',
+                clearForm: 'Clear form',
+                clearFormConfirm: 'Clear all fields and start with an empty form?',
+                photoChoose: 'Choose file',
+                photoNone: 'No file chosen',
                 downloadPdfCta: 'Download PDF · ',
                 fontSelectLabel: 'Hebrew typography',
                 densityLegend: 'Spacing / density — fit to one page',
@@ -1567,7 +1585,10 @@
                 const el = document.getElementById(id);
                 if (el && text) el.textContent = text;
             };
-            setLabel('details-heading', pack.detailsHeading);
+            setLabel('details-heading-title', pack.detailsHeading);
+            setLabel('details-heading-hint', pack.detailsHeadingHint);
+            setLabel('btn-clear-form', pack.clearForm);
+            setLabel('btn-photo-pick', pack.photoChoose);
             setLabel('label-name', pack.labels.name);
             setLabel('label-title', pack.labels.title);
             setLabel('label-phone', pack.labels.phone);
@@ -1598,7 +1619,7 @@
             setLabel('btn-continue-design', pack.continueDesign);
             setLabel('btn-continue-details', pack.continueDownload);
             setLabel('mobile-continue-label', pack.continueDesignShort);
-            setLabel('btn-switch-template', pack.switchTemplate);
+            setLabel('btn-switch-template-label', pack.switchTemplate);
             setLabel('font-select-label', pack.fontSelectLabel);
             syncCvFontSelectI18n(lang);
             setLabel('density-legend', pack.densityLegend);
@@ -1676,6 +1697,13 @@
             if (skillsEl && pack.phSkills) skillsEl.placeholder = pack.phSkills;
             if (refsEl && pack.phReferences) refsEl.placeholder = pack.phReferences;
             if (linkedinEl && pack.phLinkedin) linkedinEl.placeholder = pack.phLinkedin;
+            const photoBtn = document.getElementById('btn-photo-pick');
+            if (photoBtn && pack.photoChoose) photoBtn.textContent = pack.photoChoose;
+            const photoStatus = document.getElementById('photo-file-status');
+            const photoInput = document.getElementById('in-photo');
+            if (photoStatus && pack.photoNone && !(photoInput && photoInput.files && photoInput.files[0])) {
+                photoStatus.textContent = pack.photoNone;
+            }
             ['QCExperience', 'QCEducation', 'QCMilitary'].forEach(function (key) {
                 try {
                     const api = window[key];
@@ -1714,10 +1742,9 @@
         }
 
         function shouldSwapCvSample(prevLang) {
-            if (isCvFieldsEmpty()) return true;
+            if (isCvFieldsEmpty()) return false;
             const snap = snapshotCvFields();
             if (snap === snapshotCvSample(prevLang)) return true;
-            // Also accept the other demo pack (e.g. after language-field normalize).
             if (snap === snapshotCvSample('he') || snap === snapshotCvSample('en')) return true;
             return false;
         }
@@ -1993,14 +2020,6 @@
         }
 
         function parseDatedBlocks(text) {
-            if (window.QCExperience && typeof QCExperience.parse === 'function') {
-                return QCExperience.parse(text).map((job) => ({
-                    date: String((job && job.dates) || '').trim(),
-                    title: String((job && (job.role || job.title)) || '').trim(),
-                    role: String((job && (job.employer || job.company)) || '').trim(),
-                    bullets: Array.isArray(job && job.bullets) ? job.bullets.map((b) => String(b || '').trim()).filter(Boolean) : []
-                })).filter((job) => job.date || job.title || job.role || job.bullets.length);
-            }
             const lines = String(text || '').split('\n');
             const blocks = [];
             let current = null;
@@ -2011,24 +2030,104 @@
                 const header = line.match(headerRe);
                 if (header) {
                     if (current) blocks.push(current);
-                    current = { date: header[1].trim(), title: header[2].trim(), role: '', bullets: [] };
+                    current = { date: header[1].trim(), title: header[2].trim(), role: '', bullets: [], dates: header[1].trim(), position: header[2].trim(), company: '', description: '' };
                     return;
                 }
                 if (/^[•\-*]/.test(line)) {
-                    if (!current) current = { date: '', title: '', role: '', bullets: [] };
+                    if (!current) current = { date: '', title: '', role: '', bullets: [], dates: '', position: '', company: '', description: '' };
                     current.bullets.push(line.replace(/^[•\-*]\s*/, ''));
+                    current.description = current.bullets.map((b) => '• ' + b).join('\n');
                     return;
                 }
                 if (current && current.title && !current.role) {
                     current.role = line;
+                    current.company = line;
                     return;
                 }
-                if (!current) current = { date: '', title: line, role: '', bullets: [] };
-                else current.bullets.push(line);
+                if (!current) current = { date: '', title: line, role: '', bullets: [], dates: '', position: line, company: '', description: '' };
+                else if (!current.title) {
+                    current.title = line;
+                    current.position = line;
+                } else if (!current.role) {
+                    current.role = line;
+                    current.company = line;
+                }
             });
             if (current) blocks.push(current);
-            return blocks;
+            return blocks.filter((job) => job.date || job.title || job.role || (job.bullets && job.bullets.length));
         }
+
+        function mapExperienceJob(job) {
+            const company = String((job && (job.company || job.employer)) || '').trim();
+            const position = String((job && (job.position || job.title)) || '').trim();
+            const dates = String((job && (job.dates || job.date)) || '').trim();
+            const description = String((job && job.description) || '').trim();
+            let bullets = Array.isArray(job && job.bullets) ? job.bullets.map((b) => String(b || '').trim()).filter(Boolean) : [];
+            if (!bullets.length && description) {
+                bullets = description.split('\n').map((line) => line.replace(/^[•\-*\u2022]\s*/, '').trim()).filter(Boolean);
+            }
+            return {
+                company,
+                position,
+                dates,
+                description,
+                date: dates,
+                title: position,
+                role: company,
+                bullets
+            };
+        }
+
+        function readWorkExperienceJobs() {
+            if (window.QCExperience && typeof QCExperience.previewJobs === 'function') {
+                try {
+                    return (QCExperience.previewJobs() || []).map(mapExperienceJob).filter((job) => (
+                        job.company || job.position || job.dates || job.description || job.bullets.length
+                    ));
+                } catch (err) { /* fall through to textarea parse */ }
+            }
+            if (window.QCExperience && typeof QCExperience.getJobs === 'function') {
+                try {
+                    return (QCExperience.getJobs() || []).map(mapExperienceJob).filter((job) => (
+                        job.company || job.position || job.dates || job.description || job.bullets.length
+                    ));
+                } catch (err) { /* fall through */ }
+            }
+            return parseDatedBlocks(getVal('in-experience')).map(mapExperienceJob);
+        }
+
+        function paintExperienceJobs(container, jobs, opts) {
+            if (!container) return;
+            container.classList.remove('whitespace-pre-line');
+            container.replaceChildren();
+            (jobs || []).forEach((job) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'cv-job';
+                wrap.setAttribute('data-exp-company', job.company || '');
+                wrap.setAttribute('data-exp-position', job.position || '');
+                wrap.setAttribute('data-exp-dates', job.dates || '');
+                if (opts && opts.timeline) {
+                    const body = document.createElement('div');
+                    body.className = 'cv-job-body';
+                    fillJobBody(body, job, { dateInBody: true });
+                    wrap.append(timelineMark('job'), body);
+                } else if (opts && opts.charcoal) {
+                    const date = document.createElement('div');
+                    date.className = 'cv-job-date';
+                    date.textContent = job.dates || job.date || '';
+                    const rule = document.createElement('div');
+                    rule.className = 'cv-job-rule';
+                    const body = document.createElement('div');
+                    body.className = 'cv-job-body';
+                    fillJobBody(body, job, { dateInBody: false });
+                    wrap.append(date, rule, body);
+                } else {
+                    fillJobBody(wrap, job, { dateInBody: true });
+                }
+                container.appendChild(wrap);
+            });
+        }
+
         window.parseDatedBlocks = parseDatedBlocks;
 
         function languageLevel(label) {
@@ -2757,32 +2856,72 @@
             return mark;
         }
 
+        function markSecSkel(sec, on) {
+            if (sec) sec.classList.toggle('cv-sec-skel', !!on);
+        }
+
+        function paintPreviewSkeleton(container, kind) {
+            if (!container) return;
+            container.classList.remove('whitespace-pre-line');
+            container.replaceChildren();
+            const wrap = document.createElement('div');
+            wrap.className = 'cv-skel cv-skel-' + (kind === 'edu' ? 'edu' : 'job');
+            wrap.setAttribute('aria-hidden', 'true');
+            const count = kind === 'edu' ? 2 : 2;
+            for (let i = 0; i < count; i++) {
+                const block = document.createElement('div');
+                block.className = 'cv-skel-block';
+                const title = document.createElement('span');
+                title.className = 'cv-skel-line cv-skel-title';
+                const meta = document.createElement('span');
+                meta.className = 'cv-skel-line cv-skel-meta';
+                const line = document.createElement('span');
+                line.className = 'cv-skel-line';
+                const short = document.createElement('span');
+                short.className = 'cv-skel-line cv-skel-short';
+                block.append(title, meta, line, short);
+                wrap.appendChild(block);
+            }
+            container.appendChild(wrap);
+        }
+
         function fillJobBody(body, job, opts) {
-            const title = document.createElement('p');
-            title.className = 'cv-job-title';
-            title.textContent = job.title;
-            body.appendChild(title);
-            if (job.role) {
+            const position = (job && (job.position || job.title)) || '';
+            const company = (job && (job.company || job.role)) || '';
+            const dates = (job && (job.dates || job.date)) || '';
+            const bullets = Array.isArray(job && job.bullets) ? job.bullets : [];
+            if (position) {
+                const title = document.createElement('p');
+                title.className = 'cv-job-title';
+                title.textContent = position;
+                body.appendChild(title);
+            }
+            if (company) {
                 const role = document.createElement('p');
                 role.className = 'cv-job-role';
-                role.textContent = job.role;
+                role.textContent = company;
                 body.appendChild(role);
             }
-            if (opts && opts.dateInBody && job.date) {
+            if (opts && opts.dateInBody && dates) {
                 const date = document.createElement('p');
                 date.className = 'cv-job-date';
-                date.textContent = job.date;
+                date.textContent = dates;
                 body.appendChild(date);
             }
-            if (job.bullets.length) {
+            if (bullets.length) {
                 const ul = document.createElement('ul');
                 ul.className = 'cv-job-list';
-                job.bullets.forEach((b) => {
+                bullets.forEach((b) => {
                     const li = document.createElement('li');
                     li.textContent = b;
                     ul.appendChild(li);
                 });
                 body.appendChild(ul);
+            } else if (job && job.description) {
+                const p = document.createElement('p');
+                p.className = 'cv-job-desc';
+                p.textContent = job.description;
+                body.appendChild(p);
             }
         }
 
@@ -2793,7 +2932,8 @@
             const milVal = getVal('in-military');
             const extrasOut = cvOut('out-extras-side');
             const extrasSec = document.getElementById('sec-extras-side');
-            const expVal = getVal('in-experience');
+            const expJobs = readWorkExperienceJobs();
+            const hasExp = expJobs.length > 0;
             const eduVal = getVal('in-education');
             const skillVal = getVal('in-skills');
             const langVal = getVal('in-languages');
@@ -2814,19 +2954,26 @@
 
             if (!charcoal && !navy && !azure) {
                 if (expOut) {
-                    expOut.classList.add('whitespace-pre-line');
-                    expOut.textContent = expVal;
+                    if (hasExp) paintExperienceJobs(expOut, expJobs, { dateInBody: true });
+                    else paintPreviewSkeleton(expOut, 'job');
                 }
                 if (eduOut) {
-                    eduOut.classList.add('whitespace-pre-line');
-                    eduOut.textContent = eduVal;
+                    if (eduVal) {
+                        eduOut.classList.add('whitespace-pre-line');
+                        eduOut.textContent = eduVal;
+                    } else {
+                        paintPreviewSkeleton(eduOut, 'edu');
+                    }
                 }
                 if (eduSide) eduSide.replaceChildren();
                 if (skillOut) skillOut.textContent = skillVal;
                 if (langOut) langOut.textContent = langVal;
-                showSec(expSec, !!expVal);
-                showSec(eduSec, !!eduVal);
+                showSec(expSec, true);
+                markSecSkel(expSec, !hasExp);
+                showSec(eduSec, true);
+                markSecSkel(eduSec, !eduVal);
                 showSec(eduSideSec, false);
+                markSecSkel(eduSideSec, false);
                 showSec(skillSec, !!skillVal);
                 showSec(langSec, !!langVal);
                 if (extrasOut) extrasOut.replaceChildren();
@@ -2845,42 +2992,43 @@
                 if (skillsLabel) skillsLabel.textContent = lang === 'en' ? 'Skills' : 'מיומנויות';
 
                 if (expOut) {
-                    expOut.classList.remove('whitespace-pre-line');
-                    expOut.replaceChildren();
-                    parseDatedBlocks(expVal).forEach((job) => {
-                        const wrap = document.createElement('div');
-                        wrap.className = 'cv-job';
-                        fillJobBody(wrap, job, { dateInBody: true });
-                        expOut.appendChild(wrap);
-                    });
+                    if (hasExp) paintExperienceJobs(expOut, expJobs);
+                    else paintPreviewSkeleton(expOut, 'job');
                 }
-                showSec(expSec, !!expVal);
+                showSec(expSec, true);
+                markSecSkel(expSec, !hasExp);
 
                 if (eduSide) {
                     eduSide.replaceChildren();
-                    parseDatedBlocks(eduVal).forEach((item) => {
-                        const box = document.createElement('div');
-                        box.className = 'cv-edu-item';
-                        const school = document.createElement('p');
-                        school.className = 'cv-edu-school';
-                        school.textContent = item.title || item.date;
-                        const meta = document.createElement('p');
-                        meta.className = 'cv-edu-meta';
-                        meta.textContent = [item.role, item.date].filter(Boolean).join(' · ');
-                        box.appendChild(school);
-                        if (meta.textContent) box.appendChild(meta);
-                        eduSide.appendChild(box);
-                    });
-                    if (eduVal && !eduSide.childElementCount) {
-                        const fallback = document.createElement('p');
-                        fallback.className = 'cv-edu-meta';
-                        fallback.textContent = eduVal;
-                        eduSide.appendChild(fallback);
+                    if (eduVal) {
+                        parseDatedBlocks(eduVal).forEach((item) => {
+                            const box = document.createElement('div');
+                            box.className = 'cv-edu-item';
+                            const school = document.createElement('p');
+                            school.className = 'cv-edu-school';
+                            school.textContent = item.title || item.date;
+                            const meta = document.createElement('p');
+                            meta.className = 'cv-edu-meta';
+                            meta.textContent = [item.role, item.date].filter(Boolean).join(' · ');
+                            box.appendChild(school);
+                            if (meta.textContent) box.appendChild(meta);
+                            eduSide.appendChild(box);
+                        });
+                        if (eduVal && !eduSide.childElementCount) {
+                            const fallback = document.createElement('p');
+                            fallback.className = 'cv-edu-meta';
+                            fallback.textContent = eduVal;
+                            eduSide.appendChild(fallback);
+                        }
+                    } else {
+                        paintPreviewSkeleton(eduSide, 'edu');
                     }
                 }
                 if (eduOut) eduOut.textContent = '';
                 showSec(eduSec, false);
-                showSec(eduSideSec, !!eduVal);
+                markSecSkel(eduSec, false);
+                showSec(eduSideSec, true);
+                markSecSkel(eduSideSec, !eduVal);
 
                 if (skillOut) {
                     skillOut.replaceChildren();
@@ -2948,34 +3096,30 @@
             }
 
             if (navy) {
-                renderTimeline(expOut, expVal, 'job');
-                renderTimeline(eduOut, eduVal, 'edu');
+                if (hasExp) paintExperienceJobs(expOut, expJobs, { timeline: true });
+                else paintPreviewSkeleton(expOut, 'job');
+                if (eduVal) renderTimeline(eduOut, eduVal, 'edu');
+                else paintPreviewSkeleton(eduOut, 'edu');
                 if (eduSide) eduSide.replaceChildren();
-                showSec(expSec, !!expVal);
-                showSec(eduSec, !!eduVal);
+                showSec(expSec, true);
+                markSecSkel(expSec, !hasExp);
+                showSec(eduSec, true);
+                markSecSkel(eduSec, !eduVal);
                 showSec(eduSideSec, false);
+                markSecSkel(eduSideSec, false);
             } else if (expOut) {
-                expOut.classList.remove('whitespace-pre-line');
-                expOut.replaceChildren();
-                parseDatedBlocks(expVal).forEach((job) => {
-                    const wrap = document.createElement('div');
-                    wrap.className = 'cv-job';
-                    const date = document.createElement('div');
-                    date.className = 'cv-job-date';
-                    date.textContent = job.date;
-                    const rule = document.createElement('div');
-                    rule.className = 'cv-job-rule';
-                    const body = document.createElement('div');
-                    body.className = 'cv-job-body';
-                    fillJobBody(body, job, { dateInBody: false });
-                    wrap.append(date, rule, body);
-                    expOut.appendChild(wrap);
-                });
-                showSec(expSec, !!expVal);
+                if (hasExp) paintExperienceJobs(expOut, expJobs, { charcoal: true });
+                else paintPreviewSkeleton(expOut, 'job');
+                showSec(expSec, true);
+                markSecSkel(expSec, !hasExp);
 
                 function fillEdu(el) {
                     if (!el) return;
                     el.replaceChildren();
+                    if (!eduVal) {
+                        paintPreviewSkeleton(el, 'edu');
+                        return;
+                    }
                     parseDatedBlocks(eduVal).forEach((item) => {
                         const box = document.createElement('div');
                         box.className = 'cv-edu-item';
@@ -2989,7 +3133,6 @@
                         if (meta.textContent) box.appendChild(meta);
                         el.appendChild(box);
                     });
-                    if (!eduVal) return;
                     if (!el.childElementCount) {
                         const fallback = document.createElement('p');
                         fallback.className = 'cv-edu-meta';
@@ -3000,7 +3143,9 @@
                 fillEdu(eduSide);
                 if (eduOut) eduOut.textContent = '';
                 showSec(eduSec, false);
-                showSec(eduSideSec, !!eduVal);
+                markSecSkel(eduSec, false);
+                showSec(eduSideSec, true);
+                markSecSkel(eduSideSec, !eduVal);
             }
 
             if (skillOut) {
@@ -3133,9 +3278,10 @@
         }
 
         function clearCvForm() {
-            const msg = window.QCCvLang === 'en'
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
+            const msg = pack.clearFormConfirm || (window.QCCvLang === 'en'
                 ? 'Clear all fields and start with an empty form?'
-                : 'למחוק את כל השדות ולשחזר טופס ריק?';
+                : 'למחוק את כל השדות ולשחזר טופס ריק?');
             if (!confirm(msg)) return;
             resetForm();
         }
@@ -3167,19 +3313,23 @@
         window.setPreviewBg = setPreviewBg;
 
         function markStep(n) {
+            const step = Math.max(1, Math.min(3, Number(n) || 1));
             for (let i = 1; i <= 3; i++) {
                 const btn = document.getElementById('step-' + i);
                 if (!btn) continue;
-                const num = btn.querySelector('span');
-                if (i === n) {
-                    btn.className = 'step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold bg-blue-600 text-white min-h-10';
-                    if (num) num.className = 'w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]';
-                    btn.setAttribute('aria-current', 'step');
-                } else {
-                    btn.className = 'step-btn flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:text-slate-100 min-h-10';
-                    if (num) num.className = 'w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px]';
-                    btn.removeAttribute('aria-current');
+                const on = i === step;
+                btn.classList.toggle('is-current', on);
+                btn.classList.toggle('bg-blue-600', on);
+                btn.classList.toggle('text-white', on);
+                btn.classList.toggle('text-slate-300', !on);
+                btn.classList.toggle('hover:text-slate-100', !on);
+                const num = btn.querySelector('[data-step-num]') || btn.querySelector('span');
+                if (num) {
+                    num.classList.toggle('bg-white/20', on);
+                    num.classList.toggle('bg-slate-800', !on);
                 }
+                if (on) btn.setAttribute('aria-current', 'step');
+                else btn.removeAttribute('aria-current');
             }
         }
 
@@ -3550,6 +3700,9 @@
 
         function onPhotoChange(e) {
             const file = e?.target && e.target.files ? e.target.files[0] : null;
+            const status = document.getElementById('photo-file-status');
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
+            if (status) status.textContent = file ? file.name : (pack.photoNone || 'לא נבחר קובץ');
             const img = document.getElementById('out-photo');
             const fallback = document.getElementById('out-photo-fallback');
             if (!file || !img) return;
@@ -3576,6 +3729,9 @@
             if (fallback) fallback.style.display = '';
             if (input) input.value = '';
             window.QCPhotoDataUrl = '';
+            const status = document.getElementById('photo-file-status');
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
+            if (status && !window.QCPhotoDataUrl) status.textContent = pack.photoNone || 'לא נבחר קובץ';
         }
 
         function templateDisplayTitle(tpl, lang) {
@@ -4335,9 +4491,15 @@
             closeMobilePreview();
         });
 
-        document.getElementById('templates-panel').addEventListener('focusin', function () { markStep(1); });
-        document.getElementById('design-panel').addEventListener('focusin', function () { markStep(1); });
-        document.getElementById('details-panel').addEventListener('focusin', function () { markStep(2); });
+        document.getElementById('templates-panel').addEventListener('focusin', function () {
+            if (window.QCStudioStep === 1) markStep(1);
+        });
+        document.getElementById('design-panel').addEventListener('focusin', function () {
+            if (window.QCStudioStep === 1) markStep(1);
+        });
+        document.getElementById('details-panel').addEventListener('focusin', function () {
+            if (window.QCStudioStep === 2 || window.QCStudioStep === 3) markStep(window.QCStudioStep);
+        });
 
         window.updateCV = updateCV;
         window.resetForm = resetForm;

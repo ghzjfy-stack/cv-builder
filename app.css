@@ -5233,7 +5233,7 @@
 
         #cv-preview-wrapper,
         #cv-preview-page-2 {
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
             width: 100%;
             max-width: 100%;
             margin-inline: auto;
@@ -5275,6 +5275,10 @@
         }
 
         @media print {
+            #cv-preview-wrapper,
+            #cv-preview-page-2 {
+                box-shadow: none;
+            }
             html, body {
                 background: #ffffff !important;
                 color: #0f172a !important;

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4lock1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=launch1">
+    <link rel="stylesheet" href="./app.css?v=dummy1">
     <link rel="stylesheet" href="./cro.css?v=formpreview1">
 </head>
 <body class="on-home" id="app-body">
@@ -484,7 +484,7 @@
                             </div>
                         </article>
                     </div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="handleAddJob(event); return false;">
+                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="event.preventDefault(); addExperience(event); return false;">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה</span>
                     </button>
@@ -1027,7 +1027,7 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=launch1"></script>
+    <script src="lib/experienceEditor.js?v=jobsync1"></script>
     <script src="lib/entryEditor.js?v=launch1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
@@ -1042,18 +1042,23 @@
     <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
-        window.handleAddJob = function (e) {
+        window.addExperience = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCExperience && typeof QCExperience.addExperience === 'function') {
+                return QCExperience.addExperience(e);
+            }
             if (window.QCExperience && typeof QCExperience.addJob === 'function') {
                 return QCExperience.addJob(e);
             }
             return false;
         };
+        window.handleAddJob = window.addExperience;
+        window.addExperienceJob = window.addExperience;
         window.handleExperienceChange = function (id, field, value) {
             if (window.QCExperience && typeof QCExperience.handleExperienceChange === 'function') {
                 return QCExperience.handleExperienceChange(id, field, value);
             }
         };
-        window.addExperienceJob = window.handleAddJob;
         window.toggleExperienceRaw = function (e) {
             if (e && e.preventDefault) e.preventDefault();
             if (window.QCExperience && typeof QCExperience.toggleRaw === 'function') {
@@ -1159,34 +1164,35 @@
         const CV_SAMPLES = {
             he: {
                 'in-name': 'ישראל ישראלי',
-                'in-title': 'מנהל פרויקטים ומכירות',
+                'in-title': 'מנהל מוצר',
                 'in-phone': '050-1234567',
                 'in-email': 'israel@example.com',
                 'in-location': 'תל אביב',
                 'in-linkedin': 'linkedin.com/in/israel',
-                'in-summary': 'מנהל פרויקטים מנוסה בעל ניסיון רב בהובלת צוותים והגדלת מחזורי מכירות.',
-                'in-experience': '2021 - נוכחי | מנהל מכירות ארצי\nVerde Commerce\n• ניהול צוות עובדים והגדלת היעדים ב-35%.\n• הובלת הסכמים אסטרטגיים.\n\n2018 - 2021 | מנהל פרויקטים\nShoreline B2B\n• ניהול תקציבים ומעקב אחר אבני דרך בארגון.',
-                'in-education': '2015 - 2018 | BA במנהל עסקים\n\n2019 | קורס ניהול מוצר',
+                'in-summary': 'מנהל מוצר עם ניסיון בהובלת רודמאפ, השקת פיצ׳רים ושיתוף פעולה עם פיתוח, עיצוב ומכירות.',
+                'in-experience': '2021 - נוכחי | מנהל מוצר\nVerde Commerce\n• הגדרת רודמאפ והשקת פיצ׳רים שהגדילו שימוש ב-35%.\n• הובלת צוות פרודקט ושותפות עם פיתוח ומכירות.\n\n2018 - 2021 | מנהל פרויקטים\nShoreline B2B\n• ניהול תקציבים ומעקב אחר אבני דרך בארגון.',
+                'in-education': '2015 - 2018 | BA במנהל עסקים\nאוניברסיטת תל אביב\n\n2019 | קורס ניהול מוצר',
                 'in-military': '2012 - 2015 | שירות פיקודי בחיל האוויר',
                 'in-skills': 'ניהול צוותים, CRM, Excel מתקדם',
                 'in-languages': 'עברית (שפת אם), אנגלית (מקצועית)'
             },
             en: {
                 'in-name': 'Israel Israeli',
-                'in-title': 'Project and Sales Manager',
+                'in-title': 'Product Manager',
                 'in-phone': '050-1234567',
                 'in-email': 'israel@example.com',
                 'in-location': 'Tel Aviv',
                 'in-linkedin': 'linkedin.com/in/israel',
-                'in-summary': 'Experienced project manager with a strong record of leading teams and growing sales.',
-                'in-experience': '2021 - Present | National Sales Manager\nVerde Commerce\n• Led a team and grew targets by 35%.\n• Drove strategic agreements.\n\n2018 - 2021 | Project Manager\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
-                'in-education': '2015 - 2018 | BA in Business Administration\n\n2019 | Product Management Course',
+                'in-summary': 'Product manager experienced in roadmaps, feature launches, and partnering with engineering, design, and sales.',
+                'in-experience': '2021 - Present | Product Manager\nVerde Commerce\n• Defined the roadmap and shipped features that grew usage by 35%.\n• Led product and partnered with engineering and sales.\n\n2018 - 2021 | Project Manager\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
+                'in-education': '2015 - 2018 | BA in Business Administration\nTel Aviv University\n\n2019 | Product Management Course',
                 'in-military': '2012 - 2015 | Command role in the Israeli Air Force',
                 'in-skills': 'Team leadership, CRM, Advanced Excel',
                 'in-languages': 'Hebrew (native), English (professional)'
             }
         };
         window.CV_SAMPLES = CV_SAMPLES;
+        window.QCDummy = { active: false, dirty: false, touched: Object.create(null) };
         const CV_I18N = {
             he: {
                 nameFallback: 'שם מלא',
@@ -1811,13 +1817,112 @@
         window.refreshSectionEditors = refreshSectionEditors;
 
         function fillCvSample(lang) {
-            const sample = CV_SAMPLES[lang];
+            const sample = CV_SAMPLES[lang] || CV_SAMPLES.he;
             CV_SAMPLE_IDS.forEach((id) => {
                 const el = formField(id);
-                if (el) el.value = sample[id];
+                if (el) el.value = sample[id] || '';
             });
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
             refreshSectionEditors();
+        }
+        window.fillCvSample = fillCvSample;
+
+        function dummyValueFor(id) {
+            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
+            const sample = CV_SAMPLES[lang] || CV_SAMPLES.he;
+            return String((sample && sample[id]) || '');
+        }
+
+        function isCvSampleSnapshot() {
+            const snap = snapshotCvFields();
+            return snap === snapshotCvSample('he') || snap === snapshotCvSample('en');
+        }
+
+        function setDummyMode(on) {
+            window.QCDummy = window.QCDummy || { touched: Object.create(null) };
+            QCDummy.active = !!on;
+            if (on) {
+                QCDummy.dirty = false;
+                QCDummy.touched = Object.create(null);
+                document.documentElement.setAttribute('data-cv-dummy', '1');
+            } else {
+                document.documentElement.removeAttribute('data-cv-dummy');
+            }
+        }
+
+        function bootDummyPreview() {
+            if (isCvSampleSnapshot()) {
+                setDummyMode(true);
+                return;
+            }
+            const name = (formField('in-name')?.value || '').trim();
+            const title = (formField('in-title')?.value || '').trim();
+            if (name && title && !isCvFieldsEmpty()) {
+                setDummyMode(false);
+                QCDummy.dirty = true;
+                return;
+            }
+            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
+            const sample = CV_SAMPLES[lang] || CV_SAMPLES.he;
+            let filled = false;
+            CV_SAMPLE_IDS.forEach((id) => {
+                const el = formField(id);
+                if (el && !(el.value || '').trim()) {
+                    el.value = sample[id] || '';
+                    filled = true;
+                }
+            });
+            if (filled) {
+                if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
+                refreshSectionEditors();
+            }
+            setDummyMode(true);
+        }
+        window.bootDummyPreview = bootDummyPreview;
+
+        function dummyFieldKey(el) {
+            if (!el) return '';
+            if (el.id) return el.id;
+            const card = el.closest && el.closest('[data-job-id], [data-entry-id]');
+            const field = el.getAttribute && (el.getAttribute('data-field') || el.name || el.getAttribute('aria-label') || '');
+            if (card) return (card.getAttribute('data-job-id') || card.getAttribute('data-entry-id') || 'card') + ':' + field;
+            return '';
+        }
+
+        function shouldSelectDummy(el) {
+            if (!window.QCDummy || !QCDummy.active) return false;
+            if (!el || el.dataset.qcDummyTouched === '1') return false;
+            const key = dummyFieldKey(el);
+            if (key && QCDummy.touched[key]) return false;
+            if (!(el.value || '').trim()) return false;
+            if (el.id && CV_SAMPLE_IDS.indexOf(el.id) >= 0) return String(el.value) === dummyValueFor(el.id);
+            return true;
+        }
+
+        function bindDummyPreview() {
+            if (window.__qcDummyBound) return;
+            window.__qcDummyBound = true;
+            document.addEventListener('focusin', function (e) {
+                const el = e.target;
+                if (!isCvFormField(el) || !shouldSelectDummy(el)) return;
+                try { el.select(); } catch (err) { /* ignore */ }
+            }, true);
+            document.addEventListener('input', function (e) {
+                const el = e.target;
+                if (!window.QCDummy || !QCDummy.active) return;
+                if (!isCvFormField(el)) return;
+                const id = el.id;
+                if (id && CV_SAMPLE_IDS.indexOf(id) >= 0) {
+                    const sample = dummyValueFor(id);
+                    const val = String(el.value || '');
+                    if (sample && val.length === sample.length + 1 && val.slice(1) === sample) el.value = val.charAt(0);
+                    else if (sample && val.indexOf(sample) === 0 && val.length > sample.length) el.value = val.slice(sample.length);
+                }
+                const key = dummyFieldKey(el);
+                if (key) QCDummy.touched[key] = true;
+                el.dataset.qcDummyTouched = '1';
+                QCDummy.dirty = true;
+            }, true);
         }
 
         function phrasePack() {
@@ -2142,6 +2247,14 @@
         }
 
         function readWorkExperienceJobs() {
+            if (window.QCCvData && Array.isArray(QCCvData.experience)) {
+                try {
+                    const fromCtx = QCCvData.experience.map(mapExperienceJob).filter((job) => (
+                        job.company || job.position || job.dates || job.description || job.bullets.length
+                    ));
+                    if (fromCtx.length) return fromCtx;
+                } catch (err) { /* fall through */ }
+            }
             if (window.QCExperience && typeof QCExperience.previewJobs === 'function') {
                 try {
                     return (QCExperience.previewJobs() || []).map(mapExperienceJob).filter((job) => (
@@ -3807,6 +3920,7 @@
                     window.setTimeout(schedule, 0);
                 }
             }, true);
+            bindDummyPreview();
         }
 
         var qcModalScrollLocks = Object.create(null);
@@ -4764,7 +4878,13 @@
         } catch (presetErr) {
             console.error('preset apply failed', presetErr);
         }
-        if (!usedPreset) syncAppRoute();
+        if (!usedPreset) {
+            syncAppRoute();
+            bootDummyPreview();
+        } else {
+            setDummyMode(false);
+            QCDummy.dirty = true;
+        }
         if (window.QCHandoff && typeof QCHandoff.consume === 'function') {
             QCHandoff.consume().then(function (applied) {
                 if (!applied) {
@@ -4796,6 +4916,8 @@
                     console.error('handoff restore failed', handoffErr);
                 }
                 applyView('studio');
+                setDummyMode(false);
+                QCDummy.dirty = true;
                 updateCV();
                 if (typeof QCHandoff.sync === 'function') QCHandoff.sync();
             });

@@ -1,16 +1,44 @@
 .home-ba-section .ba-compare {
     display: grid;
     grid-template-columns: 1fr;
+    grid-template-areas: "quick" "vs" "word";
     gap: 1.1rem;
 }
-.home-ba-section .ba-vs { display: none; }
+.home-ba-section .ba-panel-after { grid-area: quick; }
+.home-ba-section .ba-panel-before { grid-area: word; }
+.home-ba-section .ba-vs { display: none; grid-area: vs; }
 @media (min-width: 640px) {
     .home-ba-section .ba-compare {
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        grid-template-areas: "word vs quick";
         gap: 0.85rem;
         align-items: stretch;
+        direction: ltr;
     }
-    .home-ba-section .ba-vs { display: flex; }
+    .home-ba-section .ba-vs {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+    }
+    .home-ba-section .ba-vs::before,
+    .home-ba-section .ba-vs::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 1.35rem;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(94, 234, 212, 0), rgba(94, 234, 212, 0.7));
+    }
+    .home-ba-section .ba-vs::before {
+        right: calc(100% + 0.15rem);
+        transform: translateY(-50%);
+    }
+    .home-ba-section .ba-vs::after {
+        left: calc(100% + 0.15rem);
+        transform: translateY(-50%) scaleX(-1);
+    }
 }
 .guarantee-badge {
     display: inline-flex;

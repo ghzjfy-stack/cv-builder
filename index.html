@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" class="qc-unpaid" data-cv-density="regular">
+<html lang="he" dir="rtl" class="qc-unpaid spacing-normal" data-cv-density="regular">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -13,10 +13,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./azure-layout.css?v=accent1">
+    <link rel="stylesheet" href="./azure-layout.css?v=a4space1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=gate1">
-    <link rel="stylesheet" href="./cro.css?v=rtl1">
+    <link rel="stylesheet" href="./app.css?v=formpreview1">
+    <link rel="stylesheet" href="./cro.css?v=formpreview1">
 </head>
 <body class="on-home" id="app-body">
     <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
@@ -333,9 +333,7 @@
                 <span class="studio-promo-badge">מחיר השקה</span>
                 <p class="studio-promo-title">קורות חיים מקצועיים ב-<span data-price>10</span> ₪ בלבד</p>
                 <p class="studio-promo-bit">תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן</p>
-                <button type="button" onclick="openPaymentModal()" class="studio-pay">
-                    לשלם <span data-price>10</span>₪ ולהוריד
-                </button>
+                <button type="button" onclick="openPaymentModal()" class="studio-pay">לשלם <span data-price>10</span> ₪ ולהוריד</button>
                 <p class="pay-guarantee" id="studio-pay-guarantee">תשלום חד-פעמי • ללא מנוי וללא התחייבות</p>
             </div>
         </div>
@@ -704,6 +702,9 @@
                         <svg class="preview-switch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.2 4.8 7.8v3.2c0 4.5 3.1 8.6 7.2 9.8 4.1-1.2 7.2-5.3 7.2-9.8V7.8L12 4.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.2" r="2.1" fill="currentColor"/><path d="M8.4 11.2h2.2M13.4 13.2h2.2M11.1 8.8v2.1M12.9 13.4v2.1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
                         <span id="btn-switch-template-label">החלף תבנית</span>
                     </button>
+                    <button type="button" id="btn-quick-design" class="preview-quick-design" onclick="goStep(1)">
+                        <span id="btn-quick-design-label">עיצוב וצבעים 🎨</span>
+                    </button>
                 </div>
                 <button type="button" id="btn-preview-close-top" onclick="closeMobilePreview()" class="preview-close preview-close-top">
                     <span class="preview-close-x" aria-hidden="true">✕</span>
@@ -711,12 +712,21 @@
                 </button>
             </div>
             <p id="cv-page-fit-banner" class="no-print" hidden></p>
+            <div id="preview-accent-strip" class="preview-accent-strip no-print" role="group" aria-label="צבע הדגשה">
+                <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="emerald" data-color="#059669" style="background:#059669" aria-label="אמרלד" aria-pressed="false" onclick="setAccent('#059669', this)"></button>
+                <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="navy" data-color="#12192b" style="background:#12192b" aria-label="נייבי" aria-pressed="false" onclick="setAccent('#12192b', this)"></button>
+                <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="charcoal" data-color="#4c4c4c" style="background:#4c4c4c" aria-label="פחם" aria-pressed="true" onclick="setAccent('#4c4c4c', this)"></button>
+                <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="teal" data-color="#0f766e" style="background:#0f766e" aria-label="טורקיז" aria-pressed="false" onclick="setAccent('#0f766e', this)"></button>
+                <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="burgundy" data-color="#7f1d3a" style="background:#7f1d3a" aria-label="בורדו" aria-pressed="false" onclick="setAccent('#7f1d3a', this)"></button>
+                <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="slate" data-color="#3e4c58" style="background:#3e4c58" aria-label="צפחה" aria-pressed="false" onclick="setAccent('#3e4c58', this)"></button>
+                <input type="color" id="preview-custom-accent" value="#4c4c4c" oninput="setCustomAccent(this.value)" class="custom-accent-input preview-accent-dot" aria-label="בחירת צבע מותאם">
+            </div>
 
             <div id="cv-preview-stack" class="cv-preview-stack cv-document-container">
             <div id="cv-preview-wrapper" class="relative overflow-hidden p-4 md:p-5 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white">
                 <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
-                <div id="cv-target" class="layout-classic bg-preview-white" dir="rtl">
+                <div id="cv-target" class="layout-classic spacing-normal bg-preview-white" dir="rtl">
                     <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
                         <h1 id="out-name" class="text-3xl font-bold">ישראל ישראלי</h1>
                         <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים ומכירות</p>
@@ -1021,17 +1031,17 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=live1"></script>
-    <script src="lib/entryEditor.js?v=live1"></script>
+    <script src="lib/experienceEditor.js?v=formpreview1"></script>
+    <script src="lib/entryEditor.js?v=formpreview1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
-    <script src="lib/templateThumbs.js?v=tpl-he3"></script>
+    <script src="lib/templateThumbs.js?v=formpreview2"></script>
     <script src="lib/export.js"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
     <script src="lib/seoLandings.js"></script>
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
-    <script src="lib/pageFit.js?v=fit1"></script>
+    <script src="lib/pageFit.js?v=a4space1"></script>
     <script src="lib/handoff.js?v=import3"></script>
     <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
@@ -1224,6 +1234,7 @@
                 continueDesignShort: 'המשך לפרטים ⬅️',
                 continueDownload: 'המשך להורדה ⬅️',
                 switchTemplate: 'החלף תבנית',
+                quickDesign: 'עיצוב וצבעים 🎨',
                 clearForm: 'נקה טופס',
                 clearFormConfirm: 'למחוק את כל השדות ולשחזר טופס ריק?',
                 photoChoose: 'בחירת קובץ',
@@ -1317,6 +1328,7 @@
                 continueDesignShort: 'Continue →',
                 continueDownload: 'Continue to download →',
                 switchTemplate: 'Change template',
+                quickDesign: 'Design & colors 🎨',
                 clearForm: 'Clear form',
                 clearFormConfirm: 'Clear all fields and start with an empty form?',
                 photoChoose: 'Choose file',
@@ -1459,22 +1471,29 @@
             return (document.documentElement.style.getPropertyValue('--accent') || '').trim();
         }
 
+        function syncAccentPickers(next) {
+            document.querySelectorAll('.custom-accent-input').forEach(function (picker) {
+                if (picker.value !== next) picker.value = next;
+            });
+        }
+
         function setAccent(color, btn) {
             const next = String(color || '').trim();
             if (!next) return;
             applyCvAccentVar(next);
-            const picker = document.getElementById('custom-accent');
-            if (picker) picker.value = next;
+            syncAccentPickers(next);
+            const hex = next.toLowerCase();
             const names = THEME_NAMES[window.QCCvLang === 'en' ? 'en' : 'he'] || THEME_NAMES.he;
             const custom = window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם';
             const label = document.getElementById('accent-label');
-            if (label) label.textContent = names[next.toLowerCase()] || custom;
-            document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
-            if (btn) btn.setAttribute('aria-pressed', 'true');
-            else {
-                const swatch = document.querySelector('.theme-swatch[data-color="' + next + '"]');
-                if (swatch) swatch.setAttribute('aria-pressed', 'true');
-            }
+            if (label) label.textContent = names[hex] || custom;
+            let matched = false;
+            document.querySelectorAll('.theme-swatch').forEach(function (el) {
+                const on = (el.getAttribute('data-color') || '').toLowerCase() === hex;
+                if (on) matched = true;
+                el.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            if (!matched && btn) btn.setAttribute('aria-pressed', 'true');
             if (window.QCDraft) QCDraft.saveSoon();
         }
 
@@ -1482,6 +1501,7 @@
             const next = String(color || '').trim();
             if (!next) return;
             applyCvAccentVar(next);
+            syncAccentPickers(next);
             const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'];
             const label = document.getElementById('accent-label');
             if (label) label.textContent = (pack && pack.customColor) || (window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם');
@@ -1632,6 +1652,11 @@
             setLabel('btn-continue-details', pack.continueDownload);
             setLabel('mobile-continue-label', pack.continueDesignShort);
             setLabel('btn-switch-template-label', pack.switchTemplate);
+            setLabel('btn-quick-design-label', pack.quickDesign);
+            const accentStrip = document.getElementById('preview-accent-strip');
+            if (accentStrip) accentStrip.setAttribute('aria-label', lang === 'en' ? 'Accent color' : 'צבע הדגשה');
+            const previewCustom = document.getElementById('preview-custom-accent');
+            if (previewCustom && pack.customColor) previewCustom.setAttribute('aria-label', pack.customColor);
             setLabel('font-select-label', pack.fontSelectLabel);
             syncCvFontSelectI18n(lang);
             setLabel('density-legend', pack.densityLegend);
@@ -1675,6 +1700,9 @@
                 const wrap = el.closest('.accent-chip-wrap');
                 const btn = wrap && wrap.querySelector('.accent-chip');
                 if (btn) btn.setAttribute('aria-label', chipNames[key]);
+                document.querySelectorAll('[data-accent-dot="' + key + '"]').forEach(function (dot) {
+                    dot.setAttribute('aria-label', chipNames[key]);
+                });
             });
             const bitCta = document.getElementById('btn-open-bit');
             if (bitCta) bitCta.textContent = pack.bitCta || (lang === 'en' ? 'Pay 10 ₪ with Bit' : 'שלמו 10 ₪ ב-Bit');
@@ -1904,6 +1932,7 @@
         function setLineHeight(val) {
             const lh = (Number(val) / 100).toFixed(2);
             document.documentElement.style.setProperty('--cv-leading', lh);
+            document.documentElement.style.setProperty('--line-height', lh);
             const label = document.getElementById('line-height-val');
             if (label) label.textContent = lh;
             const input = document.getElementById('line-height');
@@ -1928,8 +1957,15 @@
         function setCvDensity(mode, opts) {
             const next = CV_DENSITY[mode] ? mode : 'regular';
             const pack = CV_DENSITY[next];
+            const spacingClass = next === 'compact' ? 'spacing-compact' : next === 'spacious' ? 'spacing-spacious' : 'spacing-normal';
             window.QCCvDensity = next;
             document.documentElement.setAttribute('data-cv-density', next);
+            document.documentElement.classList.remove('spacing-compact', 'spacing-normal', 'spacing-spacious');
+            document.documentElement.classList.add(spacingClass);
+            document.querySelectorAll('#cv-target, #cv-target-page2, #qc-print-host .cv-print-sheet').forEach((el) => {
+                el.classList.remove('spacing-compact', 'spacing-normal', 'spacing-spacious');
+                el.classList.add(spacingClass);
+            });
             document.querySelectorAll('.density-chip').forEach((el) => {
                 el.setAttribute('aria-pressed', el.getAttribute('data-density') === next ? 'true' : 'false');
             });
@@ -3461,19 +3497,29 @@
                 openPaymentModal();
                 return;
             }
+            const pay = document.getElementById('payment-modal');
+            if (pay && !pay.classList.contains('hidden')) closePaymentModal();
             closeMobilePreview();
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
             const formCol = document.getElementById('studio-form-column');
             if (formCol) {
-                formCol.scrollTop = 0;
-                if (!(opts && opts.silent)) {
-                    const targetId = panelStep === 1 ? 'templates-panel' : 'details-panel';
-                    const target = document.getElementById(targetId);
-                    if (target && formCol.contains(target) && panelStep === 2) {
-                        const top = target.offsetTop - 12;
-                        formCol.scrollTop = Math.max(0, top);
+                const smooth = !(opts && opts.silent) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (panelStep === 1 && smooth) {
+                    requestAnimationFrame(function () {
+                        if ((window.QCStudioStep || 1) !== 1) return;
+                        const target = document.getElementById('templates-panel');
+                        const top = target ? Math.max(0, target.offsetTop - 4) : 0;
+                        formCol.scrollTo({ top: top, behavior: 'smooth' });
+                    });
+                } else {
+                    formCol.scrollTop = 0;
+                    if (!(opts && opts.silent) && panelStep === 2) {
+                        const target = document.getElementById('details-panel');
+                        if (target && formCol.contains(target)) {
+                            formCol.scrollTop = Math.max(0, target.offsetTop - 12);
+                        }
                     }
                 }
             }

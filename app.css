@@ -1766,7 +1766,8 @@
         #cv-preview-page-2 .layout-sidebar .cv-sidebar,
         #cv-preview-page-2 .layout-split .cv-sidebar {
             align-self: stretch;
-            height: auto;
+            height: 100%;
+            min-height: 100%;
         }
         #cv-target.cv-lang-en,
         #cv-target-page2.cv-lang-en,
@@ -2085,7 +2086,7 @@
             grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
             grid-template-areas: "side main";
             gap: calc(1.25rem * var(--cv-scale));
-            align-items: start;
+            align-items: stretch;
         }
         .layout-sidebar .cv-sidebar { grid-area: side; }
         .layout-sidebar .cv-main { grid-area: main; }
@@ -2140,7 +2141,7 @@
             grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr);
             grid-template-areas: "main side";
             gap: calc(1.25rem * var(--cv-scale));
-            align-items: start;
+            align-items: stretch;
         }
         .layout-split .cv-sidebar { grid-area: side; }
         .layout-split .cv-main { grid-area: main; }
@@ -2235,15 +2236,15 @@
             grid-template-rows: auto 1fr;
             grid-template-areas: "side head" "side main";
             min-height: 0;
-            height: auto;
-            max-height: none;
+            height: 100%;
+            max-height: 100%;
             background: var(--charcoal-paper, #fff);
             direction: ltr;
             text-align: start;
             font-family: var(--cv-font), 'Lato', 'Rubik', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
-            overflow: visible;
+            overflow: hidden;
         }
         #qc-print-host .cv-print-sheet.layout-charcoal {
             --charcoal: #4c4c4c;
@@ -2275,6 +2276,8 @@
             border-radius: 0;
             padding: 0;
             min-height: 100%;
+            height: 100%;
+            align-self: stretch;
             direction: rtl;
             text-align: right;
         }
@@ -2723,15 +2726,15 @@
                 "head main"
                 "side main";
             min-height: 0;
-            height: auto;
-            max-height: none;
+            height: 100%;
+            max-height: 100%;
             background: #fff;
             direction: ltr;
             text-align: start;
             font-family: var(--cv-font), 'Montserrat', 'Heebo', 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
-            overflow: visible;
+            overflow: hidden;
         }
         #qc-print-host .cv-print-sheet.layout-navy {
             --navy: #12192b;
@@ -2830,6 +2833,8 @@
             color: #fff;
             padding: 0.35rem 1.25rem 1.7rem;
             min-height: 100%;
+            height: 100%;
+            align-self: stretch;
             z-index: 1;
             direction: rtl;
             text-align: right;
@@ -5426,16 +5431,50 @@
             }
         }
 
+        #cv-preview-wrapper,
+        #cv-preview-wrapper.cv-page,
+        #cv-preview-wrapper.a4-page,
+        #cv-preview-page-2 {
+            overflow: hidden !important;
+        }
         #cv-preview-wrapper #cv-target.layout-charcoal,
         #cv-preview-wrapper #cv-target.layout-navy,
         #cv-preview-wrapper #cv-target.layout-azure,
+        #cv-preview-wrapper #cv-target.layout-sidebar,
+        #cv-preview-wrapper #cv-target.layout-split,
         #cv-preview-page-2 #cv-target-page2.layout-charcoal,
         #cv-preview-page-2 #cv-target-page2.layout-navy,
-        #cv-preview-page-2 #cv-target-page2.layout-azure {
-            height: 100%;
-            min-height: 100%;
-            max-height: 100%;
-            overflow: hidden;
+        #cv-preview-page-2 #cv-target-page2.layout-azure,
+        #cv-preview-page-2 #cv-target-page2.layout-sidebar,
+        #cv-preview-page-2 #cv-target-page2.layout-split {
+            height: 100% !important;
+            min-height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+        }
+        #cv-preview-wrapper .layout-charcoal .cv-sidebar,
+        #cv-preview-wrapper .layout-charcoal .left-column,
+        #cv-preview-wrapper .layout-navy .cv-sidebar-inner,
+        #cv-preview-wrapper .layout-navy .left-column,
+        #cv-preview-wrapper .layout-azure .cv-sidebar,
+        #cv-preview-wrapper .layout-sidebar .cv-sidebar,
+        #cv-preview-wrapper .layout-split .cv-sidebar,
+        #cv-preview-page-2 .layout-charcoal .cv-sidebar,
+        #cv-preview-page-2 .layout-navy .cv-sidebar-inner,
+        #cv-preview-page-2 .layout-azure .cv-sidebar,
+        #cv-preview-page-2 .layout-sidebar .cv-sidebar,
+        #cv-preview-page-2 .layout-split .cv-sidebar {
+            height: 100% !important;
+            min-height: 100% !important;
+            align-self: stretch;
+        }
+        #cv-preview-wrapper #cv-target.layout-navy::before,
+        #cv-preview-page-2 #cv-target-page2.layout-navy::before {
+            content: "";
+            grid-column: 1;
+            grid-row: 1 / -1;
+            background: var(--navy, #12192b);
+            z-index: 0;
         }
 
         /* Page paper is always white — beats layout/skin paper fills */

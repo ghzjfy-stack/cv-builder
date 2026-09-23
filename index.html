@@ -13,9 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./azure-layout.css?v=a4lock1">
+    <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=dummy1">
+    <link rel="stylesheet" href="./app.css?v=a4fill1">
     <link rel="stylesheet" href="./cro.css?v=formpreview1">
 </head>
 <body class="on-home" id="app-body">
@@ -504,20 +504,20 @@
                                 <div class="experience-card-fields">
                                     <div class="experience-field">
                                         <label class="experience-field-label">מוסד לימודים</label>
-                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: אוניברסיטת תל אביב">
+                                        <input type="text" data-entry-org="1" data-entry-field="company" value="" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: אוניברסיטת תל אביב">
                                     </div>
                                     <div class="experience-field">
                                         <label class="experience-field-label">תואר / תעודה / מגמה</label>
-                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: BA במנהל עסקים">
+                                        <input type="text" data-entry-title="1" data-entry-field="position" value="" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: BA במנהל עסקים">
                                     </div>
                                     <div class="experience-field">
                                         <label class="experience-field-label">שנים/שנת סיום</label>
-                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2015 - 2018">
+                                        <input type="text" data-entry-dates="1" data-entry-field="years" value="" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2015 - 2018">
                                     </div>
                                 </div>
                             </article>
                         </div>
-                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="handleAddEducation(event); return false;">
+                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="event.preventDefault(); (window.addEducation||window.handleAddEducation)(event); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-education-label">הוסף השכלה</span>
                         </button>
@@ -1027,8 +1027,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=jobsync1"></script>
-    <script src="lib/entryEditor.js?v=launch1"></script>
+    <script src="lib/experienceEditor.js?v=bind2"></script>
+    <script src="lib/entryEditor.js?v=bind2"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1067,8 +1067,15 @@
             return false;
         };
         window.handleAddEducation = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
             if (window.QCEducation && typeof QCEducation.addItem === 'function') return QCEducation.addItem(e);
             return false;
+        };
+        window.addEducation = window.handleAddEducation;
+        window.handleEducationChange = function (id, field, value) {
+            if (window.QCEducation && typeof QCEducation.handleEntryChange === 'function') {
+                return QCEducation.handleEntryChange(id, field, value);
+            }
         };
         window.handleAddMilitary = function (e) {
             if (e && e.preventDefault) e.preventDefault();
@@ -1286,7 +1293,7 @@
                 step3: 'משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.',
                 bitCta: 'שלמו 10 ₪ ב-Bit',
                 selectedTpl: '✓ נבחר',
-                checkoutGateToast: 'יש להשלים פרטים אישיים ולבחור תבנית לפני המעבר לתשלום'
+                checkoutGateToast: 'רגע לפני התשלום, כדאי למלא את הפרטים האישיים שלך בטופס ✏️'
             },
             en: {
                 nameFallback: 'Full name',
@@ -1380,7 +1387,7 @@
                 step3: 'Pay only 10 ₪ in Bit and instantly download a professional PDF.',
                 bitCta: 'Pay 10 ₪ with Bit',
                 selectedTpl: '✓ Selected',
-                checkoutGateToast: 'Complete your personal details and choose a template before payment.'
+                checkoutGateToast: 'Hold on — fill in your personal details in the form before payment ✏️'
             }
         };
         window.CV_I18N = CV_I18N;
@@ -1822,6 +1829,8 @@
                 const el = formField(id);
                 if (el) el.value = sample[id] || '';
             });
+            setDummyMode(false);
+            if (window.QCDummy) QCDummy.dirty = true;
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
             refreshSectionEditors();
         }
@@ -1850,33 +1859,41 @@
             }
         }
 
+        function useDummyPreview() {
+            return isCvFieldsEmpty();
+        }
+
+        function previewVal(id) {
+            if (useDummyPreview()) return dummyValueFor(id);
+            return getVal(id);
+        }
+
+        function isSampleFieldValue(id, value) {
+            const val = String(value || '').trim();
+            if (!val) return false;
+            const he = String((CV_SAMPLES.he && CV_SAMPLES.he[id]) || '').trim();
+            const en = String((CV_SAMPLES.en && CV_SAMPLES.en[id]) || '').trim();
+            return val === he || val === en;
+        }
+
         function bootDummyPreview() {
-            if (isCvSampleSnapshot()) {
-                setDummyMode(true);
-                return;
-            }
-            const name = (formField('in-name')?.value || '').trim();
-            const title = (formField('in-title')?.value || '').trim();
-            if (name && title && !isCvFieldsEmpty()) {
-                setDummyMode(false);
-                QCDummy.dirty = true;
-                return;
-            }
-            const lang = window.QCCvLang === 'en' ? 'en' : 'he';
-            const sample = CV_SAMPLES[lang] || CV_SAMPLES.he;
-            let filled = false;
             CV_SAMPLE_IDS.forEach((id) => {
                 const el = formField(id);
-                if (el && !(el.value || '').trim()) {
-                    el.value = sample[id] || '';
-                    filled = true;
-                }
+                if (el && isSampleFieldValue(id, el.value)) el.value = '';
             });
-            if (filled) {
-                if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
-                refreshSectionEditors();
+            if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
+            refreshSectionEditors();
+            if (isCvFieldsEmpty()) {
+                setDummyMode(true);
+                try {
+                    if (window.QCDummy) QCDummy.dirty = true;
+                    if (window.QCDraft && typeof QCDraft.save === 'function') QCDraft.save();
+                    if (window.QCDummy) QCDummy.dirty = false;
+                } catch (err) { /* ignore */ }
+                return;
             }
-            setDummyMode(true);
+            setDummyMode(false);
+            QCDummy.dirty = true;
         }
         window.bootDummyPreview = bootDummyPreview;
 
@@ -1902,26 +1919,12 @@
         function bindDummyPreview() {
             if (window.__qcDummyBound) return;
             window.__qcDummyBound = true;
-            document.addEventListener('focusin', function (e) {
-                const el = e.target;
-                if (!isCvFormField(el) || !shouldSelectDummy(el)) return;
-                try { el.select(); } catch (err) { /* ignore */ }
-            }, true);
             document.addEventListener('input', function (e) {
-                const el = e.target;
-                if (!window.QCDummy || !QCDummy.active) return;
-                if (!isCvFormField(el)) return;
-                const id = el.id;
-                if (id && CV_SAMPLE_IDS.indexOf(id) >= 0) {
-                    const sample = dummyValueFor(id);
-                    const val = String(el.value || '');
-                    if (sample && val.length === sample.length + 1 && val.slice(1) === sample) el.value = val.charAt(0);
-                    else if (sample && val.indexOf(sample) === 0 && val.length > sample.length) el.value = val.slice(sample.length);
-                }
-                const key = dummyFieldKey(el);
-                if (key) QCDummy.touched[key] = true;
-                el.dataset.qcDummyTouched = '1';
+                if (!isCvFormField(e.target)) return;
+                if (!window.QCDummy) return;
+                QCDummy.active = false;
                 QCDummy.dirty = true;
+                document.documentElement.removeAttribute('data-cv-dummy');
             }, true);
         }
 
@@ -2122,21 +2125,21 @@
 
                 const nameOut = cvOut('out-name');
                 const titleOut = cvOut('out-title');
-                setOutText(nameOut, getVal('in-name') || pack.nameFallback);
-                setOutText(titleOut, getVal('in-title') || pack.titleFallback);
+                setOutText(nameOut, previewVal('in-name') || pack.nameFallback);
+                setOutText(titleOut, previewVal('in-title') || pack.titleFallback);
 
-                const emailVal = getVal('in-email');
-                const linkedinVal = getVal('in-linkedin');
+                const emailVal = previewVal('in-email');
+                const linkedinVal = previewVal('in-linkedin');
                 const emailHref = toMailto(emailVal);
                 const linkedinHref = toWebUrl(linkedinVal);
 
-                setField('out-phone', getVal('in-phone'), '📞 ');
+                setField('out-phone', previewVal('in-phone'), '📞 ');
                 setField('out-email', emailVal, '✉️ ', emailHref);
-                setField('out-location', getVal('in-location'), '📍 ');
+                setField('out-location', previewVal('in-location'), '📍 ');
                 setField('out-linkedin', linkedinVal, '🔗 ', linkedinHref);
-                setField('out-phone-side', getVal('in-phone'), '📞 ');
+                setField('out-phone-side', previewVal('in-phone'), '📞 ');
                 setField('out-email-side', emailVal, '✉️ ', emailHref);
-                setField('out-location-side', getVal('in-location'), '📍 ');
+                setField('out-location-side', previewVal('in-location'), '📍 ');
                 setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
                 document.querySelectorAll('#cv-target .cv-contact-row').forEach((row) => {
                     const slot = row.querySelector('[id^="out-"]');
@@ -2144,8 +2147,8 @@
                     row.style.display = empty ? 'none' : '';
                 });
 
-                setSec('sec-summary', 'out-summary', getVal('in-summary'));
-                setSec('sec-military', 'out-military', getVal('in-military'));
+                setSec('sec-summary', 'out-summary', previewVal('in-summary'));
+                setSec('sec-military', 'out-military', previewVal('in-military'));
             } catch (err) {
                 console.error('updateCV failed', err);
             }
@@ -2228,7 +2231,7 @@
         function mapExperienceJob(job) {
             const company = String((job && (job.company || job.employer)) || '').trim();
             const position = String((job && (job.position || job.title)) || '').trim();
-            const dates = String((job && (job.dates || job.date)) || '').trim();
+            const dates = String((job && (job.dates || job.date || job.years)) || '').trim();
             const description = String((job && job.description) || '').trim();
             let bullets = Array.isArray(job && job.bullets) ? job.bullets.map((b) => String(b || '').trim()).filter(Boolean) : [];
             if (!bullets.length && description) {
@@ -2247,6 +2250,11 @@
         }
 
         function readWorkExperienceJobs() {
+            if (useDummyPreview()) {
+                return parseDatedBlocks(dummyValueFor('in-experience')).map(mapExperienceJob).filter((job) => (
+                    job.company || job.position || job.dates || job.description || job.bullets.length
+                ));
+            }
             if (window.QCCvData && Array.isArray(QCCvData.experience)) {
                 try {
                     const fromCtx = QCCvData.experience.map(mapExperienceJob).filter((job) => (
@@ -2270,6 +2278,39 @@
                 } catch (err) { /* fall through */ }
             }
             return parseDatedBlocks(getVal('in-experience')).map(mapExperienceJob);
+        }
+
+        function serializeEducationPreview(list) {
+            return (list || []).map((item) => {
+                const years = String((item && (item.years || item.dates || item.date)) || '').trim();
+                const position = String((item && (item.position || item.title)) || '').trim();
+                const company = String((item && (item.company || item.org || item.role)) || '').trim();
+                const description = String((item && item.description) || '').trim();
+                if (!years && !position && !company && !description) return '';
+                const header = [years, position].filter(Boolean).join(' | ');
+                const lines = [];
+                if (header) lines.push(header);
+                if (company) lines.push(company);
+                if (description) lines.push(description);
+                return lines.join('\n');
+            }).filter(Boolean).join('\n\n');
+        }
+
+        function readEducationText() {
+            if (useDummyPreview()) return dummyValueFor('in-education');
+            if (window.QCCvData && Array.isArray(QCCvData.education)) {
+                try {
+                    const text = serializeEducationPreview(QCCvData.education);
+                    if (text) return text;
+                } catch (err) { /* fall through */ }
+            }
+            if (window.QCEducation && typeof QCEducation.previewItems === 'function') {
+                try {
+                    const text = serializeEducationPreview(QCEducation.previewItems());
+                    if (text) return text;
+                } catch (err) { /* fall through */ }
+            }
+            return getVal('in-education');
         }
 
         function paintExperienceJobs(container, jobs, opts) {
@@ -3105,14 +3146,14 @@
             const charcoal = isCharcoalLayout();
             const navy = isNavyLayout();
             const azure = isAzureLayout();
-            const milVal = getVal('in-military');
+            const milVal = previewVal('in-military');
             const extrasOut = cvOut('out-extras-side');
             const extrasSec = document.getElementById('sec-extras-side');
             const expJobs = readWorkExperienceJobs();
             const hasExp = expJobs.length > 0;
-            const eduVal = getVal('in-education');
-            const skillVal = getVal('in-skills');
-            const langVal = getVal('in-languages');
+            const eduVal = readEducationText();
+            const skillVal = previewVal('in-skills');
+            const langVal = previewVal('in-languages');
             const expOut = cvOut('out-experience');
             const eduOut = cvOut('out-education');
             const eduSide = cvOut('out-education-side');
@@ -3490,19 +3531,18 @@
 
         function checkoutGateMessage() {
             const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
-            return pack.checkoutGateToast || 'יש להשלים פרטים אישיים ולבחור תבנית לפני המעבר לתשלום';
+            return pack.checkoutGateToast || 'רגע לפני התשלום, כדאי למלא את הפרטים האישיים שלך בטופס ✏️';
         }
 
         function isPersonalInfoComplete() {
             const name = getVal('in-name').trim();
-            const title = getVal('in-title').trim();
             const phone = getVal('in-phone').replace(/\D/g, '');
             const email = getVal('in-email').trim();
-            if (name.length < 2) return false;
-            if (title.length < 2) return false;
-            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-            if (phone.length < 9 && !emailOk) return false;
-            return true;
+            if (name.length < 2 || isSampleFieldValue('in-name', name)) return false;
+            const samplePhone = String((CV_SAMPLES.he && CV_SAMPLES.he['in-phone']) || '').replace(/\D/g, '');
+            const phoneOk = phone.length >= 9 && phone !== samplePhone;
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !isSampleFieldValue('in-email', email);
+            return phoneOk || emailOk;
         }
 
         function isTemplateSelected() {
@@ -3515,7 +3555,7 @@
         }
 
         function isCheckoutReady() {
-            return isPersonalInfoComplete() && isTemplateSelected();
+            return isPersonalInfoComplete();
         }
 
         var qcStudioToastTimer = 0;
@@ -3560,10 +3600,21 @@
             return ready;
         }
 
+        function focusPersonalForm() {
+            applyStudioStep(2, { silent: true });
+            const name = formField('in-name');
+            window.setTimeout(function () {
+                if (name && typeof name.focus === 'function') name.focus();
+            }, 40);
+        }
+
         function guardCheckout(opts) {
             syncCheckoutGate();
             if (isCheckoutReady()) return true;
-            if (!(opts && opts.silent)) showStudioToast();
+            if (!(opts && opts.silent)) {
+                showStudioToast();
+                focusPersonalForm();
+            }
             return false;
         }
         window.QCCheckoutGate = guardCheckout;
@@ -4941,6 +4992,12 @@
         });
         syncMobilePreviewToggle();
         setPreviewBg('bg-preview-white', null, { silent: true });
+        window.addEducation = function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            if (window.QCEducation && typeof QCEducation.addItem === 'function') return QCEducation.addItem(e);
+            return false;
+        };
+        window.handleAddEducation = window.addEducation;
     </script>
 </body>
 </html>

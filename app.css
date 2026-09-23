@@ -4708,6 +4708,27 @@
             justify-content: space-between;
             gap: 0.5rem;
         }
+        .experience-card-toggle {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-height: 2rem;
+            margin: 0;
+            padding: 0.15rem 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            text-align: inherit;
+        }
+        .experience-card:not(.is-open) .experience-card-fields,
+        .experience-card:not(.is-open) .experience-presets {
+            display: none !important;
+        }
+        .experience-card:not(.is-open) .experience-card-fields input,
+        .experience-card:not(.is-open) .experience-card-fields textarea {
+            display: none !important;
+        }
         .experience-card-badge {
             font-size: 0.68rem;
             font-weight: 700;
@@ -5316,6 +5337,9 @@
                 padding: 2rem;
                 font-size: 18px;
                 color: #0f172a;
+            }
+            html[lang="en"].qc-unpaid body::after {
+                content: "QuickCV — Preview is protected. Pay 10 ₪ to download the PDF.";
             }
 
             html.qc-print-mode body > *:not(#qc-print-host) {

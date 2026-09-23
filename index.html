@@ -330,10 +330,10 @@
     <header class="studio-header no-print border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
         <div class="studio-promo bg-gradient-to-l from-emerald-500 via-teal-400 to-amber-300 text-slate-950">
             <div class="studio-promo-inner">
-                <span class="studio-promo-badge">מחיר השקה</span>
-                <p class="studio-promo-title">קורות חיים מקצועיים ב-<span data-price>10</span> ₪ בלבד</p>
-                <p class="studio-promo-bit">תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן</p>
-                <button type="button" onclick="openPaymentModal()" class="studio-pay">לשלם <span data-price>10</span> ₪ ולהוריד</button>
+                <span class="studio-promo-badge" id="studio-promo-badge">מחיר השקה</span>
+                <p class="studio-promo-title" id="studio-promo-title">קורות חיים מקצועיים ב-<span data-price>10</span> ₪ בלבד</p>
+                <p class="studio-promo-bit" id="studio-promo-bit">תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן</p>
+                <button type="button" onclick="openPaymentModal()" class="studio-pay" id="studio-pay-cta">לשלם <span data-price>10</span> ₪ ולהוריד</button>
                 <p class="pay-guarantee" id="studio-pay-guarantee">תשלום חד-פעמי • ללא מנוי וללא התחייבות</p>
             </div>
         </div>
@@ -342,7 +342,7 @@
                 <span class="studio-mark" aria-hidden="true">QC</span>
                 <span>
                     <span class="studio-brand-name">QuickCV</span>
-                    <span class="block text-[10px] text-slate-300 hidden sm:block">חזרה לדף הבית</span>
+                    <span class="block text-[10px] text-slate-300 hidden sm:block" id="studio-back-home">חזרה לדף הבית</span>
                 </span>
             </button>
 
@@ -397,7 +397,7 @@
         <div id="studio-form-column" class="no-print space-y-6">
             <div id="templates-panel" class="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-3 shadow-xl">
                 <div class="flex items-center justify-between gap-2 flex-wrap">
-                    <h3 class="font-bold text-slate-200 text-sm">תבניות מוכנות</h3>
+                    <h3 class="font-bold text-slate-200 text-sm" id="templates-heading">תבניות מוכנות</h3>
                     <span class="ats-badge ats-badge-dark" data-ats-badge>ATS-Friendly · נסרק בהצלחה במערכות סינון</span>
                 </div>
                 <p class="text-[10px] text-slate-400" data-template-count-copy="studio">בחרו עיצוב לקורות החיים</p>
@@ -459,34 +459,10 @@
                     <div class="section-editor-head">
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
                     </div>
-                    <div id="experience-items">
-                        <article class="experience-card is-open" role="listitem" data-job-id="job-seed-0" data-job-index="0">
-                            <div class="experience-card-toolbar">
-                                <span class="experience-card-badge">משרה 1</span>
-                            </div>
-                            <div class="experience-card-fields">
-                                <div class="experience-field">
-                                    <label class="experience-field-label" for="job-seed-company">שם חברה/ארגון</label>
-                                    <input id="job-seed-company" data-job-employer="1" data-job-field="company" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: חברת דמו">
-                                </div>
-                                <div class="experience-field">
-                                    <label class="experience-field-label" for="job-seed-role">תפקיד</label>
-                                    <input id="job-seed-role" data-job-role="1" data-job-field="position" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מנהל פרויקטים">
-                                </div>
-                                <div class="experience-field">
-                                    <label class="experience-field-label" for="job-seed-dates">תאריכים/שנים</label>
-                                    <input id="job-seed-dates" data-job-dates="1" data-job-field="dates" type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2021 - היום">
-                                </div>
-                                <div class="experience-field">
-                                    <label class="experience-field-label" for="job-seed-desc">תיאור תפקיד / הישגים</label>
-                                    <textarea id="job-seed-desc" data-job-desc="1" data-job-field="description" rows="5" class="studio-field experience-desc w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none" placeholder="• הובלתי צוות והגדלתי יעדים ב-35%"></textarea>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="event.preventDefault(); if (event.stopPropagation) event.stopPropagation(); return (typeof addExperience === 'function' ? addExperience(event) : false);">
+                    <div id="experience-items" role="list"></div>
+                    <button type="button" id="btn-add-experience" class="section-add-btn">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
-                        <span id="btn-add-experience-label">הוסף משרה</span>
+                        <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                     </button>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                 </div>
@@ -496,30 +472,10 @@
                         <div class="section-editor-head">
                             <p class="font-bold dynamic-text text-sm" id="label-education">השכלה</p>
                         </div>
-                        <div id="education-items">
-                            <article class="experience-card entry-card is-open" role="listitem" data-entry-index="0">
-                                <div class="experience-card-toolbar">
-                                    <span class="experience-card-badge">השכלה 1</span>
-                                </div>
-                                <div class="experience-card-fields">
-                                    <div class="experience-field">
-                                        <label class="experience-field-label">מוסד לימודים</label>
-                                        <input type="text" data-entry-org="1" data-entry-field="company" value="" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: אוניברסיטת תל אביב">
-                                    </div>
-                                    <div class="experience-field">
-                                        <label class="experience-field-label">תואר / תעודה / מגמה</label>
-                                        <input type="text" data-entry-title="1" data-entry-field="position" value="" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: BA במנהל עסקים">
-                                    </div>
-                                    <div class="experience-field">
-                                        <label class="experience-field-label">שנים/שנת סיום</label>
-                                        <input type="text" data-entry-dates="1" data-entry-field="years" value="" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2015 - 2018">
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="event.preventDefault(); (window.addEducation||window.handleAddEducation)(event); return false;">
+                        <div id="education-items" role="list"></div>
+                        <button type="button" id="btn-add-education" class="section-add-btn">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
-                        <span id="btn-add-education-label">הוסף השכלה</span>
+                            <span id="btn-add-education-label">הוסף השכלה נוספת</span>
                         </button>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
@@ -720,12 +676,12 @@
 
             <div id="cv-preview-stack" class="cv-preview-stack cv-document-container">
             <div id="cv-preview-wrapper" class="relative overflow-hidden p-4 md:p-5 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white">
-                <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span>QuickCV · תצוגה מקדימה</span></div>
+                <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span id="cv-watermark-text">תצוגה מקדימה - QUICKCV</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
                 <div id="cv-target" class="layout-classic spacing-normal bg-preview-white" dir="rtl">
                     <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
-                        <h1 id="out-name" class="text-3xl font-bold">ישראל ישראלי</h1>
-                        <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים ומכירות</p>
+                        <h1 id="out-name" class="text-3xl font-bold">יונתן אשל</h1>
+                        <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים</p>
 
                         <div class="cv-contact-header flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-slate-500">
                             <p class="cv-contact-row" data-contact="phone">
@@ -1027,8 +983,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=lang1"></script>
-    <script src="lib/entryEditor.js?v=lang1"></script>
+    <script src="lib/experienceEditor.js?v=acc1"></script>
+    <script src="lib/entryEditor.js?v=acc1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1170,7 +1126,7 @@
         const CV_SAMPLE_IDS = ['in-name', 'in-title', 'in-phone', 'in-email', 'in-location', 'in-linkedin', 'in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-languages'];
         const CV_SAMPLES = {
             he: {
-                'in-name': 'ישראל ישראלי',
+                'in-name': 'יונתן אשל',
                 'in-title': 'מנהל מוצר',
                 'in-phone': '050-1234567',
                 'in-email': 'israel@example.com',
@@ -1206,14 +1162,14 @@
                 titleFallback: 'תפקיד',
                 detailsHeading: 'פרטים אישיים',
                 detailsHeadingHint: '(שדה ריק לא יופיע)',
-                phName: 'לדוגמה: ישראל ישראלי',
+                phName: 'לדוגמה: יונתן אשל',
                 phTitle: 'לדוגמה: מנהל פרויקטים',
                 phLocation: 'לדוגמה: תל אביב',
                 phSummary: 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור',
                 phSkills: 'לדוגמה: ניהול צוותים, CRM, Excel מתקדם',
                 phReferences: 'שם\nתפקיד / חברה\nטלפון\nאימייל',
                 phLinkedin: 'linkedin.com/in/...',
-                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות' },
+                labels: { name: 'שם מלא', title: 'תפקיד / כותרת', phone: 'טלפון', email: 'אימייל', location: 'עיר מגורים', linkedin: 'קישור ל-LinkedIn / אתר', photo: 'תמונת פרופיל', summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', education: 'השכלה', military: 'שירות צבאי / לאומי', skills: 'כישורים', languages: 'שפות', languagesSelect: 'בחר שפה...', languagesLevel: 'רמת שליטה...', languagesAdd: 'הוסף', languagesRemove: 'הסרה', languagesHint: 'בחרו שפה ורמת שליטה, ואז לחצו הוסף.', languagesPopular: 'נפוצות', languagesMore: 'עוד שפות', references: 'המלצות' },
                 i18n: { summary: 'תקציר מקצועי', experience: 'ניסיון תעסוקתי', references: 'המלצות', education: 'השכלה וקורסים', educationSide: 'השכלה', military: 'שירות צבאי / לאומי', contact: 'יצירת קשר', skills: 'כישורים', languages: 'שפות' },
                 examples: { sales: ['מכירות וניהול', 'מנהלת מכירות ארצית עם דגש על יעדים וצוותים'], tech: ['הייטק / פיתוח', 'מפתח Full-Stack עם ניסיון במוצר ובצוות אג׳ייל'], marketing: ['שיווק דיגיטלי', 'מנהלת קמפיינים עם דגש על לידים וביצועים'] },
                 phrasesHeading: 'משפטים מוכנים לפי תחום',
@@ -1289,6 +1245,19 @@
                 compareBefore: 'לפני (Word)',
                 compareAfter: 'אחרי (QuickCV)',
                 navExamples: 'דוגמאות',
+                backHome: 'חזרה לדף הבית',
+                promoBadge: 'מחיר השקה',
+                promoTitleBefore: 'קורות חיים מקצועיים ב-',
+                promoTitleAfter: ' ₪ בלבד',
+                promoBit: 'תשלום מאובטח ב-Bit • הורדה מיידית בדפדפן',
+                payGuarantee: 'תשלום חד-פעמי • ללא מנוי וללא התחייבות',
+                payMicrocopy: 'תשלום חד-פעמי • ללא מנוי • הורדה מיידית',
+                payDownloadBefore: 'לשלם ',
+                payDownloadAfter: ' ₪ ולהוריד',
+                livePreview: 'תצוגה מקדימה בזמן אמת',
+                livePreviewAria: 'תצוגה מקדימה חיה של קורות החיים',
+                templatesReady: 'תבניות מוכנות',
+                watermark: 'תצוגה מקדימה - QUICKCV',
                 homeNavCta: 'צור קורות חיים',
                 craftKicker: 'תבניות ועיצובים',
                 step3: 'משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.',
@@ -1308,7 +1277,7 @@
                 phSkills: 'e.g. Team leadership, CRM, Advanced Excel',
                 phReferences: 'Name\nTitle / company\nPhone\nEmail',
                 phLinkedin: 'linkedin.com/in/...',
-                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language...', languagesLevel: 'Proficiency...', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency, then tap Add.', languagesPopular: 'Popular', languagesMore: 'More languages', references: 'References' },
+                labels: { name: 'Full name', title: 'Job title', phone: 'Phone', email: 'Email', location: 'City', linkedin: 'LinkedIn / website', photo: 'Profile Photo', summary: 'Professional summary', experience: 'Work experience', education: 'Education', military: 'Military / national service', skills: 'Skills', languages: 'Languages', languagesSelect: 'Select a language...', languagesLevel: 'Proficiency...', languagesAdd: 'Add', languagesRemove: 'Remove', languagesHint: 'Pick a language and proficiency, then tap Add.', languagesPopular: 'Popular', languagesMore: 'More languages', references: 'References' },
                 i18n: { summary: 'Professional Summary', experience: 'Work Experience', references: 'References', education: 'Education & Courses', educationSide: 'Education', military: 'Military / National Service', contact: 'Contact', skills: 'Skills', languages: 'Languages' },
                 examples: { sales: ['Sales & Management', 'National sales manager focused on targets and teams'], tech: ['Tech / Engineering', 'Full-stack developer with product and agile experience'], marketing: ['Digital Marketing', 'Campaign manager focused on leads and performance'] },
                 phrasesHeading: 'Ready phrases by field',
@@ -1384,6 +1353,19 @@
                 compareBefore: 'Before (Word)',
                 compareAfter: 'After (QuickCV)',
                 navExamples: 'Examples',
+                backHome: 'Back to Home',
+                promoBadge: 'Launch price',
+                promoTitleBefore: 'Professional Resume for only ',
+                promoTitleAfter: ' ₪',
+                promoBit: 'Secure Payment via Bit • Instant Download',
+                payGuarantee: 'One-time payment • No subscription',
+                payMicrocopy: 'One-time payment • No subscription',
+                payDownloadBefore: 'Pay ',
+                payDownloadAfter: ' ₪ & Download',
+                livePreview: 'Live Preview',
+                livePreviewAria: 'Live resume preview',
+                templatesReady: 'Ready Templates',
+                watermark: 'PREVIEW - QUICKCV',
                 homeNavCta: 'Create CV',
                 craftKicker: 'Templates & designs',
                 step3: 'Pay only 10 ₪ in Bit and instantly download a professional PDF.',
@@ -1656,6 +1638,7 @@
             setLabel('label-email', pack.labels.email);
             setLabel('label-location', pack.labels.location);
             setLabel('label-linkedin', pack.labels.linkedin);
+            setLabel('label-photo', pack.labels.photo);
             setLabel('label-summary', pack.labels.summary);
             setLabel('label-experience', pack.labels.experience);
             setLabel('label-education', pack.labels.education);
@@ -1682,6 +1665,30 @@
             setLabel('mobile-continue-label', pack.continueDesignShort);
             setLabel('btn-switch-template-label', pack.switchTemplate);
             setLabel('btn-quick-design-label', pack.quickDesign);
+            setLabel('studio-back-home', pack.backHome);
+            setLabel('studio-promo-badge', pack.promoBadge);
+            setLabel('studio-promo-bit', pack.promoBit);
+            setLabel('studio-pay-guarantee', pack.payGuarantee);
+            setLabel('form-pay-guarantee', pack.payMicrocopy);
+            setLabel('preview-heading', pack.livePreview);
+            setLabel('templates-heading', pack.templatesReady);
+            setLabel('cv-watermark-text', pack.watermark);
+            const previewCol = document.getElementById('preview-column');
+            if (previewCol && pack.livePreviewAria) previewCol.setAttribute('aria-label', pack.livePreviewAria);
+            const priceAmount = (document.querySelector('#studio-pay-cta [data-price], [data-price]') || {}).textContent || '10';
+            const promoTitle = document.getElementById('studio-promo-title');
+            if (promoTitle && pack.promoTitleBefore) {
+                promoTitle.innerHTML = pack.promoTitleBefore + '<span data-price>' + String(priceAmount).trim() + '</span>' + (pack.promoTitleAfter || '');
+            }
+            document.querySelectorAll('.studio-pay').forEach((el) => {
+                if (!pack.payDownloadBefore) return;
+                el.innerHTML = pack.payDownloadBefore + '<span data-price>' + String(priceAmount).trim() + '</span>' + (pack.payDownloadAfter || '');
+            });
+            document.querySelectorAll('#cv-shield-grid span').forEach((el) => {
+                if (pack.watermark) el.textContent = pack.watermark;
+            });
+            const formGuarantee = document.getElementById('form-pay-guarantee');
+            if (formGuarantee) formGuarantee.setAttribute('dir', lang === 'en' ? 'ltr' : 'rtl');
             const accentStrip = document.getElementById('preview-accent-strip');
             if (accentStrip) accentStrip.setAttribute('aria-label', lang === 'en' ? 'Accent color' : 'צבע הדגשה');
             const previewCustom = document.getElementById('preview-custom-accent');
@@ -1780,7 +1787,7 @@
             const skillsEl = document.getElementById('in-skills');
             const refsEl = document.getElementById('in-references');
             const linkedinEl = document.getElementById('in-linkedin');
-            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Jonathan Eshel' : 'לדוגמה: ישראל ישראלי');
+            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Jonathan Eshel' : 'לדוגמה: יונתן אשל');
             if (titleEl) titleEl.placeholder = pack.phTitle || (lang === 'en' ? 'e.g. Project Manager' : 'לדוגמה: מנהל פרויקטים');
             if (locEl) locEl.placeholder = pack.phLocation || (lang === 'en' ? 'e.g. Tel Aviv' : 'לדוגמה: תל אביב');
             if (summaryEl) summaryEl.placeholder = pack.phSummary || (lang === 'en' ? 'e.g. Project manager experienced in leading teams' : 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים');

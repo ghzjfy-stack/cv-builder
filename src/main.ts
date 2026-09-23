@@ -965,12 +965,23 @@ function styleCta(el) {
   el.style.pointerEvents = "auto";
 }
 
+function shieldLabel() {
+  return (window as Window & { QCCvLang?: string }).QCCvLang === "en" ? "PREVIEW - QUICKCV" : "תצוגה מקדימה - QUICKCV";
+}
+
 function buildShieldGrid() {
   const grid = document.getElementById("cv-shield-grid");
-  if (!grid || grid.childElementCount) return;
+  if (!grid) return;
+  const label = shieldLabel();
+  if (grid.childElementCount) {
+    Array.prototype.forEach.call(grid.querySelectorAll("span"), (span) => {
+      span.textContent = label;
+    });
+    return;
+  }
   for (let i = 0; i < 16; i++) {
     const span = document.createElement("span");
-    span.textContent = "תצוגה מקדימה · QuickCV";
+    span.textContent = label;
     grid.appendChild(span);
   }
 }

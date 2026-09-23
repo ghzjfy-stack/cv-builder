@@ -1790,7 +1790,9 @@
         .qc-combo-btn {
             width: 100%;
             min-height: 2.75rem;
-            padding: 0.55rem 2.1rem 0.55rem 0.75rem;
+            padding-block: 0.55rem;
+            padding-inline-start: 0.9rem;
+            padding-inline-end: 2.4rem;
             border: 1px solid #64748b;
             border-radius: 0.7rem;
             background: #0f172a;
@@ -1803,6 +1805,16 @@
             display: flex;
             align-items: center;
             position: relative;
+            overflow: hidden;
+        }
+        .qc-combo-btn > span {
+            display: block;
+            min-width: 0;
+            flex: 1 1 auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-inline-end: 0.35rem;
         }
         .qc-combo-btn::after {
             content: "";
@@ -1848,7 +1860,7 @@
             display: block;
             width: 100%;
             text-align: start;
-            padding: 0.55rem 0.7rem;
+            padding: 0.55rem 0.95rem;
             background: transparent;
             border: 0;
             color: #f8fafc;
@@ -1857,6 +1869,7 @@
             border-radius: 0.5rem;
             cursor: pointer;
             line-height: 1.35;
+            white-space: normal;
         }
         .qc-combo-option:hover,
         .qc-combo-option:focus {
@@ -1953,9 +1966,10 @@
             min-height: 2.75rem;
             padding: 0.55rem 1.1rem;
             border-radius: 0.7rem;
-            border: 1px solid #64748b;
-            background: #1e293b;
-            color: #f8fafc;
+            border: 1px solid #0284c7;
+            background: #0284c7;
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
             font-size: 0.875rem;
             font-weight: 800;
             cursor: pointer !important;
@@ -1965,9 +1979,10 @@
         }
         .lang-pick-add-btn:hover,
         #lang-pick-add:hover {
-            border-color: #00E5FF;
-            color: #00E5FF;
-            background: rgba(0, 229, 255, 0.1);
+            border-color: #0369a1;
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+            background: #0369a1;
         }
         .lang-pick-add-btn:active,
         #lang-pick-add:active {
@@ -4425,9 +4440,16 @@
             scroll-margin-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
             transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
         }
+        #btn-add-education {
+            cursor: pointer !important;
+            color: #38bdf8 !important;
+            border-color: #0284c7 !important;
+            pointer-events: auto !important;
+        }
         .section-add-btn *,
         .experience-add-job-btn *,
-        #btn-add-experience * {
+        #btn-add-experience *,
+        #btn-add-education * {
             pointer-events: none;
         }
         .experience-add-icon {
@@ -4458,6 +4480,10 @@
             box-shadow: none;
             transform: none;
         }
+        #btn-add-education:hover {
+            color: #38bdf8 !important;
+            border-color: #0284c7 !important;
+        }
         .section-add-btn:active,
         .experience-add-job-btn:active,
         #btn-add-experience:active,
@@ -4483,10 +4509,16 @@
         #btn-add-military[disabled],
         .section-add-btn[aria-disabled="true"],
         .experience-add-job-btn[aria-disabled="true"],
-        #btn-add-experience[aria-disabled="true"] {
+        #btn-add-experience[aria-disabled="true"],
+        #btn-add-education[aria-disabled="true"] {
             opacity: 1 !important;
             cursor: pointer !important;
             pointer-events: auto !important;
+            color: #38bdf8 !important;
+        }
+        #btn-add-education[disabled],
+        #btn-add-education[aria-disabled="true"] {
+            border-color: #0284c7 !important;
         }
         #education-section,
         #military-section,
@@ -4554,11 +4586,14 @@
             padding-bottom: 20px;
         }
         #education-section > #btn-add-education,
-        #military-section > #btn-add-military,
         #experience-section > #btn-add-experience {
             position: relative;
             z-index: 30;
             margin-top: 0.55rem;
+        }
+        #btn-add-military,
+        #military-section > #btn-add-military {
+            display: none !important;
         }
         #experience-section > .field-tip,
         #education-section > .field-tip,
@@ -4578,6 +4613,10 @@
             pointer-events: auto;
             position: relative;
             z-index: 2;
+        }
+        #education-items .experience-card,
+        #education-items .entry-card {
+            padding-bottom: 20px;
         }
         .experience-card input,
         .experience-card textarea {

@@ -279,26 +279,34 @@
             min-width: 0;
             margin-inline: auto;
             flex: 0 0 auto;
+            container-type: inline-size;
+            container-name: cv-stack;
         }
         #cv-preview-wrapper {
             container-type: inline-size;
             container-name: cv-preview;
             /* One fixed A4 sheet: 210mm × 297mm. */
-            aspect-ratio: 210 / 297;
+            aspect-ratio: 1 / 1.414;
             width: 100%;
-            height: auto;
+            height: 100%;
+            min-height: 297mm;
             max-height: none;
             padding: 0 !important;
             background-color: #fff;
             overflow: hidden !important;
             overflow-x: hidden !important;
+            overflow-y: hidden !important;
+            transition: none;
         }
         #cv-preview-page-2 {
             container-type: inline-size;
-            aspect-ratio: 210 / 297;
-            max-height: calc(100cqw * 297 / 210);
-            overflow: hidden;
+            aspect-ratio: 1 / 1.414;
+            width: 100%;
+            height: 100%;
+            min-height: 297mm;
+            overflow: hidden !important;
             overflow-x: hidden;
+            overflow-y: hidden;
         }
         #cv-preview-page-2[hidden] {
             display: none !important;
@@ -318,14 +326,30 @@
         #cv-preview-page-2:has(.layout-azure) {
             padding: 0 !important;
         }
-        #cv-preview-wrapper #cv-target {
+        #cv-preview-wrapper #cv-target,
+        #cv-preview-wrapper #cv-target.spacing-compact,
+        #cv-preview-wrapper #cv-target.spacing-normal,
+        #cv-preview-wrapper #cv-target.spacing-spacious,
+        html[data-cv-density="compact"] #cv-preview-wrapper #cv-target,
+        html[data-cv-density="regular"] #cv-preview-wrapper #cv-target,
+        html[data-cv-density="spacious"] #cv-preview-wrapper #cv-target,
+        #cv-preview-wrapper #cv-target.layout-classic,
+        #cv-preview-wrapper #cv-target.layout-sidebar,
+        #cv-preview-wrapper #cv-target.layout-minimal,
+        #cv-preview-wrapper #cv-target.layout-executive,
+        #cv-preview-wrapper #cv-target.layout-modern,
+        #cv-preview-wrapper #cv-target.layout-compact,
+        #cv-preview-wrapper #cv-target.layout-split,
+        #cv-preview-wrapper #cv-target.layout-charcoal,
+        #cv-preview-wrapper #cv-target.layout-azure,
+        #cv-preview-wrapper #cv-target.layout-navy {
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
             min-width: 0;
-            min-height: 100%;
-            height: 100%;
-            max-height: 100%;
+            min-height: 100% !important;
+            height: 100% !important;
+            max-height: 100% !important;
             padding-bottom: 0;
             margin-inline: auto;
             margin-bottom: 0;
@@ -334,7 +358,7 @@
             break-before: avoid;
             break-after: avoid;
             transform: none;
-            overflow: hidden;
+            overflow: hidden !important;
             background-color: #fff;
         }
         #cl-preview-wrapper #cl-target {
@@ -345,6 +369,15 @@
             min-width: 0;
             margin-inline: auto;
         }
+        html[lang="he"] #cv-preview-wrapper #cv-target,
+        html[lang="en"] #cv-preview-wrapper #cv-target,
+        #cv-preview-wrapper #cv-target[dir="rtl"],
+        #cv-preview-wrapper #cv-target[dir="ltr"] {
+            min-height: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            background-color: #fff;
+        }
         #cv-preview-wrapper #cv-target .cv-columns,
         #cv-preview-wrapper #cv-target .cv-sidebar,
         #cv-preview-wrapper #cv-target .cv-main,
@@ -352,10 +385,16 @@
             min-width: 0;
             max-width: 100%;
         }
+        #cv-preview-wrapper #cv-target .cv-columns,
+        #cv-preview-wrapper #cv-target .cv-main,
+        #cv-preview-wrapper #cv-target .cv-sidebar {
+            min-height: 100%;
+            align-self: stretch;
+        }
         /* Page 1 stays a clipped A4 sheet; overflow continues on #cv-preview-page-2 when needed */
         #cv-preview-wrapper.cv-over-one-page {
             overflow: hidden !important;
-            max-height: calc(100cqw * 297 / 210);
+            min-height: 297mm;
         }
         #cl-preview-wrapper {
             display: none;
@@ -3745,9 +3784,10 @@
             #preview-column #cl-preview-wrapper {
                 width: 100%;
                 max-width: 100%;
-                height: auto;
-                aspect-ratio: 210 / 297;
-                overflow: hidden;
+                height: 100%;
+                min-height: 297mm;
+                aspect-ratio: 1 / 1.414;
+                overflow: hidden !important;
                 flex: 0 0 auto;
             }
         }
@@ -4440,11 +4480,19 @@
             scroll-margin-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
             transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
         }
-        #btn-add-education {
+        #experience-section,
+        #education-section {
+            pointer-events: auto !important;
+        }
+        #btn-add-experience,
+        #btn-add-education,
+        #experience-section > #btn-add-experience,
+        #education-section > #btn-add-education {
             cursor: pointer !important;
             color: #38bdf8 !important;
             border-color: #0284c7 !important;
             pointer-events: auto !important;
+            opacity: 1 !important;
         }
         .section-add-btn *,
         .experience-add-job-btn *,
@@ -4480,9 +4528,11 @@
             box-shadow: none;
             transform: none;
         }
+        #btn-add-experience:hover,
         #btn-add-education:hover {
             color: #38bdf8 !important;
             border-color: #0284c7 !important;
+            opacity: 1 !important;
         }
         .section-add-btn:active,
         .experience-add-job-btn:active,
@@ -4516,8 +4566,14 @@
             pointer-events: auto !important;
             color: #38bdf8 !important;
         }
+        #btn-add-experience[disabled],
         #btn-add-education[disabled],
+        #btn-add-experience[aria-disabled="true"],
         #btn-add-education[aria-disabled="true"] {
+            opacity: 1 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            color: #38bdf8 !important;
             border-color: #0284c7 !important;
         }
         #education-section,

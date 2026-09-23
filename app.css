@@ -5259,24 +5259,26 @@
         }
         #qc-print-host.qc-capturing {
             display: block !important;
-            height: auto;
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            overflow: hidden !important;
         }
-        #qc-print-host.qc-capturing,
         #qc-print-host.qc-capturing .cv-print-sheet,
-        #qc-print-host.qc-capturing .cv-print-sheet * {
-            overflow: visible !important;
-            max-height: none !important;
-            text-overflow: clip !important;
-        }
-        #qc-print-host.qc-capturing .cv-print-sheet {
-            width: 100% !important;
-            max-width: 100% !important;
+        html.qc-exporting #cv-preview-wrapper,
+        html.qc-exporting #cv-target {
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            overflow: hidden !important;
             box-sizing: border-box !important;
         }
 
         @page {
             size: A4;
-            margin: 12mm;
+            margin: 0;
         }
 
         @media print {
@@ -5323,30 +5325,42 @@
             html.qc-print-mode #qc-print-host {
                 display: block !important;
                 position: static !important;
-                width: 100% !important;
-                max-width: 186mm !important;
+                width: 210mm !important;
+                min-width: 210mm !important;
+                max-width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
                 margin: 0 auto !important;
                 padding: 0 !important;
                 background: #ffffff !important;
                 color: #0f172a !important;
-                direction: rtl !important;
-                text-align: right !important;
-                overflow: visible !important;
+                overflow: hidden !important;
             }
 
             html.qc-print-mode #qc-print-host .cv-print-sheet,
             html.qc-print-mode #qc-print-host #cv-target {
                 display: block !important;
-                width: 100% !important;
-                max-width: none !important;
+                width: 210mm !important;
+                min-width: 210mm !important;
+                max-width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 background: #ffffff !important;
                 color: #0f172a !important;
-                direction: rtl !important;
-                text-align: right !important;
-                overflow: visible !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
                 font-family: var(--cv-font), 'Rubik', sans-serif !important;
+            }
+
+            #cv-preview-wrapper,
+            #cv-target {
+                width: 210mm;
+                height: 297mm;
+                overflow: hidden;
             }
 
             html.qc-print-mode #qc-print-host .cv-columns {
@@ -5365,7 +5379,9 @@
                 direction: ltr !important;
                 text-align: start !important;
                 background: #ffffff !important;
-                min-height: 277mm !important;
+                min-height: 297mm !important;
+                height: 297mm !important;
+                overflow: hidden !important;
             }
             html.qc-print-mode #qc-print-host .layout-charcoal .cv-columns {
                 display: contents !important;

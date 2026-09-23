@@ -5,7 +5,9 @@ const PAGE_W_MM = 210;
 const PAGE_H_MM = 297;
 const A4_CSS_PX = 794;
 const A4_CSS_H = Math.round(A4_CSS_PX * PAGE_H_MM / PAGE_W_MM);
-const MARGIN_MM = 8;
+const MARGIN_MM = 0;
+const PDF_SCALE = 2;
+const PDF_JPEG_QUALITY = 0.98;
 const MAX_CANVAS = 8192;
 
 function getJsPdfCtor() {
@@ -107,17 +109,26 @@ function flattenUnsupportedColors(root, view) {
 
 function prepareCaptureRoot(root, view) {
   const win = view || window;
+  flattenUnsupportedColors(root, win);
   const nodes = [root, ...root.querySelectorAll("*")];
   nodes.forEach((node) => {
     if (!(node instanceof HTMLElement)) return;
-    node.style.overflow = "visible";
-    node.style.overflowX = "visible";
-    node.style.overflowY = "visible";
-    node.style.maxHeight = "none";
-    node.style.textOverflow = "clip";
     node.style.boxShadow = "none";
+    node.style.textOverflow = "clip";
   });
-  flattenUnsupportedColors(root, win);
+  root.style.width = "210mm";
+  root.style.height = "297mm";
+  root.style.minHeight = "297mm";
+  root.style.maxHeight = "297mm";
+  root.style.overflow = "hidden";
+  const sheet = root.querySelector(".cv-print-sheet");
+  if (sheet instanceof HTMLElement) {
+    sheet.style.width = "210mm";
+    sheet.style.height = "297mm";
+    sheet.style.minHeight = "297mm";
+    sheet.style.maxHeight = "297mm";
+    sheet.style.overflow = "hidden";
+  }
 }
 
 function isFullBleedLayout(el) {
@@ -166,15 +177,18 @@ function prepareCaptureClone() {
     position: "fixed",
     left: "0",
     top: "0",
-    width: A4_CSS_PX + "px",
-    minWidth: A4_CSS_PX + "px",
-    maxWidth: A4_CSS_PX + "px",
+    width: "210mm",
+    minWidth: "210mm",
+    maxWidth: "210mm",
+    height: "297mm",
+    minHeight: "297mm",
+    maxHeight: "297mm",
     padding: "0",
     margin: "0",
     background: "#ffffff",
     color: "#0f172a",
     zIndex: "2147483645",
-    overflow: "visible",
+    overflow: "hidden",
     pointerEvents: "none",
     boxSizing: "border-box",
     transform: "none",
@@ -183,13 +197,15 @@ function prepareCaptureClone() {
 
   Object.assign(clone.style, {
     display: "block",
-    width: "100%",
-    maxWidth: "100%",
+    width: "210mm",
+    maxWidth: "210mm",
+    minWidth: "210mm",
     margin: "0",
     padding: fullBleed ? "0" : "28px 44px 36px",
-    minHeight: A4_CSS_H + "px",
-    height: "auto",
-    overflow: "visible",
+    minHeight: "297mm",
+    height: "297mm",
+    maxHeight: "297mm",
+    overflow: "hidden",
     boxSizing: "border-box",
     wordWrap: "break-word",
     overflowWrap: "break-word",
@@ -347,7 +363,7 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, startNewPage 
     first = false;
     const sliceMm = sliceH / pxPerMm;
     pdf.addImage(
-      slice.toDataURL("image/jpeg", 0.95),
+      slice.toDataURL("image/jpeg", PDF_JPEG_QUALITY),
       "JPEG",
       MARGIN_MM,
       MARGIN_MM,
@@ -386,9 +402,9 @@ async function captureToCanvas(el) {
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     let linkMeta = measureLinks(el);
-    const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
-    const height = Math.max(1, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
-    const scale = Math.min(2, MAX_CANVAS / width, MAX_CANVAS / height);
+    const width = A4_CSS_PX;
+    const height = A4_CSS_H;
+    const scale = PDF_SCALE;
 
     const canvas = await html2canvas(el, {
       scale,
@@ -397,10 +413,10 @@ async function captureToCanvas(el) {
       logging: false,
       width,
       height,
-      windowWidth: Math.max(width, A4_CSS_PX),
-      windowHeight: Math.max(height, 400),
+      windowWidth: width,
+      windowHeight: height,
       scrollX: 0,
-      scrollY: -window.scrollY,
+      scrollY: 0,
       imageTimeout: 8000,
       onclone: (doc) => {
         doc.documentElement.setAttribute("dir", "ltr");
@@ -415,13 +431,16 @@ async function captureToCanvas(el) {
             position: "static",
             left: "auto",
             top: "auto",
-            width: A4_CSS_PX + "px",
-            minWidth: A4_CSS_PX + "px",
-            maxWidth: A4_CSS_PX + "px",
+            width: "210mm",
+            minWidth: "210mm",
+            maxWidth: "210mm",
+            height: "297mm",
+            minHeight: "297mm",
+            maxHeight: "297mm",
             padding: "0",
             margin: "0",
             background: "#ffffff",
-            overflow: "visible",
+            overflow: "hidden",
             transform: "none",
             direction: cvCaptureDir(),
           });
@@ -467,7 +486,6 @@ export async function exportHighResPdf() {
     if (document.fonts?.ready) await document.fonts.ready;
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await new Promise((resolve) => setTimeout(resolve, 50));
 
     const captured = await captureToCanvas(host);
     const canvas = captured.canvas;

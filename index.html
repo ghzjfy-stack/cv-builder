@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=a4fill1">
+    <link rel="stylesheet" href="./app.css?v=pdf2">
     <link rel="stylesheet" href="./cro.css?v=formpreview1">
 </head>
 <body class="on-home" id="app-body">
@@ -30,7 +30,7 @@
                     <span class="home-brand-name">QuickCV</span>
                 </button>
                 <div class="home-nav-actions">
-                    <button type="button" class="home-link hidden sm:inline-flex" onclick="openExamplesModal()">דוגמאות</button>
+                    <button type="button" class="home-link hidden sm:inline-flex js-nav-examples" onclick="openExamplesModal()">דוגמאות</button>
                     <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
                 </div>
             </header>
@@ -45,7 +45,7 @@
                     </p>
                     <div class="home-hero-actions">
                         <button type="button" id="home-cta" class="home-cta" onclick="showStudio()">התחילו עכשיו — 10 ₪</button>
-                        <button type="button" class="home-cta-ghost" onclick="openExamplesModal()">דוגמאות</button>
+                        <button type="button" class="home-cta-ghost js-nav-examples" onclick="openExamplesModal()">דוגמאות</button>
                     </div>
                     <nav class="seo-cat-row" aria-label="תבניות לפי תחום">
                         <a class="seo-cat-chip" href="/templates/hi-tech/">הייטק</a>
@@ -368,7 +368,7 @@
                     <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
                     <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
                 </div>
-                <button type="button" onclick="openExamplesModal()" class="text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11">
+                <button type="button" onclick="openExamplesModal()" class="text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11 js-nav-examples">
                     דוגמאות
                 </button>
             </div>
@@ -484,7 +484,7 @@
                             </div>
                         </article>
                     </div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="event.preventDefault(); addExperience(event); return false;">
+                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="event.preventDefault(); if (event.stopPropagation) event.stopPropagation(); return (typeof addExperience === 'function' ? addExperience(event) : false);">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה</span>
                     </button>
@@ -528,18 +528,18 @@
                             <p class="font-bold dynamic-text text-sm" id="label-military">שירות צבאי / לאומי</p>
                         </div>
                         <div id="military-items">
-                            <article class="experience-card entry-card is-open" role="listitem" data-entry-index="0">
+                            <article class="experience-card entry-card is-open" role="listitem" data-entry-id="military-seed-0" data-entry-index="0">
                                 <div class="experience-card-toolbar">
                                     <span class="experience-card-badge">שירות 1</span>
                                 </div>
                                 <div class="experience-card-fields">
                                     <div class="experience-field">
                                         <label class="experience-field-label">תפקיד / מסגרת</label>
-                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
+                                        <input type="text" name="role" data-entry-title="1" data-entry-field="position" value="" oninput="updateMilitary('role', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
                                     </div>
                                     <div class="experience-field">
                                         <label class="experience-field-label">פירוט קצר / שנים</label>
-                                        <input type="text" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
+                                        <input type="text" name="dates" data-entry-dates="1" data-entry-field="years" value="" oninput="updateMilitary('dates', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
                                     </div>
                                 </div>
                             </article>
@@ -1025,14 +1025,14 @@
     <script src="lib/security/sanitize.js"></script>
     <script src="lib/security/log.js"></script>
     <script src="lib/security/rateLimit.js"></script>
-    <script src="lib/draft.js"></script>
+    <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=bind2"></script>
-    <script src="lib/entryEditor.js?v=bind2"></script>
+    <script src="lib/experienceEditor.js?v=lang1"></script>
+    <script src="lib/entryEditor.js?v=lang1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
-    <script src="lib/export.js"></script>
+    <script src="lib/export.js?v=pdf2"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
     <script src="lib/seoLandings.js"></script>
     <script src="lib/seoPresets.js"></script>
@@ -1184,14 +1184,14 @@
                 'in-languages': 'עברית (שפת אם), אנגלית (מקצועית)'
             },
             en: {
-                'in-name': 'Israel Israeli',
-                'in-title': 'Product Manager',
+                'in-name': 'Jonathan Eshel',
+                'in-title': 'Project Manager',
                 'in-phone': '050-1234567',
-                'in-email': 'israel@example.com',
+                'in-email': 'jonathan.eshel@example.com',
                 'in-location': 'Tel Aviv',
-                'in-linkedin': 'linkedin.com/in/israel',
-                'in-summary': 'Product manager experienced in roadmaps, feature launches, and partnering with engineering, design, and sales.',
-                'in-experience': '2021 - Present | Product Manager\nVerde Commerce\n• Defined the roadmap and shipped features that grew usage by 35%.\n• Led product and partnered with engineering and sales.\n\n2018 - 2021 | Project Manager\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
+                'in-linkedin': 'linkedin.com/in/jonathan-eshel',
+                'in-summary': 'Project manager experienced in leading teams, shipping roadmaps, and partnering with engineering, design, and sales.',
+                'in-experience': '2021 - Present | Project Manager\nVerde Commerce\n• Defined the roadmap and shipped features that grew usage by 35%.\n• Led cross-functional teams and partnered with engineering and sales.\n\n2018 - 2021 | Project Coordinator\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
                 'in-education': '2015 - 2018 | BA in Business Administration\nTel Aviv University\n\n2019 | Product Management Course',
                 'in-military': '2012 - 2015 | Command role in the Israeli Air Force',
                 'in-skills': 'Team leadership, CRM, Advanced Excel',
@@ -1288,6 +1288,7 @@
                 compareLead: 'במקום מסמך Word עמוס ומבולגן – קורות חיים קריאים, מותאמים למערכות סינון (ATS) ומשדרים מקצועיות מהשנייה הראשונה.',
                 compareBefore: 'לפני (Word)',
                 compareAfter: 'אחרי (QuickCV)',
+                navExamples: 'דוגמאות',
                 homeNavCta: 'צור קורות חיים',
                 craftKicker: 'תבניות ועיצובים',
                 step3: 'משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.',
@@ -1300,8 +1301,8 @@
                 titleFallback: 'Job title',
                 detailsHeading: 'Personal details',
                 detailsHeadingHint: '(empty fields stay hidden)',
-                phName: 'e.g. Israel Israeli',
-                phTitle: 'e.g. Project manager',
+                phName: 'e.g. Jonathan Eshel',
+                phTitle: 'e.g. Project Manager',
                 phLocation: 'e.g. Tel Aviv',
                 phSummary: 'e.g. Project manager experienced in leading teams and growing revenue',
                 phSkills: 'e.g. Team leadership, CRM, Advanced Excel',
@@ -1382,6 +1383,7 @@
                 compareLead: 'Instead of a crowded, messy Word file — a readable CV that passes ATS scans and looks professional from the first second.',
                 compareBefore: 'Before (Word)',
                 compareAfter: 'After (QuickCV)',
+                navExamples: 'Examples',
                 homeNavCta: 'Create CV',
                 craftKicker: 'Templates & designs',
                 step3: 'Pay only 10 ₪ in Bit and instantly download a professional PDF.',
@@ -1611,6 +1613,27 @@
             document.querySelectorAll('.experience-present-btn').forEach((btn) => {
                 btn.textContent = en ? 'Present' : 'נוכחי';
             });
+            document.querySelectorAll('#experience-items .experience-field').forEach((wrap) => {
+                const caption = wrap.querySelector('.experience-field-label');
+                if (!caption) return;
+                if (wrap.querySelector('[data-job-employer]')) caption.textContent = en ? 'Company' : 'שם חברה/ארגון';
+                else if (wrap.querySelector('[data-job-role]')) caption.textContent = en ? 'Job title' : 'תפקיד';
+                else if (wrap.querySelector('[data-job-dates]')) caption.textContent = en ? 'Dates / years' : 'תאריכים/שנים';
+                else if (wrap.querySelector('[data-job-desc]')) caption.textContent = en ? 'Role description / achievements' : 'תיאור תפקיד / הישגים';
+            });
+            document.querySelectorAll('#education-items .experience-field').forEach((wrap) => {
+                const caption = wrap.querySelector('.experience-field-label');
+                if (!caption) return;
+                if (wrap.querySelector('[data-entry-org]')) caption.textContent = en ? 'Institution' : 'מוסד לימודים';
+                else if (wrap.querySelector('[data-entry-title]')) caption.textContent = en ? 'Degree / certificate / major' : 'תואר / תעודה / מגמה';
+                else if (wrap.querySelector('[data-entry-dates]')) caption.textContent = en ? 'Years' : 'שנים/שנת סיום';
+            });
+            document.querySelectorAll('#military-items .experience-field').forEach((wrap) => {
+                const caption = wrap.querySelector('.experience-field-label');
+                if (!caption) return;
+                if (wrap.querySelector('[data-entry-title], [name="role"]')) caption.textContent = en ? 'Role' : 'תפקיד / מסגרת';
+                else if (wrap.querySelector('[data-entry-dates], [name="dates"]')) caption.textContent = en ? 'Dates / years' : 'פירוט קצר / שנים';
+            });
         }
 
         function applyCvI18n(lang) {
@@ -1717,6 +1740,9 @@
             document.querySelectorAll('.home-nav-cta').forEach((el) => {
                 if (pack.homeNavCta) el.textContent = pack.homeNavCta;
             });
+            document.querySelectorAll('.js-nav-examples').forEach((el) => {
+                el.textContent = pack.navExamples || (lang === 'en' ? 'Examples' : 'דוגמאות');
+            });
             document.documentElement.style.setProperty('--qc-selected-tpl', JSON.stringify(pack.selectedTpl || '✓ נבחר'));
             const themeNames = THEME_NAMES[lang] || THEME_NAMES.he;
             const accentLabel = document.getElementById('accent-label');
@@ -1754,8 +1780,8 @@
             const skillsEl = document.getElementById('in-skills');
             const refsEl = document.getElementById('in-references');
             const linkedinEl = document.getElementById('in-linkedin');
-            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Israel Israeli' : 'לדוגמה: ישראל ישראלי');
-            if (titleEl) titleEl.placeholder = pack.phTitle || (lang === 'en' ? 'e.g. Project manager' : 'לדוגמה: מנהל פרויקטים');
+            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Jonathan Eshel' : 'לדוגמה: ישראל ישראלי');
+            if (titleEl) titleEl.placeholder = pack.phTitle || (lang === 'en' ? 'e.g. Project Manager' : 'לדוגמה: מנהל פרויקטים');
             if (locEl) locEl.placeholder = pack.phLocation || (lang === 'en' ? 'e.g. Tel Aviv' : 'לדוגמה: תל אביב');
             if (summaryEl) summaryEl.placeholder = pack.phSummary || (lang === 'en' ? 'e.g. Project manager experienced in leading teams' : 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים');
             if (skillsEl && pack.phSkills) skillsEl.placeholder = pack.phSkills;

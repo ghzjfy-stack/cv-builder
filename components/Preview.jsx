@@ -185,11 +185,19 @@ export default function Preview({
                     </p>
                   )}
 
-                  {/* Bullet descriptions underneath */}
+                  {/* Bullet descriptions underneath — RTL-safe indent so markers don't touch Hebrew text */}
                   {job.descriptions?.length > 0 && (
-                    <ul className="cv-job-list list-disc mt-2 space-y-1 ps-5 text-sm text-slate-700">
+                    <ul
+                      className="cv-job-list list-disc list-outside mt-2 text-sm text-slate-700"
+                      style={{ paddingInlineStart: '1.25rem' }}
+                    >
                       {job.descriptions.map((desc, dIdx) => (
-                        <li key={dIdx}>{desc}</li>
+                        <li
+                          key={dIdx}
+                          style={{ paddingInlineStart: '1.25rem', marginBottom: '0.25rem' }}
+                        >
+                          {desc}
+                        </li>
                       ))}
                     </ul>
                   )}
@@ -220,9 +228,17 @@ export default function Preview({
 
                   {/* Bullet descriptions underneath (if any) */}
                   {edu.descriptions?.length > 0 && (
-                    <ul className="cv-edu-list list-disc mt-2 space-y-1 ps-5 text-sm text-slate-700">
+                    <ul
+                      className="cv-edu-list list-disc list-outside mt-2 text-sm text-slate-700"
+                      style={{ paddingInlineStart: '1.25rem' }}
+                    >
                       {edu.descriptions.map((desc, dIdx) => (
-                        <li key={dIdx}>{desc}</li>
+                        <li
+                          key={dIdx}
+                          style={{ paddingInlineStart: '1.25rem', marginBottom: '0.25rem' }}
+                        >
+                          {desc}
+                        </li>
                       ))}
                     </ul>
                   )}
@@ -248,9 +264,17 @@ export default function Preview({
 
                     {/* Bullet descriptions underneath (if any) */}
                     {mil.descriptions?.length > 0 && (
-                      <ul className="cv-military-list list-disc mt-2 space-y-1 ps-5 text-sm text-slate-700">
+                      <ul
+                        className="cv-military-list list-disc list-outside mt-2 text-sm text-slate-700"
+                        style={{ paddingInlineStart: '1.25rem' }}
+                      >
                         {mil.descriptions.map((desc, dIdx) => (
-                          <li key={dIdx}>{desc}</li>
+                          <li
+                            key={dIdx}
+                            style={{ paddingInlineStart: '1.25rem', marginBottom: '0.25rem' }}
+                          >
+                            {desc}
+                          </li>
                         ))}
                       </ul>
                     )}

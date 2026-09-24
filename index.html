@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui6">
+    <link rel="stylesheet" href="./app.css?v=exp-ui9">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -1888,7 +1888,8 @@
             setLabel('step-3-label', pack.stepDownload);
             setLabel('btn-continue-design', pack.continueDesign);
             setLabel('btn-continue-details', pack.continueDownload);
-            setLabel('mobile-continue-label', pack.continueDesignShort);
+            if (typeof syncStudioStepChrome === 'function') syncStudioStepChrome();
+            else setLabel('mobile-continue-label', pack.continueDesignShort);
             setLabel('btn-switch-template-label', pack.switchTemplate);
             setLabel('btn-quick-design-label', pack.quickDesign);
             setLabel('studio-back-home', pack.backHome);
@@ -4243,10 +4244,38 @@
         function syncStudioStepChrome() {
             const step = window.QCStudioStep || 1;
             const continueBtn = document.getElementById('btn-mobile-continue');
+            const continueLabel = document.getElementById('mobile-continue-label');
             const downloadBtn = document.getElementById('btn-download-pdf-mobile');
-            const onDetails = step === 1;
-            if (continueBtn) continueBtn.hidden = !onDetails;
-            if (downloadBtn) downloadBtn.classList.toggle('qc-step-hidden', onDetails);
+            const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || CV_I18N.he;
+            const onDesign = step === 1;
+            const onDetails = step === 2;
+            const onDownload = step === 3;
+
+            // Step 1 + 2: primary continue CTA. Step 3: PDF payment only.
+            if (continueBtn) {
+                continueBtn.hidden = onDownload;
+                continueBtn.classList.toggle('qc-step-hidden', onDownload);
+                if (onDesign) {
+                    continueBtn.setAttribute('onclick', 'goStep(2)');
+                    continueBtn.onclick = function () { goStep(2); };
+                } else if (onDetails) {
+                    continueBtn.setAttribute('onclick', 'goStep(3)');
+                    continueBtn.onclick = function () { goStep(3); };
+                }
+            }
+            if (continueLabel) {
+                const he = window.QCCvLang !== 'en';
+                continueLabel.setAttribute('dir', he ? 'rtl' : 'ltr');
+                if (onDesign) {
+                    continueLabel.textContent = pack.continueDesignShort || pack.continueDesign || (he ? 'המשך למילוי פרטים ⬅️' : 'Continue to details →');
+                } else if (onDetails) {
+                    continueLabel.textContent = pack.continueDownload || (he ? 'המשך להורדה ⬅️' : 'Continue to download →');
+                }
+            }
+            if (downloadBtn) {
+                downloadBtn.hidden = !onDownload;
+                downloadBtn.classList.toggle('qc-step-hidden', !onDownload);
+            }
             if (typeof syncMobilePayLabel === 'function') syncMobilePayLabel();
             if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
         }

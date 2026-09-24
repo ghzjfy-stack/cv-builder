@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useFormData } from './FormDataContext';
+import FooterNav from './FooterNav';
 
 /**
  * DetailsStep — Step 2 experience + education form.
@@ -452,6 +453,8 @@ export default function DetailsStep({
           {isEnglish ? 'Add Another Education' : 'הוסף השכלה נוספת'}
         </button>
       </section>
+
+      <FooterNav step={2} isEnglish={isEnglish} className="pt-2" />
     </div>
   );
 }

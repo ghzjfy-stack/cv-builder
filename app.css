@@ -3516,6 +3516,7 @@
         body.qc-studio-step-1 #btn-download-pdf-mobile,
         body.qc-studio-step-1 #btn-download-pdf,
         body.qc-studio-step-1 #form-pay-guarantee,
+        body.qc-studio-step-2:not(.qc-studio-step-3) #btn-download-pdf-mobile,
         #btn-download-pdf-mobile.qc-step-hidden {
             display: none !important;
         }
@@ -3541,7 +3542,9 @@
             transform: none;
             filter: none;
         }
-        body:not(.qc-studio-step-1) #btn-mobile-continue {
+        /* Mobile continue CTA on Design (1) and Details (2); hidden on Download (3). */
+        body.qc-studio-step-3 #btn-mobile-continue,
+        #btn-mobile-continue.qc-step-hidden {
             display: none !important;
         }
         body.qc-studio-step-1 .preview-switch-tpl,

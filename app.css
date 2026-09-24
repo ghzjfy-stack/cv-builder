@@ -90,7 +90,7 @@
         .studio-social {
             flex-shrink: 0;
             /* Banner text must not steal clicks from form controls that scroll beneath it. */
-            pointer-events: none;
+            pointer-events: none !important;
         }
         .studio-social a,
         .studio-social button {

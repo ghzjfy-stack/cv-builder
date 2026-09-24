@@ -1,10 +1,135 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useFormData } from './FormDataContext';
 
 /**
  * DetailsStep — Step 2 experience + education form.
  * Reads/writes the shared form state via FormDataContext (backed by window.QCCvData).
  */
+
+const JOB_SUGGESTIONS = {
+  he: [
+    {
+      id: 'sales',
+      label: 'מכירות ושירות',
+      bullets: [
+        'ניהול שוטף של קשרי לקוחות והגדלת מחזור המכירות ב-25%',
+        'עמידה ביעדים חודשיים וזיהוי הזדמנויות מכירה נוספות',
+        'טיפול בפניות לקוחות מורכבות ושמירה על שביעות רצון גבוהה',
+      ],
+    },
+    {
+      id: 'ops',
+      label: 'ניהול ותפעול',
+      bullets: [
+        'ניהול צוות של 8 עובדים והובלת תהליכי עבודה יומיומיים',
+        'שיפור תהליכים תפעוליים והפחתת זמני טיפול ב-20%',
+        'עבודה תחת לחץ ופתרון בעיות בזמן אמת',
+      ],
+    },
+    {
+      id: 'admin',
+      label: 'אדמיניסטרציה',
+      bullets: [
+        'ניהול יומן, התכתבות ותיעוד שוטף מול לקוחות וספקים',
+        'הפקת דוחות, הזמנות ורכישות ותפעול משרד מקצה לקצה',
+        'קליטת עובדים חדשים ותמיכה במנהלים בפרויקטים שוטפים',
+      ],
+    },
+    {
+      id: 'support',
+      label: 'תמיכה טכנית',
+      bullets: [
+        'טיפול בפניות תמיכה ואבחון תקלות עד לפתרון מלא',
+        'תיעוד תהליכים ושיפור זמני מענה לפי SLA',
+        'הדרכת משתמשים והעברת משוב לצוות המוצר',
+      ],
+    },
+    {
+      id: 'tech',
+      label: 'הייטק / פיתוח',
+      bullets: [
+        "פיתוח פיצ'רים במערכת SaaS מקצה לקצה",
+        'שיפור ביצועים ויציבות בשיתוף צוות המוצר',
+        'כתיבת בדיקות, תיעוד והעברת ידע לצוות',
+      ],
+    },
+  ],
+  en: [
+    {
+      id: 'sales',
+      label: 'Sales & service',
+      bullets: [
+        'Managed ongoing client relationships and grew sales volume by 25%',
+        'Hit monthly targets and spotted extra sales opportunities',
+        'Handled complex customer cases while keeping satisfaction high',
+      ],
+    },
+    {
+      id: 'ops',
+      label: 'Ops & management',
+      bullets: [
+        'Led a team of 8 and ran day-to-day operations',
+        'Improved processes and reduced handling time by 20%',
+        'Solved problems in real time under pressure',
+      ],
+    },
+    {
+      id: 'admin',
+      label: 'Administration',
+      bullets: [
+        'Ran calendars, correspondence, and records with clients and vendors',
+        'Prepared reports, orders, and end-to-end office operations',
+        'Onboarded new hires and supported managers on live projects',
+      ],
+    },
+    {
+      id: 'support',
+      label: 'Tech support',
+      bullets: [
+        'Handled support tickets and diagnosed issues through to a full fix',
+        'Documented processes and improved response times against SLA',
+        'Trained users and fed product feedback back to the team',
+      ],
+    },
+    {
+      id: 'tech',
+      label: 'Hi-tech / engineering',
+      bullets: [
+        'Built end-to-end features in a SaaS product',
+        'Improved performance and reliability with product partners',
+        'Wrote tests, docs, and shared knowledge across the team',
+      ],
+    },
+  ],
+};
+
+function bulletsToSnippet(bullets) {
+  return (bullets || [])
+    .map((b) => String(b || '').trim())
+    .filter(Boolean)
+    .map((b) => `• ${b}`)
+    .join('\n');
+}
+
+/** Remove an exact bullet snippet from description; tidy leftover blank lines. */
+function removeSnippet(description, snippet) {
+  if (!snippet) return description || '';
+  let next = String(description || '');
+  const idx = next.indexOf(snippet);
+  if (idx === -1) return next;
+  next = `${next.slice(0, idx)}${next.slice(idx + snippet.length)}`;
+  return next
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\n+/, '')
+    .replace(/\n+$/, '');
+}
+
+function appendSnippet(description, snippet) {
+  const current = String(description || '').replace(/\s+$/, '');
+  if (!snippet) return current;
+  if (current.includes(snippet)) return current;
+  return current ? `${current}\n${snippet}` : snippet;
+}
 
 function TrashIcon({ className = 'h-3.5 w-3.5' }) {
   return (
@@ -22,6 +147,23 @@ function TrashIcon({ className = 'h-3.5 w-3.5' }) {
       <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
       <path d="M10 11v6M14 11v6" />
       <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  );
+}
+
+function CheckIcon({ className = 'h-3 w-3' }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
@@ -56,6 +198,11 @@ export default function DetailsStep({
   const education = Array.isArray(formData.education) ? formData.education.slice() : [];
   const formRev = formData._formRev || `${experience.length}-${education.length}`;
 
+  const suggestions = useMemo(
+    () => JOB_SUGGESTIONS[isEnglish ? 'en' : 'he'] || JOB_SUGGESTIONS.he,
+    [isEnglish]
+  );
+
   const removeExperience = useCallback(
     (idToDelete) => {
       setFormData((prev) => ({
@@ -75,6 +222,28 @@ export default function DetailsStep({
             ? { ...item, [field]: value == null ? '' : String(value) }
             : item
         ),
+      }));
+    },
+    [setFormData]
+  );
+
+  const toggleSuggestion = useCallback(
+    (jobId, suggestion) => {
+      if (!jobId || !suggestion) return;
+      const snippet = bulletsToSnippet(suggestion.bullets);
+      setFormData((prev) => ({
+        ...prev,
+        experience: (prev.experience || []).map((item) => {
+          if (!item || item.id !== jobId) return item;
+          const description = String(item.description || '');
+          const isActive = snippet && description.includes(snippet);
+          return {
+            ...item,
+            description: isActive
+              ? removeSnippet(description, snippet)
+              : appendSnippet(description, snippet),
+          };
+        }),
       }));
     },
     [setFormData]
@@ -165,6 +334,33 @@ export default function DetailsStep({
                   value={description}
                   onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
                 />
+                <div className="experience-presets pt-1">
+                  <p className="experience-presets-title mb-1.5 text-[11px] font-bold text-slate-400">
+                    {isEnglish ? 'Examples' : 'דוגמאות'}
+                  </p>
+                  <div className="experience-preset-row flex flex-wrap gap-1.5" role="group">
+                    {suggestions.map((suggestion) => {
+                      const snippet = bulletsToSnippet(suggestion.bullets);
+                      const isActive = !!(snippet && description.includes(snippet));
+                      return (
+                        <button
+                          key={suggestion.id}
+                          type="button"
+                          className={`experience-preset-chip inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                            isActive
+                              ? 'is-active border-teal-400/70 bg-teal-500/20 text-teal-100'
+                              : 'border-slate-600 bg-slate-900/50 text-slate-300 hover:border-teal-500/50 hover:text-teal-100'
+                          }`}
+                          aria-pressed={isActive}
+                          onClick={() => toggleSuggestion(exp.id, suggestion)}
+                        >
+                          {isActive ? <CheckIcon /> : null}
+                          <span>{suggestion.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </article>
           );

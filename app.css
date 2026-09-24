@@ -4422,7 +4422,22 @@
             z-index: 2;
         }
         .experience-item-remove { min-width: 2.5rem; }
-        #experience-items { display: grid; gap: 0.6rem; padding-bottom: 20px; }
+        #experience-items,
+        #education-items { display: grid; gap: 0.6rem; padding-bottom: 20px; min-height: 4rem; }
+        #experience-section,
+        #education-section {
+            position: relative;
+            z-index: 14;
+            isolation: isolate;
+        }
+        #experience-items input,
+        #experience-items textarea,
+        #education-items input,
+        #education-items textarea {
+            position: relative;
+            z-index: 18;
+            pointer-events: auto !important;
+        }
         .section-editor-head {
             display: flex;
             align-items: baseline;

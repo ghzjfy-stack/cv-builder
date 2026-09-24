@@ -4682,8 +4682,14 @@
         #education-section > #btn-add-education,
         #experience-section > #btn-add-experience {
             position: relative;
-            z-index: 30;
+            z-index: 80 !important;
             margin-top: 0.55rem;
+            pointer-events: auto !important;
+        }
+        #experience-items,
+        #education-items {
+            position: relative;
+            z-index: 1;
         }
         #btn-add-military,
         #military-section > #btn-add-military {

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=preview-step3">
+    <link rel="stylesheet" href="./app.css?v=add-click1">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
 </head>
 <body class="on-home" id="app-body">
@@ -485,7 +485,7 @@
                             </div>
                         </article>
                     </div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="event.preventDefault(); (window.QCExperience && QCExperience.addExperience ? QCExperience.addExperience(event) : (window.addExperience ? window.addExperience(event) : false)); return false;">
+                    <button type="button" id="btn-add-experience" class="section-add-btn">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                     </button>
@@ -518,7 +518,7 @@
                                 </div>
                             </article>
                         </div>
-                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="event.preventDefault(); addEducation(); return false;">
+                        <button type="button" id="btn-add-education" class="section-add-btn">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                             <span id="btn-add-education-label">הוסף השכלה נוספת</span>
                         </button>
@@ -1028,8 +1028,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=add7"></script>
-    <script src="lib/entryEditor.js?v=add7"></script>
+    <script src="lib/experienceEditor.js?v=add8"></script>
+    <script src="lib/entryEditor.js?v=add8"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>

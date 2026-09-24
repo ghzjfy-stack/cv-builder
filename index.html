@@ -491,11 +491,11 @@
                                 <div class="experience-card-fields">
                                     <div class="experience-field">
                                         <label class="experience-field-label">תפקיד / מסגרת</label>
-                                        <input type="text" name="role" data-entry-title="1" data-entry-field="position" value="" oninput="updateMilitary('role', this.value)" onchange="updateMilitary('role', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
+                                        <input type="text" id="in-military-role" name="role" data-entry-title="1" data-entry-field="position" value="" autocomplete="off" oninput="updateMilitary('role', this.value)" onchange="updateMilitary('role', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
                                     </div>
                                     <div class="experience-field">
                                         <label class="experience-field-label">פירוט קצר / שנים</label>
-                                        <input type="text" name="dates" data-entry-dates="1" data-entry-field="years" value="" oninput="updateMilitary('years', this.value)" onchange="updateMilitary('years', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
+                                        <input type="text" id="in-military-years" name="dates" data-entry-dates="1" data-entry-field="years" value="" autocomplete="off" oninput="updateMilitary('years', this.value)" onchange="updateMilitary('years', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
                                     </div>
                                 </div>
                             </article>
@@ -984,7 +984,7 @@
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
     <script src="lib/experienceEditor.js?v=arr1"></script>
-    <script src="lib/entryEditor.js?v=arr1"></script>
+    <script src="lib/entryEditor.js?v=mil5"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1042,6 +1042,16 @@
             if (window.QCMilitary && typeof QCMilitary.updateMilitary === 'function') {
                 return QCMilitary.updateMilitary(field, value);
             }
+            const roleEl = document.getElementById('in-military-role');
+            const yearsEl = document.getElementById('in-military-years');
+            window.QCCvData = window.QCCvData || {};
+            const prev = (QCCvData.military && typeof QCCvData.military === 'object' && !Array.isArray(QCCvData.military))
+                ? QCCvData.military
+                : { role: '', years: '' };
+            const role = field === 'years' || field === 'dates' ? (prev.role || (roleEl && roleEl.value) || '') : (value == null ? '' : String(value));
+            const years = field === 'years' || field === 'dates' ? (value == null ? '' : String(value)) : (prev.years || (yearsEl && yearsEl.value) || '');
+            QCCvData.military = (String(role).trim() || String(years).trim()) ? { role: String(role).trim(), years: String(years).trim() } : null;
+            if (typeof updateCV === 'function') updateCV();
         };
         window.toggleEducationRaw = function (e) {
             if (e && e.preventDefault) e.preventDefault();
@@ -1839,8 +1849,19 @@
             return CV_SAMPLE_IDS.map((id) => String(sample[id] || '').replace(/\r\n/g, '\n').trim()).join('\n---\n');
         }
 
+        function readMilitaryInputs() {
+            const roleEl = document.getElementById('in-military-role') || document.querySelector('#military-items [name="role"], #military-items [data-entry-title]');
+            const yearsEl = document.getElementById('in-military-years') || document.querySelector('#military-items [name="dates"], #military-items [data-entry-dates]');
+            return {
+                role: String((roleEl && roleEl.value) || '').trim(),
+                years: String((yearsEl && yearsEl.value) || '').trim()
+            };
+        }
+
         function isCvFieldsEmpty() {
-            return CV_SAMPLE_IDS.every((id) => !(formField(id)?.value || '').trim());
+            if (!CV_SAMPLE_IDS.every((id) => !(formField(id)?.value || '').trim())) return false;
+            const mil = readMilitaryInputs();
+            return !(mil.role || mil.years);
         }
 
         function shouldSwapCvSample(prevLang) {
@@ -1908,6 +1929,8 @@
         }
 
         function militaryFromState() {
+            const typedInputs = readMilitaryInputs();
+            if (typedInputs.role || typedInputs.years) return typedInputs;
             const data = window.QCCvData && QCCvData.military;
             if (data && !Array.isArray(data) && (String(data.role || '').trim() || String(data.years || '').trim())) {
                 return { role: String(data.role || '').trim(), years: String(data.years || '').trim() };
@@ -2005,6 +2028,14 @@
                 const el = formField(id);
                 if (el && isSampleFieldValue(id, el.value)) el.value = '';
             });
+            const milRole = document.getElementById('in-military-role');
+            const milYears = document.getElementById('in-military-years');
+            const milCombo = [milYears && milYears.value, milRole && milRole.value].filter(Boolean).join(' | ');
+            if (isSampleFieldValue('in-military', milCombo)) {
+                if (milRole) milRole.value = '';
+                if (milYears) milYears.value = '';
+            }
+            if (window.QCCvData) QCCvData.military = null;
             if (typeof hydrateLanguagePicker === 'function') hydrateLanguagePicker();
             refreshSectionEditors();
             if (isCvFieldsEmpty()) {

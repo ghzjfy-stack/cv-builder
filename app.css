@@ -4581,8 +4581,20 @@
             color: #38bdf8 !important;
             border-color: #0284c7 !important;
         }
-        #education-section,
-        #military-section,
+        #education-section {
+            overflow: visible;
+            position: relative;
+            z-index: 6;
+            isolation: isolate;
+            pointer-events: auto !important;
+        }
+        #military-section {
+            overflow: visible;
+            position: relative;
+            z-index: 16;
+            isolation: isolate;
+            pointer-events: auto !important;
+        }
         .section-editor {
             overflow: visible;
             position: relative;
@@ -4595,6 +4607,12 @@
             gap: 0.6rem;
             padding-bottom: 20px;
             pointer-events: auto !important;
+        }
+        #military-items input,
+        #military-items textarea {
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 18;
         }
         textarea.experience-raw-hidden,
         #in-experience.experience-raw-hidden,

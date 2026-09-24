@@ -14,9 +14,10 @@ export default function DetailsStep({
   const isEnglish = isEnglishProp !== undefined ? Boolean(isEnglishProp) : language === 'en';
   const dir = isEnglish ? 'ltr' : 'rtl';
   const { formData, setFormData, addExperience, addEducation } = useFormData();
-  const experience = Array.isArray(formData.experience) ? formData.experience : [];
-  const education = Array.isArray(formData.education) ? formData.education : [];
-  const formRev = formData._formRev || experience.length + education.length;
+  // Always read fresh array copies so React sees new references after add.
+  const experience = Array.isArray(formData.experience) ? formData.experience.slice() : [];
+  const education = Array.isArray(formData.education) ? formData.education.slice() : [];
+  const formRev = formData._formRev || `${experience.length}-${education.length}`;
 
   const removeExperience = useCallback(
     (idToDelete) => {

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui3">
+    <link rel="stylesheet" href="./app.css?v=exp-ui4">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -69,17 +69,75 @@
         window.addExperience = function (e) { return window.__qcClickAddJob(e); };
         window.handleAddJob = window.addExperience;
         window.addExperienceJob = window.addExperience;
-        /* Capture-phase: never depends on later scripts wiring the button. */
+
+        /* Early stub for education — same pattern as jobs (works if entryEditor 404s). */
+        window.__qcClickAddEducation = window.__qcClickAddEducation || function (e) {
+            try {
+                if (e && e.preventDefault) e.preventDefault();
+                if (e && e.stopPropagation) e.stopPropagation();
+                if (window.QCEducation && typeof QCEducation.addItem === 'function') {
+                    try { return QCEducation.addItem(e || { __qcForceAdd: true }); } catch (err0) { /* fall through */ }
+                }
+                var host = document.getElementById('education-items');
+                if (!host) return false;
+                var n = host.querySelectorAll('.experience-card, .entry-card').length + 1;
+                var id = 'education-fallback-' + Date.now();
+                var card = document.createElement('article');
+                card.className = 'experience-card entry-card is-open is-just-added';
+                card.setAttribute('role', 'listitem');
+                card.setAttribute('data-entry-id', id);
+                card.setAttribute('data-entry-index', String(n - 1));
+                card.innerHTML =
+                    '<div class="experience-card-toolbar"><span class="experience-card-badge">השכלה ' + n + '</span></div>' +
+                    '<div class="experience-card-fields">' +
+                    '<div class="experience-field"><label class="experience-field-label">מוסד לימודים</label>' +
+                    '<input type="text" data-entry-org="1" data-entry-field="company" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
+                    '<div class="experience-field"><label class="experience-field-label">תואר / תעודה / מגמה</label>' +
+                    '<input type="text" data-entry-title="1" data-entry-field="position" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
+                    '<div class="experience-field"><label class="experience-field-label">שנים/שנת סיום</label>' +
+                    '<input type="text" data-entry-dates="1" data-entry-field="years" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
+                    '</div>';
+                host.appendChild(card);
+                var status = document.getElementById('education-add-status');
+                if (status) {
+                    status.textContent = 'השכלה ' + n + ' ✓';
+                    status.classList.add('is-visible');
+                }
+                try { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (err) {}
+                window.QCCvData = window.QCCvData || {};
+                if (!Array.isArray(QCCvData.education)) QCCvData.education = [];
+                QCCvData.education.push({ id: id, institution: '', degree: '', dates: '' });
+                if (typeof window.updateCV === 'function') {
+                    try { window.updateCV(); } catch (errU) {}
+                }
+                return false;
+            } catch (err) {
+                try { console.error('__qcClickAddEducation stub failed', err); } catch (e2) {}
+                return false;
+            }
+        };
+        window.addEducation = function (e) { return window.__qcClickAddEducation(e); };
+        window.handleAddEducation = window.addEducation;
+
+        /* Capture-phase for both add buttons — never depends on later scripts. */
         if (!window.__qcAddJobCaptureBound) {
             window.__qcAddJobCaptureBound = true;
             document.addEventListener('click', function (e) {
                 var t = e && e.target;
                 if (!t || !t.closest) return;
-                var btn = t.closest('#btn-add-experience, [data-qc-add-job="1"]');
-                if (!btn) return;
-                e.preventDefault();
-                e.stopPropagation();
-                window.__qcClickAddJob(e);
+                var jobBtn = t.closest('#btn-add-experience, [data-qc-add-job="1"]');
+                if (jobBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.__qcClickAddJob(e);
+                    return;
+                }
+                var eduBtn = t.closest('#btn-add-education, [data-qc-add-education="1"]');
+                if (eduBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.__qcClickAddEducation(e);
+                }
             }, true);
         }
     </script>
@@ -588,10 +646,13 @@
                                 </div>
                             </article>
                         </div>
-                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="return window.handleAddEducation ? window.handleAddEducation(event) : false;">
-                            <span class="experience-add-icon" aria-hidden="true">+</span>
-                            <span id="btn-add-education-label">הוסף השכלה נוספת</span>
-                        </button>
+                        <p id="education-add-status" class="experience-add-status" role="status" aria-live="polite"></p>
+                        <div class="exp-add-form">
+                            <button type="button" id="btn-add-education" class="exp-add-bar" data-qc-add-education="1" onclick="return window.__qcClickAddEducation(event)">
+                                <span class="exp-add-bar-plus" aria-hidden="true">+</span>
+                                <span id="btn-add-education-label">הוסף השכלה נוספת</span>
+                            </button>
+                        </div>
                         <textarea id="in-education" rows="3" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                     </div>
                     <div class="space-y-2 relative section-editor" id="military-section">
@@ -1098,9 +1159,9 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=exp-ui3"></script>
-    <script src="lib/addJobBoot.js?v=exp-ui3"></script>
-    <script src="lib/entryEditor.js?v=exp-ui3"></script>
+    <script src="lib/experienceEditor.js?v=exp-ui4"></script>
+    <script src="lib/addJobBoot.js?v=exp-ui4"></script>
+    <script src="lib/entryEditor.js?v=exp-ui4"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1141,9 +1202,9 @@
             return false;
         };
         window.handleAddEducation = function (e) {
-            if (e && e.preventDefault) e.preventDefault();
-            if (window.QCEducation && typeof QCEducation.addItem === 'function') return QCEducation.addItem(e);
-            return false;
+            return window.__qcClickAddEducation
+                ? window.__qcClickAddEducation(e)
+                : (window.QCEducation && typeof QCEducation.addItem === 'function' ? QCEducation.addItem(e) : false);
         };
         window.addEducation = window.handleAddEducation;
         window.handleEducationChange = function (id, field, value) {
@@ -5478,9 +5539,9 @@
         syncMobilePreviewToggle();
         setPreviewBg('bg-preview-white', null, { silent: true });
         window.addEducation = function (e) {
-            if (e && e.preventDefault) e.preventDefault();
-            if (window.QCEducation && typeof QCEducation.addItem === 'function') return QCEducation.addItem(e);
-            return false;
+            return window.__qcClickAddEducation
+                ? window.__qcClickAddEducation(e)
+                : (window.QCEducation && typeof QCEducation.addItem === 'function' ? QCEducation.addItem(e) : false);
         };
         window.handleAddEducation = window.addEducation;
     </script>

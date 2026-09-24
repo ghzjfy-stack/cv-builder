@@ -199,6 +199,16 @@
     color: var(--azure-muted);
     padding: 0;
 }
+.layout-azure .cv-skill-badges {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0.1rem -0.125rem;
+}
+.layout-azure .cv-skill-badge {
+    color: var(--azure-ink);
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(61, 90, 108, 0.22);
+}
 .layout-azure .cv-skill-list,
 .layout-azure .cv-extra-list,
 .layout-azure .cv-job-list {
@@ -207,7 +217,21 @@
     margin: 0;
     font-size: calc(0.74rem * var(--cv-scale));
 }
-.layout-azure .cv-skill-list li,
+.layout-azure .cv-skill-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    padding-inline-start: 0;
+}
+.layout-azure .cv-skill-list li {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    margin: 0.125rem;
+    border-radius: 0.25rem;
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(61, 90, 108, 0.22);
+    unicode-bidi: isolate;
+}
 .layout-azure .cv-extra-list li,
 .layout-azure .cv-job-list li { margin-bottom: 0.18rem; }
 .layout-azure .cv-lang-line {
@@ -224,8 +248,9 @@
 .layout-azure .cv-job { margin-bottom: 1rem; }
 .layout-azure .cv-job-head {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
     gap: 0.15rem 0.75rem;
     margin-bottom: 0.3rem;
     min-width: 0;
@@ -242,7 +267,6 @@
     font-size: calc(0.72rem * var(--cv-scale));
     color: #5a5a5a;
     margin: 0;
-    margin-inline-start: auto;
     line-height: 1.4;
     font-weight: 500;
     min-width: 0;
@@ -252,7 +276,6 @@
     padding-inline: 0.15rem 0.35rem;
     direction: ltr;
     unicode-bidi: isolate;
-    text-align: start;
 }
 .layout-azure .cv-job-role {
     color: #5a5a5a;

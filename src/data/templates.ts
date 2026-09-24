@@ -601,7 +601,7 @@ export const CATEGORY_FILTERS = [
   { id: "hi-tech", labelHe: "הייטק", labelEn: "High-Tech" },
   { id: "management", labelHe: "ניהול", labelEn: "Management" },
   { id: "students", labelHe: "סטודנטים", labelEn: "Students" },
-  { id: "ats", labelHe: "ATS", labelEn: "ATS" },
+  { id: "ats", labelHe: "ATS", labelEn: "ATS-Friendly" },
 ] as const;
 
 export const STYLE_FILTERS = [

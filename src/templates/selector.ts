@@ -94,6 +94,7 @@ function markSelected(key: string): void {
 }
 
 export function renderTemplateGalleries(): void {
+  ensureModalChrome();
   const list = filteredList();
   const cards = list.map(cardHtml).join("");
   const empty =
@@ -133,25 +134,51 @@ export function renderTemplateGalleries(): void {
 }
 
 function syncFilterUi(): void {
+  const isEn = lang() === "en";
   document.querySelectorAll("[data-tpl-category]").forEach((btn) => {
     const id = btn.getAttribute("data-tpl-category");
     btn.setAttribute("aria-pressed", id === filters.category ? "true" : "false");
     btn.classList.toggle("is-active", id === filters.category);
+    const filterDef = CATEGORY_FILTERS.find((c) => c.id === id);
+    if (filterDef) {
+      btn.textContent = isEn ? filterDef.labelEn : filterDef.labelHe;
+    }
   });
+  const cats = document.querySelector(".tpl-cats");
+  if (cats) {
+    cats.setAttribute("aria-label", isEn ? "Filter by category" : "סינון לפי קטגוריה");
+  }
+
+  const modalTitle = document.getElementById("examples-title");
+  if (modalTitle) {
+    modalTitle.textContent = isEn ? "Ready Templates & Examples" : "תבניות ודוגמאות מוכנות";
+  }
+  const modalLead = document.getElementById("examples-lead");
+  if (modalLead) {
+    modalLead.textContent = isEn
+      ? "Choose the best template for your domain. Colors and fonts can be customized anytime."
+      : "בחרו את התבנית המתאימה לתחום שלכם. ניתן לשנות את הצבעים והפונטים בכל שלב.";
+  }
 }
 
 function ensureModalChrome(): void {
   const panel = document.querySelector("#examples-modal .examples-panel");
-  if (!panel || panel.querySelector("[data-tpl-toolbar]")) return;
+  if (!panel) return;
+  const existingToolbar = panel.querySelector("[data-tpl-toolbar]");
+  if (existingToolbar) {
+    syncFilterUi();
+    return;
+  }
 
+  const isEn = lang() === "en";
   const toolbar = document.createElement("div");
   toolbar.className = "tpl-toolbar";
   toolbar.setAttribute("data-tpl-toolbar", "");
   toolbar.innerHTML = `
-    <div class="tpl-cats" role="tablist" aria-label="סינון לפי קטגוריה">
+    <div class="tpl-cats" role="tablist" aria-label="${isEn ? "Filter by category" : "סינון לפי קטגוריה"}">
       ${CATEGORY_FILTERS.map(
         (c) =>
-          `<button type="button" class="tpl-chip" role="tab" data-tpl-category="${c.id}" aria-pressed="${c.id === "all" ? "true" : "false"}">${c.labelHe}</button>`
+          `<button type="button" class="tpl-chip" role="tab" data-tpl-category="${c.id}" aria-pressed="${c.id === "all" ? "true" : "false"}">${isEn ? c.labelEn : c.labelHe}</button>`
       ).join("")}
     </div>
   `;
@@ -164,6 +191,7 @@ function ensureModalChrome(): void {
   } else {
     panel.insertBefore(toolbar, panel.querySelector("[data-template-gallery]"));
   }
+  syncFilterUi();
 }
 
 function applyDesign(tpl: CvTemplate): void {

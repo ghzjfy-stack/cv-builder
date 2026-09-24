@@ -1780,9 +1780,9 @@
         #cv-target-page2 .cv-job-head,
         #qc-print-host .cv-job-head {
             display: flex;
-            flex-wrap: wrap;
-            align-items: flex-start;
+            align-items: baseline;
             justify-content: space-between;
+            width: 100%;
             gap: 0.15rem 0.85rem;
             margin: 0 0 0.35rem;
             min-width: 0;
@@ -1817,24 +1817,100 @@
             display: block;
             position: static;
             float: none;
+            margin: 0.1rem 0 0.25rem;
+            padding: 0;
+            font-weight: 500;
+            font-size: calc(0.84rem * var(--cv-scale));
+            line-height: 1.4;
+            color: #475569;
+        }
+        #cv-target .cv-edu-item,
+        #cv-target-page2 .cv-edu-item,
+        #qc-print-host .cv-edu-item,
+        #cv-target .cv-military-item,
+        #cv-target-page2 .cv-military-item,
+        #qc-print-host .cv-military-item {
+            margin-bottom: 0.85rem;
+            min-width: 0;
+            max-width: 100%;
+        }
+        #cv-target .cv-edu-school,
+        #cv-target-page2 .cv-edu-school,
+        #qc-print-host .cv-edu-school {
+            display: block;
+            position: static;
+            float: none;
+            margin: 0;
+            padding: 0;
+            font-weight: 700;
+            font-size: calc(1.05rem * var(--cv-scale));
+            line-height: 1.35;
+            color: inherit;
+        }
+        #cv-target .cv-edu-meta,
+        #cv-target-page2 .cv-edu-meta,
+        #qc-print-host .cv-edu-meta {
+            display: block;
+            position: static;
+            float: none;
+            margin: 0.1rem 0 0.25rem;
+            padding: 0;
+            font-weight: 500;
+            font-size: calc(0.84rem * var(--cv-scale));
+            line-height: 1.4;
+            color: #475569;
+        }
+        #cv-target .cv-military-main,
+        #cv-target-page2 .cv-military-main,
+        #qc-print-host .cv-military-main {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.15rem 0.55rem;
+            min-width: 0;
+        }
+        #cv-target .cv-military-role,
+        #cv-target-page2 .cv-military-role,
+        #qc-print-host .cv-military-role {
+            display: inline-block;
+            position: static;
+            float: none;
+            margin: 0;
+            padding: 0;
+            font-weight: 700;
+            font-size: calc(1.05rem * var(--cv-scale));
+            line-height: 1.35;
+            color: inherit;
+        }
+        #cv-target .cv-military-sub,
+        #cv-target-page2 .cv-military-sub,
+        #qc-print-host .cv-military-sub {
+            display: inline-block;
+            position: static;
+            float: none;
             margin: 0;
             padding: 0;
             font-weight: 500;
             font-size: calc(0.84rem * var(--cv-scale));
             line-height: 1.4;
+            color: #475569;
         }
         #cv-target .cv-job-date,
         #cv-target-page2 .cv-job-date,
-        #qc-print-host .cv-job-date {
-            display: block;
+        #qc-print-host .cv-job-date,
+        #cv-target .cv-military-years,
+        #cv-target-page2 .cv-military-years,
+        #qc-print-host .cv-military-years,
+        #cv-target .cv-military-date,
+        #cv-target-page2 .cv-military-date,
+        #qc-print-host .cv-military-date {
+            display: inline-block;
             position: static;
             float: none;
             flex: 0 0 auto;
-            align-self: flex-start;
             min-width: 0;
             max-width: 100%;
             margin: 0;
-            margin-inline-start: auto;
             padding-block: 0;
             padding-inline: 0.15rem 0.35rem;
             box-sizing: border-box;
@@ -1846,7 +1922,6 @@
             word-break: normal;
             direction: ltr;
             unicode-bidi: isolate;
-            text-align: start;
         }
         #cv-target .cv-job-list,
         #cv-target-page2 .cv-job-list,
@@ -2197,6 +2272,48 @@
         #cv-target .cv-section-title,
         #qc-print-host .cv-print-sheet .cv-section-title {
             font-size: calc(0.75rem * var(--cv-scale));
+        }
+
+        .cv-skill-badges {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .cv-skill-badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            margin: 0.125rem;
+            border-radius: 0.25rem;
+            font-size: calc(0.75rem * var(--cv-scale));
+            line-height: 1.35;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            unicode-bidi: isolate;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        #cv-target:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge {
+            background: rgba(15, 23, 42, 0.06);
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+
+        .cv-ref-item {
+            margin-bottom: calc(0.5rem * var(--cv-scale));
+        }
+        .cv-ref-name {
+            font-weight: 700;
+            font-size: calc(0.8rem * var(--cv-scale));
+        }
+        .cv-ref-role {
+            font-size: calc(0.72rem * var(--cv-scale));
+            opacity: 0.9;
+        }
+        .cv-ref-line {
+            font-size: calc(0.7rem * var(--cv-scale));
+            opacity: 0.85;
+            line-height: 1.4;
         }
 
         .cv-columns { display: flex; flex-direction: column; gap: calc(1rem * var(--cv-scale)); }
@@ -2596,14 +2713,34 @@
             color: #fff;
             padding: 0;
         }
+        .layout-charcoal .cv-skill-badges {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0.1rem -0.125rem;
+        }
+        .layout-charcoal .cv-skill-badge {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
         .layout-charcoal .cv-skill-list {
-            list-style: disc;
-            padding-inline-start: 1.1rem;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
             margin: 0;
             color: #fff;
             font-size: calc(0.68rem * var(--cv-scale));
         }
-        .layout-charcoal .cv-skill-list li { margin-bottom: 0.2rem; }
+        .layout-charcoal .cv-skill-list li {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            margin: 0.125rem;
+            border-radius: 0.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            unicode-bidi: isolate;
+        }
         .layout-charcoal .cv-lang-row {
             display: grid;
             grid-template-columns: 4.2rem 1fr;
@@ -3084,14 +3221,34 @@
             color: #fff;
             padding: 0;
         }
+        .layout-navy .cv-skill-badges {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0.1rem -0.125rem;
+        }
+        .layout-navy .cv-skill-badge {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
         .layout-navy .cv-skill-list {
-            list-style: disc;
-            padding-inline-start: 1.05rem;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
             margin: 0;
             color: #fff;
             font-size: calc(0.66rem * var(--cv-scale));
         }
-        .layout-navy .cv-skill-list li { margin-bottom: 0.22rem; unicode-bidi: plaintext; }
+        .layout-navy .cv-skill-list li {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            margin: 0.125rem;
+            border-radius: 0.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            unicode-bidi: isolate;
+        }
         .layout-navy .cv-lang-row {
             display: flex;
             justify-content: space-between;

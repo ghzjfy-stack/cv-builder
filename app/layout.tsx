@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Frank_Ruhl_Libre, Rubik } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_NAME, SITE_URL } from "./lib/site";
 import "./templates/templates.css";
 
@@ -35,7 +36,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="he" dir="rtl" className={`${rubik.variable} ${frank.variable}`}>
-      <body className="seo-body">{children}</body>
+      <body className="seo-body">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

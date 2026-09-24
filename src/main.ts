@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { inject as injectVercelAnalytics } from "@vercel/analytics";
 import { initTemplateSelector } from "./templates/selector";
 import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken } from "./access/gate.js";
 import {
@@ -21,6 +22,12 @@ import {
   isManualOrderApproved,
   waitForManualOrderPaid,
 } from "./payment/manualOrder.js";
+
+try {
+  injectVercelAnalytics();
+} catch (err) {
+  console.warn("Vercel Analytics init failed", err);
+}
 
 const modal = () => document.getElementById("payment-modal");
 const feedback = () => document.getElementById("code-feedback");

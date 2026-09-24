@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui5">
+    <link rel="stylesheet" href="./app.css?v=exp-ui6">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -588,6 +588,12 @@
                         <article class="experience-card exp-block is-open" role="listitem" data-job-id="job-seed-0" data-job-index="0">
                             <div class="exp-block-head">
                                 <span class="experience-card-badge exp-block-num" id="job-seed-badge">משרה 1</span>
+                                <div class="experience-card-actions">
+                                    <button type="button" class="exp-block-remove" data-remove-job="job-seed-0" aria-label="מחק משרה" title="מחק משרה" disabled aria-disabled="true">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                        <span>מחק משרה</span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="experience-card-fields exp-block-fields">
                                 <div class="experience-field">
@@ -629,6 +635,12 @@
                             <article class="experience-card entry-card is-open" role="listitem" data-entry-id="education-seed-0" data-entry-index="0">
                                 <div class="experience-card-toolbar">
                                     <span class="experience-card-badge">השכלה 1</span>
+                                    <div class="experience-card-actions">
+                                        <button type="button" class="exp-block-remove" data-remove-entry="education-seed-0" aria-label="מחק השכלה" title="מחק השכלה" disabled aria-disabled="true">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                            <span>מחק השכלה</span>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="experience-card-fields">
                                     <div class="experience-field">
@@ -1159,9 +1171,9 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=exp-ui4"></script>
-    <script src="lib/addJobBoot.js?v=exp-ui4"></script>
-    <script src="lib/entryEditor.js?v=exp-ui4"></script>
+    <script src="lib/experienceEditor.js?v=exp-ui6"></script>
+    <script src="lib/addJobBoot.js?v=exp-ui6"></script>
+    <script src="lib/entryEditor.js?v=exp-ui6"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>

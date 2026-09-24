@@ -6619,6 +6619,10 @@
             text-transform: none !important;
         }
         .exp-block-remove {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
             min-height: 2rem;
             padding: 0.2rem 0.65rem;
             border-radius: 0.55rem;
@@ -6629,6 +6633,17 @@
             font-weight: 700;
             cursor: pointer;
             pointer-events: auto !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .exp-block-remove svg {
+            width: 0.9rem;
+            height: 0.9rem;
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+        .exp-block-remove span {
+            pointer-events: none;
         }
         .exp-block-remove:disabled {
             opacity: 0.35;
@@ -6637,6 +6652,22 @@
         .exp-block-remove:hover:not(:disabled) {
             background: rgba(153, 27, 27, 0.45);
             border-color: #f87171;
+            color: #fecaca;
+        }
+        #education-section .experience-card-toolbar,
+        #experience-section .exp-block-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            width: 100%;
+        }
+        #education-section .experience-card-actions,
+        #experience-section .experience-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-inline-start: auto;
         }
         .exp-block-fields {
             display: grid;

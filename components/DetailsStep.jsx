@@ -6,6 +6,43 @@ import { useFormData } from './FormDataContext';
  * Reads/writes the shared form state via FormDataContext (backed by window.QCCvData).
  */
 
+function TrashIcon({ className = 'h-3.5 w-3.5' }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  );
+}
+
+/** Shared delete control — same look for experience and education cards. */
+function DeleteEntryButton({ label, disabled, onClick }) {
+  return (
+    <button
+      type="button"
+      className="entry-delete-btn inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-rose-400/45 bg-rose-950/40 px-2.5 py-1 text-xs font-bold text-rose-300 transition-colors hover:border-rose-400 hover:bg-rose-900/50 hover:text-rose-100 disabled:cursor-default disabled:opacity-35"
+      disabled={disabled}
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+    >
+      <TrashIcon />
+      <span>{label}</span>
+    </button>
+  );
+}
+
 export default function DetailsStep({
   language = 'he',
   isEnglish: isEnglishProp,
@@ -83,6 +120,7 @@ export default function DetailsStep({
           const role = exp.role || exp.title || '';
           const dates = exp.dates || exp.years || '';
           const description = exp.description || '';
+          const deleteLabel = isEnglish ? 'Delete job' : 'מחק משרה';
           return (
             <article
               key={key}
@@ -92,14 +130,11 @@ export default function DetailsStep({
                 <span className="text-xs font-semibold text-slate-300">
                   {isEnglish ? `Job ${index + 1}` : `משרה ${index + 1}`}
                 </span>
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-rose-300 hover:text-rose-200 disabled:opacity-40"
+                <DeleteEntryButton
+                  label={deleteLabel}
                   disabled={experience.length <= 1}
                   onClick={() => removeExperience(exp.id)}
-                >
-                  {isEnglish ? 'Delete job' : 'מחק משרה'}
-                </button>
+                />
               </div>
               <div className="space-y-2">
                 <input
@@ -156,6 +191,7 @@ export default function DetailsStep({
           const degree = edu.degree || edu.title || '';
           const years = edu.years || edu.dates || '';
           const details = edu.details || edu.notes || edu.description || '';
+          const deleteLabel = isEnglish ? 'Delete education' : 'מחק השכלה';
           return (
             <article
               key={key}
@@ -165,14 +201,11 @@ export default function DetailsStep({
                 <span className="text-xs font-semibold text-slate-300">
                   {isEnglish ? `Education ${index + 1}` : `השכלה ${index + 1}`}
                 </span>
-                <button
-                  type="button"
-                  className="text-xs font-semibold text-rose-300 hover:text-rose-200 disabled:opacity-40"
+                <DeleteEntryButton
+                  label={deleteLabel}
                   disabled={education.length <= 1}
                   onClick={() => removeEducation(edu.id)}
-                >
-                  {isEnglish ? 'Delete education' : 'מחק השכלה'}
-                </button>
+                />
               </div>
               <div className="space-y-2">
                 <input

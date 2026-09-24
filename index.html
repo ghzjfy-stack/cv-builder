@@ -15,8 +15,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=add-click5">
+    <link rel="stylesheet" href="./app.css?v=add-click6">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
+    <script>
+        /* Early stub so add-job buttons work even before experienceEditor.js loads. */
+        window.__qcClickAddJob = window.__qcClickAddJob || function (e) {
+            try {
+                if (e && e.preventDefault) e.preventDefault();
+                if (window.QCExperience && typeof QCExperience.addExperience === 'function') {
+                    return QCExperience.addExperience(e);
+                }
+                var host = document.getElementById('experience-items');
+                if (!host) return false;
+                var n = host.querySelectorAll('.experience-card').length + 1;
+                var id = 'job-fallback-' + Date.now();
+                var card = document.createElement('article');
+                card.className = 'experience-card is-open is-just-added';
+                card.setAttribute('role', 'listitem');
+                card.setAttribute('data-job-id', id);
+                card.setAttribute('data-job-index', String(n - 1));
+                card.innerHTML =
+                    '<div class="experience-card-toolbar"><span class="experience-card-badge">משרה ' + n + '</span></div>' +
+                    '<div class="experience-card-fields">' +
+                    '<div class="experience-field"><label class="experience-field-label">שם חברה/ארגון</label>' +
+                    '<input type="text" data-job-employer="1" data-job-field="company" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
+                    '<div class="experience-field"><label class="experience-field-label">תפקיד</label>' +
+                    '<input type="text" data-job-role="1" data-job-field="position" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
+                    '<div class="experience-field"><label class="experience-field-label">תאריכים/שנים</label>' +
+                    '<input type="text" data-job-dates="1" data-job-field="years" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
+                    '<div class="experience-field"><label class="experience-field-label">תיאור תפקיד / הישגים</label>' +
+                    '<textarea rows="4" data-job-desc="1" data-job-field="description" class="studio-field experience-desc w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea></div>' +
+                    '</div>';
+                host.appendChild(card);
+                try { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (err) {}
+                if (window.QCCvData) {
+                    QCCvData.experience = QCCvData.experience || [];
+                    QCCvData.experience.push({ id: id, title: '', company: '', dates: '', description: '' });
+                }
+                return false;
+            } catch (err) {
+                try { console.error('__qcClickAddJob stub failed', err); } catch (e2) {}
+                return false;
+            }
+        };
+        window.addExperience = function (e) { return window.__qcClickAddJob(e); };
+        window.handleAddJob = window.addExperience;
+        window.addExperienceJob = window.addExperience;
+    </script>
 </head>
 <body class="on-home" id="app-body">
     <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
@@ -458,7 +503,7 @@
                 <div class="space-y-2 relative" id="experience-section">
                     <div class="section-editor-head">
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
-                        <button type="button" id="btn-add-experience-top" class="section-add-btn section-add-btn--inline" data-qc-add-job="1" onclick="if(event){event.preventDefault();event.stopPropagation();}if(window.QCExperience&amp;&amp;QCExperience.addExperience)return QCExperience.addExperience(event);if(window.addExperience)return window.addExperience(event);return false;">
+                        <button type="button" id="btn-add-experience-top" class="section-add-btn section-add-btn--inline" data-qc-add-job="1" onclick="return window.__qcClickAddJob(event)">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                             <span id="btn-add-experience-top-label">הוסף משרה</span>
                         </button>
@@ -489,7 +534,7 @@
                             </div>
                         </article>
                     </div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn" data-qc-add-job="1" onclick="if(event){event.preventDefault();event.stopPropagation();}if(window.QCExperience&amp;&amp;QCExperience.addExperience)return QCExperience.addExperience(event);if(window.addExperience)return window.addExperience(event);return false;">
+                    <button type="button" id="btn-add-experience" class="section-add-btn" data-qc-add-job="1" onclick="return window.__qcClickAddJob(event)">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                     </button>
@@ -1032,8 +1077,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=add13"></script>
-    <script src="lib/entryEditor.js?v=add13"></script>
+    <script src="lib/experienceEditor.js?v=add14"></script>
+    <script src="lib/entryEditor.js?v=add14"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1047,7 +1092,7 @@
     <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
-        window.addExperience = function (e) {
+        window.__qcClickAddJob = function (e) {
             if (window.QCExperience && typeof QCExperience.addExperience === 'function') {
                 return QCExperience.addExperience(e);
             }
@@ -1056,8 +1101,9 @@
             }
             return false;
         };
-        window.handleAddJob = window.addExperience;
-        window.addExperienceJob = window.addExperience;
+        window.addExperience = window.__qcClickAddJob;
+        window.handleAddJob = window.__qcClickAddJob;
+        window.addExperienceJob = window.__qcClickAddJob;
         window.handleExperienceChange = function (id, field, value) {
             if (window.QCExperience && typeof QCExperience.handleExperienceChange === 'function') {
                 return QCExperience.handleExperienceChange(id, field, value);

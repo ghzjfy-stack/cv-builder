@@ -57,6 +57,27 @@ let checkoutPhoneTimer = 0;
 
 const WAIT_STATUS = "ממתין לאישור תשלום... (ההורדה תתחיל אוטומטית)";
 
+function qcT(key: string, fallback = ""): string {
+  try {
+    const fn = (window as Window & { qcT?: (k: string) => string }).qcT;
+    if (typeof fn === "function") {
+      const v = fn(key);
+      if (v) return v;
+    }
+    const pack = (window as Window & { CV_I18N?: Record<string, Record<string, string>> }).CV_I18N;
+    const lang = (window as Window & { QCCvLang?: string }).QCCvLang === "en" ? "en" : "he";
+    const hit = pack?.[lang]?.[key];
+    if (hit) return hit;
+  } catch {
+    /* ignore */
+  }
+  return fallback || key;
+}
+
+function waitStatusText(): string {
+  return qcT("waitStatus", WAIT_STATUS);
+}
+
 function normalizeStoredOrderId(value) {
   const id = String(value || "")
     .trim()
@@ -171,7 +192,7 @@ function showDownloadStep() {
   const step = document.getElementById("download-step");
   step?.classList.remove("hidden");
   const title = document.getElementById("pay-success-title");
-  if (title) title.textContent = "התשלום אושר בהצלחה!";
+  if (title) title.textContent = qcT("paySuccess", "התשלום אושר בהצלחה!");
   const mark = step?.querySelector(".pay-success-check");
   if (mark instanceof HTMLElement) {
     mark.style.animation = "none";
@@ -278,7 +299,7 @@ function showAutoVerifyStatus(statusText) {
   const live = document.getElementById("pay-live-status");
   live?.classList.remove("hidden");
   const statusEl = document.getElementById("manual-order-status");
-  if (statusEl) statusEl.textContent = statusText || WAIT_STATUS;
+  if (statusEl) statusEl.textContent = statusText || waitStatusText();
 }
 
 function setTransferWaiting(on, orderId, statusText) {
@@ -290,7 +311,7 @@ function setTransferWaiting(on, orderId, statusText) {
   live?.classList.remove("hidden");
   panel?.classList.add("hidden");
   if (idEl && orderId) idEl.textContent = orderId;
-  showAutoVerifyStatus(statusText || WAIT_STATUS);
+  showAutoVerifyStatus(statusText || waitStatusText());
   enableBitButton();
 }
 
@@ -311,7 +332,7 @@ async function startManualOrderPolling(orderId, options = {}) {
   const quiet = Boolean(options.quiet);
   stopManualOrderPoll();
   persistManualOrderId(orderId, "PENDING");
-  setManualOrderUi(orderId, WAIT_STATUS);
+  setManualOrderUi(orderId, waitStatusText());
   if (!quiet || modal()?.classList.contains("flex")) {
     showWaitStep();
   }
@@ -324,28 +345,28 @@ async function startManualOrderPolling(orderId, options = {}) {
     if (isManualOrderApproved(result, orderId) || result.paid === true) {
       window.QCLog?.add("auth_ok", "telegram approve");
       persistManualOrderId("");
-      applyPaidUnlock(result.token, "התשלום אושר בהצלחה!");
+      applyPaidUnlock(result.token, qcT("paySuccess", "התשלום אושר בהצלחה!"));
       return;
     }
     if (result.status === "CANCELLED") {
       persistManualOrderId("");
       setTransferWaiting(false);
       const statusEl = document.getElementById("manual-order-status");
-      if (statusEl) statusEl.textContent = "ההזמנה נדחתה.";
-      setFeedback("ההזמנה לא אושרה. אפשר לפתוח הזמנה חדשה.", false);
+      if (statusEl) statusEl.textContent = qcT("orderRejected", "ההזמנה נדחתה.");
+      setFeedback(qcT("orderRejectedFb", "ההזמנה לא אושרה. אפשר לפתוח הזמנה חדשה."), false);
       return;
     }
     if (result.status === "EXPIRED") {
       persistManualOrderId("");
       setTransferWaiting(false);
       const statusEl = document.getElementById("manual-order-status");
-      if (statusEl) statusEl.textContent = "פג תוקף הגישה.";
-      setFeedback(result.error || "פג תוקף הגישה. יש לבצע הזמנה חדשה.", false);
+      if (statusEl) statusEl.textContent = qcT("accessExpired", "פג תוקף הגישה.");
+      setFeedback(result.error || qcT("accessExpiredFb", "פג תוקף הגישה. יש לבצע הזמנה חדשה."), false);
       return;
     }
     if (result.error && result.error !== "cancelled") {
       const soft = /kv|redis|אחסון|database/i.test(String(result.error))
-        ? WAIT_STATUS
+        ? waitStatusText()
         : result.error;
       setManualOrderUi(orderId, soft);
       if (!/kv|redis|אחסון|database/i.test(String(result.error))) {
@@ -423,7 +444,7 @@ function setCheckoutPhoneFieldVisible(visible) {
   if (visible) {
     el.removeAttribute("tabindex");
     el.setAttribute("aria-hidden", "false");
-    el.placeholder = "מספר טלפון לזיהוי ההעברה";
+    el.placeholder = qcT("payPhoneLabel", "מספר טלפון לזיהוי ההעברה");
   } else {
     el.setAttribute("tabindex", "-1");
     el.setAttribute("aria-hidden", "true");
@@ -465,7 +486,7 @@ async function proceedToPayment() {
   const run = (async () => {
     const existingId = activeManualOrderId || readPersistedManualOrderId();
     setFeedback("", false);
-    setTransferWaiting(true, existingId || "…", WAIT_STATUS);
+    setTransferWaiting(true, existingId || "…", waitStatusText());
     showWaitStep();
     let created;
     try {
@@ -478,14 +499,14 @@ async function proceedToPayment() {
         orderId: existingId || undefined,
       });
     } catch {
-      created = { ok: false, error: "לא הצלחנו לפתוח הזמנה. נסו שוב." };
+      created = { ok: false, error: qcT("orderOpenFail", "לא הצלחנו לפתוח הזמנה. נסו שוב.") };
     }
     if (!created.ok || !created.order_id) {
       if (existingId) {
         void startManualOrderPolling(existingId);
         return { ok: true, order_id: existingId };
       }
-      const raw = created.error || "לא הצלחנו לפתוח הזמנה.";
+      const raw = created.error || qcT("orderOpenFail", "לא הצלחנו לפתוח הזמנה.");
       if (/טלפון/.test(raw)) {
         setCheckoutPhoneFieldVisible(true);
         showAutoVerifyStatus();
@@ -493,10 +514,10 @@ async function proceedToPayment() {
         return null;
       }
       const message = /kv|redis|אחסון|database/i.test(raw)
-        ? "לא הצלחנו לפתוח הזמנה. נסו שוב."
+        ? qcT("orderOpenFail", "לא הצלחנו לפתוח הזמנה. נסו שוב.")
         : raw;
       setFeedback(message, false);
-      setTransferWaiting(true, "", WAIT_STATUS);
+      setTransferWaiting(true, "", waitStatusText());
       showPayStep();
       return null;
     }
@@ -522,7 +543,7 @@ function applyPaidUnlock(token, message) {
   setTransferWaiting(false);
   document.getElementById("pay-live-status")?.classList.add("hidden");
   modal()?.classList.remove("is-waiting");
-  setFeedback(message || "התשלום אושר בהצלחה!", true);
+  setFeedback(message || qcT("paySuccess", "התשלום אושר בהצלחה!"), true);
   showDownloadStep();
   void attemptApprovedPdfDownload();
 }
@@ -530,12 +551,12 @@ function applyPaidUnlock(token, message) {
 async function attemptApprovedPdfDownload() {
   const status = document.getElementById("download-status");
   if (status) {
-    status.textContent = "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.";
+    status.textContent = qcT("autoDownloadTry", "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.");
   }
   try {
     await runHighResExport();
   } catch {
-    if (status) status.textContent = "לחצו על הכפתור הירוק להורדת ה-PDF.";
+    if (status) status.textContent = qcT("clickGreenDownload", "לחצו על הכפתור הירוק להורדת ה-PDF.");
   }
 }
 
@@ -544,10 +565,10 @@ function prefersSameTabCheckout() {
   return /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
 }
 
-const PAY_FALLBACK_TOAST = "המספר הועתק! שנה לאפליקציית התשלום";
+const PAY_FALLBACK_TOAST = () => qcT("payFallbackToast", "המספר הועתק! שנה לאפליקציית התשלום");
 let payToastTimer = 0;
 
-function showPayFallbackToast(message = PAY_FALLBACK_TOAST) {
+function showPayFallbackToast(message = PAY_FALLBACK_TOAST()) {
   let el = document.getElementById("qc-pay-toast");
   if (!el) {
     el = document.createElement("div");
@@ -599,9 +620,9 @@ function flashCopyButton() {
   const btn = document.getElementById("btn-copy-bit");
   if (!btn) return;
   const prev = btn.textContent;
-  btn.textContent = "הועתק";
+  btn.textContent = qcT("payCopied", "הועתק");
   setTimeout(() => {
-    btn.textContent = prev || "העתק מספר";
+    btn.textContent = prev || qcT("payCopyNumber", "העתק מספר");
   }, 1600);
 }
 
@@ -654,7 +675,7 @@ function intlPhoneDigits(raw) {
 
 async function sharePdfFile(blob, filename) {
   const file = new File([blob], filename, { type: "application/pdf" });
-  const payload = { files: [file], title: filename, text: "קורות החיים מ-QuickCV" };
+  const payload = { files: [file], title: filename, text: qcT("pdfShareTitle", "קורות החיים מ-QuickCV") };
   if (navigator.canShare && navigator.canShare(payload)) {
     await navigator.share(payload);
     return true;
@@ -671,7 +692,7 @@ async function sendPdfToWhatsApp(e) {
   const status = document.getElementById("download-status");
   const phoneEl = document.getElementById("wa-pdf-phone");
   const phone = String(phoneEl && "value" in phoneEl ? phoneEl.value : readCheckoutContact()).trim();
-  if (status) status.textContent = "מכין PDF לשליחה...";
+  if (status) status.textContent = qcT("waPreparing", "מכין PDF לשליחה...");
   try {
     const result = await exportHighResPdf({ download: false });
     const blob = result?.blob;
@@ -689,14 +710,14 @@ async function sendPdfToWhatsApp(e) {
       });
       const data = await res.json().catch(() => null);
       if (data?.ok) {
-        if (status) status.textContent = "ה-PDF נשלח לוואטסאפ.";
+        if (status) status.textContent = qcT("waPdfSent", "ה-PDF נשלח לוואטסאפ.");
         return;
       }
     }
 
     try {
       if (await sharePdfFile(blob, filename)) {
-        if (status) status.textContent = "בחרו WhatsApp בשיתוף כדי לשלוח את הקובץ.";
+        if (status) status.textContent = qcT("sharePickWa", "בחרו WhatsApp בשיתוף כדי לשלוח את הקובץ.");
         return;
       }
     } catch {
@@ -712,13 +733,13 @@ async function sendPdfToWhatsApp(e) {
     a.click();
     a.remove();
     window.open(
-      whatsappPdfShareUrl(intl, "היי, אלה קורות החיים מ-QuickCV. הקובץ ירד למכשיר — צרפו אותו כאן."),
+      whatsappPdfShareUrl(intl, qcT("waShareText", "היי, אלה קורות החיים מ-QuickCV. הקובץ ירד למכשיר — צרפו אותו כאן.")),
       "_blank",
       "noopener",
     );
-    if (status) status.textContent = "הקובץ ירד. צרפו אותו בשיחת WhatsApp שנפתחה.";
+    if (status) status.textContent = qcT("waDownloadedAttach", "הקובץ ירד. צרפו אותו בשיחת WhatsApp שנפתחה.");
   } catch {
-    if (status) status.textContent = "לא הצלחנו לשלוח. נסו הורדה רגילה.";
+    if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
   }
 }
 
@@ -776,9 +797,9 @@ async function copyReferralLink(e) {
     await navigator.clipboard.writeText(link);
     if (btn) {
       const prev = btn.textContent;
-      btn.textContent = "הועתק";
+      btn.textContent = qcT("payCopied", "הועתק");
       setTimeout(() => {
-        btn.textContent = prev || "העתק קישור";
+        btn.textContent = prev || qcT("payCopyLink", "העתק קישור");
       }, 1600);
     }
   } catch {
@@ -795,7 +816,7 @@ function downloadCoverLetter(e) {
   if (!isUnlocked() || selectedPack !== "complete") return;
   window.QCCoverLetter?.download?.();
   const status = document.getElementById("download-status");
-  if (status) status.textContent = "המכתב המקדים ירד.";
+  if (status) status.textContent = qcT("coverDownloaded", "המכתב המקדים ירד.");
 }
 
 function onOrderBumpChange() {
@@ -804,12 +825,12 @@ function onOrderBumpChange() {
 
 async function runHighResExport() {
   const status = document.getElementById("download-status");
-  if (status) status.textContent = "מכין קובץ PDF...";
+  if (status) status.textContent = qcT("preparingPdf", "מכין קובץ PDF...");
   try {
     await exportHighResPdf();
-    if (status) status.textContent = "ההורדה התחילה.";
+    if (status) status.textContent = qcT("downloadStarted", "ההורדה התחילה.");
   } catch {
-    if (status) status.textContent = "ההורדה נכשלה. נסו שוב.";
+    if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
   }
 }
 
@@ -869,6 +890,12 @@ function openCheckoutModal() {
   openModal();
   setFeedback("", false);
   selectedPack = "basic";
+  const lang = (window as Window & { QCCvLang?: string }).QCCvLang === "en" ? "en" : "he";
+  try {
+    (window as Window & { QCSiteI18n?: { apply?: (l: string) => void } }).QCSiteI18n?.apply?.(lang);
+  } catch {
+    /* ignore */
+  }
   applyPackUi();
   prefillCheckoutContact();
   showPayStep();
@@ -900,7 +927,7 @@ function downloadFormat(kind) {
   if (!assertCheckoutReady()) return;
   if (!isUnlocked()) {
     openCheckoutModal();
-    setFeedback("יש לאמת תשלום או קוד לפני ההורדה.", false);
+    setFeedback(qcT("needPayBeforeDl", "יש לאמת תשלום או קוד לפני ההורדה."), false);
     return;
   }
   if (kind === "pdf") {
@@ -914,13 +941,13 @@ function downloadFormat(kind) {
   const run = window.QCExport?.[kind];
   const status = document.getElementById("download-status");
   if (!run) return;
-  if (status) status.textContent = "מכין קובץ...";
+  if (status) status.textContent = qcT("preparingFile", "מכין קובץ...");
   Promise.resolve(run()).then(
     () => {
-      if (status) status.textContent = "ההורדה התחילה.";
+      if (status) status.textContent = qcT("downloadStarted", "ההורדה התחילה.");
     },
     () => {
-      if (status) status.textContent = "ההורדה נכשלה. נסו שוב.";
+      if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
     },
   );
 }
@@ -934,18 +961,17 @@ function applyPackUi() {
   bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(amount));
   const bitBtn = document.getElementById("btn-open-bit");
   if (bitBtn) {
-    const en = (window as Window & { QCCvLang?: string }).QCCvLang === "en";
-    bitBtn.textContent = en ? "Pay 10 ₪ with Bit" : "שלמו 10 ₪ ב-Bit";
+    bitBtn.textContent = qcT("bitCta", "שלמו 10 ₪ ב-Bit");
   }
   enableBitButton();
   const qr = document.getElementById("bit-qr");
   if (qr instanceof HTMLImageElement) {
     qr.src = bitPayUrl(amount);
-    qr.alt = `קוד QR לתשלום ${display} ₪ ב-Bit`;
+    qr.alt = (qcT("payQrAlt", "קוד QR לתשלום 10 ₪ ב-Bit") || "").replace("10", String(display));
   }
   applyMobilePayCopy();
   const saveEl = document.getElementById("pay-save-badge");
-  if (saveEl) saveEl.textContent = "מחיר השקה — 10 ₪ בלבד";
+  if (saveEl) saveEl.textContent = qcT("payLaunchBadge", "מחיר השקה — 10 ₪ בלבד");
   const nameEl = document.getElementById("mvp-pack-name");
   if (nameEl) nameEl.textContent = CHECKOUT.packageName;
 }
@@ -1011,7 +1037,7 @@ function flashShotBlock() {
   el.classList.remove("hidden");
   el.classList.add("flex");
   try {
-    void navigator.clipboard.writeText("QuickCV — התצוגה המקדימה מוגנת עד לאחר התשלום.");
+    void navigator.clipboard.writeText(qcT("clipGuard", "QuickCV — התצוגה המקדימה מוגנת עד לאחר התשלום."));
   } catch {
     /* ignore */
   }

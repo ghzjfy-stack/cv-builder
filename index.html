@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui9">
+    <link rel="stylesheet" href="./app.css?v=exp-ui10-i18n">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -154,6 +154,10 @@
                     <span class="home-brand-name">QuickCV</span>
                 </button>
                 <div class="home-nav-actions">
+                    <div class="lang-switch" id="home-lang-switch" role="group" aria-label="שפת האתר">
+                        <button type="button" id="home-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
+                        <button type="button" id="home-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
+                    </div>
                     <button type="button" class="home-link hidden sm:inline-flex js-nav-examples" onclick="openExamplesModal()">דוגמאות</button>
                     <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
                 </div>
@@ -163,8 +167,8 @@
                 <div>
                     <p class="home-brand-lockup" aria-hidden="true">QuickCV</p>
                     <h1 id="home-title" class="home-title">קורות חיים מקצועיים שפותחים דלתות</h1>
-                    <p class="home-subhead">קורות חיים מותאמים למערכות סינון (ATS) • עיצוב נקי ומקצועי</p>
-                    <p class="home-lead">
+                    <p class="home-subhead" id="home-subhead">קורות חיים מותאמים למערכות סינון (ATS) • עיצוב נקי ומקצועי</p>
+                    <p class="home-lead" id="home-lead">
                         ממלאים פרטים, בוחרים עיצוב נקי ומורידים קובץ PDF מוכן להגשה. תשלום חד-פעמי של 10 ₪ בלבד – ללא הרשמה וללא מנוי מוסתר.
                     </p>
                     <div class="home-hero-actions">
@@ -172,10 +176,10 @@
                         <button type="button" class="home-cta-ghost js-nav-examples" onclick="openExamplesModal()">דוגמאות</button>
                     </div>
                     <nav class="seo-cat-row" aria-label="תבניות לפי תחום">
-                        <a class="seo-cat-chip" href="/templates/hi-tech/">הייטק</a>
-                        <a class="seo-cat-chip" href="/templates/sales/">מכירות</a>
-                        <a class="seo-cat-chip" href="/templates/students/">סטודנטים</a>
-                        <a class="seo-cat-chip" href="/templates/customer-service/">שירות לקוחות</a>
+                        <a class="seo-cat-chip" data-seo-cat="tech" href="/templates/hi-tech/">הייטק</a>
+                        <a class="seo-cat-chip" data-seo-cat="sales" href="/templates/sales/">מכירות</a>
+                        <a class="seo-cat-chip" data-seo-cat="students" href="/templates/students/">סטודנטים</a>
+                        <a class="seo-cat-chip" data-seo-cat="cs" href="/templates/customer-service/">שירות לקוחות</a>
                     </nav>
                 </div>
                 <div class="home-stage" aria-hidden="true">
@@ -184,6 +188,7 @@
                         <div class="home-paper-back"></div>
                         <div class="home-paper-mid"></div>
                         <article class="home-paper-sheet home-cv">
+                            <div class="i18n-he" dir="rtl">
                             <aside class="home-cv-side">
                                 <div class="home-cv-mark">נ״כ</div>
                                 <p class="home-cv-side-h">יצירת קשר</p>
@@ -234,8 +239,61 @@
                                 <p class="home-cv-h">השכלה</p>
                                 <p class="home-cv-p"><strong>B.A. כלכלה</strong> · אוניברסיטת תל אביב · 2012 – 2016</p>
                             </div>
+                            </div>
+                            <div class="i18n-en" dir="ltr">
+                            <aside class="home-cv-side">
+                                <div class="home-cv-mark">NC</div>
+                                <p class="home-cv-side-h">Contact</p>
+                                <p class="home-cv-side-p">052-5554433</p>
+                                <p class="home-cv-side-p">noa.cohen@email.com</p>
+                                <p class="home-cv-side-p">Tel Aviv</p>
+                                <p class="home-cv-side-h">Skills</p>
+                                <ul class="home-cv-tags">
+                                    <li>Team leadership</li>
+                                    <li>CRM</li>
+                                    <li>Advanced Excel</li>
+                                    <li>Negotiation</li>
+                                </ul>
+                                <p class="home-cv-side-h">Languages</p>
+                                <p class="home-cv-side-p">Hebrew · Native</p>
+                                <p class="home-cv-side-p">English · Fluent</p>
+                            </aside>
+                            <div class="home-cv-main">
+                                <header class="home-cv-head">
+                                    <p class="home-paper-name">Noa Cohen</p>
+                                    <p class="home-paper-role">National Sales Manager</p>
+                                </header>
+                                <p class="home-cv-h">Professional Summary</p>
+                                <p class="home-cv-p">Sales manager experienced in leading teams, hitting targets, and growing B2B revenue.</p>
+                                <p class="home-cv-h">Work Experience</p>
+                                <div class="home-cv-job">
+                                    <div class="home-cv-job-top">
+                                        <p class="home-cv-job-title">National Sales Manager</p>
+                                        <p class="home-cv-job-dates">2019 – Present</p>
+                                    </div>
+                                    <p class="home-cv-org">Alpha Ltd</p>
+                                    <ul class="home-cv-bullets">
+                                        <li>Led a team of 12 and grew targets by 35%</li>
+                                        <li>Built sales processes and key-account retention</li>
+                                        <li>Managed funnel and CRM reporting for leadership</li>
+                                    </ul>
+                                </div>
+                                <div class="home-cv-job">
+                                    <div class="home-cv-job-top">
+                                        <p class="home-cv-job-title">Inside Sales Rep</p>
+                                        <p class="home-cv-job-dates">2016 – 2019</p>
+                                    </div>
+                                    <p class="home-cv-org">Shoreline Ltd</p>
+                                    <ul class="home-cv-bullets">
+                                        <li>Closed deals and supported major accounts</li>
+                                    </ul>
+                                </div>
+                                <p class="home-cv-h">Education</p>
+                                <p class="home-cv-p"><strong>B.A. Economics</strong> · Tel Aviv University · 2012 – 2016</p>
+                            </div>
+                            </div>
                         </article>
-                        <span class="home-paper-badge">פורמט ATS מאושר</span>
+                        <span class="home-paper-badge" id="home-paper-badge">פורמט ATS מאושר</span>
                     </div>
                 </div>
             </section>
@@ -243,28 +301,28 @@
 
         <div class="home-band">
             <div class="home-inner home-band-row">
-                <p><strong>עברית ואנגלית</strong>פריסה מיושרת לימין או לשמאל לפי שפת הקורות חיים</p>
-                <p><strong>תבניות מנצחות</strong>עיצובים נקיים, מקצועיים ומותאמים לסינון ATS</p>
-                <p><strong>הורדה מאובטחת</strong>תשלום מאובטח ב-Bit • הורדה מיידית</p>
+                <p><strong id="home-band-1-title">עברית ואנגלית</strong><span id="home-band-1-body">פריסה מיושרת לימין או לשמאל לפי שפת הקורות חיים</span></p>
+                <p><strong id="home-band-2-title">תבניות מנצחות</strong><span id="home-band-2-body">עיצובים נקיים, מקצועיים ומותאמים לסינון ATS</span></p>
+                <p><strong id="home-band-3-title">הורדה מאובטחת</strong><span id="home-band-3-body">תשלום מאובטח ב-Bit • הורדה מיידית</span></p>
             </div>
         </div>
 
         <div class="home-inner">
             <section class="home-section" aria-labelledby="home-how">
-                <p class="home-kicker">איך זה עובד</p>
+                <p class="home-kicker" id="home-how-kicker">איך זה עובד</p>
                 <h2 id="home-how">3 צעדים פשוטים לקורות חיים מושלמים</h2>
-                <p class="home-section-lead">בלי להסתבך עם מעצבים או קבצי Word שמתפרקים. פשוט, מהיר ומקצועי.</p>
+                <p class="home-section-lead" id="home-how-lead">בלי להסתבך עם מעצבים או קבצי Word שמתפרקים. פשוט, מהיר ומקצועי.</p>
                 <div class="home-steps">
                     <article class="home-step">
-                        <h3><span class="home-step-num">01 |</span> מזינים פרטים</h3>
-                        <p>ממלאים את הניסיון, ההשכלה והכישורים בטופס הנגיש. שדות שאין בהם צורך פשוט לא יופיעו.</p>
+                        <h3><span class="home-step-num">01 |</span> <span id="home-step-1-title-text">מזינים פרטים</span></h3>
+                        <p id="home-step-1-body">ממלאים את הניסיון, ההשכלה והכישורים בטופס הנגיש. שדות שאין בהם צורך פשוט לא יופיעו.</p>
                     </article>
                     <article class="home-step">
-                        <h3><span class="home-step-num">02 |</span> בוחרים עיצוב</h3>
-                        <p>בוחרים צבעים, פונט עברי וסגנון פריסה. השינוי משתקף מיד בתצוגה המקדימה.</p>
+                        <h3><span class="home-step-num">02 |</span> <span id="home-step-2-title-text">בוחרים עיצוב</span></h3>
+                        <p id="home-step-2-body">בוחרים צבעים, פונט עברי וסגנון פריסה. השינוי משתקף מיד בתצוגה המקדימה.</p>
                     </article>
                     <article class="home-step">
-                        <h3><span class="home-step-num">03 |</span> מורידים PDF</h3>
+                        <h3><span class="home-step-num">03 |</span> <span id="home-step-3-title-text">מורידים PDF</span></h3>
                         <p id="home-step-3-copy">משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.</p>
                     </article>
                 </div>
@@ -279,7 +337,7 @@
                 <div class="ba-compare" role="group" aria-label="השוואת לפני ואחרי">
                     <figure class="ba-panel ba-panel-before">
                         <figcaption class="ba-caption" id="ba-caption-before">לפני (Word)</figcaption>
-                        <div class="ba-doc ba-word" aria-hidden="true">
+                        <div class="ba-doc ba-word i18n-he" aria-hidden="true" dir="rtl">
                             <p class="ba-w-doc-title">קורות חיים</p>
                             <p class="ba-w-name">נועה כהן מנהלת מכירות</p>
                             <p class="ba-w-meta">טלפון: 052-5554433 אימייל: <span class="ba-w-link">noa.cohen@email.com</span> תל אביב <span class="ba-w-link">linkedin.com/in/noacohen</span></p>
@@ -290,11 +348,22 @@
                             <p class="ba-w-block"><span class="ba-w-h">שירות צבאי</span> מלא. רישיון נהיגה. המלצות אפשר לפנות למנהל הישיר בטלפון או במייל בכל שעה.</p>
                             <p class="ba-w-block">עוד פרטים: זמינה למשרה מלאה מיידית מוכנה לנסיעות פגישות וגם עבודה מהבית לפי הצורך.</p>
                         </div>
+                        <div class="ba-doc ba-word i18n-en" aria-hidden="true" dir="ltr">
+                            <p class="ba-w-doc-title">Resume</p>
+                            <p class="ba-w-name">Noa Cohen Sales Manager</p>
+                            <p class="ba-w-meta">Phone: 052-5554433 Email: <span class="ba-w-link">noa.cohen@email.com</span> Tel Aviv <span class="ba-w-link">linkedin.com/in/noacohen</span></p>
+                            <p class="ba-w-block"><span class="ba-w-h">Experience</span> 2019-Present National Sales Manager Alpha Ltd responsible for a team of 12, targets, key accounts plus ongoing admin including Excel reports meetings and constant calls grew revenue about 35%.</p>
+                            <p class="ba-w-block">2016-2019 Inside sales Shoreline Ltd phone sales CRM reports and tickets. Worked with small and large clients.</p>
+                            <p class="ba-w-block"><span class="ba-w-h">Education</span> BA Economics Tel Aviv University 2012-2016 including seminar and teamwork.</p>
+                            <p class="ba-w-block"><span class="ba-w-h">Skills:</span> Advanced Excel Word CRM team leadership Hebrew native English good works under pressure.</p>
+                            <p class="ba-w-block"><span class="ba-w-h">Military</span> Full service. Drivers license. References available from manager anytime by phone or email.</p>
+                            <p class="ba-w-block">More: available full-time immediately ready for travel meetings and remote work as needed.</p>
+                        </div>
                     </figure>
-                    <p class="ba-vs" aria-hidden="true">מול</p>
+                    <p class="ba-vs" id="ba-vs" aria-hidden="true">מול</p>
                     <figure class="ba-panel ba-panel-after">
                         <figcaption class="ba-caption" id="ba-caption-after">אחרי (QuickCV)</figcaption>
-                        <div class="ba-doc ba-pro" aria-hidden="true">
+                        <div class="ba-doc ba-pro i18n-he" aria-hidden="true" dir="rtl">
                             <p class="ba-pro-name">נועה כהן</p>
                             <p class="ba-pro-role">מנהלת מכירות ארצית</p>
                             <div class="ba-pro-rule"></div>
@@ -323,6 +392,35 @@
                             <p class="ba-pro-h">כישורים</p>
                             <p class="ba-pro-skills"><span>Excel מתקדם</span><span>CRM</span><span>ניהול צוותים</span></p>
                         </div>
+                        <div class="ba-doc ba-pro i18n-en" aria-hidden="true" dir="ltr">
+                            <p class="ba-pro-name">Noa Cohen</p>
+                            <p class="ba-pro-role">National Sales Manager</p>
+                            <div class="ba-pro-rule"></div>
+                            <p class="ba-pro-contact">052-5554433 · noa.cohen@email.com · Tel Aviv</p>
+                            <p class="ba-pro-h">Summary</p>
+                            <p class="ba-pro-p">Sales manager experienced in leading teams, hitting targets, and growing revenue.</p>
+                            <p class="ba-pro-h">Experience</p>
+                            <div class="ba-pro-job">
+                                <div class="ba-pro-job-top">
+                                    <p class="ba-pro-job-title">National Sales Manager</p>
+                                    <p class="ba-pro-job-dates">2019 – Present</p>
+                                </div>
+                                <p class="ba-pro-org">Alpha Ltd</p>
+                                <p class="ba-pro-li">Led a team of 12 and grew targets by 35%</p>
+                                <p class="ba-pro-li">Built sales processes and key-account retention</p>
+                            </div>
+                            <div class="ba-pro-job">
+                                <div class="ba-pro-job-top">
+                                    <p class="ba-pro-job-title">Inside Sales Rep</p>
+                                    <p class="ba-pro-job-dates">2016 – 2019</p>
+                                </div>
+                                <p class="ba-pro-org">Shoreline Ltd</p>
+                            </div>
+                            <p class="ba-pro-h">Education</p>
+                            <p class="ba-pro-p"><strong>B.A. Economics</strong> · Tel Aviv University · 2012 – 2016</p>
+                            <p class="ba-pro-h">Skills</p>
+                            <p class="ba-pro-skills"><span>Advanced Excel</span><span>CRM</span><span>Team leadership</span></p>
+                        </div>
                     </figure>
                 </div>
             </section>
@@ -337,54 +435,54 @@
                 <div class="home-layouts" data-home-templates></div>
                 <div class="home-cards home-cards--tools" style="margin-top:1rem">
                     <article class="home-card">
-                        <h3>משפטים לפי תחום</h3>
-                        <p>מאגר ניסוחים מקצועיים להייטק, מכירות ועוד – שמוסיפים בלחיצה אחת.</p>
+                        <h3 id="home-tool-phrases-title">משפטים לפי תחום</h3>
+                        <p id="home-tool-phrases-body">מאגר ניסוחים מקצועיים להייטק, מכירות ועוד – שמוסיפים בלחיצה אחת.</p>
                     </article>
                     <article class="home-card">
-                        <h3>שמירה אוטומטית</h3>
-                        <p>כל הפרטים נשמרים בדפדפן באופן מאובטח, כך שתוכלו לחזור ולערוך בכל רגע.</p>
+                        <h3 id="home-tool-save-title">שמירה אוטומטית</h3>
+                        <p id="home-tool-save-body">כל הפרטים נשמרים בדפדפן באופן מאובטח, כך שתוכלו לחזור ולערוך בכל רגע.</p>
                     </article>
                     <article class="home-card">
-                        <h3>הורדה מיידית ב-PDF</h3>
-                        <p>קובץ PDF נקי, מעוצב ומוכן למשלוח מיידי למעסיקים ולמגייסים.</p>
+                        <h3 id="home-tool-pdf-title">הורדה מיידית ב-PDF</h3>
+                        <p id="home-tool-pdf-body">קובץ PDF נקי, מעוצב ומוכן למשלוח מיידי למעסיקים ולמגייסים.</p>
                     </article>
                 </div>
             </section>
 
             <section class="home-section home-section-roles" aria-labelledby="home-roles">
-                <p class="home-kicker">לפי תפקיד</p>
+                <p class="home-kicker" id="home-roles-kicker">לפי תפקיד</p>
                 <h2 id="home-roles">תבניות מוכנות למכירות, הייטק ועוד</h2>
-                <p class="home-section-lead">בחרו את התחום שלכם לקבלת תבנית מותאמת אישית עם ניסוחים מקצועיים מוכנים לשימוש.</p>
+                <p class="home-section-lead" id="home-roles-lead">בחרו את התחום שלכם לקבלת תבנית מותאמת אישית עם ניסוחים מקצועיים מוכנים לשימוש.</p>
                 <div class="home-cards">
                     <a class="home-card home-role-card" href="/templates/sales/">
-                        <h3>מכירות</h3>
-                        <p>דגש על עמידה ביעדים, ניהול משא ומתן והרחבת מעגל הלקוחות.</p>
+                        <h3 id="home-role-sales-title">מכירות</h3>
+                        <p id="home-role-sales-body">דגש על עמידה ביעדים, ניהול משא ומתן והרחבת מעגל הלקוחות.</p>
                     </a>
                     <a class="home-card home-role-card" href="/templates/hi-tech/">
-                        <h3>הייטק</h3>
-                        <p>דגש על טכנולוגיות, שפות פיתוח, פרויקטים ופריסה נקייה ל-ATS.</p>
+                        <h3 id="home-role-tech-title">הייטק</h3>
+                        <p id="home-role-tech-body">דגש על טכנולוגיות, שפות פיתוח, פרויקטים ופריסה נקייה ל-ATS.</p>
                     </a>
                     <a class="home-card home-role-card" href="/templates/students/">
-                        <h3>סטודנטים</h3>
-                        <p>הבלטת השכלה, פרויקטי גמר ויכולות אישיות גם ללא ניסיון קודם.</p>
+                        <h3 id="home-role-students-title">סטודנטים</h3>
+                        <p id="home-role-students-body">הבלטת השכלה, פרויקטי גמר ויכולות אישיות גם ללא ניסיון קודם.</p>
                     </a>
                     <a class="home-card home-role-card" href="/templates/customer-service/">
-                        <h3>שירות לקוחות</h3>
-                        <p>הצגת יחסי אנוש מעולים, פתרון בעיות וניהול קשרי לקוחות.</p>
+                        <h3 id="home-role-cs-title">שירות לקוחות</h3>
+                        <p id="home-role-cs-body">הצגת יחסי אנוש מעולים, פתרון בעיות וניהול קשרי לקוחות.</p>
                     </a>
                 </div>
-                <p class="home-section-lead" style="margin-top:1rem"><a class="home-link" href="/templates/" style="padding:0">כל התחומים</a></p>
+                <p class="home-section-lead" style="margin-top:1rem"><a class="home-link" href="/templates/" id="home-all-fields" style="padding:0">כל התחומים</a></p>
             </section>
 
             <section class="home-section home-section-offer" aria-labelledby="home-offer">
                 <div class="home-price">
                     <div>
-                        <p class="home-kicker" style="color:#e7c98a">מחיר השקה</p>
+                        <p class="home-kicker" id="home-offer-kicker" style="color:#e7c98a">מחיר השקה</p>
                         <h2 id="home-offer">קורות חיים מוכנים להגשה</h2>
-                        <p>תשלום מאובטח ב-Bit, אישור מיידי במערכת והורדת קובץ PDF ישר למחשב. בלי מנוי ובלי הפתעות.</p>
-                        <p class="home-price-coffee">פורמט מקצועי המותאם למערכות סינון (ATS) ב-<span data-price>10</span> ₪ בלבד.</p>
-                        <p class="home-price-foot" role="status">תשלום חד-פעמי • הורדה מיידית בדפדפן</p>
-                        <button type="button" class="home-cta" onclick="showStudio()">יצירת קורות החיים</button>
+                        <p id="home-offer-lead">תשלום מאובטח ב-Bit, אישור מיידי במערכת והורדת קובץ PDF ישר למחשב. בלי מנוי ובלי הפתעות.</p>
+                        <p class="home-price-coffee" id="home-offer-coffee">פורמט מקצועי המותאם למערכות סינון (ATS) ב-<span data-price>10</span> ₪ בלבד.</p>
+                        <p class="home-price-foot" id="home-offer-foot" role="status">תשלום חד-פעמי • הורדה מיידית בדפדפן</p>
+                        <button type="button" class="home-cta" id="home-offer-cta" onclick="showStudio()">יצירת קורות החיים</button>
                     </div>
                     <p class="home-price-tag">
                         <s class="home-price-was"><span data-compare-price>49</span><small> ₪</small></s>
@@ -394,15 +492,15 @@
             </section>
 
             <footer class="home-footer">
-                <p>QuickCV · מחולל קורות חיים פרימיום</p>
+                <p id="home-footer-tag">QuickCV · מחולל קורות חיים פרימיום</p>
                 <p>
-                    <a href="/templates/hi-tech/">הייטק</a>
+                    <a href="/templates/hi-tech/" data-i18n-footer-cat="tech">הייטק</a>
                     ·
-                    <a href="/templates/sales/">מכירות</a>
+                    <a href="/templates/sales/" data-i18n-footer-cat="sales">מכירות</a>
                     ·
-                    <a href="/templates/students/">סטודנטים</a>
+                    <a href="/templates/students/" data-i18n-footer-cat="students">סטודנטים</a>
                     ·
-                    <a href="/templates/">כל התחומים</a>
+                    <a href="/templates/" id="home-footer-all">כל התחומים</a>
                 </p>
             </footer>
         </div>
@@ -420,9 +518,13 @@
                     </span>
                 </button>
                 <div class="home-nav-actions">
-                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/tech" data-seo-landing>הייטק</a>
-                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/sales" data-seo-landing>מכירות</a>
-                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/students" data-seo-landing>סטודנטים</a>
+                    <div class="lang-switch" role="group" aria-label="שפת האתר">
+                        <button type="button" id="seo-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
+                        <button type="button" id="seo-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
+                    </div>
+                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/tech" data-seo-landing data-i18n-footer-cat="tech">הייטק</a>
+                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/sales" data-seo-landing data-i18n-footer-cat="sales">מכירות</a>
+                    <a class="home-link hidden sm:inline-flex" href="/cv-templates/students" data-seo-landing data-i18n-footer-cat="students">סטודנטים</a>
                     <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
                 </div>
             </header>
@@ -434,7 +536,7 @@
                     <ul class="seo-landing-bullets" id="seo-landing-bullets"></ul>
                     <div class="home-hero-actions">
                         <button type="button" class="home-cta" id="seo-landing-cta">התחילו עם דוגמה</button>
-                        <button type="button" class="home-cta-ghost" onclick="showStudio()">לסטודיו ריק</button>
+                        <button type="button" class="home-cta-ghost" id="seo-landing-studio-empty" onclick="showStudio()">לסטודיו ריק</button>
                     </div>
                 </div>
                 <blockquote class="home-quote seo-landing-quote">
@@ -443,7 +545,7 @@
                 </blockquote>
             </section>
             <section class="home-section" aria-labelledby="seo-landing-examples-heading">
-                <p class="home-kicker">דוגמאות מוכנות</p>
+                <p class="home-kicker" id="seo-landing-examples-kicker">דוגמאות מוכנות</p>
                 <h2 id="seo-landing-examples-heading">בחרו תבנית וערכו מיד</h2>
                 <div class="home-layouts" id="seo-landing-examples"></div>
             </section>
@@ -1088,8 +1190,8 @@
                 <div class="pay-head">
                     <h3 id="pay-title">תשלום ₪10 בלבד</h3>
                     <p id="pay-subtitle">
-                        <span class="pay-sub-desktop">סירקו את הקוד במחשב, או לחצו לפתיחת Bit בנייד.</span>
-                        <span class="pay-sub-mobile" aria-hidden="true">לחצו למעבר מאובטח לתשלום באפליקציית Bit</span>
+                        <span class="pay-sub-desktop" id="pay-sub-desktop">סירקו את הקוד במחשב, או לחצו לפתיחת Bit בנייד.</span>
+                        <span class="pay-sub-mobile" id="pay-sub-mobile" aria-hidden="true">לחצו למעבר מאובטח לתשלום באפליקציית Bit</span>
                     </p>
                 </div>
 
@@ -1100,7 +1202,7 @@
                 <div class="pay-bit-block">
                     <figure class="pay-qr-wrap">
                         <img id="bit-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https%3A%2F%2Fwww.bitpay.co.il%2Fapp%2Fme%2FE4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F%3Fsum%3D10.00%26amount%3D10.00&amp;ecc=M" alt="קוד QR לתשלום 10 ₪ ב-Bit" width="168" height="168">
-                        <figcaption>סריקה מהמחשב</figcaption>
+                        <figcaption id="pay-qr-caption">סריקה מהמחשב</figcaption>
                     </figure>
                     <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">שלמו 10 ₪ ב-Bit</a>
                     <div id="pay-live-status" class="pay-live-status" aria-live="polite">
@@ -1120,20 +1222,20 @@
             <div id="download-step" class="hidden space-y-4">
                 <div class="pay-success-check mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white text-3xl shadow-lg shadow-emerald-500/40" aria-hidden="true">✓</div>
                 <h3 id="pay-success-title" class="text-xl font-extrabold text-white">התשלום אושר בהצלחה!</h3>
-                <p class="text-xs text-slate-300">אם ההורדה לא מתחילה אוטומטית ב-Safari, לחצו על הכפתור הירוק.</p>
+                <p id="pay-success-hint" class="text-xs text-slate-300">אם ההורדה לא מתחילה אוטומטית ב-Safari, לחצו על הכפתור הירוק.</p>
                 <p id="download-complete-note" class="hidden text-xs text-amber-200 font-semibold">נכלל מכתב מקדים — אפשר להוריד אותו למטה.</p>
                 <button type="button" id="btn-download-cv-pdf" class="btn-download-cv-pdf w-full min-h-14 bg-emerald-500 hover:bg-emerald-400 text-white font-black py-4 px-4 rounded-2xl text-base sm:text-lg">
                     הורד קורות חיים ב-PDF
                 </button>
                 <div class="grid grid-cols-1 gap-2 text-right">
                     <button type="button" id="btn-send-pdf-whatsapp" class="w-full min-h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold py-3 px-4 rounded-xl text-sm">שלח PDF לוואטסאפ שלי</button>
-                    <label for="wa-pdf-phone" class="block text-[11px] font-bold text-slate-300">נייד לשליחה</label>
+                    <label for="wa-pdf-phone" id="wa-pdf-phone-label" class="block text-[11px] font-bold text-slate-300">נייד לשליחה</label>
                     <input type="tel" id="wa-pdf-phone" inputmode="tel" autocomplete="tel" placeholder="054-0000000" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
                     <button type="button" id="cover-letter-download" data-pack-extra data-download="cover" class="hidden w-full min-h-12 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-3 px-4 rounded-xl text-sm">הורד מכתב מקדים</button>
                 </div>
                 <div class="text-right rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
-                    <p class="text-xs font-extrabold text-white">שתפו עם חברים</p>
-                    <p class="text-[11px] text-slate-300">קישור הפניה אישי — וואטסאפ או העתקה.</p>
+                    <p id="pay-share-title" class="text-xs font-extrabold text-white">שתפו עם חברים</p>
+                    <p id="pay-share-lead" class="text-[11px] text-slate-300">קישור הפניה אישי — וואטסאפ או העתקה.</p>
                     <input type="text" id="referral-link" readonly class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-2.5 text-center text-[11px] rounded-xl outline-none" dir="ltr">
                     <div class="grid grid-cols-2 gap-2">
                         <button type="button" id="btn-copy-referral" class="min-h-11 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15">העתק קישור</button>
@@ -1141,7 +1243,7 @@
                     </div>
                 </div>
                 <p id="download-status" class="text-xs text-emerald-300 min-h-4"></p>
-                <button type="button" class="btn-back-checkout w-full min-h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/15" onclick="closePaymentModal(event)">
+                <button type="button" id="btn-back-checkout" class="btn-back-checkout w-full min-h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/15" onclick="closePaymentModal(event)">
                     חזרה לקורות החיים
                 </button>
             </div>
@@ -1152,16 +1254,16 @@
 
     <div id="shot-block" class="fixed inset-0 hidden items-center justify-center bg-slate-950 text-white no-print px-6 text-center" style="z-index:2147483645" role="status" aria-live="assertive">
         <div>
-            <p class="text-lg font-black">התצוגה המקדימה מוגנת</p>
-            <p class="text-sm text-slate-300 mt-2">לאחר תשלום של <span data-price>10</span> ₪ אפשר להוריד PDF נקי.</p>
+            <p class="text-lg font-black" id="shot-title">התצוגה המקדימה מוגנת</p>
+            <p class="text-sm text-slate-300 mt-2" id="shot-lead">לאחר תשלום של <span data-price>10</span> ₪ אפשר להוריד PDF נקי.</p>
         </div>
     </div>
 
     <div id="pdf-spinner" class="fixed inset-0 hidden items-center justify-center bg-slate-950/60 no-print" style="z-index:2147483646" aria-live="polite" aria-busy="true">
         <div class="bg-white text-slate-800 rounded-2xl px-6 py-5 text-center shadow-2xl max-w-xs w-[90%]">
             <div class="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"></div>
-            <p class="text-sm font-semibold">מכין PDF...</p>
-            <p class="text-xs text-slate-500 mt-1">הקובץ יורד למחשב בעוד רגע</p>
+            <p class="text-sm font-semibold" id="pdf-spin-title">מכין PDF...</p>
+            <p class="text-xs text-slate-500 mt-1" id="pdf-spin-lead">הקובץ יורד למחשב בעוד רגע</p>
         </div>
     </div>
 
@@ -1169,6 +1271,7 @@
     <script src="lib/security/sanitize.js"></script>
     <script src="lib/security/log.js"></script>
     <script src="lib/security/rateLimit.js"></script>
+    <script src="lib/siteI18n.js?v=site-i18n1"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
     <script src="lib/experienceEditor.js?v=exp-ui8"></script>
@@ -1179,7 +1282,7 @@
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
     <script src="lib/export.js?v=pdf2"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
-    <script src="lib/seoLandings.js"></script>
+    <script src="lib/seoLandings.js?v=i18n1"></script>
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
     <script src="lib/pageFit.js?v=a4space1"></script>
@@ -2014,6 +2117,8 @@
             if (typeof syncMobilePreviewToggle === 'function') syncMobilePreviewToggle();
             if (typeof updateCvScore === 'function') updateCvScore();
             if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
+            if (window.QCSiteI18n && typeof QCSiteI18n.apply === 'function') QCSiteI18n.apply(lang);
+            if (window.QCLandings && typeof QCLandings.refreshActive === 'function') QCLandings.refreshActive();
             const langNameBtn = document.getElementById('lang-pick-name-btn');
             const langLevelBtn = document.getElementById('lang-pick-level-btn');
             if (langNameBtn && pack.labels.languagesSelect) langNameBtn.setAttribute('aria-label', pack.labels.languagesSelect);
@@ -2352,6 +2457,8 @@
             const dir = isEnglish ? 'ltr' : 'rtl';
             window.QCCvLang = next;
             document.documentElement.lang = next;
+            document.documentElement.dir = dir;
+            if (document.body) document.body.setAttribute('dir', dir);
             const target = document.getElementById('cv-target');
             const previewWrap = document.getElementById('cv-preview-wrapper');
             const page2Wrap = document.getElementById('cv-preview-page-2');
@@ -5231,11 +5338,16 @@
 
         const DEFAULT_SEO = {
             title: 'QuickCV - מחולל קורות חיים פרימיום',
-            description: 'מחולל קורות חיים בעברית: תבניות מוכנות, תצוגה חיה, והורדת PDF אחרי תשלום ב-Bit.'
+            description: 'מחולל קורות חיים בעברית: תבניות מוכנות, תצוגה חיה, והורדת PDF אחרי תשלום ב-Bit.',
+            titleEn: 'QuickCV - Professional CV Builder',
+            descriptionEn: 'Build a professional resume: ready templates, live preview, and instant PDF download after Bit payment.'
         };
 
         function applySeoMeta(page) {
-            document.title = page && page.title ? page.title : DEFAULT_SEO.title;
+            const en = window.QCCvLang === 'en';
+            const fallbackTitle = en ? DEFAULT_SEO.titleEn : DEFAULT_SEO.title;
+            const fallbackDesc = en ? DEFAULT_SEO.descriptionEn : DEFAULT_SEO.description;
+            document.title = page && page.title ? page.title : fallbackTitle;
             let desc = document.getElementById('meta-description');
             if (!desc) {
                 desc = document.querySelector('meta[name="description"]');
@@ -5246,7 +5358,7 @@
                 desc.id = 'meta-description';
                 document.head.appendChild(desc);
             }
-            desc.setAttribute('content', page && page.description ? page.description : DEFAULT_SEO.description);
+            desc.setAttribute('content', page && page.description ? page.description : fallbackDesc);
             let canonical = document.getElementById('canonical-url');
             if (!canonical) {
                 canonical = document.createElement('link');
@@ -5270,7 +5382,7 @@
             set('seo-landing-cite', page.cite);
             const cta = document.getElementById('seo-landing-cta');
             if (cta) {
-                cta.textContent = page.cta || 'התחילו עם דוגמה';
+                cta.textContent = page.cta || (window.QCCvLang === 'en' ? 'Start with a sample' : 'התחילו עם דוגמה');
                 cta.onclick = function () {
                     if (page.field && typeof applyIndustryPreset === 'function') applyIndustryPreset(page.field);
                     else loadExample(page.example);
@@ -5297,6 +5409,8 @@
             }
             applySeoMeta(page);
         }
+        window.renderSeoLanding = renderSeoLanding;
+        window.applySeoMeta = applySeoMeta;
 
         function showSeoLanding(page, opts) {
             if (!page) {

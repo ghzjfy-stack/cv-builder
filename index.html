@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=add-click6">
+    <link rel="stylesheet" href="./app.css?v=exp-ui1">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub so add-job buttons work even before experienceEditor.js loads. */
@@ -500,20 +500,17 @@
                     <textarea id="in-summary" rows="2" oninput="updateCV()" placeholder="לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea>
                 </div>
 
-                <div class="space-y-2 relative" id="experience-section">
-                    <div class="section-editor-head">
-                        <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
-                        <button type="button" id="btn-add-experience-top" class="section-add-btn section-add-btn--inline" data-qc-add-job="1" onclick="return window.__qcClickAddJob(event)">
-                            <span class="experience-add-icon" aria-hidden="true">+</span>
-                            <span id="btn-add-experience-top-label">הוסף משרה</span>
-                        </button>
+                <div class="exp-section" id="experience-section">
+                    <div class="exp-section-head">
+                        <p class="exp-section-title" id="label-experience">ניסיון תעסוקתי</p>
+                        <p class="exp-section-hint" id="experience-section-hint">כל משרה בבלוק נפרד — לחצו למטה להוספה</p>
                     </div>
-                    <div id="experience-items" role="list">
-                        <article class="experience-card is-open" role="listitem" data-job-id="job-seed-0" data-job-index="0">
-                            <div class="experience-card-toolbar">
-                                <span class="experience-card-badge" id="job-seed-badge">משרה 1</span>
+                    <div id="experience-items" class="exp-list" role="list">
+                        <article class="experience-card exp-block is-open" role="listitem" data-job-id="job-seed-0" data-job-index="0">
+                            <div class="exp-block-head">
+                                <span class="experience-card-badge exp-block-num" id="job-seed-badge">משרה 1</span>
                             </div>
-                            <div class="experience-card-fields">
+                            <div class="experience-card-fields exp-block-fields">
                                 <div class="experience-field">
                                     <label class="experience-field-label" for="job-seed-company">שם חברה/ארגון</label>
                                     <input type="text" id="job-seed-company" data-job-employer="1" data-job-field="company" value="" autocomplete="off" oninput="handleExperienceChange('job-seed-0', 'company', this.value)" onchange="handleExperienceChange('job-seed-0', 'company', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: חברת דמו">
@@ -534,10 +531,13 @@
                             </div>
                         </article>
                     </div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn" data-qc-add-job="1" onclick="return window.__qcClickAddJob(event)">
-                        <span class="experience-add-icon" aria-hidden="true">+</span>
-                        <span id="btn-add-experience-label">הוסף משרה נוספת</span>
-                    </button>
+                    <p id="experience-add-status" class="experience-add-status" role="status" aria-live="polite"></p>
+                    <form id="experience-add-form" class="exp-add-form" action="#" method="get" onsubmit="event.preventDefault(); window.__qcClickAddJob(event); return false;">
+                        <button type="submit" id="btn-add-experience" class="exp-add-bar" data-qc-add-job="1">
+                            <span class="exp-add-bar-plus" aria-hidden="true">+</span>
+                            <span id="btn-add-experience-label">הוסף משרה נוספת</span>
+                        </button>
+                    </form>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                 </div>
 
@@ -1077,8 +1077,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=add14"></script>
-    <script src="lib/entryEditor.js?v=add14"></script>
+    <script src="lib/experienceEditor.js?v=exp-ui1"></script>
+    <script src="lib/entryEditor.js?v=exp-ui1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>

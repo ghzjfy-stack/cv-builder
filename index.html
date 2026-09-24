@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=nav-mobile1">
+    <link rel="stylesheet" href="./app.css?v=pdf-wysiwyg1">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -647,8 +647,8 @@
                 <div class="space-y-3">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-white mb-1" for="in-name" id="label-name">שם מלא</label>
-                            <input type="text" id="in-name" name="name" autocomplete="name" value="" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
+                            <label class="block text-xs text-white mb-1" for="in-name" id="label-name">שם מלא <span class="text-teal-300" aria-hidden="true">*</span></label>
+                            <input type="text" id="in-name" name="name" autocomplete="name" value="" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" required>
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
@@ -656,11 +656,11 @@
                             <datalist id="role-title-list"></datalist>
                         </div>
                         <div>
-                            <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון</label>
+                            <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון <span class="text-teal-300 text-[10px] font-normal" id="label-phone-hint">(או אימייל)</span></label>
                             <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="" placeholder="050-1234567" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-white mb-1" for="in-email" id="label-email">אימייל</label>
+                            <label class="block text-xs text-white mb-1" for="in-email" id="label-email">אימייל <span class="text-teal-300 text-[10px] font-normal" id="label-email-hint">(או טלפון)</span></label>
                             <input type="email" id="in-email" name="email" autocomplete="email" value="" placeholder="israel@example.com" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
@@ -1231,7 +1231,7 @@
             <div id="download-step" class="hidden space-y-4">
                 <div class="pay-success-check mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white text-3xl shadow-lg shadow-emerald-500/40" aria-hidden="true">✓</div>
                 <h3 id="pay-success-title" class="text-xl font-extrabold text-white">התשלום אושר בהצלחה!</h3>
-                <p id="pay-success-hint" class="text-xs text-slate-300">אם ההורדה לא מתחילה אוטומטית ב-Safari, לחצו על הכפתור הירוק.</p>
+                <p id="pay-success-hint" class="text-xs text-slate-300">במחשב ההורדה מתחילה אוטומטית. בנייד (בעיקר Safari) לחצו על הכפתור הירוק אם הקובץ לא נשמר.</p>
                 <p id="download-complete-note" class="hidden text-xs text-amber-200 font-semibold">נכלל מכתב מקדים — אפשר להוריד אותו למטה.</p>
                 <button type="button" id="btn-download-cv-pdf" class="btn-download-cv-pdf w-full min-h-14 bg-emerald-500 hover:bg-emerald-400 text-white font-black py-4 px-4 rounded-2xl text-base sm:text-lg">
                     הורד קורות חיים ב-PDF
@@ -1272,7 +1272,7 @@
         <div class="bg-white text-slate-800 rounded-2xl px-6 py-5 text-center shadow-2xl max-w-xs w-[90%]">
             <div class="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"></div>
             <p class="text-sm font-semibold" id="pdf-spin-title">מכין PDF...</p>
-            <p class="text-xs text-slate-500 mt-1" id="pdf-spin-lead">הקובץ יורד למחשב בעוד רגע</p>
+            <p class="text-xs text-slate-500 mt-1" id="pdf-spin-lead">הקובץ יירד באיכות מלאה כמו בתצוגה החיה</p>
         </div>
     </div>
 
@@ -1592,7 +1592,10 @@
                 examplesTitle: 'תבניות ודוגמאות מוכנות',
                 examplesLead: 'בחרו את התבנית המתאימה לתחום שלכם. ניתן לשנות את הצבעים והפונטים בכל שלב.',
                 examplesClose: 'סגור דוגמאות',
-                checkoutGateToast: 'רגע לפני התשלום, כדאי למלא את הפרטים האישיים שלך בטופס ✏️'
+                checkoutGateToast: 'לפני התשלום צריך למלא שם מלא וטלפון או אימייל בטופס הפרטים ✏️',
+                checkoutGateNeedName: 'חסר שם מלא בטופס הפרטים',
+                checkoutGateNeedContact: 'חסר טלפון או אימייל בטופס הפרטים',
+                checkoutGateNeedBoth: 'חסרים שם מלא וטלפון או אימייל בטופס הפרטים'
             },
             en: {
                 nameFallback: 'Full name',
@@ -1711,7 +1714,10 @@
                 examplesTitle: 'Ready Templates & Examples',
                 examplesLead: 'Choose the best template for your domain. Colors and fonts can be customized anytime.',
                 examplesClose: 'Close examples',
-                checkoutGateToast: 'Hold on — fill in your personal details in the form before payment ✏️'
+                checkoutGateToast: 'Before payment, add your full name and a phone or email in the details form ✏️',
+                checkoutGateNeedName: 'Full name is missing in the details form',
+                checkoutGateNeedContact: 'Phone or email is missing in the details form',
+                checkoutGateNeedBoth: 'Full name and phone or email are missing in the details form'
             }
         };
         window.CV_I18N = CV_I18N;
@@ -1968,14 +1974,30 @@
                 const el = document.getElementById(id);
                 if (el && text) el.textContent = text;
             };
+            const setLabelHtml = (id, html) => {
+                const el = document.getElementById(id);
+                if (el && html) el.innerHTML = html;
+            };
             setLabel('details-heading-title', pack.detailsHeading);
             setLabel('details-heading-hint', pack.detailsHeadingHint);
             setLabel('btn-clear-form', pack.clearForm);
             setLabel('btn-photo-pick', pack.photoChoose);
-            setLabel('label-name', pack.labels.name);
+            setLabelHtml('label-name', (pack.labels.name || 'שם מלא') + ' <span class="text-teal-300" aria-hidden="true">*</span>');
             setLabel('label-title', pack.labels.title);
-            setLabel('label-phone', pack.labels.phone);
-            setLabel('label-email', pack.labels.email);
+            setLabelHtml(
+                'label-phone',
+                (pack.labels.phone || 'טלפון') +
+                    ' <span class="text-teal-300 text-[10px] font-normal" id="label-phone-hint">' +
+                    (lang === 'en' ? '(or email)' : '(או אימייל)') +
+                    '</span>'
+            );
+            setLabelHtml(
+                'label-email',
+                (pack.labels.email || 'אימייל') +
+                    ' <span class="text-teal-300 text-[10px] font-normal" id="label-email-hint">' +
+                    (lang === 'en' ? '(or phone)' : '(או טלפון)') +
+                    '</span>'
+            );
             setLabel('label-location', pack.labels.location);
             setLabel('label-linkedin', pack.labels.linkedin);
             setLabel('label-photo', pack.labels.photo);
@@ -2213,7 +2235,15 @@
         function isCvFieldsEmpty() {
             if (!CV_SAMPLE_IDS.every((id) => !(formField(id)?.value || '').trim())) return false;
             const mil = readMilitaryInputs();
-            return !(mil.role || mil.years);
+            if (mil.role || mil.years) return false;
+            // Experience / education cards count as real input (not only legacy textareas).
+            try {
+                if (typeof typedExperienceJobs === 'function' && typedExperienceJobs().length) return false;
+            } catch (err) { /* ignore */ }
+            try {
+                if (typeof typedEducationText === 'function' && String(typedEducationText() || '').trim()) return false;
+            } catch (err) { /* ignore */ }
+            return true;
         }
 
         function shouldSwapCvSample(prevLang) {
@@ -4272,18 +4302,49 @@
 
         function checkoutGateMessage() {
             const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
-            return pack.checkoutGateToast || 'רגע לפני התשלום, כדאי למלא את הפרטים האישיים שלך בטופס ✏️';
+            const missing = checkoutGateMissing();
+            if (missing.name && missing.contact) {
+                return pack.checkoutGateNeedBoth || pack.checkoutGateToast || 'חסרים שם מלא וטלפון או אימייל בטופס הפרטים';
+            }
+            if (missing.name) {
+                return pack.checkoutGateNeedName || pack.checkoutGateToast || 'חסר שם מלא בטופס הפרטים';
+            }
+            if (missing.contact) {
+                return pack.checkoutGateNeedContact || pack.checkoutGateToast || 'חסר טלפון או אימייל בטופס הפרטים';
+            }
+            return pack.checkoutGateToast || 'לפני התשלום צריך למלא שם מלא וטלפון או אימייל בטופס הפרטים ✏️';
         }
 
-        function isPersonalInfoComplete() {
+        function checkoutGateMissing() {
             const name = getVal('in-name').trim();
             const phone = getVal('in-phone').replace(/\D/g, '');
             const email = getVal('in-email').trim();
-            if (name.length < 2 || isSampleFieldValue('in-name', name)) return false;
+            const nameOk = name.length >= 2 && !isSampleFieldValue('in-name', name);
             const samplePhone = String((CV_SAMPLES.he && CV_SAMPLES.he['in-phone']) || '').replace(/\D/g, '');
-            const phoneOk = phone.length >= 9 && phone !== samplePhone;
-            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !isSampleFieldValue('in-email', email);
-            return phoneOk || emailOk;
+            const samplePhoneEn = String((CV_SAMPLES.en && CV_SAMPLES.en['in-phone']) || '').replace(/\D/g, '');
+            const phoneOk = phone.length >= 9 && phone !== samplePhone && phone !== samplePhoneEn;
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && !isSampleFieldValue('in-email', email);
+            return {
+                name: !nameOk,
+                contact: !(phoneOk || emailOk),
+                phoneOk: phoneOk,
+                emailOk: emailOk
+            };
+        }
+
+        function isPersonalInfoComplete() {
+            const missing = checkoutGateMissing();
+            return !missing.name && !missing.contact;
+        }
+
+        function markCheckoutRequiredFields() {
+            const missing = checkoutGateMissing();
+            const nameEl = formField('in-name');
+            const phoneEl = formField('in-phone');
+            const emailEl = formField('in-email');
+            if (nameEl) nameEl.classList.toggle('qc-field-required-missing', missing.name);
+            if (phoneEl) phoneEl.classList.toggle('qc-field-required-missing', missing.contact && !missing.phoneOk);
+            if (emailEl) emailEl.classList.toggle('qc-field-required-missing', missing.contact && !missing.emailOk);
         }
 
         function isTemplateSelected() {
@@ -4315,13 +4376,14 @@
             window.clearTimeout(qcStudioToastTimer);
             qcStudioToastTimer = window.setTimeout(function () {
                 el.classList.remove('is-visible');
-            }, 3600);
+            }, 4200);
         }
 
         function checkoutGateTargets() {
             const nodes = [
                 document.getElementById('step-3'),
                 document.getElementById('btn-continue-details'),
+                document.getElementById('btn-mobile-continue'),
                 document.getElementById('btn-download-pdf'),
                 document.getElementById('btn-download-pdf-mobile'),
                 document.getElementById('btn-sample-pdf-download')
@@ -4334,32 +4396,62 @@
             const ready = isCheckoutReady();
             document.body.classList.toggle('qc-checkout-locked', !ready);
             checkoutGateTargets().forEach(function (el) {
+                // Mobile continue on step 1 must stay clickable (goes to details, not pay).
+                if (el.id === 'btn-mobile-continue' && (window.QCStudioStep || 1) === 1) {
+                    el.classList.remove('is-locked');
+                    el.removeAttribute('aria-disabled');
+                    return;
+                }
                 el.classList.toggle('is-locked', !ready);
                 if (!ready) el.setAttribute('aria-disabled', 'true');
                 else el.removeAttribute('aria-disabled');
             });
+            if (ready) {
+                ['in-name', 'in-phone', 'in-email'].forEach(function (id) {
+                    const el = formField(id);
+                    if (el) el.classList.remove('qc-field-required-missing');
+                });
+            }
             return ready;
         }
 
         function focusPersonalForm() {
             applyStudioStep(2, { silent: true });
-            const name = formField('in-name');
+            markCheckoutRequiredFields();
+            const missing = checkoutGateMissing();
+            let focusId = 'in-name';
+            if (!missing.name && missing.contact) {
+                focusId = missing.phoneOk ? 'in-email' : 'in-phone';
+            }
+            const target = formField(focusId) || formField('in-name');
             window.setTimeout(function () {
-                if (name && typeof name.focus === 'function') name.focus();
-            }, 40);
+                if (!target) return;
+                try {
+                    const formCol = document.getElementById('studio-form-column');
+                    if (formCol && formCol.contains(target)) {
+                        const top = Math.max(0, target.offsetTop - 24);
+                        formCol.scrollTo({ top: top, behavior: 'smooth' });
+                    }
+                    if (typeof target.scrollIntoView === 'function') {
+                        target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                } catch (err) { /* ignore */ }
+                if (typeof target.focus === 'function') target.focus();
+            }, 60);
         }
 
         function guardCheckout(opts) {
             syncCheckoutGate();
             if (isCheckoutReady()) return true;
             if (!(opts && opts.silent)) {
-                showStudioToast();
+                showStudioToast(checkoutGateMessage());
                 focusPersonalForm();
             }
             return false;
         }
         window.QCCheckoutGate = guardCheckout;
         window.syncCheckoutGate = syncCheckoutGate;
+        window.isCheckoutReady = isCheckoutReady;
 
         function markStep(n) {
             const step = Math.max(1, Math.min(3, Number(n) || 1));
@@ -5701,10 +5793,21 @@
             window.__qcCheckoutGateBound = true;
             document.addEventListener('click', function (e) {
                 const t = e.target && e.target.closest && e.target.closest(
-                    '#step-3, #btn-continue-details, #btn-download-pdf, #btn-download-pdf-mobile, .studio-pay, #btn-sample-pdf-download'
+                    '#step-3, #btn-continue-details, #btn-mobile-continue, #btn-download-pdf, #btn-download-pdf-mobile, .studio-pay, #btn-sample-pdf-download'
                 );
                 if (!t) return;
+                // Step-1 mobile continue goes to details — never block it.
+                if (t.id === 'btn-mobile-continue' && (window.QCStudioStep || 1) === 1) return;
                 if (typeof isCheckoutReady === 'function' && isCheckoutReady()) return;
+                // Only gate payment-bound actions (step 3 / download / pay).
+                const paying = t.id === 'step-3'
+                    || t.id === 'btn-continue-details'
+                    || t.id === 'btn-mobile-continue'
+                    || t.id === 'btn-download-pdf'
+                    || t.id === 'btn-download-pdf-mobile'
+                    || t.id === 'btn-sample-pdf-download'
+                    || t.classList.contains('studio-pay');
+                if (!paying) return;
                 e.preventDefault();
                 e.stopPropagation();
                 if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();

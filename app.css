@@ -3742,6 +3742,7 @@
         }
         #step-3.is-locked,
         #btn-continue-details.is-locked,
+        #btn-mobile-continue.is-locked,
         .studio-pay.is-locked,
         #btn-download-pdf.is-locked,
         #btn-download-pdf-mobile.is-locked,
@@ -3752,11 +3753,17 @@
         }
         #step-3.is-locked:hover,
         #btn-continue-details.is-locked:hover,
+        #btn-mobile-continue.is-locked:hover,
         .studio-pay.is-locked:hover,
         #btn-download-pdf.is-locked:hover,
         #btn-download-pdf-mobile.is-locked:hover {
             transform: none;
             filter: none;
+        }
+        #details-panel .qc-field-required-missing,
+        .studio-field.qc-field-required-missing {
+            border-color: #f87171 !important;
+            box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.45);
         }
         /* Mobile continue CTA on Design (1) and Details (2); hidden on Download (3). */
         body.qc-studio-step-3 #btn-mobile-continue,
@@ -5952,23 +5959,33 @@
             position: absolute;
             pointer-events: none;
         }
+        /* Full-height capture host: never clip multi-page CV content */
         #qc-print-host.qc-capturing {
             display: block !important;
-            width: 210mm !important;
-            height: 297mm !important;
-            min-height: 297mm !important;
-            max-height: 297mm !important;
-            overflow: hidden !important;
+            width: 794px !important;
+            min-width: 794px !important;
+            max-width: 794px !important;
+            height: auto !important;
+            min-height: 1123px !important;
+            max-height: none !important;
+            overflow: visible !important;
+            background: #fff !important;
         }
         #qc-print-host.qc-capturing .cv-print-sheet,
-        html.qc-exporting #cv-preview-wrapper,
-        html.qc-exporting #cv-target {
-            width: 210mm !important;
-            height: 297mm !important;
-            min-height: 297mm !important;
-            max-height: 297mm !important;
-            overflow: hidden !important;
+        html.qc-exporting #qc-print-host .cv-print-sheet {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 1123px !important;
+            max-height: none !important;
+            overflow: visible !important;
             box-sizing: border-box !important;
+            transform: none !important;
+            box-shadow: none !important;
+            filter: none !important;
+        }
+        html.qc-exporting #qc-print-host.qc-capturing .cv-watermark,
+        html.qc-exporting #qc-print-host.qc-capturing .cv-shield {
+            display: none !important;
         }
 
         @page {

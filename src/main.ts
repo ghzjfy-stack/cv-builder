@@ -550,11 +550,19 @@ function applyPaidUnlock(token, message) {
 
 async function attemptApprovedPdfDownload() {
   const status = document.getElementById("download-status");
+  const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {
-    status.textContent = qcT("autoDownloadTry", "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.");
+    status.textContent = mobile
+      ? qcT("autoDownloadTryMobile", "מכין PDF… אם לא נפתח שיתוף/הורדה, לחצו על הכפתור הירוק.")
+      : qcT("autoDownloadTry", "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.");
   }
   try {
     await runHighResExport();
+    if (status) {
+      status.textContent = mobile
+        ? qcT("downloadReadyMobile", "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.")
+        : qcT("downloadStarted", "ההורדה התחילה.");
+    }
   } catch {
     if (status) status.textContent = qcT("clickGreenDownload", "לחצו על הכפתור הירוק להורדת ה-PDF.");
   }
@@ -825,10 +833,19 @@ function onOrderBumpChange() {
 
 async function runHighResExport() {
   const status = document.getElementById("download-status");
-  if (status) status.textContent = qcT("preparingPdf", "מכין קובץ PDF...");
+  const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+  if (status) {
+    status.textContent = mobile
+      ? qcT("preparingPdfMobile", "מכין PDF באיכות מלאה לתצוגה שלכם…")
+      : qcT("preparingPdf", "מכין קובץ PDF...");
+  }
   try {
     await exportHighResPdf();
-    if (status) status.textContent = qcT("downloadStarted", "ההורדה התחילה.");
+    if (status) {
+      status.textContent = mobile
+        ? qcT("downloadReadyMobile", "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.")
+        : qcT("downloadStarted", "ההורדה התחילה.");
+    }
   } catch {
     if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
   }

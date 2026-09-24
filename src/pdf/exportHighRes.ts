@@ -1,12 +1,14 @@
 // @ts-nocheck
+/**
+ * WYSIWYG high-res PDF: captures the live #cv-target (all layouts/templates)
+ * via html2canvas → jsPDF, then downloads reliably on desktop + mobile.
+ */
 import { isUnlocked } from "../access/gate.js";
-import { exportSelectablePdf } from "./exportSelectable.js";
 
 const PAGE_W_MM = 210;
 const PAGE_H_MM = 297;
 const A4_CSS_PX = 794;
-const A4_CSS_H = Math.round(A4_CSS_PX * PAGE_H_MM / PAGE_W_MM);
-const MARGIN_MM = 8;
+const A4_CSS_H = Math.round((A4_CSS_PX * PAGE_H_MM) / PAGE_W_MM);
 const MAX_CANVAS = 8192;
 
 function getJsPdfCtor() {
@@ -21,7 +23,8 @@ function cvCaptureDir() {
 function fileBase() {
   const english = cvCaptureDir() === "ltr";
   const raw = document.getElementById("in-name")?.value || (english ? "Resume" : "קורות_חיים");
-  const safe = window.QCSanitize?.filename?.(raw) || String(raw).replace(/[^\w\u0590-\u05FF-]+/g, "_");
+  const safe =
+    window.QCSanitize?.filename?.(raw) || String(raw).replace(/[^\w\u0590-\u05FF-]+/g, "_");
   return (english ? "Resume_" : "קורות_חיים_") + (safe || "resume");
 }
 
@@ -30,15 +33,19 @@ function cvThemeSource() {
     const root = window.QCCvThemeRoot();
     if (root) return root;
   }
-  return document.getElementById("cv-preview-wrapper")
-    || document.getElementById("cv-preview-stack")
-    || document.documentElement;
+  return (
+    document.getElementById("cv-preview-wrapper") ||
+    document.getElementById("cv-preview-stack") ||
+    document.documentElement
+  );
 }
 
 function copyCssVars(fromEl, toEl) {
   const accentSrc = fromEl && fromEl !== document.documentElement ? fromEl : cvThemeSource();
   const fontSrc = document.documentElement;
+  const preview = document.getElementById("cv-target") || cvThemeSource();
   const copyNamed = (src, names) => {
+    if (!src) return;
     const cs = getComputedStyle(src);
     names.forEach((name) => {
       const v = (src.style.getPropertyValue(name) || cs.getPropertyValue(name) || "").trim();
@@ -46,20 +53,33 @@ function copyCssVars(fromEl, toEl) {
     });
   };
   copyNamed(accentSrc, ["--accent", "--cv-accent-color"]);
-  copyNamed(fontSrc, ["--cv-font", "--cv-scale", "--cv-leading"]);
-  const accent = (toEl.style.getPropertyValue("--accent") || toEl.style.getPropertyValue("--cv-accent-color") || "").trim();
+  copyNamed(fontSrc, ["--cv-font", "--cv-scale", "--cv-leading", "--cv-density"]);
+  // Match live page-fit spacing so PDF matches on-screen preview.
+  copyNamed(preview, ["--space-fit", "--section-gap", "--item-padding"]);
+  const accent = (
+    toEl.style.getPropertyValue("--accent") ||
+    toEl.style.getPropertyValue("--cv-accent-color") ||
+    ""
+  ).trim();
   if (accent) {
     toEl.style.setProperty("--accent", accent);
     toEl.style.setProperty("--cv-accent-color", accent);
   }
-  const stack = (fontSrc.style.getPropertyValue("--cv-font") || getComputedStyle(fontSrc).getPropertyValue("--cv-font") || "").trim();
+  // Never inherit a compressed fit-scale from the studio chrome.
+  toEl.style.setProperty("--cv-fit-scale", "1");
+  const stack = (
+    fontSrc.style.getPropertyValue("--cv-font") ||
+    getComputedStyle(fontSrc).getPropertyValue("--cv-font") ||
+    ""
+  ).trim();
   if (stack) toEl.style.fontFamily = stack;
 }
 
 function selectedCvFontName() {
-  const raw = document.documentElement.style.getPropertyValue("--cv-font")
-    || getComputedStyle(document.documentElement).getPropertyValue("--cv-font")
-    || "";
+  const raw =
+    document.documentElement.style.getPropertyValue("--cv-font") ||
+    getComputedStyle(document.documentElement).getPropertyValue("--cv-font") ||
+    "";
   return raw.replace(/['"]/g, "").split(",")[0].trim() || "Rubik";
 }
 
@@ -67,7 +87,7 @@ async function waitForCvFonts() {
   const name = selectedCvFontName();
   const loads = [];
   if (document.fonts?.load) {
-    ["400", "500", "700"].forEach((weight) => {
+    ["400", "500", "600", "700"].forEach((weight) => {
       loads.push(document.fonts.load(`${weight} 16px "${name}"`));
     });
   }
@@ -86,6 +106,17 @@ function setSpinner(on) {
   if (!el) return;
   el.classList.toggle("hidden", !on);
   el.classList.toggle("flex", on);
+  const lead = document.getElementById("pdf-spin-lead");
+  if (lead && on) {
+    const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+    lead.textContent = mobile
+      ? window.QCCvLang === "en"
+        ? "Preparing your PDF — keep this screen open"
+        : "מכין את ה-PDF — השאירו את המסך פתוח"
+      : window.QCCvLang === "en"
+        ? "Your file will download in a moment"
+        : "הקובץ יורד למחשב בעוד רגע";
+  }
 }
 
 function flattenUnsupportedColors(root, view) {
@@ -103,6 +134,9 @@ function flattenUnsupportedColors(root, view) {
     node.style.borderBottomColor = cs.borderBottomColor;
     node.style.borderLeftColor = cs.borderLeftColor;
     node.style.fontFamily = cs.fontFamily;
+    // html2canvas often drops filter/blur — strip for fidelity.
+    if (cs.filter && cs.filter !== "none") node.style.filter = "none";
+    if (cs.backdropFilter && cs.backdropFilter !== "none") node.style.backdropFilter = "none";
   });
 }
 
@@ -117,14 +151,17 @@ function prepareCaptureRoot(root, view) {
     node.style.maxHeight = "none";
     node.style.textOverflow = "clip";
     node.style.boxShadow = "none";
+    node.style.transform = "none";
   });
   flattenUnsupportedColors(root, win);
 }
 
 function isFullBleedLayout(el) {
-  return el.classList.contains("layout-charcoal")
-    || el.classList.contains("layout-navy")
-    || el.classList.contains("layout-azure");
+  return (
+    el.classList.contains("layout-charcoal") ||
+    el.classList.contains("layout-navy") ||
+    el.classList.contains("layout-azure")
+  );
 }
 
 function ensureCaptureHost() {
@@ -138,29 +175,47 @@ function ensureCaptureHost() {
   return host;
 }
 
+function stripPreviewChrome(clone) {
+  clone.querySelectorAll(".cv-skel, .cv-watermark, .cv-shield, .cv-page-fit, #cv-page-break-line, #cv-page-fit-msg, #cv-page-fit-banner").forEach((el) => el.remove());
+  clone.querySelectorAll(".cv-sec-skel").forEach((el) => {
+    el.style.display = "none";
+  });
+  // Paid / clean sheet — no unpaid overlays.
+  clone.classList.add("paid");
+  clone.querySelectorAll("[hidden]").forEach((el) => {
+    if (el.classList.contains("cv-print-keep")) return;
+    // Keep structurally relevant empty sections out of the way.
+  });
+}
+
 function prepareCaptureClone(sourceId = "cv-target") {
   const source = document.getElementById(sourceId);
   if (!source) return null;
 
   if (typeof window.updateCV === "function") window.updateCV();
-  window.QCDraft?.save?.();
+  try {
+    window.QCDraft?.save?.();
+  } catch {
+    /* ignore */
+  }
 
   const host = ensureCaptureHost();
   const dir = cvCaptureDir();
   host.setAttribute("dir", dir);
   host.replaceChildren();
-  copyCssVars(document.documentElement, host);
+  copyCssVars(cvThemeSource(), host);
+  copyCssVars(source, host);
 
   const clone = source.cloneNode(true);
   clone.removeAttribute("id");
-  clone.classList.add("cv-print-sheet");
-  clone.querySelectorAll(".cv-skel").forEach((el) => el.remove());
-  clone.querySelectorAll(".cv-sec-skel").forEach((el) => {
-    el.style.display = "none";
-  });
+  clone.classList.add("cv-print-sheet", "paid");
+  if (source.classList.contains("cv-lang-en")) clone.classList.add("cv-lang-en");
+  if (source.classList.contains("cv-lang-he")) clone.classList.add("cv-lang-he");
+  stripPreviewChrome(clone);
   host.appendChild(clone);
 
   host.classList.add("qc-capturing");
+  document.documentElement.classList.add("qc-exporting");
   const fullBleed = isFullBleedLayout(clone);
   Object.assign(host.style, {
     display: "block",
@@ -170,6 +225,9 @@ function prepareCaptureClone(sourceId = "cv-target") {
     width: A4_CSS_PX + "px",
     minWidth: A4_CSS_PX + "px",
     maxWidth: A4_CSS_PX + "px",
+    height: "auto",
+    minHeight: A4_CSS_H + "px",
+    maxHeight: "none",
     padding: "0",
     margin: "0",
     background: "#ffffff",
@@ -183,20 +241,25 @@ function prepareCaptureClone(sourceId = "cv-target") {
   });
 
   Object.assign(clone.style, {
-    display: "block",
     width: "100%",
     maxWidth: "100%",
     margin: "0",
     padding: fullBleed ? "0" : "28px 44px 36px",
     minHeight: A4_CSS_H + "px",
     height: "auto",
+    maxHeight: "none",
     overflow: "visible",
     boxSizing: "border-box",
     wordWrap: "break-word",
     overflowWrap: "break-word",
     wordBreak: "normal",
     hyphens: "manual",
+    transform: "none",
+    boxShadow: "none",
   });
+  if (!fullBleed) {
+    clone.style.display = "block";
+  }
 
   prepareCaptureRoot(host, window);
   return host;
@@ -204,32 +267,69 @@ function prepareCaptureClone(sourceId = "cv-target") {
 
 function cleanupCapture() {
   const host = document.getElementById("qc-print-host");
+  document.documentElement.classList.remove("qc-exporting");
   if (!host) return;
   host.classList.remove("qc-capturing");
   host.replaceChildren();
   host.removeAttribute("style");
 }
 
-function triggerBlobDownload(blob, filename) {
+function isMobileUa() {
+  return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+}
+
+function isIOS() {
+  return /iP(hone|ad|od)/i.test(navigator.userAgent || "");
+}
+
+/**
+ * Best-effort PDF download across desktop, Android, and iOS Safari.
+ * Prefer Web Share on mobile (saves to Files / opens share sheet);
+ * fall back to <a download> + temporary tab open on iOS.
+ */
+async function downloadPdfBlob(blob, filename, pdf) {
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+
+  const file = new File([blob], filename, { type: "application/pdf" });
+  if (isMobileUa() && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return "shared";
+    } catch (err) {
+      if (err && err.name === "AbortError") return "aborted";
+      /* fall through to classic download */
+    }
+  }
+
+  if (pdf && typeof pdf.save === "function" && !isIOS()) {
+    try {
+      pdf.save(filename);
+      return "saved";
+    } catch {
+      /* fall through */
+    }
+  }
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.rel = "noopener";
-  a.target = "_blank";
   a.style.display = "none";
   document.body.appendChild(a);
   a.click();
-  const isiOS = /iP(hone|ad|od)/i.test(navigator.userAgent || "");
-  if (isiOS) {
+
+  if (isIOS()) {
     try {
       window.open(url, "_blank", "noopener");
     } catch {
-      /* Safari may block this without a tap — the green button stays visible. */
+      /* Safari may block without a gesture — green button remains. */
     }
   }
+
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 8000);
+  setTimeout(() => URL.revokeObjectURL(url), 12000);
+  return "anchor";
 }
 
 function isMostlyBlankRow(data, width, y) {
@@ -276,17 +376,19 @@ function collectLinkBoxes(host) {
     if (cs.display === "none" || cs.visibility === "hidden") return [];
     const r = node.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return [];
-    return [{
-      href,
-      x: r.left - hostRect.left,
-      y: r.top - hostRect.top,
-      w: r.width,
-      h: r.height,
-    }];
+    return [
+      {
+        href,
+        x: r.left - hostRect.left,
+        y: r.top - hostRect.top,
+        w: r.width,
+        h: r.height,
+      },
+    ];
   });
 }
 
-function overlayPdfLinks(pdf, links, pageTopPx, pageBottomPx, sx, sy, pxPerMm) {
+function overlayPdfLinks(pdf, links, pageTopPx, pageBottomPx, sx, sy, pxPerMm, marginMm) {
   for (const box of links) {
     const x = box.x * sx;
     const y = box.y * sy;
@@ -296,8 +398,8 @@ function overlayPdfLinks(pdf, links, pageTopPx, pageBottomPx, sx, sy, pxPerMm) {
     const bottom = Math.min(y + h, pageBottomPx);
     if (bottom - top < 0.5 || w < 0.5) continue;
     pdf.link(
-      MARGIN_MM + x / pxPerMm,
-      MARGIN_MM + (top - pageTopPx) / pxPerMm,
+      marginMm + x / pxPerMm,
+      marginMm + (top - pageTopPx) / pxPerMm,
       w / pxPerMm,
       (bottom - top) / pxPerMm,
       { url: box.href },
@@ -321,9 +423,11 @@ function isCanvasRegionBlank(canvas, y0, height) {
   return true;
 }
 
-function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, startNewPage = false) {
-  const usableW = PAGE_W_MM - MARGIN_MM * 2;
-  const usableH = PAGE_H_MM - MARGIN_MM * 2;
+function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
+  const marginMm = opts.marginMm ?? 0;
+  const startNewPage = !!opts.startNewPage;
+  const usableW = PAGE_W_MM - marginMm * 2;
+  const usableH = PAGE_H_MM - marginMm * 2;
   const pxPerMm = canvas.width / usableW;
   const pagePxH = Math.floor(usableH * pxPerMm);
   const sx = canvas.width / Math.max(1, hostWidth);
@@ -357,16 +461,16 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, startNewPage 
     first = false;
     const sliceMm = sliceH / pxPerMm;
     pdf.addImage(
-      slice.toDataURL("image/jpeg", 0.95),
+      slice.toDataURL("image/jpeg", 0.96),
       "JPEG",
-      MARGIN_MM,
-      MARGIN_MM,
+      marginMm,
+      marginMm,
       usableW,
       sliceMm,
       undefined,
       "FAST",
     );
-    overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm);
+    overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm, marginMm);
     y += sliceH;
   }
 }
@@ -397,21 +501,24 @@ async function captureToCanvas(el) {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     let linkMeta = measureLinks(el);
     const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
-    const height = Math.max(1, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
-    const scale = Math.min(2, MAX_CANVAS / width, MAX_CANVAS / height);
+    const height = Math.max(A4_CSS_H, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
+    // Prefer higher DPI on desktop; keep mobile under memory limits.
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2 : 2.5);
+    const scale = Math.min(dpr, MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await html2canvas(el, {
-      scale,
+      scale: Math.max(1.5, scale),
       useCORS: true,
+      allowTaint: false,
       backgroundColor: "#ffffff",
       logging: false,
       width,
       height,
       windowWidth: Math.max(width, A4_CSS_PX),
-      windowHeight: Math.max(height, 400),
+      windowHeight: Math.max(height, A4_CSS_H),
       scrollX: 0,
-      scrollY: -window.scrollY,
-      imageTimeout: 8000,
+      scrollY: 0,
+      imageTimeout: 12000,
       onclone: (doc) => {
         doc.documentElement.setAttribute("dir", "ltr");
         doc.documentElement.style.direction = "ltr";
@@ -428,6 +535,9 @@ async function captureToCanvas(el) {
             width: A4_CSS_PX + "px",
             minWidth: A4_CSS_PX + "px",
             maxWidth: A4_CSS_PX + "px",
+            height: "auto",
+            minHeight: A4_CSS_H + "px",
+            maxHeight: "none",
             padding: "0",
             margin: "0",
             background: "#ffffff",
@@ -435,6 +545,13 @@ async function captureToCanvas(el) {
             transform: "none",
             direction: cvCaptureDir(),
           });
+          const sheet = host.querySelector(".cv-print-sheet");
+          if (sheet instanceof HTMLElement) {
+            sheet.style.height = "auto";
+            sheet.style.maxHeight = "none";
+            sheet.style.overflow = "visible";
+            sheet.style.transform = "none";
+          }
           prepareCaptureRoot(host, doc.defaultView);
           const cloned = measureLinks(host);
           if (cloned.links.length) linkMeta = cloned;
@@ -456,22 +573,16 @@ export async function exportHighResPdf(opts = {}) {
   const download = opts.download !== false;
 
   document.getElementById("cv-preview-wrapper")?.classList.add("paid");
-  setSpinner(true);
-
-  try {
-    const result = await exportSelectablePdf(opts);
-    setSpinner(false);
-    return result;
-  } catch (err) {
-    console.warn("selectable pdf failed, using visual fallback", err);
-  }
+  document.body.classList.add("paid");
+  document.documentElement.classList.add("qc-paid");
+  document.documentElement.classList.remove("qc-unpaid");
 
   const JsPDF = getJsPdfCtor();
   if (!JsPDF) {
-    setSpinner(false);
     throw new Error("jsPDF missing");
   }
 
+  setSpinner(true);
   const host = prepareCaptureClone();
   if (!host) {
     setSpinner(false);
@@ -482,14 +593,26 @@ export async function exportHighResPdf(opts = {}) {
     if (document.fonts?.ready) await document.fonts.ready;
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 80));
 
     const captured = await captureToCanvas(host);
     const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
-    const pdf = new JsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
-    addCanvasPages(pdf, canvas, captured.links, captured.width, captured.height);
+    const sheet = host.querySelector(".cv-print-sheet");
+    const fullBleed = sheet ? isFullBleedLayout(sheet) : false;
+    // Edge-to-edge for sidebar layouts; tiny inset for classic sheets (padding already in clone).
+    const marginMm = fullBleed ? 0 : 0;
+
+    const pdf = new JsPDF({
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait",
+      compress: true,
+    });
+    addCanvasPages(pdf, canvas, captured.links, captured.width, captured.height, {
+      marginMm,
+    });
 
     if (typeof window.QCCoverLetter?.enabled === "function" && window.QCCoverLetter.enabled()) {
       window.QCCoverLetter.render?.();
@@ -497,14 +620,10 @@ export async function exportHighResPdf(opts = {}) {
       if (letterHost) {
         const letterCap = await captureToCanvas(letterHost);
         if (letterCap.canvas?.width) {
-          addCanvasPages(
-            pdf,
-            letterCap.canvas,
-            letterCap.links,
-            letterCap.width,
-            letterCap.height,
-            true,
-          );
+          addCanvasPages(pdf, letterCap.canvas, letterCap.links, letterCap.width, letterCap.height, {
+            marginMm: 0,
+            startNewPage: true,
+          });
         }
       }
     }
@@ -513,11 +632,7 @@ export async function exportHighResPdf(opts = {}) {
     const blob = pdf.output("blob");
     if (!blob || blob.size < 100) throw new Error("empty pdf");
     if (download) {
-      try {
-        pdf.save(filename);
-      } catch {
-        triggerBlobDownload(blob, filename);
-      }
+      await downloadPdfBlob(blob, filename, pdf);
     }
     return { blob, filename };
   } finally {

@@ -1994,8 +1994,7 @@
         #qc-print-host .cv-military-list li {
             display: list-item;
             margin: 0 0 0.25rem;
-            /* Extra gap so disc markers don't touch Hebrew text */
-            padding-inline-start: 1.25rem;
+            padding-inline-start: 0;
             line-height: 1.45;
         }
         #cv-target.cv-lang-en .cv-job-list,
@@ -2033,6 +2032,18 @@
         #qc-print-host .cv-print-sheet.cv-lang-en {
             direction: ltr;
             text-align: left;
+        }
+        /* Hebrew section titles: Tailwind uppercase/tracking spreads glyphs badly */
+        #cv-target:not(.cv-lang-en) .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en) .cv-section-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-section-title {
+            text-transform: none !important;
+            letter-spacing: 0.02em !important;
+        }
+        #cv-target:not(.cv-lang-en) #out-name,
+        #cv-target-page2:not(.cv-lang-en) #out-name,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) #out-name {
+            text-transform: none;
         }
         #studio-form-column.cv-form-en,
         #details-panel.cv-form-en,
@@ -2647,8 +2658,8 @@
             border-radius: 0;
             margin: 0;
             padding: 1.85rem 2rem 1.25rem;
-            text-align: left;
-            direction: ltr;
+            text-align: right;
+            direction: rtl;
         }
         .layout-charcoal #out-name,
         .layout-charcoal #out-title,
@@ -3059,13 +3070,49 @@
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-sidebar,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-main,
         #cv-target.cv-lang-en.layout-charcoal .cv-job-body,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-body {
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-body,
+        #cv-target.cv-lang-en.layout-charcoal #cv-header,
+        #cv-target-page2.cv-lang-en.layout-charcoal #cv-header,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal #cv-header {
             direction: ltr;
             text-align: left;
         }
         #cv-target.cv-lang-en.layout-charcoal .cv-job-date,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-date {
             text-align: left;
+        }
+        #cv-target.cv-lang-en.layout-charcoal .cv-job,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-job,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job {
+            grid-template-columns: minmax(0, 7.4rem) 12px minmax(0, 1fr);
+        }
+        /* Hebrew: keep readable titles (no Latin-style tracking / forced uppercase) */
+        #cv-target:not(.cv-lang-en).layout-charcoal #out-name,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal #out-name,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal #out-name {
+            text-transform: none;
+            letter-spacing: 0.01em;
+            font-family: var(--cv-font), 'Frank Ruhl Libre', 'Playfair Display', serif;
+        }
+        #cv-target:not(.cv-lang-en).layout-charcoal #out-title,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal #out-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal #out-title {
+            letter-spacing: 0.02em;
+        }
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-section-title,
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-sidebar .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-sidebar .cv-section-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-section-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-sidebar .cv-section-title {
+            letter-spacing: 0.04em;
+            text-transform: none;
+            font-family: var(--cv-font), 'Frank Ruhl Libre', 'Heebo', serif;
+        }
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-sidebar .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-sidebar .cv-section-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-sidebar .cv-section-title {
+            letter-spacing: 0.06em;
         }
 
         #cv-preview-wrapper:has(.layout-navy) {
@@ -3423,6 +3470,36 @@
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-main {
             direction: ltr;
             text-align: left;
+        }
+        #cv-target:not(.cv-lang-en).layout-navy #out-name,
+        #cv-target:not(.cv-lang-en).layout-navy #out-title,
+        #cv-target-page2:not(.cv-lang-en).layout-navy #out-name,
+        #cv-target-page2:not(.cv-lang-en).layout-navy #out-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-navy #out-name,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-navy #out-title {
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+        #cv-target:not(.cv-lang-en).layout-navy .cv-section-title,
+        #cv-target:not(.cv-lang-en).layout-navy .cv-sidebar .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en).layout-navy .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en).layout-navy .cv-sidebar .cv-section-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-navy .cv-section-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-navy .cv-sidebar .cv-section-title {
+            letter-spacing: 0.04em;
+            text-transform: none;
+        }
+        #cv-target.cv-lang-en.layout-navy .cv-contact-row,
+        #cv-target.cv-lang-en.layout-navy .cv-job-title,
+        #cv-target.cv-lang-en.layout-navy .cv-job-role,
+        #cv-target.cv-lang-en.layout-navy .cv-job-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-contact-row,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-job-title,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-job-role,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy .cv-job-list {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: normal;
         }
 
         .cv-watermark {

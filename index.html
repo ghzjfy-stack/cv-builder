@@ -13,9 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
+    <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui10-i18n">
+    <link rel="stylesheet" href="./app.css?v=exp-ui11-tpl-i18n">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -2515,9 +2515,22 @@
             patchSectionPlaceholders(next);
             if (!restore && next === 'en') {
                 const font = document.getElementById('font-select');
-                const hebrewOnly = { Alef: 1, 'David Libre': 1, 'Secular One': 1 };
-                if (font && hebrewOnly[font.value]) setCvFont('Rubik');
+                const hebrewPrimary = {
+                    Alef: 1,
+                    'David Libre': 1,
+                    'Secular One': 1,
+                    'IBM Plex Sans Hebrew': 1,
+                    'Noto Sans Hebrew': 1,
+                    'Frank Ruhl Libre': 1
+                };
+                if (font && hebrewPrimary[font.value]) setCvFont('Rubik');
             }
+            if (!restore && next === 'he') {
+                const font = document.getElementById('font-select');
+                const latinOnly = { Lato: 1, Montserrat: 1, Inter: 1, 'Playfair Display': 1 };
+                if (font && latinOnly[font.value]) setCvFont('Rubik');
+            }
+            if (window.QCPageFit && typeof QCPageFit.updateSoon === 'function') QCPageFit.updateSoon();
             initPhrases();
             if (typeof renderTemplateGalleries === 'function') renderTemplateGalleries();
             updateCV();

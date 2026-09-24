@@ -245,6 +245,11 @@ export default function DetailsStep({
           };
         }),
       }));
+      if (typeof window !== 'undefined' && typeof window.updateCV === 'function') {
+        window.setTimeout(() => {
+          try { window.updateCV(); } catch { /* preview optional */ }
+        }, 0);
+      }
     },
     [setFormData]
   );

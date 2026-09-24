@@ -1171,7 +1171,7 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=exp-ui7"></script>
+    <script src="lib/experienceEditor.js?v=exp-ui8"></script>
     <script src="lib/addJobBoot.js?v=exp-ui6"></script>
     <script src="lib/entryEditor.js?v=exp-ui6"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
@@ -2711,8 +2711,16 @@
         }
 
         function typedExperienceJobs() {
-            const cards = document.querySelectorAll('#experience-items .experience-card');
-            if (cards.length) return jobsFromExperienceDom();
+            // Prefer the experience editor model — stays in sync on chip clicks
+            // even before the card DOM is re-rendered.
+            if (window.QCExperience && typeof QCExperience.getJobs === 'function') {
+                try {
+                    const fromJobs = (QCExperience.getJobs() || []).map(mapExperienceJob).filter((job) => (
+                        job.company || job.position || job.dates || job.description || job.bullets.length
+                    ));
+                    if (fromJobs.length) return fromJobs;
+                } catch (err) { /* fall through */ }
+            }
             if (window.QCCvData && Array.isArray(QCCvData.experience)) {
                 try {
                     const fromCtx = QCCvData.experience.map(mapExperienceJob).filter((job) => (
@@ -2727,16 +2735,10 @@
                         job.company || job.position || job.dates || job.description || job.bullets.length
                     ));
                     if (fromPreview.length) return fromPreview;
-                } catch (err) { /* fall through to textarea parse */ }
-            }
-            if (window.QCExperience && typeof QCExperience.getJobs === 'function') {
-                try {
-                    const fromJobs = (QCExperience.getJobs() || []).map(mapExperienceJob).filter((job) => (
-                        job.company || job.position || job.dates || job.description || job.bullets.length
-                    ));
-                    if (fromJobs.length) return fromJobs;
                 } catch (err) { /* fall through */ }
             }
+            const cards = document.querySelectorAll('#experience-items .experience-card');
+            if (cards.length) return jobsFromExperienceDom();
             return parseDatedBlocks(getVal('in-experience')).map(mapExperienceJob).filter((job) => (
                 job.company || job.position || job.dates || job.description || (job.bullets && job.bullets.length)
             ));

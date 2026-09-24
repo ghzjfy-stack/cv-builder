@@ -420,6 +420,18 @@ function applyMobilePayCopy() {
   mob?.setAttribute("aria-hidden", mobile ? "false" : "true");
   const qrWrap = document.querySelector(".pay-qr-wrap");
   if (qrWrap instanceof HTMLElement) qrWrap.hidden = mobile;
+  const bit = document.getElementById("btn-open-bit");
+  if (bit instanceof HTMLElement) {
+    bit.hidden = !mobile;
+    bit.setAttribute("aria-hidden", mobile ? "false" : "true");
+    if (mobile) {
+      bit.removeAttribute("tabindex");
+      bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(CHECKOUT.amountIls));
+    } else {
+      bit.setAttribute("tabindex", "-1");
+      bit.removeAttribute("target");
+    }
+  }
   enableBitButton();
 }
 

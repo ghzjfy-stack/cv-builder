@@ -1199,8 +1199,8 @@
                 <div class="pay-head">
                     <h3 id="pay-title">תשלום ₪10 בלבד</h3>
                     <p id="pay-subtitle">
-                        <span class="pay-sub-desktop" id="pay-sub-desktop">סירקו את הקוד במחשב, או לחצו לפתיחת Bit בנייד.</span>
-                        <span class="pay-sub-mobile" id="pay-sub-mobile" aria-hidden="true">לחצו למעבר מאובטח לתשלום באפליקציית Bit</span>
+                        <span class="pay-sub-desktop" id="pay-sub-desktop">סרקו את הקוד באמצעות הטלפון כדי להשלים את התשלום ב-Bit</span>
+                        <span class="pay-sub-mobile" id="pay-sub-mobile" aria-hidden="true">לחצו לפתיחת אפליקציית Bit והשלימו את התשלום</span>
                     </p>
                 </div>
 
@@ -1211,9 +1211,9 @@
                 <div class="pay-bit-block">
                     <figure class="pay-qr-wrap">
                         <img id="bit-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https%3A%2F%2Fwww.bitpay.co.il%2Fapp%2Fme%2FE4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F%3Fsum%3D10.00%26amount%3D10.00&amp;ecc=M" alt="קוד QR לתשלום 10 ₪ ב-Bit" width="168" height="168">
-                        <figcaption id="pay-qr-caption">סריקה מהמחשב</figcaption>
+                        <figcaption id="pay-qr-caption">Bit · 10 ₪</figcaption>
                     </figure>
-                    <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" target="_blank" class="pay-deeplink pay-deeplink-bit">שלמו 10 ₪ ב-Bit</a>
+                    <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" class="pay-deeplink pay-deeplink-bit" hidden aria-hidden="true">שלמו 10 ₪ ב-Bit</a>
                     <div id="pay-live-status" class="pay-live-status" aria-live="polite">
                         <div id="manual-order-panel" class="hidden" aria-hidden="true">
                             <p id="manual-order-id" class="sr-only" dir="ltr">—</p>
@@ -4633,6 +4633,15 @@
             const qr = modal.querySelector('.pay-qr-wrap');
             if (qr instanceof HTMLElement) qr.hidden = mobile;
             const bit = document.getElementById('btn-open-bit');
+            if (bit instanceof HTMLElement) {
+                bit.hidden = !mobile;
+                bit.setAttribute('aria-hidden', mobile ? 'false' : 'true');
+                if (mobile) bit.removeAttribute('tabindex');
+                else {
+                    bit.setAttribute('tabindex', '-1');
+                    bit.removeAttribute('target');
+                }
+            }
             bit?.removeAttribute('disabled');
             bit?.removeAttribute('aria-disabled');
             if (bit instanceof HTMLElement) bit.style.pointerEvents = 'auto';

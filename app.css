@@ -4786,6 +4786,24 @@
             pointer-events: auto !important;
             margin-bottom: 0.15rem;
         }
+        .section-add-btn--inline {
+            width: auto !important;
+            min-height: 2rem !important;
+            margin-top: 0 !important;
+            padding: 0.25rem 0.7rem !important;
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+        .experience-add-status {
+            display: none;
+            margin: 0.35rem 0 0;
+            color: #5eead4;
+            font-size: 0.8125rem;
+            font-weight: 700;
+        }
+        .experience-add-status.is-visible {
+            display: block;
+        }
         .section-editor-head .dynamic-text {
             margin: 0;
             font-size: 1rem;

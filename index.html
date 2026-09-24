@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=add-click3">
+    <link rel="stylesheet" href="./app.css?v=add-click4">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
 </head>
 <body class="on-home" id="app-body">
@@ -458,6 +458,10 @@
                 <div class="space-y-2 relative" id="experience-section">
                     <div class="section-editor-head">
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
+                        <button type="button" id="btn-add-experience-top" class="section-add-btn section-add-btn--inline" onclick="return window.addExperience ? window.addExperience(event) : false;">
+                            <span class="experience-add-icon" aria-hidden="true">+</span>
+                            <span id="btn-add-experience-top-label">הוסף משרה</span>
+                        </button>
                     </div>
                     <div id="experience-items" role="list">
                         <article class="experience-card is-open" role="listitem" data-job-id="job-seed-0" data-job-index="0">
@@ -1028,8 +1032,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=add11"></script>
-    <script src="lib/entryEditor.js?v=add11"></script>
+    <script src="lib/experienceEditor.js?v=add12"></script>
+    <script src="lib/entryEditor.js?v=add12"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>

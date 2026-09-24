@@ -1930,29 +1930,47 @@
             unicode-bidi: isolate;
         }
         #cv-target .cv-job-list,
+        #cv-target .cv-edu-list,
+        #cv-target .cv-military-list,
         #cv-target-page2 .cv-job-list,
-        #qc-print-host .cv-job-list {
+        #cv-target-page2 .cv-edu-list,
+        #cv-target-page2 .cv-military-list,
+        #qc-print-host .cv-job-list,
+        #qc-print-host .cv-edu-list,
+        #qc-print-host .cv-military-list {
             display: block;
             list-style-type: disc;
             list-style-position: outside;
             margin: 0.1rem 0 0;
-            padding-right: 1.25rem;
+            /* Marker gutter on the inline-start side (right in RTL / left in LTR) */
             padding-inline-start: 1.25rem;
             line-height: 1.45;
         }
         #cv-target .cv-job-list li,
+        #cv-target .cv-edu-list li,
+        #cv-target .cv-military-list li,
         #cv-target-page2 .cv-job-list li,
-        #qc-print-host .cv-job-list li {
+        #cv-target-page2 .cv-edu-list li,
+        #cv-target-page2 .cv-military-list li,
+        #qc-print-host .cv-job-list li,
+        #qc-print-host .cv-edu-list li,
+        #qc-print-host .cv-military-list li {
             display: list-item;
-            margin: 0 0 0.22rem;
-            padding: 0;
+            margin: 0 0 0.25rem;
+            /* Extra gap so disc markers don't touch Hebrew text */
+            padding-inline-start: 1.25rem;
             line-height: 1.45;
         }
         #cv-target.cv-lang-en .cv-job-list,
+        #cv-target.cv-lang-en .cv-edu-list,
+        #cv-target.cv-lang-en .cv-military-list,
         #cv-target-page2.cv-lang-en .cv-job-list,
-        #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list {
-            padding-right: 0;
-            padding-left: 1.25rem;
+        #cv-target-page2.cv-lang-en .cv-edu-list,
+        #cv-target-page2.cv-lang-en .cv-military-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-edu-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-military-list {
+            padding-inline-start: 1.25rem;
         }
         #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure),
         #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) {
@@ -6631,14 +6649,17 @@
             pointer-events: auto !important;
         }
         .exp-add-bar,
-        #experience-section #btn-add-experience.exp-add-bar {
+        #experience-section #btn-add-experience.exp-add-bar,
+        #education-section #btn-add-education.exp-add-bar,
+        #btn-add-experience.exp-add-bar,
+        #btn-add-education.exp-add-bar {
             display: flex !important;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
             width: 100%;
             min-height: 3rem;
-            margin: 0;
+            margin: 0.55rem 0 0;
             padding: 0.65rem 1rem;
             border: 0 !important;
             border-radius: 0.85rem !important;
@@ -6652,17 +6673,24 @@
             pointer-events: auto !important;
             position: relative;
             z-index: 130 !important;
+            opacity: 1 !important;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
         .exp-add-bar:hover,
-        #experience-section #btn-add-experience.exp-add-bar:hover {
+        #experience-section #btn-add-experience.exp-add-bar:hover,
+        #education-section #btn-add-education.exp-add-bar:hover,
+        #btn-add-experience.exp-add-bar:hover,
+        #btn-add-education.exp-add-bar:hover {
             filter: brightness(1.06);
             color: #ffffff !important;
             border: 0 !important;
             background: linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%) !important;
+            box-shadow: 0 10px 28px rgba(8, 145, 178, 0.36);
         }
-        .exp-add-bar:active {
+        .exp-add-bar:active,
+        #btn-add-experience.exp-add-bar:active,
+        #btn-add-education.exp-add-bar:active {
             transform: translateY(1px);
         }
         .exp-add-bar-plus {
@@ -6677,11 +6705,15 @@
             font-weight: 800;
             line-height: 1;
             pointer-events: none;
+            color: inherit;
         }
-        #btn-add-experience-label {
+        #btn-add-experience-label,
+        #btn-add-education-label {
             pointer-events: none;
+            color: inherit;
         }
-        #experience-section .experience-add-status {
+        #experience-section .experience-add-status,
+        #education-section .experience-add-status {
             margin: 0;
             text-align: center;
         }

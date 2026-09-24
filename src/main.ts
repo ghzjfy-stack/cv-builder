@@ -1,5 +1,7 @@
 // @ts-nocheck
-import { inject as injectVercelAnalytics } from "@vercel/analytics";
+import { createRoot } from "react-dom/client";
+import { createElement } from "react";
+import App from "./App.jsx";
 import { initTemplateSelector } from "./templates/selector";
 import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken } from "./access/gate.js";
 import {
@@ -23,10 +25,19 @@ import {
   waitForManualOrderPaid,
 } from "./payment/manualOrder.js";
 
-try {
-  injectVercelAnalytics();
-} catch (err) {
-  console.warn("Vercel Analytics init failed", err);
+function mountAnalytics() {
+  try {
+    let host = document.getElementById("qc-vercel-analytics");
+    if (!host) {
+      host = document.createElement("div");
+      host.id = "qc-vercel-analytics";
+      host.setAttribute("aria-hidden", "true");
+      document.body.appendChild(host);
+    }
+    createRoot(host).render(createElement(App));
+  } catch (err) {
+    console.warn("Vercel Analytics mount failed", err);
+  }
 }
 
 const modal = () => document.getElementById("payment-modal");
@@ -1162,10 +1173,12 @@ function bootTemplates() {
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => {
+    mountAnalytics();
     bootTemplates();
     bind();
   });
 } else {
+  mountAnalytics();
   bootTemplates();
   bind();
 }

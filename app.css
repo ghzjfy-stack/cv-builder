@@ -1750,6 +1750,100 @@
         #qc-print-host .whitespace-pre-line {
             line-height: var(--line-height, var(--cv-leading));
         }
+        #cv-target .cv-job,
+        #cv-target-page2 .cv-job,
+        #qc-print-host .cv-job {
+            display: block;
+            position: relative;
+            margin: 0 0 1rem;
+            padding: 0;
+            line-height: 1.45;
+            overflow: visible;
+        }
+        #cv-target .cv-job-head,
+        #cv-target-page2 .cv-job-head,
+        #qc-print-host .cv-job-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.15rem 0.85rem;
+            margin: 0 0 0.35rem;
+        }
+        #cv-target .cv-job-head-main,
+        #cv-target-page2 .cv-job-head-main,
+        #qc-print-host .cv-job-head-main {
+            flex: 1 1 9rem;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        #cv-target .cv-job-title,
+        #cv-target-page2 .cv-job-title,
+        #qc-print-host .cv-job-title {
+            display: block;
+            position: static;
+            float: none;
+            margin: 0;
+            padding: 0;
+            font-weight: 700;
+            font-size: calc(1.125rem * var(--cv-scale));
+            line-height: 1.35;
+            color: inherit;
+        }
+        #cv-target .cv-job-role,
+        #cv-target-page2 .cv-job-role,
+        #qc-print-host .cv-job-role {
+            display: block;
+            position: static;
+            float: none;
+            margin: 0;
+            padding: 0;
+            font-weight: 500;
+            font-size: calc(0.84rem * var(--cv-scale));
+            line-height: 1.4;
+        }
+        #cv-target .cv-job-date,
+        #cv-target-page2 .cv-job-date,
+        #qc-print-host .cv-job-date {
+            display: block;
+            position: static;
+            float: none;
+            flex: 0 1 auto;
+            margin: 0;
+            padding: 0;
+            font-weight: 500;
+            font-size: calc(0.78rem * var(--cv-scale));
+            line-height: 1.4;
+            white-space: nowrap;
+            text-align: inherit;
+        }
+        #cv-target .cv-job-list,
+        #cv-target-page2 .cv-job-list,
+        #qc-print-host .cv-job-list {
+            display: block;
+            list-style-type: disc;
+            list-style-position: outside;
+            margin: 0.1rem 0 0;
+            padding-right: 1.25rem;
+            padding-inline-start: 1.25rem;
+            line-height: 1.45;
+        }
+        #cv-target .cv-job-list li,
+        #cv-target-page2 .cv-job-list li,
+        #qc-print-host .cv-job-list li {
+            display: list-item;
+            margin: 0 0 0.22rem;
+            padding: 0;
+            line-height: 1.45;
+        }
+        #cv-target.cv-lang-en .cv-job-list,
+        #cv-target-page2.cv-lang-en .cv-job-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list {
+            padding-right: 0;
+            padding-left: 1.25rem;
+        }
         #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure),
         #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) {
             display: flex;
@@ -2115,26 +2209,29 @@
 
         .layout-classic #cv-header { text-align: center; }
         .layout-classic .cv-contact-header { justify-content: center; }
-        .layout-classic .cv-job { margin-bottom: 0.7rem; }
+        .layout-classic .cv-job { margin-bottom: 1rem; }
         .layout-classic .cv-job-title {
             font-weight: 700;
-            font-size: calc(0.86rem * var(--cv-scale));
+            font-size: calc(1.05rem * var(--cv-scale));
             color: #0f172a;
+            line-height: 1.35;
         }
         .layout-classic .cv-job-role,
         .layout-classic .cv-job-date,
         .layout-classic .cv-job-desc {
-            font-size: calc(0.72rem * var(--cv-scale));
+            font-size: calc(0.78rem * var(--cv-scale));
             color: #475569;
-            margin-top: 0.08rem;
+            margin-top: 0;
+            line-height: 1.4;
         }
         .layout-classic .cv-job-list {
-            margin: 0.2rem 0 0;
-            padding-inline-start: 1.1rem;
-            font-size: calc(0.72rem * var(--cv-scale));
+            margin: 0.25rem 0 0;
+            padding-inline-start: 1.25rem;
+            font-size: calc(0.78rem * var(--cv-scale));
             color: #334155;
+            list-style-type: disc;
         }
-        .layout-classic .cv-job-list li { margin-bottom: 0.1rem; }
+        .layout-classic .cv-job-list li { margin-bottom: 0.2rem; line-height: 1.45; }
 
         .layout-split .cv-columns {
             display: grid;
@@ -2509,8 +2606,15 @@
             display: grid;
             grid-template-columns: minmax(0, 5.6rem) 12px minmax(0, 1fr);
             column-gap: 0.15rem;
-            margin-bottom: 0.85rem;
+            margin-bottom: 1rem;
             direction: ltr;
+        }
+        #cv-target.layout-charcoal .cv-job,
+        #cv-target-page2.layout-charcoal .cv-job,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-job {
+            display: grid;
+            grid-template-columns: minmax(0, 5.6rem) 12px minmax(0, 1fr);
+            margin-bottom: 1rem;
         }
         .layout-charcoal .cv-job-date {
             font-size: calc(0.62rem * var(--cv-scale));
@@ -2521,6 +2625,12 @@
             white-space: normal;
             overflow-wrap: anywhere;
         }
+        #cv-target.layout-charcoal .cv-job-date,
+        #cv-target-page2.layout-charcoal .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-job-date {
+            white-space: normal;
+            flex: none;
+        }
         .layout-charcoal .cv-job-rule {
             width: 1px;
             background: #cfcfcf;
@@ -2530,23 +2640,37 @@
             padding-inline-start: 0.55rem;
             direction: rtl;
             text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .layout-charcoal .cv-job-head {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.12rem;
+            margin-bottom: 0.2rem;
         }
         .layout-charcoal .cv-job-title {
             font-weight: 700;
             color: #2f2f2f;
-            font-size: calc(0.74rem * var(--cv-scale));
+            font-size: calc(0.86rem * var(--cv-scale));
+            line-height: 1.35;
+            margin: 0;
         }
         .layout-charcoal .cv-job-role {
             color: #5a5a5a;
-            font-size: calc(0.64rem * var(--cv-scale));
-            margin-bottom: 0.2rem;
+            font-size: calc(0.68rem * var(--cv-scale));
+            font-weight: 500;
+            margin: 0;
+            line-height: 1.4;
         }
         .layout-charcoal .cv-job-list {
-            margin: 0;
-            padding-inline-start: 1rem;
+            margin: 0.15rem 0 0;
+            padding-inline-start: 1.25rem;
             list-style: disc;
         }
-        .layout-charcoal .cv-job-list li { margin-bottom: 0.12rem; }
+        .layout-charcoal .cv-job-list li { margin-bottom: 0.18rem; line-height: 1.45; }
         .layout-charcoal .cv-ref-item { margin-bottom: 0.75rem; }
         .layout-charcoal .cv-ref-name {
             font-weight: 700;
@@ -2976,7 +3100,7 @@
         .layout-navy .cv-job {
             position: relative;
             display: block;
-            margin-bottom: 0.95rem;
+            margin-bottom: 1rem;
             direction: inherit;
         }
         .layout-navy .cv-job-mark {
@@ -3008,27 +3132,31 @@
         .layout-navy .cv-job-title {
             font-weight: 700;
             color: var(--navy);
-            font-size: calc(0.78rem * var(--cv-scale));
+            font-size: calc(0.95rem * var(--cv-scale));
             unicode-bidi: plaintext;
+            line-height: 1.35;
+            margin: 0;
         }
         .layout-navy .cv-job-role,
         .layout-navy .cv-job-date {
             color: var(--navy);
-            font-size: calc(0.66rem * var(--cv-scale));
+            font-size: calc(0.72rem * var(--cv-scale));
             unicode-bidi: plaintext;
+            line-height: 1.4;
+            font-weight: 500;
+            margin: 0;
         }
         .layout-navy .cv-job-date {
-            margin: 0.08rem 0 0.28rem;
-            white-space: normal;
+            white-space: nowrap;
             text-align: inherit;
         }
         .layout-navy .cv-job-list {
-            margin: 0;
-            padding-inline-start: 1rem;
+            margin: 0.2rem 0 0;
+            padding-inline-start: 1.25rem;
             list-style: disc;
             color: var(--navy-muted);
         }
-        .layout-navy .cv-job-list li { margin-bottom: 0.12rem; unicode-bidi: plaintext; }
+        .layout-navy .cv-job-list li { margin-bottom: 0.2rem; unicode-bidi: plaintext; line-height: 1.45; }
 
         #cv-target.cv-lang-en.layout-navy .cv-sidebar-inner,
         #cv-target.cv-lang-en.layout-navy .cv-main,

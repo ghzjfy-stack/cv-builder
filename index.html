@@ -762,7 +762,7 @@
                                     <span class="cv-sec-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="8" width="17" height="11.5" rx="1.4"/><path d="M8 8V6.6A2.6 2.6 0 0 1 10.6 4h2.8A2.6 2.6 0 0 1 16 6.6V8"/><path d="M3.5 13h17"/></svg></span>
                                     <span data-i18n="experience">ניסיון תעסוקתי</span>
                                 </h3>
-                                <div id="out-experience" class="whitespace-pre-line text-slate-700"></div>
+                                <div id="out-experience" class="text-slate-700"></div>
                             </div>
                             <div id="sec-references" style="display:none">
                                 <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">
@@ -3347,43 +3347,56 @@
             container.appendChild(wrap);
         }
 
+        function jobDescriptionLines(job) {
+            const fromBullets = Array.isArray(job && job.bullets)
+                ? job.bullets.map((b) => String(b == null ? '' : b).replace(/^[•\-*\u2022]\s*/, '').trim()).filter(Boolean)
+                : [];
+            if (fromBullets.length) return fromBullets;
+            return String((job && job.description) || '')
+                .replace(/\r\n/g, '\n')
+                .split('\n')
+                .map((line) => line.replace(/^[•\-*\u2022]\s*/, '').trim())
+                .filter(Boolean);
+        }
+
         function fillJobBody(body, job, opts) {
             const position = (job && (job.position || job.title)) || '';
             const company = (job && (job.company || job.role)) || '';
             const dates = (job && (job.dates || job.date)) || '';
-            const bullets = Array.isArray(job && job.bullets) ? job.bullets : [];
+            const lines = jobDescriptionLines(job);
+            const head = document.createElement('div');
+            head.className = 'cv-job-head';
+            const main = document.createElement('div');
+            main.className = 'cv-job-head-main';
             if (position) {
                 const title = document.createElement('p');
                 title.className = 'cv-job-title';
                 title.textContent = position;
-                body.appendChild(title);
+                main.appendChild(title);
             }
             if (company) {
                 const role = document.createElement('p');
                 role.className = 'cv-job-role';
                 role.textContent = company;
-                body.appendChild(role);
+                main.appendChild(role);
             }
+            if (main.childElementCount) head.appendChild(main);
             if (opts && opts.dateInBody && dates) {
                 const date = document.createElement('p');
                 date.className = 'cv-job-date';
                 date.textContent = dates;
-                body.appendChild(date);
+                head.appendChild(date);
             }
-            if (bullets.length) {
+            if (head.childElementCount) body.appendChild(head);
+            if (lines.length) {
                 const ul = document.createElement('ul');
                 ul.className = 'cv-job-list';
-                bullets.forEach((b) => {
+                lines.forEach((b) => {
                     const li = document.createElement('li');
                     li.textContent = b;
                     ul.appendChild(li);
                 });
                 body.appendChild(ul);
-            } else if (job && job.description) {
-                const p = document.createElement('p');
-                p.className = 'cv-job-desc';
-                p.textContent = job.description;
-                body.appendChild(p);
             }
         }
 

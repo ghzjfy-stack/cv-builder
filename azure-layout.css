@@ -221,22 +221,38 @@
     line-height: 1.55;
     padding: 0;
 }
-.layout-azure .cv-job { margin-bottom: 0.95rem; }
+.layout-azure .cv-job { margin-bottom: 1rem; }
+.layout-azure .cv-job-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.15rem 0.75rem;
+    margin-bottom: 0.3rem;
+}
 .layout-azure .cv-job-title {
     font-weight: 700;
     color: var(--azure-ink);
-    font-size: calc(0.8rem * var(--cv-scale));
+    font-size: calc(0.95rem * var(--cv-scale));
     margin: 0;
+    line-height: 1.35;
 }
 .layout-azure .cv-job-date {
-    font-size: calc(0.7rem * var(--cv-scale));
+    font-size: calc(0.72rem * var(--cv-scale));
     color: #5a5a5a;
-    margin: 0.12rem 0 0.28rem;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 500;
 }
 .layout-azure .cv-job-role {
     color: #5a5a5a;
-    font-size: calc(0.7rem * var(--cv-scale));
-    margin-bottom: 0.2rem;
+    font-size: calc(0.74rem * var(--cv-scale));
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.4;
+}
+.layout-azure .cv-job-list {
+    padding-inline-start: 1.25rem;
+    margin-top: 0.2rem;
 }
 
 @media print {

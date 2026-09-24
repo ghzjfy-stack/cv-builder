@@ -648,7 +648,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-name" id="label-name">שם מלא <span class="text-teal-300" aria-hidden="true">*</span></label>
-                            <input type="text" id="in-name" name="name" autocomplete="name" value="" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" required>
+                            <input type="text" id="in-name" name="name" autocomplete="name" value="" placeholder="לדוגמה: ישראל ישראלי" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
                             <label class="block text-xs text-white mb-1" for="in-title" id="label-title">תפקיד / כותרת</label>
@@ -656,11 +656,11 @@
                             <datalist id="role-title-list"></datalist>
                         </div>
                         <div>
-                            <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון <span class="text-teal-300 text-[10px] font-normal" id="label-phone-hint">(או אימייל)</span></label>
+                            <label class="block text-xs text-white mb-1" for="in-phone" id="label-phone">טלפון</label>
                             <input type="tel" id="in-phone" name="tel" autocomplete="tel" value="" placeholder="050-1234567" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
-                            <label class="block text-xs text-white mb-1" for="in-email" id="label-email">אימייל <span class="text-teal-300 text-[10px] font-normal" id="label-email-hint">(או טלפון)</span></label>
+                            <label class="block text-xs text-white mb-1" for="in-email" id="label-email">אימייל</label>
                             <input type="email" id="in-email" name="email" autocomplete="email" value="" placeholder="israel@example.com" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
                         <div>
@@ -1984,20 +1984,8 @@
             setLabel('btn-photo-pick', pack.photoChoose);
             setLabelHtml('label-name', (pack.labels.name || 'שם מלא') + ' <span class="text-teal-300" aria-hidden="true">*</span>');
             setLabel('label-title', pack.labels.title);
-            setLabelHtml(
-                'label-phone',
-                (pack.labels.phone || 'טלפון') +
-                    ' <span class="text-teal-300 text-[10px] font-normal" id="label-phone-hint">' +
-                    (lang === 'en' ? '(or email)' : '(או אימייל)') +
-                    '</span>'
-            );
-            setLabelHtml(
-                'label-email',
-                (pack.labels.email || 'אימייל') +
-                    ' <span class="text-teal-300 text-[10px] font-normal" id="label-email-hint">' +
-                    (lang === 'en' ? '(or phone)' : '(או טלפון)') +
-                    '</span>'
-            );
+            setLabel('label-phone', pack.labels.phone);
+            setLabel('label-email', pack.labels.email);
             setLabel('label-location', pack.labels.location);
             setLabel('label-linkedin', pack.labels.linkedin);
             setLabel('label-photo', pack.labels.photo);
@@ -4300,6 +4288,12 @@
         }
         window.setPreviewBg = setPreviewBg;
 
+        function checkoutGateRaw(id) {
+            const el = formField(id);
+            if (!el || el.value == null) return '';
+            return String(el.value).replace(/\u200e|\u200f|\u202a-\u202e/g, '').trim();
+        }
+
         function checkoutGateMessage() {
             const pack = CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he'] || {};
             const missing = checkoutGateMissing();
@@ -4316,14 +4310,33 @@
         }
 
         function checkoutGateMissing() {
-            const name = getVal('in-name').trim();
-            const phone = getVal('in-phone').replace(/\D/g, '');
-            const email = getVal('in-email').trim();
-            const nameOk = name.length >= 2 && !isSampleFieldValue('in-name', name);
-            const samplePhone = String((CV_SAMPLES.he && CV_SAMPLES.he['in-phone']) || '').replace(/\D/g, '');
-            const samplePhoneEn = String((CV_SAMPLES.en && CV_SAMPLES.en['in-phone']) || '').replace(/\D/g, '');
-            const phoneOk = phone.length >= 9 && phone !== samplePhone && phone !== samplePhoneEn;
-            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && !isSampleFieldValue('in-email', email);
+            // Read raw input values (not sanitized preview helpers) so a typed name always counts.
+            const name = checkoutGateRaw('in-name');
+            const phoneRaw = checkoutGateRaw('in-phone');
+            const email = checkoutGateRaw('in-email');
+            const phone = phoneRaw.replace(/\D/g, '');
+
+            // Any real typed name (2+ visible chars) is enough — do not reject demo names
+            // like "יונתן אשל" or the placeholder example, which blocked paying users.
+            const nameOk = name.replace(/\s+/g, '').length >= 2;
+
+            const samplePhones = [
+                String((CV_SAMPLES.he && CV_SAMPLES.he['in-phone']) || '').replace(/\D/g, ''),
+                String((CV_SAMPLES.en && CV_SAMPLES.en['in-phone']) || '').replace(/\D/g, ''),
+                '0501234567',
+                '501234567'
+            ].filter(Boolean);
+            const phoneOk = phone.length >= 9 && samplePhones.indexOf(phone) < 0;
+
+            const sampleEmails = [
+                String((CV_SAMPLES.he && CV_SAMPLES.he['in-email']) || '').trim().toLowerCase(),
+                String((CV_SAMPLES.en && CV_SAMPLES.en['in-email']) || '').trim().toLowerCase(),
+                'israel@example.com',
+                'jonathan.eshel@example.com'
+            ].filter(Boolean);
+            const emailNorm = email.toLowerCase();
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && sampleEmails.indexOf(emailNorm) < 0;
+
             return {
                 name: !nameOk,
                 contact: !(phoneOk || emailOk),
@@ -4342,9 +4355,10 @@
             const nameEl = formField('in-name');
             const phoneEl = formField('in-phone');
             const emailEl = formField('in-email');
-            if (nameEl) nameEl.classList.toggle('qc-field-required-missing', missing.name);
-            if (phoneEl) phoneEl.classList.toggle('qc-field-required-missing', missing.contact && !missing.phoneOk);
-            if (emailEl) emailEl.classList.toggle('qc-field-required-missing', missing.contact && !missing.emailOk);
+            if (nameEl) nameEl.classList.toggle('qc-field-required-missing', !!missing.name);
+            // Only paint contact fields that are actually still empty/invalid.
+            if (phoneEl) phoneEl.classList.toggle('qc-field-required-missing', !!missing.contact && !missing.phoneOk);
+            if (emailEl) emailEl.classList.toggle('qc-field-required-missing', !!missing.contact && !missing.emailOk);
         }
 
         function isTemplateSelected() {
@@ -4406,12 +4420,8 @@
                 if (!ready) el.setAttribute('aria-disabled', 'true');
                 else el.removeAttribute('aria-disabled');
             });
-            if (ready) {
-                ['in-name', 'in-phone', 'in-email'].forEach(function (id) {
-                    const el = formField(id);
-                    if (el) el.classList.remove('qc-field-required-missing');
-                });
-            }
+            // Keep red outlines in sync while typing (clear name mark once filled).
+            markCheckoutRequiredFields();
             return ready;
         }
 

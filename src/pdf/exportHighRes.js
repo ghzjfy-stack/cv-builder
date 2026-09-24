@@ -145,15 +145,37 @@ function prepareCaptureRoot(root, view) {
   const nodes = [root, ...root.querySelectorAll("*")];
   nodes.forEach((node) => {
     if (!(node instanceof HTMLElement)) return;
-    node.style.overflow = "visible";
-    node.style.overflowX = "visible";
-    node.style.overflowY = "visible";
-    node.style.maxHeight = "none";
+    // Keep photo crop + circular masks intact for html2canvas.
+    const keepClip =
+      node.classList.contains("cv-photo") ||
+      node.classList.contains("cv-photo-block") ||
+      node.id === "out-photo" ||
+      node.id === "out-photo-fallback" ||
+      Boolean(node.closest?.(".cv-photo"));
+    if (!keepClip) {
+      node.style.overflow = "visible";
+      node.style.overflowX = "visible";
+      node.style.overflowY = "visible";
+      node.style.maxHeight = "none";
+    } else {
+      node.style.overflow = "hidden";
+      node.style.maxHeight = "";
+    }
     node.style.textOverflow = "clip";
     node.style.boxShadow = "none";
     node.style.transform = "none";
   });
   flattenUnsupportedColors(root, win);
+}
+
+function isSidebarLayout(el) {
+  return (
+    el.classList.contains("layout-sidebar") ||
+    el.classList.contains("layout-split") ||
+    el.classList.contains("layout-charcoal") ||
+    el.classList.contains("layout-navy") ||
+    el.classList.contains("layout-azure")
+  );
 }
 
 function isFullBleedLayout(el) {
@@ -162,6 +184,35 @@ function isFullBleedLayout(el) {
     el.classList.contains("layout-navy") ||
     el.classList.contains("layout-azure")
   );
+}
+
+/** Lock sheet to full A4 (or taller) so 1fr sidebar columns paint to the bottom. */
+function lockCaptureSheetHeight(host) {
+  const sheet = host?.querySelector?.(".cv-print-sheet");
+  if (!(sheet instanceof HTMLElement)) return;
+  const sidebarish = isSidebarLayout(sheet) || isFullBleedLayout(sheet);
+  // Measure natural content height first (overflow hidden would clip the measure).
+  sheet.style.height = "auto";
+  sheet.style.minHeight = `${A4_CSS_H}px`;
+  sheet.style.overflow = "visible";
+  void sheet.offsetHeight;
+  const needed = Math.max(A4_CSS_H, Math.ceil(sheet.scrollHeight || 0), Math.ceil(sheet.offsetHeight || 0));
+  sheet.style.minHeight = `${needed}px`;
+  sheet.style.height = `${needed}px`;
+  host.style.minHeight = `${needed}px`;
+  if (sidebarish) {
+    sheet.style.overflow = "hidden";
+    sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner, .cv-main, .cv-columns, .cv-photo-block, #cv-header").forEach((el) => {
+      if (!(el instanceof HTMLElement)) return;
+      if (el.classList.contains("cv-photo") || el.closest?.(".cv-photo")) return;
+      el.style.alignSelf = "stretch";
+    });
+    sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner").forEach((el) => {
+      if (!(el instanceof HTMLElement)) return;
+      el.style.height = "100%";
+      el.style.minHeight = "100%";
+    });
+  }
 }
 
 function ensureCaptureHost() {
@@ -244,11 +295,11 @@ function prepareCaptureClone(sourceId = "cv-target") {
     width: "100%",
     maxWidth: "100%",
     margin: "0",
-    padding: fullBleed ? "0" : "28px 44px 36px",
+    padding: fullBleed ? "0" : isSidebarLayout(clone) ? "0" : "28px 44px 36px",
     minHeight: A4_CSS_H + "px",
-    height: "auto",
+    height: A4_CSS_H + "px",
     maxHeight: "none",
-    overflow: "visible",
+    overflow: fullBleed || isSidebarLayout(clone) ? "hidden" : "visible",
     boxSizing: "border-box",
     wordWrap: "break-word",
     overflowWrap: "break-word",
@@ -257,11 +308,12 @@ function prepareCaptureClone(sourceId = "cv-target") {
     transform: "none",
     boxShadow: "none",
   });
-  if (!fullBleed) {
+  if (!fullBleed && !isSidebarLayout(clone)) {
     clone.style.display = "block";
   }
 
   prepareCaptureRoot(host, window);
+  lockCaptureSheetHeight(host);
   return host;
 }
 
@@ -461,14 +513,14 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
     first = false;
     const sliceMm = sliceH / pxPerMm;
     pdf.addImage(
-      slice.toDataURL("image/jpeg", 0.96),
+      slice.toDataURL("image/jpeg", 0.98),
       "JPEG",
       marginMm,
       marginMm,
       usableW,
       sliceMm,
       undefined,
-      "FAST",
+      "MEDIUM",
     );
     overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm, marginMm);
     y += sliceH;
@@ -499,15 +551,16 @@ async function captureToCanvas(el) {
   try {
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    lockCaptureSheetHeight(el);
     let linkMeta = measureLinks(el);
     const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
     const height = Math.max(A4_CSS_H, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
-    // Prefer higher DPI on desktop; keep mobile under memory limits.
-    const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2 : 2.5);
-    const scale = Math.min(dpr, MAX_CANVAS / width, MAX_CANVAS / height);
+    // Prefer print-like DPI; keep mobile under memory limits.
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2.25 : 3);
+    const scale = Math.min(Math.max(dpr, isMobileUa() ? 2 : 2.75), MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await html2canvas(el, {
-      scale: Math.max(1.5, scale),
+      scale: Math.max(2, scale),
       useCORS: true,
       allowTaint: false,
       backgroundColor: "#ffffff",
@@ -518,10 +571,11 @@ async function captureToCanvas(el) {
       windowHeight: Math.max(height, A4_CSS_H),
       scrollX: 0,
       scrollY: 0,
-      imageTimeout: 12000,
+      imageTimeout: 15000,
       onclone: (doc) => {
         doc.documentElement.setAttribute("dir", "ltr");
         doc.documentElement.style.direction = "ltr";
+        doc.documentElement.classList.add("qc-exporting");
         copyCssVars(document.documentElement, doc.documentElement);
         const host = doc.getElementById("qc-print-host");
         if (host instanceof HTMLElement) {
@@ -547,12 +601,16 @@ async function captureToCanvas(el) {
           });
           const sheet = host.querySelector(".cv-print-sheet");
           if (sheet instanceof HTMLElement) {
-            sheet.style.height = "auto";
+            const fullBleed = isFullBleedLayout(sheet) || isSidebarLayout(sheet);
+            sheet.style.minHeight = A4_CSS_H + "px";
+            sheet.style.height = A4_CSS_H + "px";
             sheet.style.maxHeight = "none";
-            sheet.style.overflow = "visible";
+            sheet.style.overflow = fullBleed ? "hidden" : "visible";
             sheet.style.transform = "none";
+            if (fullBleed) sheet.style.padding = "0";
           }
           prepareCaptureRoot(host, doc.defaultView);
+          lockCaptureSheetHeight(host);
           const cloned = measureLinks(host);
           if (cloned.links.length) linkMeta = cloned;
         }
@@ -594,6 +652,7 @@ export async function exportHighResPdf(opts = {}) {
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     await new Promise((resolve) => setTimeout(resolve, 80));
+    lockCaptureSheetHeight(host);
 
     const captured = await captureToCanvas(host);
     const canvas = captured.canvas;

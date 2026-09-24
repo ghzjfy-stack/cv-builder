@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import App from "./App.jsx";
 import { initTemplateSelector } from "./templates/selector";
-import { clearPersistedUnlock, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken } from "./access/gate.js";
+import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken } from "./access/gate.js";
 import {
   CHECKOUT,
   REF_CODE_KEY,
@@ -14,8 +14,8 @@ import {
   displayCompareValue,
   isPackId,
   packAmount,
-  whatsappPdfShareUrl,
   whatsappReferralUrl,
+  whatsappSelfPdfUrl,
   type PackId,
 } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
@@ -205,9 +205,11 @@ function showDownloadStep() {
   });
   setPaidUi(true);
   fillReferralUi();
-  const phone = readCheckoutContact();
+  const phone = readPersonalPhone();
   const waPhone = document.getElementById("wa-pdf-phone");
-  if (waPhone instanceof HTMLInputElement && phone && !waPhone.value) waPhone.value = phone;
+  if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
+    waPhone.value = phone;
+  }
 }
 
 function setFeedback(text, ok) {
@@ -680,34 +682,71 @@ function openBitApp(e) {
   openDeepLink(url);
 }
 
-function blobToBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result || "");
-      const comma = result.indexOf(",");
-      resolve(comma >= 0 ? result.slice(comma + 1) : result);
-    };
-    reader.onerror = () => reject(new Error("read_failed"));
-    reader.readAsDataURL(blob);
-  });
-}
-
-function intlPhoneDigits(raw) {
-  let digits = String(raw || "").replace(/\D/g, "");
-  if (digits.startsWith("00")) digits = digits.slice(2);
-  if (digits.startsWith("0") && digits.length === 10) digits = `972${digits.slice(1)}`;
-  return digits;
-}
-
-async function sharePdfFile(blob, filename) {
-  const file = new File([blob], filename, { type: "application/pdf" });
-  const payload = { files: [file], title: filename, text: qcT("pdfShareTitle", "קורות החיים מ-QuickCV") };
-  if (navigator.canShare && navigator.canShare(payload)) {
-    await navigator.share(payload);
-    return true;
+function readPersonalPhone() {
+  const waPhone = document.getElementById("wa-pdf-phone");
+  const fromWaField = String(waPhone && "value" in waPhone ? waPhone.value : "").trim();
+  const fromForm = readCvFormPhone();
+  const fromCheckout = readCheckoutContact();
+  let fromData = "";
+  try {
+    const data = window.QCCvData || {};
+    fromData = String(data.phone || data.personalDetails?.phone || "").trim();
+  } catch {
+    /* ignore */
   }
-  return false;
+  for (const raw of [fromWaField, fromForm, fromCheckout, fromData]) {
+    if (phoneDigits(raw).length >= 9) return cleanPhoneSource(raw);
+  }
+  return String(fromWaField || fromForm || fromCheckout || fromData || "").trim();
+}
+
+async function createCvDownloadShareUrl() {
+  try {
+    window.QCDraft?.save?.();
+  } catch {
+    /* ignore */
+  }
+  let draft = {};
+  try {
+    draft = window.QCDraft?.read?.() || {};
+  } catch {
+    draft = {};
+  }
+  const safe = { ...(draft || {}) };
+  delete safe.photo;
+  try {
+    const res = await fetch("/api/handoff", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ draft: safe }),
+    });
+    const data = await res.json().catch(() => null);
+    if (data?.ok && data.id) {
+      const url = new URL(location.href);
+      url.hash = "studio";
+      url.search = `?h=${encodeURIComponent(data.id)}`;
+      return url.toString();
+    }
+  } catch {
+    /* fall through */
+  }
+  try {
+    const json = JSON.stringify(safe);
+    const encoded = btoa(unescape(encodeURIComponent(json)))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/g, "");
+    if (encoded.length <= 12000) {
+      const url = new URL(location.href);
+      url.hash = "studio";
+      url.search = `?d=${encodeURIComponent(encoded)}`;
+      return url.toString();
+    }
+  } catch {
+    /* fall through */
+  }
+  return `${location.origin}/#studio`;
 }
 
 async function sendPdfToWhatsApp(e) {
@@ -717,54 +756,26 @@ async function sendPdfToWhatsApp(e) {
     return;
   }
   const status = document.getElementById("download-status");
-  const phoneEl = document.getElementById("wa-pdf-phone");
-  const phone = String(phoneEl && "value" in phoneEl ? phoneEl.value : readCheckoutContact()).trim();
+  const phone = readPersonalPhone();
+  const waPhone = document.getElementById("wa-pdf-phone");
+  if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
+    waPhone.value = phone;
+  }
   if (status) status.textContent = qcT("waPreparing", "מכין PDF לשליחה...");
   try {
-    const result = await exportHighResPdf({ download: false });
+    const result = await exportHighResPdf({ download: true });
     const blob = result?.blob;
-    const filename = result?.filename || "cv.pdf";
     if (!blob) throw new Error("empty pdf");
 
-    const token = getPaymentToken();
-    const intl = intlPhoneDigits(phone);
-    if (token && intl.startsWith("972")) {
-      const pdfBase64 = await blobToBase64(blob);
-      const res = await fetch("/api/send-pdf-whatsapp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, phone: intl, filename, pdfBase64 }),
-      });
-      const data = await res.json().catch(() => null);
-      if (data?.ok) {
-        if (status) status.textContent = qcT("waPdfSent", "ה-PDF נשלח לוואטסאפ.");
-        return;
-      }
+    const downloadUrl = await createCvDownloadShareUrl();
+    const english = window.QCCvLang === "en";
+    const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
+    window.open(waUrl, "_blank", "noopener");
+    if (status) {
+      status.textContent = phone
+        ? qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
+        : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
     }
-
-    try {
-      if (await sharePdfFile(blob, filename)) {
-        if (status) status.textContent = qcT("sharePickWa", "בחרו WhatsApp בשיתוף כדי לשלוח את הקובץ.");
-        return;
-      }
-    } catch {
-      /* cancelled */
-    }
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.open(
-      whatsappPdfShareUrl(intl, qcT("waShareText", "היי, אלה קורות החיים מ-QuickCV. הקובץ ירד למכשיר — צרפו אותו כאן.")),
-      "_blank",
-      "noopener",
-    );
-    if (status) status.textContent = qcT("waDownloadedAttach", "הקובץ ירד. צרפו אותו בשיחת WhatsApp שנפתחה.");
   } catch {
     if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
   }

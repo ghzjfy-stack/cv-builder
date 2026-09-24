@@ -113,6 +113,35 @@ export function whatsappPdfShareUrl(phoneDigits, text) {
   return `${base}?text=${encodeURIComponent(text)}`;
 }
 
+/** Convert local IL mobiles (050…) to WhatsApp international digits (97250…). */
+export function toWhatsAppIntlPhone(raw) {
+  let digits = String(raw || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  if (digits.startsWith("972")) return digits;
+  if (digits.length === 10 && digits.startsWith("0")) return `972${digits.slice(1)}`;
+  if (digits.length === 9 && digits.startsWith("5")) return `972${digits}`;
+  return digits;
+}
+
+export function whatsappSelfPdfMessage(downloadUrl, english = false) {
+  const url = String(downloadUrl || "").trim();
+  if (english) return `Here's a link to view and save your QuickCV resume: ${url}`;
+  return `הנה קישור לצפייה ושמירה של קורות החיים שלך מ-QuickCV: ${url}`;
+}
+
+/** wa.me to the user's own number, or a generic share link when phone is missing. */
+export function whatsappSelfPdfUrl(phoneRaw, downloadUrl, english = false) {
+  const intl = toWhatsAppIntlPhone(phoneRaw);
+  const text = whatsappSelfPdfMessage(downloadUrl, english);
+  const validIl = /^9725\d{8}$/.test(intl);
+  const validIntl = /^\d{10,15}$/.test(intl);
+  if (validIl || (validIntl && intl.length >= 11)) {
+    return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`;
+  }
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
 export function referralShareText(url) {
   return `היי, בניתי קורות חיים ב-QuickCV ב-${displayAmountValue(CHECKOUT.amountIls)} ₪. שווה לנסות: ${url}`;
 }

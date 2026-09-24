@@ -5984,7 +5984,7 @@
         #qc-print-host.qc-capturing .cv-print-sheet,
         html.qc-exporting #qc-print-host .cv-print-sheet {
             width: 100% !important;
-            height: auto !important;
+            /* Do not force height:auto !important — JS locks A4 height so 1fr sidebars fill */
             min-height: 1123px !important;
             max-height: none !important;
             overflow: visible !important;
@@ -5992,6 +5992,89 @@
             transform: none !important;
             box-shadow: none !important;
             filter: none !important;
+        }
+        /* Full-bleed / sidebar templates: paint the side column to the page bottom */
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-navy,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-charcoal,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-azure,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-sidebar,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-split,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-charcoal,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-azure,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-sidebar,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-split {
+            padding: 0 !important;
+            overflow: hidden !important;
+            min-height: 1123px !important;
+        }
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {
+            content: "";
+            grid-column: 1;
+            grid-row: 1 / -1;
+            background: var(--navy, #12192b);
+            z-index: 0;
+        }
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-charcoal::before,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-charcoal::before {
+            content: "";
+            grid-column: 1;
+            grid-row: 1 / -1;
+            background: var(--charcoal, #4c4c4c);
+            z-index: 0;
+        }
+        #qc-print-host.qc-capturing .layout-charcoal .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-charcoal #cv-header,
+        html.qc-exporting #qc-print-host .layout-charcoal .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-charcoal #cv-header {
+            background: var(--charcoal, #4c4c4c) !important;
+            color: #fff !important;
+            z-index: 1;
+        }
+        #qc-print-host.qc-capturing .layout-navy .cv-photo-block,
+        #qc-print-host.qc-capturing .layout-navy #cv-header,
+        #qc-print-host.qc-capturing .layout-navy .cv-sidebar-inner,
+        html.qc-exporting #qc-print-host .layout-navy .cv-photo-block,
+        html.qc-exporting #qc-print-host .layout-navy #cv-header,
+        html.qc-exporting #qc-print-host .layout-navy .cv-sidebar-inner {
+            background: var(--navy, #12192b) !important;
+            color: #fff !important;
+            z-index: 1;
+        }
+        #qc-print-host.qc-capturing .layout-navy .cv-sidebar-inner,
+        #qc-print-host.qc-capturing .layout-charcoal .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-azure .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-sidebar .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-split .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-navy .cv-sidebar-inner,
+        html.qc-exporting #qc-print-host .layout-charcoal .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-azure .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-sidebar .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-split .cv-sidebar {
+            height: 100% !important;
+            min-height: 100% !important;
+            align-self: stretch !important;
+        }
+        #qc-print-host.qc-capturing .layout-navy .cv-photo,
+        #qc-print-host.qc-capturing .layout-charcoal .cv-photo,
+        html.qc-exporting #qc-print-host .layout-navy .cv-photo,
+        html.qc-exporting #qc-print-host .layout-charcoal .cv-photo {
+            overflow: hidden !important;
+            border-radius: 999px !important;
+        }
+        #qc-print-host.qc-capturing .layout-navy .cv-photo svg,
+        #qc-print-host.qc-capturing .layout-navy .cv-photo img,
+        #qc-print-host.qc-capturing .layout-charcoal .cv-photo svg,
+        #qc-print-host.qc-capturing .layout-charcoal .cv-photo img,
+        html.qc-exporting #qc-print-host .layout-navy .cv-photo svg,
+        html.qc-exporting #qc-print-host .layout-navy .cv-photo img,
+        html.qc-exporting #qc-print-host .layout-charcoal .cv-photo svg,
+        html.qc-exporting #qc-print-host .layout-charcoal .cv-photo img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
         }
         html.qc-exporting #qc-print-host.qc-capturing .cv-watermark,
         html.qc-exporting #qc-print-host.qc-capturing .cv-shield {

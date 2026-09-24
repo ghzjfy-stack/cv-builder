@@ -460,7 +460,7 @@
                         <p class="font-bold dynamic-text text-sm" id="label-experience">ניסיון תעסוקתי</p>
                     </div>
                     <div id="experience-items" role="list"></div>
-                    <button type="button" id="btn-add-experience" class="section-add-btn">
+                    <button type="button" id="btn-add-experience" class="section-add-btn" onclick="event.preventDefault(); addExperience(); return false;">
                         <span class="experience-add-icon" aria-hidden="true">+</span>
                         <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                     </button>
@@ -473,7 +473,7 @@
                             <p class="font-bold dynamic-text text-sm" id="label-education">השכלה</p>
                         </div>
                         <div id="education-items" role="list"></div>
-                        <button type="button" id="btn-add-education" class="section-add-btn">
+                        <button type="button" id="btn-add-education" class="section-add-btn" onclick="event.preventDefault(); addEducation(); return false;">
                             <span class="experience-add-icon" aria-hidden="true">+</span>
                             <span id="btn-add-education-label">הוסף השכלה נוספת</span>
                         </button>
@@ -491,11 +491,11 @@
                                 <div class="experience-card-fields">
                                     <div class="experience-field">
                                         <label class="experience-field-label">תפקיד / מסגרת</label>
-                                        <input type="text" name="role" data-entry-title="1" data-entry-field="position" value="" oninput="updateMilitary('role', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
+                                        <input type="text" name="role" data-entry-title="1" data-entry-field="position" value="" oninput="updateMilitary('role', this.value)" onchange="updateMilitary('role', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: מפקד כיתה, חיל האוויר">
                                     </div>
                                     <div class="experience-field">
                                         <label class="experience-field-label">פירוט קצר / שנים</label>
-                                        <input type="text" name="dates" data-entry-dates="1" data-entry-field="years" value="" oninput="updateMilitary('dates', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
+                                        <input type="text" name="dates" data-entry-dates="1" data-entry-field="years" value="" oninput="updateMilitary('years', this.value)" onchange="updateMilitary('years', this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" placeholder="לדוגמה: 2012 - 2015">
                                     </div>
                                 </div>
                             </article>
@@ -983,8 +983,8 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=acc2"></script>
-    <script src="lib/entryEditor.js?v=acc2"></script>
+    <script src="lib/experienceEditor.js?v=arr1"></script>
+    <script src="lib/entryEditor.js?v=arr1"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1037,6 +1037,11 @@
             if (e && e.preventDefault) e.preventDefault();
             if (window.QCMilitary && typeof QCMilitary.addItem === 'function') return QCMilitary.addItem(e);
             return false;
+        };
+        window.updateMilitary = function (field, value) {
+            if (window.QCMilitary && typeof QCMilitary.updateMilitary === 'function') {
+                return QCMilitary.updateMilitary(field, value);
+            }
         };
         window.toggleEducationRaw = function (e) {
             if (e && e.preventDefault) e.preventDefault();
@@ -1897,8 +1902,94 @@
         }
 
         function previewVal(id) {
+            if (id === 'in-military') return readMilitaryText();
             if (useDummyPreview()) return dummyValueFor(id);
             return getVal(id);
+        }
+
+        function militaryFromState() {
+            const data = window.QCCvData && QCCvData.military;
+            if (data && !Array.isArray(data) && (String(data.role || '').trim() || String(data.years || '').trim())) {
+                return { role: String(data.role || '').trim(), years: String(data.years || '').trim() };
+            }
+            if (Array.isArray(data) && data[0]) {
+                const role = String(data[0].role || data[0].position || data[0].title || '').trim();
+                const years = String(data[0].years || data[0].dates || data[0].date || '').trim();
+                if (role || years) return { role: role, years: years };
+            }
+            if (window.QCMilitary && typeof QCMilitary.getMilitary === 'function') {
+                try {
+                    const row = QCMilitary.getMilitary();
+                    if (row && (String(row.role || '').trim() || String(row.years || '').trim())) {
+                        return { role: String(row.role || '').trim(), years: String(row.years || '').trim() };
+                    }
+                } catch (err) { /* fall through */ }
+            }
+            if (window.QCMilitary && typeof QCMilitary.previewItems === 'function') {
+                try {
+                    const rows = QCMilitary.previewItems() || [];
+                    const row = rows[0];
+                    if (row) {
+                        const role = String(row.role || row.position || row.title || '').trim();
+                        const years = String(row.years || row.dates || row.date || '').trim();
+                        if (role || years) return { role: role, years: years };
+                    }
+                } catch (err) { /* fall through */ }
+            }
+            const raw = getVal('in-military');
+            if (!raw) return { role: '', years: '' };
+            const blocks = typeof parseDatedBlocks === 'function' ? parseDatedBlocks(raw) : [];
+            if (blocks[0]) {
+                return {
+                    role: String(blocks[0].title || blocks[0].role || '').trim(),
+                    years: String(blocks[0].date || '').trim()
+                };
+            }
+            return { role: raw.trim(), years: '' };
+        }
+
+        function formatMilitaryText(row) {
+            if (!row || (!row.role && !row.years)) return '';
+            return [row.years, row.role].filter(Boolean).join(' | ');
+        }
+
+        function readMilitaryText() {
+            const typed = militaryFromState();
+            if (typed.role || typed.years) return formatMilitaryText(typed);
+            if (useDummyPreview()) return dummyValueFor('in-military');
+            return '';
+        }
+
+        function paintMilitaryPreview(container, text) {
+            if (!container) return;
+            container.replaceChildren();
+            const typed = militaryFromState();
+            const dummy = !(typed.role || typed.years) && useDummyPreview();
+            const row = (typed.role || typed.years)
+                ? typed
+                : (dummy && text ? (function () {
+                    const blocks = typeof parseDatedBlocks === 'function' ? parseDatedBlocks(text) : [];
+                    if (blocks[0]) {
+                        return {
+                            role: String(blocks[0].title || blocks[0].role || '').trim(),
+                            years: String(blocks[0].date || '').trim()
+                        };
+                    }
+                    return { role: String(text || '').trim(), years: '' };
+                }()) : { role: '', years: '' });
+            if (!row.role && !row.years) return;
+            if (row.role) {
+                const roleEl = document.createElement('p');
+                roleEl.className = 'cv-military-role';
+                roleEl.textContent = row.role;
+                container.appendChild(roleEl);
+            }
+            if (row.years) {
+                const yearsEl = document.createElement('p');
+                yearsEl.className = 'cv-military-years';
+                yearsEl.textContent = row.years;
+                container.appendChild(yearsEl);
+            }
         }
 
         function isSampleFieldValue(id, value) {
@@ -2181,7 +2272,9 @@
                 });
 
                 setSec('sec-summary', 'out-summary', previewVal('in-summary'));
-                setSec('sec-military', 'out-military', previewVal('in-military'));
+                const milText = readMilitaryText();
+                setSec('sec-military', 'out-military', milText);
+                paintMilitaryPreview(cvOut('out-military'), milText);
             } catch (err) {
                 console.error('updateCV failed', err);
             }
@@ -2282,12 +2375,7 @@
             };
         }
 
-        function readWorkExperienceJobs() {
-            if (useDummyPreview()) {
-                return parseDatedBlocks(dummyValueFor('in-experience')).map(mapExperienceJob).filter((job) => (
-                    job.company || job.position || job.dates || job.description || job.bullets.length
-                ));
-            }
+        function typedExperienceJobs() {
             if (window.QCCvData && Array.isArray(QCCvData.experience)) {
                 try {
                     const fromCtx = QCCvData.experience.map(mapExperienceJob).filter((job) => (
@@ -2298,19 +2386,31 @@
             }
             if (window.QCExperience && typeof QCExperience.previewJobs === 'function') {
                 try {
-                    return (QCExperience.previewJobs() || []).map(mapExperienceJob).filter((job) => (
+                    const fromPreview = (QCExperience.previewJobs() || []).map(mapExperienceJob).filter((job) => (
                         job.company || job.position || job.dates || job.description || job.bullets.length
                     ));
+                    if (fromPreview.length) return fromPreview;
                 } catch (err) { /* fall through to textarea parse */ }
             }
             if (window.QCExperience && typeof QCExperience.getJobs === 'function') {
                 try {
-                    return (QCExperience.getJobs() || []).map(mapExperienceJob).filter((job) => (
+                    const fromJobs = (QCExperience.getJobs() || []).map(mapExperienceJob).filter((job) => (
                         job.company || job.position || job.dates || job.description || job.bullets.length
                     ));
+                    if (fromJobs.length) return fromJobs;
                 } catch (err) { /* fall through */ }
             }
-            return parseDatedBlocks(getVal('in-experience')).map(mapExperienceJob);
+            return parseDatedBlocks(getVal('in-experience')).map(mapExperienceJob).filter((job) => (
+                job.company || job.position || job.dates || job.description || (job.bullets && job.bullets.length)
+            ));
+        }
+
+        function readWorkExperienceJobs() {
+            const typed = typedExperienceJobs();
+            if (typed && typed.length) return typed;
+            return parseDatedBlocks(dummyValueFor('in-experience')).map(mapExperienceJob).filter((job) => (
+                job.company || job.position || job.dates || job.description || job.bullets.length
+            ));
         }
 
         function serializeEducationPreview(list) {
@@ -2329,8 +2429,7 @@
             }).filter(Boolean).join('\n\n');
         }
 
-        function readEducationText() {
-            if (useDummyPreview()) return dummyValueFor('in-education');
+        function typedEducationText() {
             if (window.QCCvData && Array.isArray(QCCvData.education)) {
                 try {
                     const text = serializeEducationPreview(QCCvData.education);
@@ -2344,6 +2443,12 @@
                 } catch (err) { /* fall through */ }
             }
             return getVal('in-education');
+        }
+
+        function readEducationText() {
+            const typed = typedEducationText();
+            if (String(typed || '').trim()) return typed;
+            return dummyValueFor('in-education');
         }
 
         function paintExperienceJobs(container, jobs, opts) {
@@ -3179,7 +3284,7 @@
             const charcoal = isCharcoalLayout();
             const navy = isNavyLayout();
             const azure = isAzureLayout();
-            const milVal = previewVal('in-military');
+            const milVal = readMilitaryText();
             const extrasOut = cvOut('out-extras-side');
             const extrasSec = document.getElementById('sec-extras-side');
             const expJobs = readWorkExperienceJobs();
@@ -3307,19 +3412,34 @@
 
                 if (extrasOut) {
                     extrasOut.replaceChildren();
-                    const items = String(milVal || '').split('\n').map((s) => s.trim()).filter(Boolean);
-                    if (items.length) {
+                    const mil = militaryFromState();
+                    const dummyOnly = !(mil.role || mil.years) && useDummyPreview();
+                    const row = (mil.role || mil.years) ? mil : (dummyOnly ? (function () {
+                        const raw = dummyValueFor('in-military');
+                        const blocks = typeof parseDatedBlocks === 'function' ? parseDatedBlocks(raw) : [];
+                        if (blocks[0]) {
+                            return {
+                                role: String(blocks[0].title || blocks[0].role || '').trim(),
+                                years: String(blocks[0].date || '').trim()
+                            };
+                        }
+                        return { role: '', years: '' };
+                    }()) : { role: '', years: '' });
+                    const bits = [row.role, row.years].filter(Boolean);
+                    if (bits.length) {
                         const ul = document.createElement('ul');
                         ul.className = 'cv-extra-list';
-                        items.forEach((item) => {
+                        bits.forEach((item) => {
                             const li = document.createElement('li');
-                            li.textContent = item.replace(/^[•\-*]\s*/, '');
+                            li.textContent = item;
                             ul.appendChild(li);
                         });
                         extrasOut.appendChild(ul);
                     }
+                    showSec(extrasSec, bits.length > 0);
+                } else {
+                    showSec(extrasSec, false);
                 }
-                showSec(extrasSec, !!milVal);
                 renderReferences(false);
                 return;
             }

@@ -3387,6 +3387,12 @@
         .paid .cv-watermark,
         .paid .cv-shield { display: none; }
 
+        /* Watermark / shield only on Step 3 (Download/Payment) */
+        body:not(.qc-studio-step-3) .cv-watermark,
+        body:not(.qc-studio-step-3) .cv-shield {
+            display: none !important;
+        }
+
         #cv-preview-wrapper:not(.paid),
         #cv-preview-page-2:not(.paid) {
             -webkit-user-select: none;

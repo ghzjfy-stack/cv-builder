@@ -15,8 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=pdf2">
-    <link rel="stylesheet" href="./cro.css?v=formpreview1">
+    <link rel="stylesheet" href="./app.css?v=preview-step3">
+    <link rel="stylesheet" href="./cro.css?v=preview-step3">
 </head>
 <body class="on-home" id="app-body">
     <a href="#home-cta" class="skip-link no-print" id="skip-link">דלג לתוכן</a>
@@ -4047,6 +4047,7 @@
             const panelStep = step === 3 ? 2 : step;
             document.body.classList.toggle('qc-studio-step-1', panelStep === 1);
             document.body.classList.toggle('qc-studio-step-2', panelStep === 2);
+            document.body.classList.toggle('qc-studio-step-3', step === 3);
             markStep(step);
             if (typeof syncStudioStepChrome === 'function') syncStudioStepChrome();
             if (step === 3) {
@@ -5040,7 +5041,7 @@
                 if (!window.QCStudioStep) applyStudioStep(1, { silent: true });
             } else {
                 window.QCStudioStep = 0;
-                document.body.classList.remove('qc-studio-step-1', 'qc-studio-step-2');
+                document.body.classList.remove('qc-studio-step-1', 'qc-studio-step-2', 'qc-studio-step-3');
             }
             if (isStudio) window.scrollTo(0, 0);
             document.body.classList.toggle('bg-slate-900', isStudio);

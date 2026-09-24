@@ -1,7 +1,54 @@
 import React from 'react';
 
+const PRESENT_ANY = /^(present|current|today|now|היום|נוכחי|בהווה)$/i;
+const YEAR_RE = /^(?:19|20)\d{2}$/;
+
+/**
+ * Normalize a present-tense end token for the active language.
+ * Keeps Hebrew "נוכחי" (does not rewrite to היום).
+ */
+function normalizePresentToken(token, isEnglish) {
+  const t = String(token || '').trim();
+  if (!t) return '';
+  if (PRESENT_ANY.test(t)) return isEnglish ? 'Present' : 'נוכחי';
+  return t;
+}
+
+/**
+ * Split a date-range string into { start, end } with chronological year-first order.
+ * Fixes reversed RTL forms like "נוכחי - 2023" → start=2023, end=נוכחי.
+ */
+export function parseDateRangeParts(rawDates) {
+  if (!rawDates) return { start: '', end: '' };
+  let str = String(rawDates).trim();
+  if (str.includes('\n')) str = str.split('\n')[0].trim();
+  str = str.replace(/^[•\-–—*\u2022|·\s]+/, '').replace(/[•\-–—*\u2022|·\s]+$/, '').trim();
+
+  const range = str.match(
+    /^(.+?)\s*[-–—]\s*(.+)$/
+  );
+  if (!range) {
+    return { start: str, end: '' };
+  }
+
+  let a = range[1].trim();
+  let b = range[2].trim();
+
+  // If end looks like a year and start is "נוכחי"/Present, swap to year-first.
+  if (PRESENT_ANY.test(a) && YEAR_RE.test(b)) {
+    return { start: b, end: a };
+  }
+  // If start is present-like text and end is a year-ish token
+  if (PRESENT_ANY.test(a) && /\d{4}/.test(b) && !YEAR_RE.test(a)) {
+    return { start: b.replace(/.*?((?:19|20)\d{2}).*/, '$1'), end: a };
+  }
+
+  return { start: a, end: b };
+}
+
 /**
  * Normalizes date range strings (e.g., "2010-2015" -> "2010 - 2015", "2020-present" -> "2020 - Present").
+ * Always keeps chronological order: YEAR - end. Preserves Hebrew "נוכחי".
  */
 export function formatCleanDates(rawDates, isEnglish) {
   if (!rawDates) return '';
@@ -9,17 +56,21 @@ export function formatCleanDates(rawDates, isEnglish) {
   if (str.includes('\n')) str = str.split('\n')[0].trim();
   str = str.replace(/^[•\-–—*\u2022|·\s]+/, '').replace(/[•\-–—*\u2022|·\s]+$/, '').trim();
 
-  // Normalize separators: 2010-2015, 2010 - 2015, 2010–2015, 2010—2015
-  str = str.replace(/(\d{4})\s*[-–—]\s*(\d{4}|present|current|today|היום|נוכחי)/i, (_, y1, y2) => {
-    let second = y2;
-    const low = y2.toLowerCase();
-    if (low === 'present' || low === 'current' || low === 'today' || low === 'היום' || low === 'נוכחי') {
-      second = isEnglish ? 'Present' : 'היום';
-    }
-    return `${y1} - ${second}`;
-  });
+  // Normalize "YYYY - YYYY|present|נוכחי" and also reversed "נוכחי - YYYY"
+  str = str.replace(
+    /(\d{4})\s*[-–—]\s*(\d{4}|present|current|today|now|היום|נוכחי|בהווה)/i,
+    (_, y1, y2) => `${y1} - ${normalizePresentToken(y2, isEnglish)}`
+  );
+  str = str.replace(
+    /(present|current|today|now|היום|נוכחי|בהווה)\s*[-–—]\s*(\d{4})/i,
+    (_, present, y) => `${y} - ${normalizePresentToken(present, isEnglish)}`
+  );
 
-  return str;
+  const parts = parseDateRangeParts(str);
+  if (!parts.start) return '';
+  if (!parts.end) return parts.start;
+  const end = normalizePresentToken(parts.end, isEnglish) || parts.end;
+  return `${parts.start} - ${end}`;
 }
 
 /**
@@ -35,7 +86,7 @@ export function splitInlineMergedDate(rawText, fallbackDates, isEnglish) {
   str = str.replace(/^[•\-–—*\u2022|·\s]+/, '').trim();
 
   // Pattern matching: "2010-2015 - Institution", "2010-2015 -- Institution", "2010-2015 | Institution"
-  const headerRe = /^((?:\d{4}|\b(?:19|20)\d{2}\b)(?:\s*[-–—]\s*(?:\d{4}|present|current|today|היום|נוכחי|שנה [א-ד]))?)\s*(?:[\|·•]|\-{1,2}|[–—])\s*(.+)$/i;
+  const headerRe = /^((?:\d{4}|\b(?:19|20)\d{2}\b)(?:\s*[-–—]\s*(?:\d{4}|present|current|today|now|היום|נוכחי|בהווה|שנה [א-ד]))?)\s*(?:[\|·•]|\-{1,2}|[–—])\s*(.+)$/i;
   const match = str.match(headerRe);
 
   if (match) {
@@ -51,7 +102,7 @@ export function splitInlineMergedDate(rawText, fallbackDates, isEnglish) {
   }
 
   // Reverse pattern: "Institution - 2010-2015" or "Institution | 2010-2015"
-  const reverseRe = /^(.+?)\s*(?:[\|·•]|\-{1,2}|[–—])\s*((?:\d{4}|\b(?:19|20)\d{2}\b)(?:\s*[-–—]\s*(?:\d{4}|present|current|today|היום|נוכחי))?)$/i;
+  const reverseRe = /^(.+?)\s*(?:[\|·•]|\-{1,2}|[–—])\s*((?:\d{4}|\b(?:19|20)\d{2}\b)(?:\s*[-–—]\s*(?:\d{4}|present|current|today|now|היום|נוכחי|בהווה))?)$/i;
   const revMatch = str.match(reverseRe);
   if (revMatch) {
     const remainingText = revMatch[1]
@@ -224,11 +275,12 @@ export function normalizeMilitaryItem(item, isEnglish) {
       .map((l) => l.replace(/^[•\-–—*\u2022|·\s]+/, '').trim())
       .filter(Boolean);
 
-    const roleOrUnit = [text, subtitle && !text.includes(subtitle) ? subtitle : ''].filter(Boolean).join(', ') || text;
+    const roleOrUnit = text || (isEnglish ? 'Military Service' : 'שירות צבאי / לאומי');
 
     return {
-      title: roleOrUnit || (isEnglish ? 'Military Service' : 'שירות צבאי / לאומי'),
-      role: roleOrUnit || (isEnglish ? 'Military Service' : 'שירות צבאי / לאומי'),
+      title: roleOrUnit,
+      role: roleOrUnit,
+      subtitle: subtitle && !text.includes(subtitle) ? subtitle : '',
       dates,
       descriptions,
     };
@@ -258,20 +310,18 @@ export function normalizeMilitaryItem(item, isEnglish) {
       .filter(Boolean);
   }
 
-  const roleParts = [cleanRole, cleanBranch].filter(Boolean);
-  const resolvedRole =
-    roleParts.length > 0
-      ? cleanBranch && cleanRole && !cleanRole.includes(cleanBranch)
-        ? `${cleanRole}, ${cleanBranch}`
-        : cleanRole || cleanBranch
-      : isEnglish
-      ? 'Military Service'
-      : 'שירות צבאי / לאומי';
+  const title =
+    cleanRole ||
+    cleanBranch ||
+    (isEnglish ? 'Military Service' : 'שירות צבאי / לאומי');
+  const subtitle =
+    cleanRole && cleanBranch && !cleanRole.includes(cleanBranch) ? cleanBranch : '';
 
   return {
     id: item.id,
-    title: resolvedRole,
-    role: resolvedRole,
+    title,
+    role: title,
+    subtitle,
     dates: cleanDates,
     descriptions,
   };
@@ -299,6 +349,47 @@ export function normalizeReferenceItem(item) {
 }
 
 /**
+ * Date range chip: forced LTR isolate so "2023 - נוכחי" never becomes "נוכחי - 2023"
+ * and Hebrew end-tokens are not visually reversed.
+ */
+/**
+ * Date range chip: forced LTR isolate so "2023 - נוכחי" never becomes "נוכחי - 2023"
+ * and Hebrew end-tokens are not visually reversed.
+ * Expects dates already language-normalized by formatCleanDates / normalize* helpers.
+ */
+export function DateRangeText({ dates, className = '' }) {
+  const raw = String(dates || '').trim();
+  if (!raw) return null;
+  // Year-first only — do not rewrite Present/נוכחי (callers already cleaned language).
+  const yearFirst = raw.replace(
+    /(present|current|today|now|היום|נוכחי|בהווה)\s*[-–—]\s*(\d{4})/i,
+    (_, present, y) => `${y} - ${present}`
+  );
+  const parts = parseDateRangeParts(yearFirst);
+  const start = parts.start;
+  const end = parts.end;
+  return (
+    <span
+      className={`cv-job-date text-sm font-medium text-slate-500 whitespace-nowrap shrink-0 ${className}`.trim()}
+      dir="ltr"
+      style={{ unicodeBidi: 'isolate', direction: 'ltr' }}
+    >
+      {end ? (
+        <>
+          <bdi>{start}</bdi>
+          <span className="cv-date-sep" aria-hidden="true">
+            {' – '}
+          </span>
+          <bdi>{end}</bdi>
+        </>
+      ) : (
+        <bdi>{start}</bdi>
+      )}
+    </span>
+  );
+}
+
+/**
  * Reusable Unified Flex Header component for entry titles and dates.
  * Wraps title and dates inside:
  * `<div className="flex justify-between items-baseline w-full">`
@@ -306,19 +397,50 @@ export function normalizeReferenceItem(item) {
  * - In LTR (English): Title automatically aligns Left, Dates align Right on the exact same line.
  */
 export function EntryFlexHeader({ title, dates, className = '' }) {
+  if (!title && !dates) return null;
   return (
-    <div className={`flex justify-between items-baseline w-full ${className}`.trim()}>
-      <span className="font-bold text-base text-slate-800 leading-snug">
-        {title}
-      </span>
-      {dates && (
-        <span
-          className="cv-job-date text-sm font-medium text-slate-500 whitespace-nowrap shrink-0"
-          style={{ direction: 'ltr', unicodeBidi: 'isolate' }}
-        >
-          {dates}
+    <div className={`cv-job-head flex justify-between items-baseline w-full gap-x-3 ${className}`.trim()}>
+      {title ? (
+        <span className="cv-job-title font-bold text-base text-slate-800 leading-snug min-w-0">
+          {title}
         </span>
+      ) : (
+        <span />
       )}
+      <DateRangeText dates={dates} />
+    </div>
+  );
+}
+
+/**
+ * Unified entry block used by Experience / Education / Military so headers match.
+ */
+export function CvEntryItem({
+  title,
+  subtitle,
+  dates,
+  descriptions = [],
+  className = '',
+  listClassName = 'cv-job-list',
+}) {
+  return (
+    <div className={`cv-job ${className}`.trim()}>
+      <EntryFlexHeader title={title} dates={dates} />
+      {subtitle ? (
+        <p className="cv-job-role text-sm text-slate-600 mt-0.5">{subtitle}</p>
+      ) : null}
+      {descriptions?.length > 0 ? (
+        <ul
+          className={`${listClassName} list-disc list-outside mt-2 text-sm text-slate-700`}
+          style={{ paddingInlineStart: '1.25rem' }}
+        >
+          {descriptions.map((desc, dIdx) => (
+            <li key={dIdx} style={{ marginBottom: '0.25rem' }}>
+              {desc}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }
@@ -370,7 +492,11 @@ export function ContactRow({ icon, value, href, isSidebar = false }) {
 
   return (
     <div className={`flex items-start gap-1.5 min-w-0 ${isSidebar ? 'w-full' : ''}`}>
-      {icon && <span className="shrink-0 text-slate-400 select-none">{icon}</span>}
+      {icon && (
+        <span className="cv-contact-ico shrink-0 text-slate-400 select-none self-baseline leading-none mt-[0.15em]">
+          {icon}
+        </span>
+      )}
       {href ? (
         <a
           href={href}

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   EntryFlexHeader,
   ContactRow,
+  CvEntryItem,
   formatCleanDates,
   splitInlineMergedDate,
   normalizeJobItem,
@@ -20,6 +21,7 @@ export {
   normalizeReferenceItem,
   EntryFlexHeader,
   ContactRow,
+  CvEntryItem,
 };
 
 /**
@@ -174,34 +176,14 @@ export default function Preview({
             </h2>
             <div className="space-y-4">
               {jobs.map((job, idx) => (
-                <div key={job.id || idx} className="cv-job">
-                  {/* Unified flex header container wrapping role and dates */}
-                  <EntryFlexHeader title={job.title} dates={job.dates} />
-
-                  {/* Subtitle Row underneath: Company Name */}
-                  {job.company && (
-                    <p className="cv-job-role text-sm text-slate-600 mt-0.5">
-                      {job.company}
-                    </p>
-                  )}
-
-                  {/* Bullet descriptions underneath — RTL-safe indent so markers don't touch Hebrew text */}
-                  {job.descriptions?.length > 0 && (
-                    <ul
-                      className="cv-job-list list-disc list-outside mt-2 text-sm text-slate-700"
-                      style={{ paddingInlineStart: '1.25rem' }}
-                    >
-                      {job.descriptions.map((desc, dIdx) => (
-                        <li
-                          key={dIdx}
-                          style={{ paddingInlineStart: '1.25rem', marginBottom: '0.25rem' }}
-                        >
-                          {desc}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                <CvEntryItem
+                  key={job.id || idx}
+                  title={job.title}
+                  subtitle={job.company}
+                  dates={job.dates}
+                  descriptions={job.descriptions}
+                  listClassName="cv-job-list"
+                />
               ))}
             </div>
           </section>
@@ -215,34 +197,14 @@ export default function Preview({
             </h2>
             <div className="space-y-4">
               {education.map((edu, idx) => (
-                <div key={edu.id || idx} className="cv-edu-item">
-                  {/* Unified flex header container wrapping degree/title and dates */}
-                  <EntryFlexHeader title={edu.title} dates={edu.dates} />
-
-                  {/* Subtitle Row underneath: Institution / School */}
-                  {edu.subtitle && (
-                    <p className="cv-edu-meta text-sm text-slate-600 mt-0.5">
-                      {edu.subtitle}
-                    </p>
-                  )}
-
-                  {/* Bullet descriptions underneath (if any) */}
-                  {edu.descriptions?.length > 0 && (
-                    <ul
-                      className="cv-edu-list list-disc list-outside mt-2 text-sm text-slate-700"
-                      style={{ paddingInlineStart: '1.25rem' }}
-                    >
-                      {edu.descriptions.map((desc, dIdx) => (
-                        <li
-                          key={dIdx}
-                          style={{ paddingInlineStart: '1.25rem', marginBottom: '0.25rem' }}
-                        >
-                          {desc}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                <CvEntryItem
+                  key={edu.id || idx}
+                  title={edu.title}
+                  subtitle={edu.subtitle}
+                  dates={edu.dates}
+                  descriptions={edu.descriptions}
+                  listClassName="cv-edu-list"
+                />
               ))}
             </div>
           </section>
@@ -255,32 +217,16 @@ export default function Preview({
               {isEnglish ? 'Military / National Service' : 'שירות צבאי / לאומי'}
             </h2>
             <div className="space-y-4">
-              {military.map((mil, idx) => {
-                const roleOrUnit = mil.role || mil.title || (isEnglish ? 'Military Service' : 'שירות צבאי / לאומי');
-                return (
-                  <div key={mil.id || idx} className="cv-military-item">
-                    {/* Unified flex header: Military role and dates on the exact same line */}
-                    <EntryFlexHeader title={roleOrUnit} dates={mil.dates} />
-
-                    {/* Bullet descriptions underneath (if any) */}
-                    {mil.descriptions?.length > 0 && (
-                      <ul
-                        className="cv-military-list list-disc list-outside mt-2 text-sm text-slate-700"
-                        style={{ paddingInlineStart: '1.25rem' }}
-                      >
-                        {mil.descriptions.map((desc, dIdx) => (
-                          <li
-                            key={dIdx}
-                            style={{ paddingInlineStart: '1.25rem', marginBottom: '0.25rem' }}
-                          >
-                            {desc}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
+              {military.map((mil, idx) => (
+                <CvEntryItem
+                  key={mil.id || idx}
+                  title={mil.title || mil.role || (isEnglish ? 'Military Service' : 'שירות צבאי / לאומי')}
+                  subtitle={mil.subtitle}
+                  dates={mil.dates}
+                  descriptions={mil.descriptions}
+                  listClassName="cv-military-list"
+                />
+              ))}
             </div>
           </section>
         )}

@@ -1873,26 +1873,37 @@
         #cv-target .cv-military-item,
         #cv-target-page2 .cv-military-item,
         #qc-print-host .cv-military-item {
-            margin-bottom: 0.85rem;
+            display: block;
+            position: relative;
+            margin: 0 0 1rem;
+            padding: 0;
+            line-height: 1.45;
+            overflow: visible;
             min-width: 0;
             max-width: 100%;
         }
         #cv-target .cv-edu-school,
         #cv-target-page2 .cv-edu-school,
-        #qc-print-host .cv-edu-school {
+        #qc-print-host .cv-edu-school,
+        #cv-target .cv-military-role,
+        #cv-target-page2 .cv-military-role,
+        #qc-print-host .cv-military-role {
             display: block;
             position: static;
             float: none;
             margin: 0;
             padding: 0;
             font-weight: 700;
-            font-size: calc(1.05rem * var(--cv-scale));
+            font-size: calc(1.125rem * var(--cv-scale));
             line-height: 1.35;
             color: inherit;
         }
         #cv-target .cv-edu-meta,
         #cv-target-page2 .cv-edu-meta,
-        #qc-print-host .cv-edu-meta {
+        #qc-print-host .cv-edu-meta,
+        #cv-target .cv-military-sub,
+        #cv-target-page2 .cv-military-sub,
+        #qc-print-host .cv-military-sub {
             display: block;
             position: static;
             float: none;
@@ -1912,32 +1923,6 @@
             gap: 0.15rem 0.55rem;
             min-width: 0;
         }
-        #cv-target .cv-military-role,
-        #cv-target-page2 .cv-military-role,
-        #qc-print-host .cv-military-role {
-            display: inline-block;
-            position: static;
-            float: none;
-            margin: 0;
-            padding: 0;
-            font-weight: 700;
-            font-size: calc(1.05rem * var(--cv-scale));
-            line-height: 1.35;
-            color: inherit;
-        }
-        #cv-target .cv-military-sub,
-        #cv-target-page2 .cv-military-sub,
-        #qc-print-host .cv-military-sub {
-            display: inline-block;
-            position: static;
-            float: none;
-            margin: 0;
-            padding: 0;
-            font-weight: 500;
-            font-size: calc(0.84rem * var(--cv-scale));
-            line-height: 1.4;
-            color: #475569;
-        }
         #cv-target .cv-job-date,
         #cv-target-page2 .cv-job-date,
         #qc-print-host .cv-job-date,
@@ -1946,7 +1931,10 @@
         #qc-print-host .cv-military-years,
         #cv-target .cv-military-date,
         #cv-target-page2 .cv-military-date,
-        #qc-print-host .cv-military-date {
+        #qc-print-host .cv-military-date,
+        #cv-target .cv-edu-date,
+        #cv-target-page2 .cv-edu-date,
+        #qc-print-host .cv-edu-date {
             display: inline-block;
             position: static;
             float: none;
@@ -1963,7 +1951,12 @@
             white-space: nowrap;
             overflow-wrap: normal;
             word-break: normal;
-            direction: ltr;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+        }
+        #cv-target .cv-job-date bdi,
+        #cv-target-page2 .cv-job-date bdi,
+        #qc-print-host .cv-job-date bdi {
             unicode-bidi: isolate;
         }
         #cv-target .cv-job-list,
@@ -2698,7 +2691,7 @@
         .layout-charcoal .cv-section-title,
         .layout-charcoal .cv-sidebar .cv-section-title {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             gap: 0.45rem;
             font-family: var(--cv-font), 'Playfair Display', 'Frank Ruhl Libre', serif;
             font-weight: 600;
@@ -2731,10 +2724,16 @@
         }
         .layout-charcoal .cv-sec-ico {
             display: inline-flex;
+            align-items: center;
+            justify-content: center;
             width: 1.05rem;
             height: 1.05rem;
             color: var(--accent);
             flex: none;
+            align-self: baseline;
+            /* Nudge icon to optical baseline of the title glyphs */
+            transform: translateY(0.12em);
+            line-height: 1;
         }
         .layout-charcoal .cv-sec-ico svg {
             width: 100%;
@@ -2742,6 +2741,10 @@
             stroke: currentColor;
             fill: none;
             stroke-width: 1.6;
+            display: block;
+        }
+        .layout-charcoal .cv-section-title > span:not(.cv-sec-ico) {
+            line-height: 1.25;
         }
         .layout-charcoal .cv-sidebar .cv-sec-ico { display: none; }
         .layout-charcoal .cv-contact-row {
@@ -2771,12 +2774,34 @@
         .layout-charcoal #sec-education { display: none !important; }
         .layout-charcoal #sec-education-side { display: block; }
         .layout-charcoal .cv-edu-item { margin-bottom: 0.7rem; }
-        .layout-charcoal .cv-edu-item .cv-edu-school {
+        /* Match Experience header: title + dates on one baseline row */
+        .layout-charcoal .cv-edu-item .cv-job-head {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.35rem;
+            width: 100%;
+            margin-bottom: 0.12rem;
+        }
+        .layout-charcoal .cv-edu-item .cv-edu-school,
+        .layout-charcoal .cv-edu-item .cv-job-title {
             font-weight: 700;
             color: #fff;
             font-size: calc(0.72rem * var(--cv-scale));
+            min-width: 0;
         }
-        .layout-charcoal .cv-edu-item .cv-edu-meta {
+        .layout-charcoal .cv-edu-item .cv-job-date,
+        .layout-charcoal .cv-edu-item .cv-edu-date {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: calc(0.58rem * var(--cv-scale));
+            padding-top: 0;
+            white-space: nowrap;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+        }
+        .layout-charcoal .cv-edu-item .cv-edu-meta,
+        .layout-charcoal .cv-edu-item .cv-job-role {
             color: rgba(255, 255, 255, 0.82);
             font-size: calc(0.62rem * var(--cv-scale));
             margin-top: 0.12rem;
@@ -3408,7 +3433,8 @@
         .layout-navy .cv-job-mark {
             position: absolute;
             inset-inline-start: -1.42rem;
-            top: 0.05rem;
+            /* Center the badge on the first line of .cv-job-title (0.95rem × 1.35) */
+            top: calc((0.95rem * var(--cv-scale) * 1.35 - 1.18rem) / 2);
             width: 1.18rem;
             height: 1.18rem;
             border-radius: 999px;
@@ -3418,6 +3444,7 @@
             align-items: center;
             justify-content: center;
             z-index: 1;
+            line-height: 1;
         }
         .layout-navy .cv-job-mark svg {
             width: 0.62rem;
@@ -3425,6 +3452,7 @@
             stroke: #fff;
             fill: none;
             stroke-width: 1.8;
+            display: block;
         }
         .layout-navy .cv-job-body {
             padding: 0;

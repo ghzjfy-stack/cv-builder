@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui11-tpl-i18n">
+    <link rel="stylesheet" href="./app.css?v=exp-ui12-dates">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -1010,7 +1010,10 @@
                                 <div id="out-experience" class="text-slate-700"></div>
                             </div>
                             <div id="sec-education">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="education">השכלה וקורסים</h3>
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">
+                                    <span class="cv-sec-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 6l9 4.5-9 4.5L3 10.5z"/><path d="M7 12.8v3.4c0 .7 2.2 2.3 5 2.3s5-1.6 5-2.3v-3.4"/><path d="M21 10.5v5.2"/></svg></span>
+                                    <span data-i18n="education">השכלה וקורסים</span>
+                                </h3>
                                 <div id="out-education" class="text-slate-700"></div>
                             </div>
                             <div id="sec-military">
@@ -2350,26 +2353,33 @@
             if (!row.role && !row.years) return;
 
             const wrap = document.createElement('div');
-            wrap.className = 'cv-military-item';
+            wrap.className = 'cv-job cv-military-item';
             const head = document.createElement('div');
             head.className = 'cv-job-head flex justify-between items-baseline w-full';
 
-            const roleOrUnit = [row.role, row.branch && !row.role.includes(row.branch) ? row.branch : ''].filter(Boolean).join(', ') || row.role;
+            const roleOrUnit = row.role || '';
+            const branchSub = row.branch && row.role && !row.role.includes(row.branch) ? row.branch : '';
 
             if (roleOrUnit) {
                 const roleEl = document.createElement('span');
-                roleEl.className = 'cv-military-role font-bold text-slate-800';
+                roleEl.className = 'cv-job-title cv-military-role font-bold text-slate-800';
                 roleEl.textContent = roleOrUnit;
                 head.appendChild(roleEl);
             }
 
             if (row.years) {
                 const yearsEl = document.createElement('span');
-                yearsEl.className = 'cv-military-years cv-job-date text-sm font-medium text-slate-500 whitespace-nowrap shrink-0';
-                yearsEl.textContent = row.years;
+                yearsEl.className = 'cv-job-date cv-military-years text-sm font-medium text-slate-500 whitespace-nowrap shrink-0';
+                setDateRangeEl(yearsEl, row.years);
                 head.appendChild(yearsEl);
             }
             wrap.appendChild(head);
+            if (branchSub) {
+                const sub = document.createElement('p');
+                sub.className = 'cv-job-role cv-military-sub text-sm text-slate-600 mt-0.5';
+                sub.textContent = branchSub;
+                wrap.appendChild(sub);
+            }
             container.appendChild(wrap);
         }
 
@@ -2946,7 +2956,7 @@
                 } else if (opts && opts.charcoal) {
                     const date = document.createElement('div');
                     date.className = 'cv-job-date';
-                    date.textContent = job.dates || job.date || '';
+                    setDateRangeEl(date, job.dates || job.date || '');
                     const rule = document.createElement('div');
                     rule.className = 'cv-job-rule';
                     const body = document.createElement('div');
@@ -2958,6 +2968,53 @@
                 }
                 container.appendChild(wrap);
             });
+        }
+
+        function formatCleanDates(rawDates, isEnglish) {
+            if (!rawDates) return '';
+            var str = String(rawDates).trim();
+            if (str.indexOf('\n') >= 0) str = str.split('\n')[0].trim();
+            str = str.replace(/^[•\-–—*\u2022|·\s]+/, '').replace(/[•\-–—*\u2022|·\s]+$/, '').trim();
+            var present = function (tok) {
+                var t = String(tok || '').trim();
+                if (/^(present|current|today|now|היום|נוכחי|בהווה)$/i.test(t)) {
+                    return isEnglish ? 'Present' : 'נוכחי';
+                }
+                return t;
+            };
+            str = str.replace(/(\d{4})\s*[-–—]\s*(\d{4}|present|current|today|now|היום|נוכחי|בהווה)/i, function (_, y1, y2) {
+                return y1 + ' - ' + present(y2);
+            });
+            str = str.replace(/(present|current|today|now|היום|נוכחי|בהווה)\s*[-–—]\s*(\d{4})/i, function (_, p, y) {
+                return y + ' - ' + present(p);
+            });
+            return str;
+        }
+
+        function setDateRangeEl(el, rawDates) {
+            if (!el) return;
+            var isEnglish = window.QCCvLang === 'en';
+            var clean = formatCleanDates(rawDates, isEnglish);
+            el.setAttribute('dir', 'ltr');
+            el.style.direction = 'ltr';
+            el.style.unicodeBidi = 'isolate';
+            el.textContent = '';
+            if (!clean) return;
+            var parts = clean.split(/\s*[-–—]\s*/);
+            if (parts.length >= 2) {
+                var start = document.createElement('bdi');
+                start.textContent = parts[0];
+                var sep = document.createElement('span');
+                sep.setAttribute('aria-hidden', 'true');
+                sep.textContent = ' – ';
+                var end = document.createElement('bdi');
+                end.textContent = parts.slice(1).join(' - ');
+                el.append(start, sep, end);
+            } else {
+                var only = document.createElement('bdi');
+                only.textContent = clean;
+                el.appendChild(only);
+            }
         }
 
         function paintEducationItems(container, eduVal) {
@@ -2973,7 +3030,7 @@
 
             blocks.forEach((item) => {
                 const box = document.createElement('div');
-                box.className = 'cv-edu-item';
+                box.className = 'cv-job cv-edu-item';
                 const head = document.createElement('div');
                 head.className = 'cv-job-head flex justify-between items-baseline w-full';
 
@@ -2994,20 +3051,20 @@
 
                 if (primaryTitle) {
                     const titleEl = document.createElement('p');
-                    titleEl.className = 'cv-edu-school cv-job-title font-bold';
+                    titleEl.className = 'cv-job-title cv-edu-school font-bold';
                     titleEl.textContent = primaryTitle;
                     head.appendChild(titleEl);
                 }
                 if (cleanDates) {
                     const datesEl = document.createElement('span');
-                    datesEl.className = 'cv-edu-date cv-job-date text-sm font-medium text-slate-500 whitespace-nowrap';
-                    datesEl.textContent = cleanDates;
+                    datesEl.className = 'cv-job-date cv-edu-date text-sm font-medium text-slate-500 whitespace-nowrap shrink-0';
+                    setDateRangeEl(datesEl, cleanDates);
                     head.appendChild(datesEl);
                 }
                 box.appendChild(head);
                 if (subtitle) {
                     const subEl = document.createElement('p');
-                    subEl.className = 'cv-edu-meta cv-job-role text-sm text-slate-600 mt-0.5';
+                    subEl.className = 'cv-job-role cv-edu-meta text-sm text-slate-600 mt-0.5';
                     subEl.textContent = subtitle;
                     box.appendChild(subEl);
                 }
@@ -3016,7 +3073,7 @@
 
             if (!container.childElementCount && eduVal) {
                 const fallback = document.createElement('div');
-                fallback.className = 'cv-edu-item';
+                fallback.className = 'cv-job cv-edu-item';
                 fallback.textContent = eduVal;
                 container.appendChild(fallback);
             }
@@ -3835,7 +3892,7 @@
             if (opts && opts.dateInBody && dates) {
                 const date = document.createElement('span');
                 date.className = 'cv-job-date text-sm font-medium text-slate-500 whitespace-nowrap';
-                date.textContent = dates;
+                setDateRangeEl(date, dates);
                 head.appendChild(date);
             }
             if (head.childElementCount) body.appendChild(head);

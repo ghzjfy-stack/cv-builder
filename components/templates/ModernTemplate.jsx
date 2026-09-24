@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  EntryFlexHeader,
+  CvEntryItem,
   ContactRow,
   normalizeJobItem,
   normalizeEducationItem,
@@ -119,21 +119,13 @@ export default function ModernTemplate({
           </h2>
           <div className="space-y-4">
             {jobs.map((job, idx) => (
-              <div key={job.id || idx} className="cv-job p-3 rounded-lg bg-slate-50/70">
-                <EntryFlexHeader title={job.title} dates={job.dates} />
-                {job.company && (
-                  <p className="cv-job-role text-sm text-slate-600 mt-0.5 font-medium">
-                    {job.company}
-                  </p>
-                )}
-                {job.descriptions?.length > 0 && (
-                  <ul className="cv-job-list list-disc mt-2 space-y-1 ps-5 text-sm text-slate-700">
-                    {job.descriptions.map((desc, dIdx) => (
-                      <li key={dIdx}>{desc}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <CvEntryItem
+                key={job.id || idx}
+                title={job.title}
+                subtitle={job.company}
+                dates={job.dates}
+                descriptions={job.descriptions}
+              />
             ))}
           </div>
         </section>
@@ -147,21 +139,14 @@ export default function ModernTemplate({
           </h2>
           <div className="space-y-4">
             {education.map((edu, idx) => (
-              <div key={edu.id || idx} className="cv-edu-item p-3 rounded-lg bg-slate-50/70">
-                <EntryFlexHeader title={edu.title} dates={edu.dates} />
-                {edu.subtitle && (
-                  <p className="cv-edu-meta text-sm text-slate-600 mt-0.5">
-                    {edu.subtitle}
-                  </p>
-                )}
-                {edu.descriptions?.length > 0 && (
-                  <ul className="cv-edu-list list-disc mt-2 space-y-1 ps-5 text-sm text-slate-700">
-                    {edu.descriptions.map((desc, dIdx) => (
-                      <li key={dIdx}>{desc}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <CvEntryItem
+                key={edu.id || idx}
+                title={edu.title}
+                subtitle={edu.subtitle}
+                dates={edu.dates}
+                descriptions={edu.descriptions}
+                listClassName="cv-edu-list"
+              />
             ))}
           </div>
         </section>
@@ -175,16 +160,14 @@ export default function ModernTemplate({
           </h2>
           <div className="space-y-4">
             {military.map((mil, idx) => (
-              <div key={mil.id || idx} className="cv-military-item p-3 rounded-lg bg-slate-50/70">
-                <EntryFlexHeader title={mil.title} dates={mil.dates} />
-                {mil.descriptions?.length > 0 && (
-                  <ul className="cv-military-list list-disc mt-2 space-y-1 ps-5 text-sm text-slate-700">
-                    {mil.descriptions.map((desc, dIdx) => (
-                      <li key={dIdx}>{desc}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <CvEntryItem
+                key={mil.id || idx}
+                title={mil.title}
+                subtitle={mil.subtitle}
+                dates={mil.dates}
+                descriptions={mil.descriptions}
+                listClassName="cv-military-list"
+              />
             ))}
           </div>
         </section>

@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui12-dates">
+    <link rel="stylesheet" href="./app.css?v=nav-mobile1">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -149,17 +149,20 @@
         <div class="home-grain" aria-hidden="true"></div>
         <div class="home-inner">
             <header class="home-nav">
-                <button type="button" class="home-brand" onclick="showHome()" aria-current="page">
-                    <span class="home-mark" aria-hidden="true">QC</span>
-                    <span class="home-brand-name">QuickCV</span>
+                <button type="button" class="home-brand min-w-0 shrink" onclick="showHome()" aria-current="page">
+                    <span class="home-mark shrink-0" aria-hidden="true">QC</span>
+                    <span class="home-brand-name truncate">QuickCV</span>
                 </button>
-                <div class="home-nav-actions">
-                    <div class="lang-switch" id="home-lang-switch" role="group" aria-label="שפת האתר">
-                        <button type="button" id="home-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
-                        <button type="button" id="home-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
+                <div class="home-nav-actions shrink-0">
+                    <div class="lang-switch shrink-0" id="home-lang-switch" role="group" aria-label="שפת האתר">
+                        <button type="button" id="home-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
+                        <button type="button" id="home-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
                     </div>
                     <button type="button" class="home-link hidden sm:inline-flex js-nav-examples" onclick="openExamplesModal()">דוגמאות</button>
-                    <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
+                    <button type="button" class="home-nav-cta shrink-0" onclick="showStudio()">
+                        <span class="home-nav-cta-long">צור קורות חיים</span>
+                        <span class="home-nav-cta-short">צור CV</span>
+                    </button>
                 </div>
             </header>
 
@@ -510,22 +513,25 @@
         <div class="home-grain" aria-hidden="true"></div>
         <div class="home-inner">
             <header class="home-nav">
-                <button type="button" class="home-brand" onclick="showHome()">
-                    <span class="home-mark" aria-hidden="true">QC</span>
-                    <span>
-                        <span class="home-brand-name">QuickCV</span>
-                        <span class="home-brand-sub">Templates</span>
+                <button type="button" class="home-brand min-w-0 shrink" onclick="showHome()">
+                    <span class="home-mark shrink-0" aria-hidden="true">QC</span>
+                    <span class="min-w-0">
+                        <span class="home-brand-name truncate">QuickCV</span>
+                        <span class="home-brand-sub hidden sm:block">Templates</span>
                     </span>
                 </button>
-                <div class="home-nav-actions">
-                    <div class="lang-switch" role="group" aria-label="שפת האתר">
-                        <button type="button" id="seo-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
-                        <button type="button" id="seo-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
+                <div class="home-nav-actions shrink-0">
+                    <div class="lang-switch shrink-0" role="group" aria-label="שפת האתר">
+                        <button type="button" id="seo-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
+                        <button type="button" id="seo-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
                     </div>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/tech" data-seo-landing data-i18n-footer-cat="tech">הייטק</a>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/sales" data-seo-landing data-i18n-footer-cat="sales">מכירות</a>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/students" data-seo-landing data-i18n-footer-cat="students">סטודנטים</a>
-                    <button type="button" class="home-nav-cta" onclick="showStudio()">צור קורות חיים</button>
+                    <button type="button" class="home-nav-cta shrink-0" onclick="showStudio()">
+                        <span class="home-nav-cta-long">צור קורות חיים</span>
+                        <span class="home-nav-cta-short">צור CV</span>
+                    </button>
                 </div>
             </header>
             <section class="home-hero" aria-labelledby="seo-landing-title">
@@ -589,12 +595,12 @@
                 </button>
             </nav>
 
-            <div class="flex items-center gap-2">
-                <div class="lang-switch" role="group" aria-label="שפת קורות החיים">
-                    <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true">עברית</button>
-                    <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false">English</button>
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
+                <div class="lang-switch shrink-0" role="group" aria-label="שפת קורות החיים">
+                    <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
+                    <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
                 </div>
-                <button type="button" onclick="openExamplesModal()" class="text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11 js-nav-examples">
+                <button type="button" onclick="openExamplesModal()" class="hidden sm:inline-flex text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11 js-nav-examples">
                     דוגמאות
                 </button>
             </div>
@@ -1578,6 +1584,7 @@
                 templatesReady: 'תבניות מוכנות',
                 watermark: 'תצוגה מקדימה - QUICKCV',
                 homeNavCta: 'צור קורות חיים',
+                homeNavCtaShort: 'צור CV',
                 craftKicker: 'תבניות ועיצובים',
                 step3: 'משלמים 10 ₪ בלבד ב-Bit ומורידים קובץ PDF מקצועי באופן מיידי.',
                 bitCta: 'שלמו 10 ₪ ב-Bit',
@@ -1696,6 +1703,7 @@
                 templatesReady: 'Ready Templates',
                 watermark: 'PREVIEW - QUICKCV',
                 homeNavCta: 'Create CV',
+                homeNavCtaShort: 'Create CV',
                 craftKicker: 'Templates & designs',
                 step3: 'Pay only 10 ₪ in Bit and instantly download a professional PDF.',
                 bitCta: 'Pay 10 ₪ with Bit',
@@ -2094,7 +2102,15 @@
                 });
             }
             document.querySelectorAll('.home-nav-cta').forEach((el) => {
-                if (pack.homeNavCta) el.textContent = pack.homeNavCta;
+                if (!pack.homeNavCta) return;
+                const longEl = el.querySelector('.home-nav-cta-long');
+                const shortEl = el.querySelector('.home-nav-cta-short');
+                if (longEl && shortEl) {
+                    longEl.textContent = pack.homeNavCta;
+                    shortEl.textContent = pack.homeNavCtaShort || pack.homeNavCta;
+                } else {
+                    el.textContent = pack.homeNavCta;
+                }
             });
             document.querySelectorAll('.js-nav-examples').forEach((el) => {
                 el.textContent = pack.navExamples || (lang === 'en' ? 'Examples' : 'דוגמאות');

@@ -12,6 +12,7 @@
             scroll-behavior: smooth;
             overflow-x: hidden;
             max-width: 100%;
+            width: 100%;
         }
         html[lang="en"] .i18n-he { display: none !important; }
         html:not([lang="en"]) .i18n-en { display: none !important; }
@@ -19,6 +20,7 @@
             display: inline-flex;
             gap: 0.35rem;
             align-items: center;
+            flex-shrink: 0;
         }
         .home-nav .lang-chip {
             min-height: 2.25rem;
@@ -30,7 +32,10 @@
             font-size: 0.75rem;
             font-weight: 700;
             cursor: pointer;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
+        .home-nav .lang-chip .lang-chip-short { display: none; }
         .home-nav .lang-chip[aria-pressed="true"] {
             background: rgba(45, 212, 191, 0.18);
             border-color: rgba(45, 212, 191, 0.55);
@@ -40,6 +45,7 @@
             font-family: 'Rubik', sans-serif;
             overflow-x: hidden;
             max-width: 100%;
+            width: 100%;
             margin: 0;
         }
 
@@ -483,6 +489,9 @@
             justify-content: space-between;
             gap: 1rem;
             padding: 1.15rem 0 0.5rem;
+            min-width: 0;
+            max-width: 100%;
+            flex-wrap: nowrap;
         }
         .home-brand {
             display: flex;
@@ -493,6 +502,8 @@
             padding: 0;
             cursor: pointer;
             color: inherit;
+            min-width: 0;
+            flex: 0 1 auto;
         }
         .home-mark {
             width: 2.35rem;
@@ -567,7 +578,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-shrink: 0;
+            min-width: 0;
+            max-width: 100%;
         }
+        .home-nav-cta .home-nav-cta-short { display: none; }
+        .home-nav-cta .home-nav-cta-long { display: inline; }
         .home-link {
             display: inline-flex;
             align-items: center;
@@ -602,6 +618,7 @@
             font-weight: 800;
             font-size: 0.85rem;
             white-space: nowrap;
+            flex-shrink: 0;
             transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
         .home-nav-cta,
@@ -621,6 +638,60 @@
             background: rgba(255, 255, 255, 0.04);
         }
         .home-cta-ghost:hover { background: rgba(255, 255, 255, 0.08); }
+
+        /* Mobile / small screens: keep CTA + lang chips fully visible */
+        @media (max-width: 639px) {
+            .home-inner {
+                padding-inline: 0.85rem;
+            }
+            .home-nav {
+                gap: 0.4rem;
+                padding: 0.85rem 0 0.4rem;
+            }
+            .home-brand {
+                gap: 0.4rem;
+            }
+            .home-mark {
+                width: 2rem;
+                height: 2rem;
+                font-size: 0.7rem;
+                flex-shrink: 0;
+            }
+            .home-brand-name {
+                font-size: 1.05rem;
+            }
+            .home-nav-actions {
+                gap: 0.3rem;
+            }
+            .home-nav .lang-switch {
+                gap: 0.15rem;
+            }
+            .home-nav .lang-chip {
+                min-height: 2rem;
+                padding: 0.25rem 0.45rem;
+                font-size: 0.68rem;
+            }
+            .home-nav .lang-chip .lang-chip-full { display: none; }
+            .home-nav .lang-chip .lang-chip-short { display: inline; }
+            .home-nav-cta {
+                min-height: 2.25rem;
+                padding: 0.35rem 0.55rem;
+                font-size: 0.72rem;
+                border-radius: 0.6rem;
+            }
+            .home-nav-cta .home-nav-cta-long { display: none; }
+            .home-nav-cta .home-nav-cta-short { display: inline; }
+        }
+        @media (max-width: 380px) {
+            .home-brand-name {
+                display: none;
+            }
+            .home-nav-cta {
+                padding: 0.35rem 0.5rem;
+                font-size: 0.68rem;
+            }
+        }
+
         .home-hero {
             display: grid;
             grid-template-columns: 1fr;
@@ -3632,8 +3703,11 @@
             cursor: pointer;
             outline: none;
             box-shadow: none;
+            flex-shrink: 0;
+            white-space: nowrap;
             transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
         }
+        .studio-toolbar .lang-chip .lang-chip-short { display: none; }
         .studio-toolbar .lang-chip[aria-pressed="true"] {
             background: #0b1220;
             color: #f8fafc;
@@ -3928,9 +4002,16 @@
         @media (max-width: 1023px) {
             html {
                 scroll-padding-top: 5.5rem;
+                overflow-x: hidden;
+                max-width: 100%;
             }
+            body,
             body.on-home {
                 overflow-x: hidden;
+                max-width: 100%;
+                width: 100%;
+            }
+            body.on-home {
                 overflow-y: auto;
             }
             .studio-workspace {
@@ -3984,7 +4065,20 @@
             .studio-header .studio-toolbar > div:last-child {
                 grid-area: actions;
                 justify-self: end;
+                min-width: 0;
+                max-width: 100%;
             }
+            .studio-toolbar .lang-switch {
+                gap: 0.1rem;
+                padding: 0.12rem;
+            }
+            .studio-toolbar .lang-chip {
+                min-height: 1.95rem;
+                padding: 0 0.5rem;
+                font-size: 0.68rem;
+            }
+            .studio-toolbar .lang-chip .lang-chip-full { display: none; }
+            .studio-toolbar .lang-chip .lang-chip-short { display: inline; }
             .studio-header nav {
                 grid-area: steps;
                 order: unset;

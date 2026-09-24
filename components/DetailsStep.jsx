@@ -16,6 +16,7 @@ export default function DetailsStep({
   const { formData, setFormData, addExperience, addEducation } = useFormData();
   const experience = Array.isArray(formData.experience) ? formData.experience : [];
   const education = Array.isArray(formData.education) ? formData.education : [];
+  const formRev = formData._formRev || experience.length + education.length;
 
   const removeExperience = useCallback(
     (idToDelete) => {
@@ -66,8 +67,12 @@ export default function DetailsStep({
   );
 
   return (
-    <div dir={dir} className={`details-step space-y-6 ${className}`.trim()}>
-      <section className="details-step-experience space-y-3">
+    <div
+      dir={dir}
+      className={`details-step space-y-6 ${className}`.trim()}
+      data-form-rev={formRev}
+    >
+      <section key={`exp-${formRev}-${experience.length}`} className="details-step-experience space-y-3">
         <h3 className="text-sm font-bold text-slate-200">
           {isEnglish ? 'Work Experience' : 'ניסיון תעסוקתי'}
         </h3>
@@ -140,7 +145,7 @@ export default function DetailsStep({
         </button>
       </section>
 
-      <section className="details-step-education space-y-3">
+      <section key={`edu-${formRev}-${education.length}`} className="details-step-education space-y-3">
         <h3 className="text-sm font-bold text-slate-200">
           {isEnglish ? 'Education' : 'השכלה'}
         </h3>

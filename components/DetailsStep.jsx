@@ -1,45 +1,23 @@
 import React, { useCallback } from 'react';
+import { useFormData } from './FormDataContext';
 
 /**
- * DetailsStep — Step 2 form helpers for experience (jobs).
- * Mirrors the live studio experience editor with immutable state updates.
- *
- * The production studio currently drives experience via lib/experienceEditor.js;
- * this component is the React equivalent for add / edit / delete job cards.
+ * DetailsStep — Step 2 experience (jobs) form.
+ * Reads/writes the shared form state via FormDataContext (backed by window.QCCvData).
  */
 
-function emptyJob() {
-  return {
-    id: Date.now().toString() + '-' + Math.random().toString(36).slice(2, 7),
-    company: '',
-    role: '',
-    years: '',
-    description: '',
-  };
-}
-
 export default function DetailsStep({
-  formData = {},
-  setFormData,
   language = 'he',
   isEnglish: isEnglishProp,
   className = '',
 }) {
   const isEnglish = isEnglishProp !== undefined ? Boolean(isEnglishProp) : language === 'en';
   const dir = isEnglish ? 'ltr' : 'rtl';
+  const { formData, setFormData, addExperience } = useFormData();
   const experience = Array.isArray(formData.experience) ? formData.experience : [];
-
-  const addExperience = useCallback(() => {
-    if (typeof setFormData !== 'function') return;
-    setFormData((prev) => ({
-      ...prev,
-      experience: [...(prev.experience || []), emptyJob()],
-    }));
-  }, [setFormData]);
 
   const removeExperience = useCallback(
     (idToDelete) => {
-      if (typeof setFormData !== 'function') return;
       setFormData((prev) => ({
         ...prev,
         experience: (prev.experience || []).filter((item) => item && item.id !== idToDelete),
@@ -50,11 +28,12 @@ export default function DetailsStep({
 
   const updateExperience = useCallback(
     (id, field, value) => {
-      if (typeof setFormData !== 'function') return;
       setFormData((prev) => ({
         ...prev,
         experience: (prev.experience || []).map((item) =>
-          item && item.id === id ? { ...item, [field]: value == null ? '' : String(value) } : item
+          item && item.id === id
+            ? { ...item, [field]: value == null ? '' : String(value) }
+            : item
         ),
       }));
     },
@@ -66,11 +45,14 @@ export default function DetailsStep({
       {experience.map((exp, index) => {
         const key = exp.id || index;
         const company = exp.company || '';
-        const role = exp.role || '';
-        const years = exp.years || '';
+        const title = exp.title || exp.role || '';
+        const dates = exp.dates || exp.years || '';
         const description = exp.description || '';
         return (
-          <article key={key} className="experience-card is-open rounded-xl border border-slate-600 bg-slate-900/40 p-3">
+          <article
+            key={key}
+            className="experience-card is-open rounded-xl border border-slate-600 bg-slate-900/40 p-3"
+          >
             <div className="mb-2 flex items-center justify-between gap-2">
               <span className="text-xs font-semibold text-slate-300">
                 {isEnglish ? `Job ${index + 1}` : `משרה ${index + 1}`}
@@ -95,16 +77,16 @@ export default function DetailsStep({
               <input
                 type="text"
                 className="studio-field w-full min-h-11 rounded-lg border border-slate-600 bg-slate-900/60 p-2.5 text-sm text-white outline-none"
-                placeholder={isEnglish ? 'Role' : 'תפקיד'}
-                value={role}
-                onChange={(e) => updateExperience(exp.id, 'role', e.target.value)}
+                placeholder={isEnglish ? 'Role / Title' : 'תפקיד'}
+                value={title}
+                onChange={(e) => updateExperience(exp.id, 'title', e.target.value)}
               />
               <input
                 type="text"
                 className="studio-field w-full min-h-11 rounded-lg border border-slate-600 bg-slate-900/60 p-2.5 text-sm text-white outline-none"
-                placeholder={isEnglish ? 'Years' : 'תאריכים/שנים'}
-                value={years}
-                onChange={(e) => updateExperience(exp.id, 'years', e.target.value)}
+                placeholder={isEnglish ? 'Dates' : 'תאריכים/שנים'}
+                value={dates}
+                onChange={(e) => updateExperience(exp.id, 'dates', e.target.value)}
               />
               <textarea
                 rows={4}
@@ -124,10 +106,9 @@ export default function DetailsStep({
         className="inline-flex min-h-11 items-center justify-center rounded-xl border border-teal-500/40 bg-teal-500/10 px-4 text-sm font-bold text-teal-200 hover:bg-teal-500/20"
         onClick={addExperience}
       >
+        <span aria-hidden="true">+ </span>
         {isEnglish ? 'Add Another Job' : 'הוסף משרה נוספת'}
       </button>
     </div>
   );
 }
-
-export { emptyJob };

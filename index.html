@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui1">
+    <link rel="stylesheet" href="./app.css?v=exp-ui2">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub so add-job buttons work even before experienceEditor.js loads. */
@@ -532,12 +532,12 @@
                         </article>
                     </div>
                     <p id="experience-add-status" class="experience-add-status" role="status" aria-live="polite"></p>
-                    <form id="experience-add-form" class="exp-add-form" action="#" method="get" onsubmit="event.preventDefault(); window.__qcClickAddJob(event); return false;">
-                        <button type="submit" id="btn-add-experience" class="exp-add-bar" data-qc-add-job="1">
+                    <div id="experience-add-form" class="exp-add-form">
+                        <button type="button" id="btn-add-experience" class="exp-add-bar" data-qc-add-job="1">
                             <span class="exp-add-bar-plus" aria-hidden="true">+</span>
                             <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                         </button>
-                    </form>
+                    </div>
                     <textarea id="in-experience" rows="4" oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none experience-raw-hidden" aria-hidden="true" tabindex="-1"></textarea>
                 </div>
 
@@ -1077,8 +1077,9 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=exp-ui1"></script>
-    <script src="lib/entryEditor.js?v=exp-ui1"></script>
+    <script src="lib/experienceEditor.js?v=exp-ui2"></script>
+    <script src="lib/addJobBoot.js?v=exp-ui2"></script>
+    <script src="lib/entryEditor.js?v=exp-ui2"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>
@@ -1092,18 +1093,20 @@
     <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
     <script>
-        window.__qcClickAddJob = function (e) {
-            if (window.QCExperience && typeof QCExperience.addExperience === 'function') {
-                return QCExperience.addExperience(e);
-            }
-            if (window.QCExperience && typeof QCExperience.addJob === 'function') {
-                return QCExperience.addJob(e);
-            }
-            return false;
+        // addJobBoot.js owns the real click path; only install a fallback if missing.
+        if (typeof window.__qcClickAddJob !== 'function') {
+            window.__qcClickAddJob = function (e) {
+                if (window.QCExperience && typeof QCExperience.addExperience === 'function') {
+                    return QCExperience.addExperience(Object.assign({ __qcForceAdd: true }, e || {}));
+                }
+                return false;
+            };
+        }
+        window.addExperience = function (e) {
+            return window.__qcClickAddJob(e);
         };
-        window.addExperience = window.__qcClickAddJob;
-        window.handleAddJob = window.__qcClickAddJob;
-        window.addExperienceJob = window.__qcClickAddJob;
+        window.handleAddJob = window.addExperience;
+        window.addExperienceJob = window.addExperience;
         window.handleExperienceChange = function (id, field, value) {
             if (window.QCExperience && typeof QCExperience.handleExperienceChange === 'function') {
                 return QCExperience.handleExperienceChange(id, field, value);

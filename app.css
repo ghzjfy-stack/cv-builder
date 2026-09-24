@@ -1750,6 +1750,20 @@
         #qc-print-host .whitespace-pre-line {
             line-height: var(--line-height, var(--cv-leading));
         }
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns {
+            padding-inline: 1.35rem;
+            box-sizing: border-box;
+        }
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header {
+            padding-top: 1.15rem;
+        }
         #cv-target .cv-job,
         #cv-target-page2 .cv-job,
         #qc-print-host .cv-job {
@@ -1759,6 +1773,8 @@
             padding: 0;
             line-height: 1.45;
             overflow: visible;
+            min-width: 0;
+            max-width: 100%;
         }
         #cv-target .cv-job-head,
         #cv-target-page2 .cv-job-head,
@@ -1769,6 +1785,9 @@
             justify-content: space-between;
             gap: 0.15rem 0.85rem;
             margin: 0 0 0.35rem;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         #cv-target .cv-job-head-main,
         #cv-target-page2 .cv-job-head-main,
@@ -1810,14 +1829,24 @@
             display: block;
             position: static;
             float: none;
-            flex: 0 1 auto;
+            flex: 0 0 auto;
+            align-self: flex-start;
+            min-width: 0;
+            max-width: 100%;
             margin: 0;
-            padding: 0;
+            margin-inline-start: auto;
+            padding-block: 0;
+            padding-inline: 0.15rem 0.35rem;
+            box-sizing: border-box;
             font-weight: 500;
             font-size: calc(0.78rem * var(--cv-scale));
             line-height: 1.4;
             white-space: nowrap;
-            text-align: inherit;
+            overflow-wrap: normal;
+            word-break: normal;
+            direction: ltr;
+            unicode-bidi: isolate;
+            text-align: start;
         }
         #cv-target .cv-job-list,
         #cv-target-page2 .cv-job-list,
@@ -2604,26 +2633,34 @@
         }
         .layout-charcoal .cv-job {
             display: grid;
-            grid-template-columns: minmax(0, 5.6rem) 12px minmax(0, 1fr);
-            column-gap: 0.15rem;
+            grid-template-columns: minmax(0, 6.4rem) 12px minmax(0, 1fr);
+            column-gap: 0.35rem;
             margin-bottom: 1rem;
             direction: ltr;
+            min-width: 0;
+            max-width: 100%;
         }
         #cv-target.layout-charcoal .cv-job,
         #cv-target-page2.layout-charcoal .cv-job,
         #qc-print-host .cv-print-sheet.layout-charcoal .cv-job {
             display: grid;
-            grid-template-columns: minmax(0, 5.6rem) 12px minmax(0, 1fr);
+            grid-template-columns: minmax(0, 6.4rem) 12px minmax(0, 1fr);
             margin-bottom: 1rem;
         }
         .layout-charcoal .cv-job-date {
             font-size: calc(0.62rem * var(--cv-scale));
             color: #555;
             padding-top: 0.15rem;
-            text-align: right;
+            padding-inline: 0.2rem;
+            text-align: start;
             direction: ltr;
+            unicode-bidi: isolate;
             white-space: normal;
-            overflow-wrap: anywhere;
+            overflow-wrap: break-word;
+            word-break: normal;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         #cv-target.layout-charcoal .cv-job-date,
         #cv-target-page2.layout-charcoal .cv-job-date,
@@ -3147,8 +3184,12 @@
             margin: 0;
         }
         .layout-navy .cv-job-date {
-            white-space: nowrap;
-            text-align: inherit;
+            white-space: normal;
+            direction: ltr;
+            unicode-bidi: isolate;
+            text-align: start;
+            max-width: 100%;
+            overflow-wrap: anywhere;
         }
         .layout-navy .cv-job-list {
             margin: 0.2rem 0 0;

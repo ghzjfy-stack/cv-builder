@@ -228,6 +228,8 @@
     justify-content: space-between;
     gap: 0.15rem 0.75rem;
     margin-bottom: 0.3rem;
+    min-width: 0;
+    max-width: 100%;
 }
 .layout-azure .cv-job-title {
     font-weight: 700;
@@ -240,8 +242,17 @@
     font-size: calc(0.72rem * var(--cv-scale));
     color: #5a5a5a;
     margin: 0;
+    margin-inline-start: auto;
     line-height: 1.4;
     font-weight: 500;
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow-wrap: normal;
+    padding-inline: 0.15rem 0.35rem;
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: start;
 }
 .layout-azure .cv-job-role {
     color: #5a5a5a;

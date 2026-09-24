@@ -15,28 +15,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=exp-ui2">
+    <link rel="stylesheet" href="./app.css?v=exp-ui3">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
-        /* Early stub so add-job buttons work even before experienceEditor.js loads. */
+        /* Early stub: works even when lib/*.js fail to load (404). */
         window.__qcClickAddJob = window.__qcClickAddJob || function (e) {
             try {
                 if (e && e.preventDefault) e.preventDefault();
+                if (e && e.stopPropagation) e.stopPropagation();
                 if (window.QCExperience && typeof QCExperience.addExperience === 'function') {
-                    return QCExperience.addExperience(e);
+                    try { return QCExperience.addExperience({ __qcForceAdd: true }); } catch (err0) { /* fall through */ }
                 }
                 var host = document.getElementById('experience-items');
                 if (!host) return false;
                 var n = host.querySelectorAll('.experience-card').length + 1;
                 var id = 'job-fallback-' + Date.now();
                 var card = document.createElement('article');
-                card.className = 'experience-card is-open is-just-added';
+                card.className = 'experience-card exp-block is-open is-just-added';
                 card.setAttribute('role', 'listitem');
                 card.setAttribute('data-job-id', id);
                 card.setAttribute('data-job-index', String(n - 1));
                 card.innerHTML =
-                    '<div class="experience-card-toolbar"><span class="experience-card-badge">משרה ' + n + '</span></div>' +
-                    '<div class="experience-card-fields">' +
+                    '<div class="exp-block-head"><span class="experience-card-badge exp-block-num">משרה ' + n + '</span></div>' +
+                    '<div class="experience-card-fields exp-block-fields">' +
                     '<div class="experience-field"><label class="experience-field-label">שם חברה/ארגון</label>' +
                     '<input type="text" data-job-employer="1" data-job-field="company" class="studio-field w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11" value=""></div>' +
                     '<div class="experience-field"><label class="experience-field-label">תפקיד</label>' +
@@ -47,10 +48,17 @@
                     '<textarea rows="4" data-job-desc="1" data-job-field="description" class="studio-field experience-desc w-full bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none"></textarea></div>' +
                     '</div>';
                 host.appendChild(card);
+                var status = document.getElementById('experience-add-status');
+                if (status) {
+                    status.textContent = 'משרה ' + n + ' ✓';
+                    status.classList.add('is-visible');
+                }
                 try { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (err) {}
-                if (window.QCCvData) {
-                    QCCvData.experience = QCCvData.experience || [];
-                    QCCvData.experience.push({ id: id, title: '', company: '', dates: '', description: '' });
+                window.QCCvData = window.QCCvData || {};
+                if (!Array.isArray(QCCvData.experience)) QCCvData.experience = [];
+                QCCvData.experience.push({ id: id, title: '', company: '', dates: '', description: '' });
+                if (typeof window.updateCV === 'function') {
+                    try { window.updateCV(); } catch (errU) {}
                 }
                 return false;
             } catch (err) {
@@ -61,6 +69,19 @@
         window.addExperience = function (e) { return window.__qcClickAddJob(e); };
         window.handleAddJob = window.addExperience;
         window.addExperienceJob = window.addExperience;
+        /* Capture-phase: never depends on later scripts wiring the button. */
+        if (!window.__qcAddJobCaptureBound) {
+            window.__qcAddJobCaptureBound = true;
+            document.addEventListener('click', function (e) {
+                var t = e && e.target;
+                if (!t || !t.closest) return;
+                var btn = t.closest('#btn-add-experience, [data-qc-add-job="1"]');
+                if (!btn) return;
+                e.preventDefault();
+                e.stopPropagation();
+                window.__qcClickAddJob(e);
+            }, true);
+        }
     </script>
 </head>
 <body class="on-home" id="app-body">
@@ -533,7 +554,7 @@
                     </div>
                     <p id="experience-add-status" class="experience-add-status" role="status" aria-live="polite"></p>
                     <div id="experience-add-form" class="exp-add-form">
-                        <button type="button" id="btn-add-experience" class="exp-add-bar" data-qc-add-job="1">
+                        <button type="button" id="btn-add-experience" class="exp-add-bar" data-qc-add-job="1" onclick="return window.__qcClickAddJob(event)">
                             <span class="exp-add-bar-plus" aria-hidden="true">+</span>
                             <span id="btn-add-experience-label">הוסף משרה נוספת</span>
                         </button>
@@ -1077,9 +1098,9 @@
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/draft.js?v=mil1"></script>
     <script src="lib/cvStrength.js"></script>
-    <script src="lib/experienceEditor.js?v=exp-ui2"></script>
-    <script src="lib/addJobBoot.js?v=exp-ui2"></script>
-    <script src="lib/entryEditor.js?v=exp-ui2"></script>
+    <script src="lib/experienceEditor.js?v=exp-ui3"></script>
+    <script src="lib/addJobBoot.js?v=exp-ui3"></script>
+    <script src="lib/entryEditor.js?v=exp-ui3"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=tpl-he3"></script>
     <script src="lib/templateThumbs.js?v=formpreview2"></script>

@@ -4842,9 +4842,10 @@
         }
         .experience-card.is-just-added,
         .entry-card.is-just-added {
-            outline: 2px solid rgba(45, 212, 191, 0.65);
-            outline-offset: 2px;
-            animation: qc-card-flash 1.1s ease;
+            outline: 3px solid rgba(45, 212, 191, 0.9);
+            outline-offset: 3px;
+            animation: qc-card-flash 1.4s ease;
+            box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.25);
         }
         @keyframes qc-card-flash {
             0% { background-color: rgba(45, 212, 191, 0.18); }

@@ -4827,6 +4827,7 @@
         .section-add-btn,
         .experience-add-job-btn,
         #btn-add-experience,
+        #btn-add-experience-top,
         #btn-add-education,
         #btn-add-military {
             display: inline-flex;
@@ -4846,7 +4847,7 @@
             letter-spacing: 0;
             box-shadow: none;
             position: relative;
-            z-index: 90;
+            z-index: 120;
             isolation: isolate;
             scroll-margin-top: 5rem;
             scroll-margin-bottom: 6rem;
@@ -4874,18 +4875,22 @@
             pointer-events: auto !important;
         }
         #btn-add-experience,
+        #btn-add-experience-top,
         #btn-add-education,
         #experience-section > #btn-add-experience,
+        #experience-section #btn-add-experience-top,
         #education-section > #btn-add-education {
             cursor: pointer !important;
             color: #38bdf8 !important;
             border-color: #0284c7 !important;
             pointer-events: auto !important;
             opacity: 1 !important;
+            z-index: 120 !important;
         }
         .section-add-btn *,
         .experience-add-job-btn *,
         #btn-add-experience *,
+        #btn-add-experience-top *,
         #btn-add-education * {
             pointer-events: none;
         }
@@ -5049,11 +5054,15 @@
             padding-bottom: 20px;
         }
         #education-section > #btn-add-education,
-        #experience-section > #btn-add-experience {
+        #experience-section > #btn-add-experience,
+        #experience-section #btn-add-experience-top {
             position: relative;
-            z-index: 80 !important;
+            z-index: 120 !important;
             margin-top: 0.55rem;
             pointer-events: auto !important;
+        }
+        #experience-section #btn-add-experience-top {
+            margin-top: 0;
         }
         #experience-items,
         #education-items {

@@ -653,11 +653,18 @@ function bindDeepLinkAnchor(id, url) {
 function openBitApp(e) {
   const url = bitAppOpenUrl(CHECKOUT.amountIls);
   bindDeepLinkAnchor("btn-open-bit", url);
+  // Start order polling in parallel — do not await before opening Bit.
   void startCheckoutVerification();
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
+  const el = e?.currentTarget;
+  // Native <a> navigation is required for Bit Universal Links / App Links.
+  // preventDefault + location.href often opens Safari/Chrome instead of the Bit app.
+  if (el instanceof HTMLAnchorElement) {
+    el.href = url;
+    if (prefersSameTabCheckout()) el.removeAttribute("target");
+    else el.target = "_blank";
+    return;
   }
+  e?.preventDefault?.();
   openDeepLink(url);
 }
 

@@ -90,9 +90,18 @@ export function bitPayUrl(total = CHECKOUT.amountIls): string {
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${data}&ecc=M`;
 }
 
-/** Always open Bit via https (web/app bridge). */
+/**
+ * Open Bit with the personal /me payment request (same payload as the QR).
+ * Android: Intent into the Bit app; iOS/desktop: https web→app bridge.
+ */
 export function bitAppOpenUrl(total = CHECKOUT.amountIls): string {
-  return bitWebPayUrl(total);
+  const https = bitWebPayUrl(total);
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  if (/Android/i.test(ua)) {
+    const path = bitSendPath(total);
+    return `intent://${path}#Intent;scheme=https;package=com.bnhp.payments.paymentsapp;S.browser_fallback_url=${encodeURIComponent(https)};end`;
+  }
+  return https;
 }
 
 export function whatsappPaymentMessage(total = CHECKOUT.amountIls): string {

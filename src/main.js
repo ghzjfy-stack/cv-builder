@@ -216,9 +216,12 @@ function copyBitPhone(e) {
 function openBitApp(e) {
   const url = bitAppOpenUrl(selectedAmount());
   const el = e?.currentTarget;
+  // Native <a> navigation so Bit Universal Links / App Links open the app
+  // with the personal /me payment request (same as the QR).
   if (el instanceof HTMLAnchorElement) {
     el.href = url;
-    el.target = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "_self" : "_blank";
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) el.removeAttribute("target");
+    else el.target = "_blank";
     return;
   }
   e?.preventDefault?.();

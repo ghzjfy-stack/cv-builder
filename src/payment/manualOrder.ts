@@ -63,6 +63,8 @@ export async function createManualOrderSession(input: {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      // Survives same-tab navigation into the Bit app.
+      keepalive: true,
     });
   let res;
   try {

@@ -941,6 +941,7 @@ async function createCvDownloadShareUrl() {
 
 async function sendPdfToWhatsApp(e) {
   e?.preventDefault?.();
+  e?.stopPropagation?.();
   if (!isUnlocked()) {
     openCheckoutModal();
     return;
@@ -951,22 +952,66 @@ async function sendPdfToWhatsApp(e) {
   if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
     waPhone.value = phone;
   }
+
+  // Open a tab synchronously so popup blockers don't kill WhatsApp after the PDF build.
+  const waWin = window.open("about:blank", "_blank");
   if (status) status.textContent = qcT("waPreparing", "מכין PDF לשליחה...");
+
   try {
-    const result = await exportHighResPdf({ download: true });
+    const result = await exportHighResPdf({ download: false });
     const blob = result?.blob;
+    const filename = String(result?.filename || "cv.pdf");
     if (!blob) throw new Error("empty pdf");
 
-    const downloadUrl = await createCvDownloadShareUrl();
     const english = window.QCCvLang === "en";
+
+    // Mobile / supporting browsers: native share sheet with the actual PDF file.
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        const file = new File([blob], filename, { type: "application/pdf" });
+        const canFiles = typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] });
+        if (canFiles) {
+          if (waWin && !waWin.closed) waWin.close();
+          await navigator.share({
+            files: [file],
+            title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
+            text: english ? "Resume from QuickCV" : "קורות חיים מ-QuickCV",
+          });
+          if (status) {
+            status.textContent = qcT("waShared", "בחרו WhatsApp בחלון השיתוף כדי לשלוח את ה-PDF.");
+          }
+          return;
+        }
+      } catch (shareErr) {
+        if (shareErr && shareErr.name === "AbortError") {
+          if (status) status.textContent = "";
+          if (waWin && !waWin.closed) waWin.close();
+          return;
+        }
+        /* fall through to wa.me link */
+      }
+    }
+
+    const downloadUrl = await createCvDownloadShareUrl();
     const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
-    window.open(waUrl, "_blank", "noopener");
+    if (waWin && !waWin.closed) {
+      waWin.location.href = waUrl;
+    } else {
+      const a = document.createElement("a");
+      a.href = waUrl;
+      a.target = "_blank";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
     if (status) {
       status.textContent = phone
         ? qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
         : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
     }
   } catch {
+    if (waWin && !waWin.closed) waWin.close();
     if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
   }
 }

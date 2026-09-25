@@ -141,7 +141,7 @@ export default function Preview({
         {/* Header / Personal Details */}
         <header id="cv-header" className="border-b-2 dynamic-border pb-4 mb-5">
           <h1 id="out-name" className="text-3xl font-bold">
-            {data.name || (isEnglish ? 'John Doe' : 'יונתן אשל')}
+            {data.name || (isEnglish ? 'Israel Israeli' : 'ישראל ישראלי')}
           </h1>
           {(data.title || data.role) && (
             <p id="out-title" className="text-sm font-semibold text-slate-600 mt-1">

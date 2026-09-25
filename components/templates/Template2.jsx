@@ -83,7 +83,7 @@ export default function Template2({
       {/* Centered / Clean Header */}
       <header className="text-center border-b pb-4 mb-6">
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 uppercase">
-          {data.name || (isEnglish ? 'John Doe' : 'יונתן אשל')}
+          {data.name || (isEnglish ? 'Israel Israeli' : 'ישראל ישראלי')}
         </h1>
         {(data.title || data.role) && (
           <p className="text-sm font-semibold tracking-wide text-slate-500 mt-1 uppercase">

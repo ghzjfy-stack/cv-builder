@@ -985,7 +985,7 @@
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
                 <div id="cv-target" class="layout-classic spacing-normal bg-preview-white" dir="rtl">
                     <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
-                        <h1 id="out-name" class="text-3xl font-bold">יונתן אשל</h1>
+                        <h1 id="out-name" class="text-3xl font-bold">ישראל ישראלי</h1>
                         <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים</p>
 
                         <div class="cv-contact-header flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] text-slate-500">
@@ -1480,7 +1480,7 @@
         const CV_SAMPLE_IDS = ['in-name', 'in-title', 'in-phone', 'in-email', 'in-location', 'in-linkedin', 'in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-languages'];
         const CV_SAMPLES = {
             he: {
-                'in-name': 'יונתן אשל',
+                'in-name': 'ישראל ישראלי',
                 'in-title': 'מנהל מוצר',
                 'in-phone': '050-1234567',
                 'in-email': 'israel@example.com',
@@ -1494,12 +1494,12 @@
                 'in-languages': 'עברית (שפת אם), אנגלית (מקצועית)'
             },
             en: {
-                'in-name': 'Jonathan Eshel',
+                'in-name': 'Israel Israeli',
                 'in-title': 'Project Manager',
                 'in-phone': '050-1234567',
-                'in-email': 'jonathan.eshel@example.com',
+                'in-email': 'israel.israeli@example.com',
                 'in-location': 'Tel Aviv',
-                'in-linkedin': 'linkedin.com/in/jonathan-eshel',
+                'in-linkedin': 'linkedin.com/in/israel-israeli',
                 'in-summary': 'Project manager experienced in leading teams, shipping roadmaps, and partnering with engineering, design, and sales.',
                 'in-experience': '2021 - Present | Project Manager\nVerde Commerce\n• Defined the roadmap and shipped features that grew usage by 35%.\n• Led cross-functional teams and partnered with engineering and sales.\n\n2018 - 2021 | Project Coordinator\nShoreline B2B\n• Managed budgets and tracked organizational milestones.',
                 'in-education': '2015 - 2018 | BA in Business Administration\nTel Aviv University\n\n2019 | Product Management Course',
@@ -1516,7 +1516,7 @@
                 titleFallback: 'תפקיד',
                 detailsHeading: 'פרטים אישיים',
                 detailsHeadingHint: '(שדה ריק לא יופיע)',
-                phName: 'לדוגמה: יונתן אשל',
+                phName: 'לדוגמה: ישראל ישראלי',
                 phTitle: 'לדוגמה: מנהל פרויקטים',
                 phLocation: 'לדוגמה: תל אביב',
                 phSummary: 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים והגדלת מחזור',
@@ -1638,7 +1638,7 @@
                 titleFallback: 'Job title',
                 detailsHeading: 'Personal details',
                 detailsHeadingHint: '(empty fields stay hidden)',
-                phName: 'e.g. Jonathan Eshel',
+                phName: 'e.g. Israel Israeli',
                 phTitle: 'e.g. Project Manager',
                 phLocation: 'e.g. Tel Aviv',
                 phSummary: 'e.g. Project manager experienced in leading teams and growing revenue',
@@ -2206,7 +2206,7 @@
             const skillsEl = document.getElementById('in-skills');
             const refsEl = document.getElementById('in-references');
             const linkedinEl = document.getElementById('in-linkedin');
-            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Jonathan Eshel' : 'לדוגמה: יונתן אשל');
+            if (nameEl) nameEl.placeholder = pack.phName || (lang === 'en' ? 'e.g. Israel Israeli' : 'לדוגמה: ישראל ישראלי');
             if (titleEl) titleEl.placeholder = pack.phTitle || (lang === 'en' ? 'e.g. Project Manager' : 'לדוגמה: מנהל פרויקטים');
             if (locEl) locEl.placeholder = pack.phLocation || (lang === 'en' ? 'e.g. Tel Aviv' : 'לדוגמה: תל אביב');
             if (summaryEl) summaryEl.placeholder = pack.phSummary || (lang === 'en' ? 'e.g. Project manager experienced in leading teams' : 'לדוגמה: מנהל פרויקטים עם ניסיון בהובלת צוותים');
@@ -4361,7 +4361,7 @@
             const phone = phoneRaw.replace(/\D/g, '');
 
             // Any real typed name (2+ visible chars) is enough — do not reject demo names
-            // like "יונתן אשל" or the placeholder example, which blocked paying users.
+            // like "ישראל ישראלי" or the placeholder example, which blocked paying users.
             const nameOk = name.replace(/\s+/g, '').length >= 2;
 
             const samplePhones = [
@@ -4376,7 +4376,7 @@
                 String((CV_SAMPLES.he && CV_SAMPLES.he['in-email']) || '').trim().toLowerCase(),
                 String((CV_SAMPLES.en && CV_SAMPLES.en['in-email']) || '').trim().toLowerCase(),
                 'israel@example.com',
-                'jonathan.eshel@example.com'
+                'israel.israeli@example.com'
             ].filter(Boolean);
             const emailNorm = email.toLowerCase();
             const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && sampleEmails.indexOf(emailNorm) < 0;

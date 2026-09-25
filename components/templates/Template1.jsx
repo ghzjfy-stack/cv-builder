@@ -83,7 +83,7 @@ export default function Template1({
       {/* Header / Personal Details */}
       <header className="border-b-2 dynamic-border pb-4 mb-5">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-          {data.name || (isEnglish ? 'John Doe' : 'יונתן אשל')}
+          {data.name || (isEnglish ? 'Israel Israeli' : 'ישראל ישראלי')}
         </h1>
         {(data.title || data.role) && (
           <p className="text-sm font-semibold text-slate-600 mt-1">

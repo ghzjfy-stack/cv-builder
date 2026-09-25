@@ -83,7 +83,7 @@ export default function ModernTemplate({
       {/* Modern Banner Header */}
       <header className="bg-slate-900 text-white p-6 rounded-2xl mb-6 shadow-sm">
         <h1 className="text-3xl font-bold tracking-tight text-white">
-          {data.name || (isEnglish ? 'John Doe' : 'יונתן אשל')}
+          {data.name || (isEnglish ? 'Israel Israeli' : 'ישראל ישראלי')}
         </h1>
         {(data.title || data.role) && (
           <p className="text-sm font-medium text-slate-300 mt-1">

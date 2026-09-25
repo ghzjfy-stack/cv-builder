@@ -703,6 +703,9 @@
             direction: rtl;
             overflow: visible;
         }
+        html[lang="en"] .home-hero {
+            direction: ltr;
+        }
         .home-hero > :first-child {
             min-width: 0;
         }
@@ -754,6 +757,31 @@
             line-height: 1.7;
             color: #a8b6cc;
             font-weight: 400;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+        }
+        html[lang="en"] .home-lead,
+        html[lang="en"] #home-lead,
+        html[lang="en"] #seo-landing-lead {
+            direction: ltr;
+            text-align: left;
+            text-align: start;
+            unicode-bidi: isolate;
+        }
+        html[lang="en"] .home-title,
+        html[lang="en"] .home-subhead,
+        html[lang="en"] #home-title,
+        html[lang="en"] #home-subhead,
+        html[lang="en"] #seo-landing-title {
+            direction: ltr;
+            text-align: left;
+            text-align: start;
+            unicode-bidi: isolate;
+        }
+        html[lang="en"] #home-cta {
+            direction: ltr;
+            unicode-bidi: isolate;
         }
         .home-hero-offer {
             margin-top: 1.35rem;

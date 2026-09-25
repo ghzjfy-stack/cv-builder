@@ -4101,6 +4101,14 @@
         html.qc-paid .studio-pay.is-paid-session {
             display: none !important;
         }
+        /* Never offer Bit / pay-again while the 24h session is live. */
+        html.qc-paid #payment-modal #pay-step,
+        html.qc-paid #payment-modal #btn-open-bit,
+        html.qc-paid #payment-modal.is-mobile-pay #btn-open-bit,
+        html.qc-paid #payment-modal .pay-bit-block,
+        html.qc-paid #payment-modal .pay-qr-wrap {
+            display: none !important;
+        }
         html.qc-paid #form-pay-guarantee.is-paid-session {
             color: #6ee7b7;
         }

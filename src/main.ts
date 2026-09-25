@@ -601,12 +601,13 @@ function applyMobilePayCopy() {
   desk?.setAttribute("aria-hidden", mobile ? "true" : "false");
   mob?.setAttribute("aria-hidden", mobile ? "false" : "true");
   const qrWrap = document.querySelector(".pay-qr-wrap");
-  if (qrWrap instanceof HTMLElement) qrWrap.hidden = mobile;
+  if (qrWrap instanceof HTMLElement) qrWrap.hidden = mobile || isUnlocked();
   const bit = document.getElementById("btn-open-bit");
   if (bit instanceof HTMLElement) {
-    bit.hidden = !mobile;
-    bit.setAttribute("aria-hidden", mobile ? "false" : "true");
-    if (mobile) {
+    const showBit = mobile && !isUnlocked();
+    bit.hidden = !showBit;
+    bit.setAttribute("aria-hidden", showBit ? "false" : "true");
+    if (showBit) {
       bit.removeAttribute("tabindex");
       bindDeepLinkAnchor("btn-open-bit", bitAppOpenUrl(CHECKOUT.amountIls));
     } else {
@@ -1123,13 +1124,11 @@ function assertCheckoutReady(): boolean {
 
 function openCheckoutModal() {
   if (!assertCheckoutReady()) return;
-  // Valid 24h paid session: skip Bit/Telegram and go straight to download UI.
+  // Valid 24h paid session: skip Bit/pay UI and download directly.
   if (isUnlocked()) {
     setPaidUi(true);
-    openModal();
-    setFeedback("", false);
-    applyPackUi();
-    showDownloadStep();
+    startPaidSessionTimer();
+    triggerPDFDownload();
     return;
   }
   openModal();

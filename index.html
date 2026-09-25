@@ -4539,6 +4539,14 @@
             markStep(step);
             if (typeof syncStudioStepChrome === 'function') syncStudioStepChrome();
             if (step === 3) {
+                if (isQcPaidSession()) {
+                    if (typeof window.triggerPDFDownload === 'function') {
+                        window.triggerPDFDownload();
+                    } else {
+                        openPaymentModal();
+                    }
+                    return;
+                }
                 openPaymentModal();
                 return;
             }
@@ -4675,12 +4683,14 @@
             desk?.setAttribute('aria-hidden', mobile ? 'true' : 'false');
             mob?.setAttribute('aria-hidden', mobile ? 'false' : 'true');
             const qr = modal.querySelector('.pay-qr-wrap');
-            if (qr instanceof HTMLElement) qr.hidden = mobile;
+            if (qr instanceof HTMLElement) qr.hidden = mobile || isQcPaidSession();
             const bit = document.getElementById('btn-open-bit');
             if (bit instanceof HTMLElement) {
-                bit.hidden = !mobile;
-                bit.setAttribute('aria-hidden', mobile ? 'false' : 'true');
-                if (mobile) bit.removeAttribute('tabindex');
+                const paid = isQcPaidSession();
+                const showBit = mobile && !paid;
+                bit.hidden = !showBit;
+                bit.setAttribute('aria-hidden', showBit ? 'false' : 'true');
+                if (showBit) bit.removeAttribute('tabindex');
                 else {
                     bit.setAttribute('tabindex', '-1');
                     bit.removeAttribute('target');
@@ -4709,8 +4719,29 @@
             }
         }
 
+        function isQcPaidSession() {
+            if (document.documentElement.classList.contains('qc-paid') || window.QCIsPaid) return true;
+            try {
+                var until = Number(localStorage.getItem('quickcv_paid_until') || 0);
+                return Number.isFinite(until) && until > Date.now();
+            } catch (err) {
+                return false;
+            }
+        }
+
         function openPaymentModal() {
             if (!guardCheckout()) return;
+            // 24h paid session: never show Bit / pay-again UI.
+            if (isQcPaidSession()) {
+                if (typeof window.triggerPDFDownload === 'function') {
+                    window.triggerPDFDownload();
+                    return;
+                }
+                if (typeof window.onDownloadPdfClick === 'function') {
+                    window.onDownloadPdfClick();
+                    return;
+                }
+            }
             const el = document.getElementById('payment-modal');
             if (!el) return;
             document.body.classList.add('qc-checkout-open');

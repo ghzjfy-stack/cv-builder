@@ -2079,7 +2079,8 @@
             white-space: normal;
             overflow-wrap: break-word;
             word-break: normal;
-            unicode-bidi: plaintext;
+            unicode-bidi: isolate;
+            text-align: inherit;
             font-size: calc(0.72rem * var(--cv-scale)) !important;
             line-height: 1.35;
         }
@@ -2118,7 +2119,92 @@
         #qc-print-host #sec-education-side .cv-edu-item .cv-job-role {
             font-size: calc(0.62rem * var(--cv-scale)) !important;
             margin-top: 0.1rem;
-            unicode-bidi: plaintext;
+            unicode-bidi: isolate;
+            text-align: inherit;
+        }
+        #cv-target:not(.cv-lang-en) #sec-education-side,
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-section-title,
+        #cv-target:not(.cv-lang-en) #out-education-side,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-section-title,
+        #cv-target-page2:not(.cv-lang-en) #out-education-side,
+        #qc-print-host[dir="rtl"] #sec-education-side,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-section-title,
+        #qc-print-host[dir="rtl"] #out-education-side {
+            direction: rtl;
+            text-align: right;
+        }
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-edu-item,
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-edu-school,
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-edu-meta,
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-job-title,
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-job-role,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-edu-item,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-edu-school,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-edu-meta,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-job-title,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-job-role,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-edu-item,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-edu-school,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-edu-meta,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-job-title,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-job-role {
+            direction: rtl !important;
+            text-align: right !important;
+            unicode-bidi: isolate;
+        }
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-edu-date,
+        #cv-target:not(.cv-lang-en) #sec-education-side .cv-job-date,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-edu-date,
+        #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-job-date,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-edu-date,
+        #qc-print-host[dir="rtl"] #sec-education-side .cv-job-date {
+            direction: ltr !important;
+            unicode-bidi: isolate;
+            text-align: right !important;
+            align-self: flex-end;
+        }
+        #cv-target.cv-lang-en #sec-education-side,
+        #cv-target.cv-lang-en #sec-education-side .cv-section-title,
+        #cv-target.cv-lang-en #out-education-side,
+        #cv-target-page2.cv-lang-en #sec-education-side,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-section-title,
+        #cv-target-page2.cv-lang-en #out-education-side,
+        #qc-print-host[dir="ltr"] #sec-education-side,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-section-title,
+        #qc-print-host[dir="ltr"] #out-education-side {
+            direction: ltr;
+            text-align: left;
+        }
+        #cv-target.cv-lang-en #sec-education-side .cv-edu-item,
+        #cv-target.cv-lang-en #sec-education-side .cv-edu-school,
+        #cv-target.cv-lang-en #sec-education-side .cv-edu-meta,
+        #cv-target.cv-lang-en #sec-education-side .cv-job-title,
+        #cv-target.cv-lang-en #sec-education-side .cv-job-role,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-edu-item,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-edu-school,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-edu-meta,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-job-title,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-job-role,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-edu-item,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-edu-school,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-edu-meta,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-job-title,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-job-role {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: isolate;
+        }
+        #cv-target.cv-lang-en #sec-education-side .cv-edu-date,
+        #cv-target.cv-lang-en #sec-education-side .cv-job-date,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-edu-date,
+        #cv-target-page2.cv-lang-en #sec-education-side .cv-job-date,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-edu-date,
+        #qc-print-host[dir="ltr"] #sec-education-side .cv-job-date {
+            direction: ltr !important;
+            unicode-bidi: isolate;
+            text-align: left !important;
+            align-self: flex-start;
         }
         #cv-target .cv-edu-school,
         #cv-target-page2 .cv-edu-school,
@@ -3065,7 +3151,7 @@
             color: #fff;
             font-size: calc(0.72rem * var(--cv-scale));
             min-width: 0;
-            unicode-bidi: plaintext;
+            unicode-bidi: isolate;
         }
         #cv-target.layout-charcoal .cv-edu-item .cv-job-date,
         #cv-target.layout-charcoal .cv-edu-item .cv-edu-date,
@@ -3089,7 +3175,7 @@
             color: rgba(255, 255, 255, 0.82);
             font-size: calc(0.62rem * var(--cv-scale));
             margin-top: 0.12rem;
-            unicode-bidi: plaintext;
+            unicode-bidi: isolate;
         }
         .layout-charcoal #out-skills {
             color: #fff;

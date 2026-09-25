@@ -3097,6 +3097,9 @@
             if (!container) return;
             container.replaceChildren();
             container.classList.remove('whitespace-pre-line');
+            const eduDir = window.QCCvLang === 'en' ? 'ltr' : 'rtl';
+            container.setAttribute('dir', eduDir);
+            container.style.textAlign = eduDir === 'rtl' ? 'right' : 'left';
             if (!eduVal) {
                 paintPreviewSkeleton(container, 'edu');
                 return;
@@ -3107,8 +3110,12 @@
             blocks.forEach((item) => {
                 const box = document.createElement('div');
                 box.className = 'cv-job cv-edu-item';
+                const eduAlign = eduDir === 'rtl' ? 'right' : 'left';
+                box.setAttribute('dir', eduDir);
+                box.style.textAlign = eduAlign;
                 const head = document.createElement('div');
                 head.className = 'cv-job-head flex justify-between items-baseline w-full';
+                head.setAttribute('dir', eduDir);
 
                 let primaryTitle = item.title || item.date || '';
                 let subtitle = item.role || '';
@@ -3128,7 +3135,8 @@
                 if (primaryTitle) {
                     const titleEl = document.createElement('p');
                     titleEl.className = 'cv-job-title cv-edu-school font-bold';
-                    titleEl.setAttribute('dir', 'auto');
+                    titleEl.setAttribute('dir', eduDir);
+                    titleEl.style.textAlign = eduAlign;
                     titleEl.textContent = primaryTitle;
                     head.appendChild(titleEl);
                 }
@@ -3142,7 +3150,8 @@
                 if (subtitle) {
                     const subEl = document.createElement('p');
                     subEl.className = 'cv-job-role cv-edu-meta text-sm text-slate-600 mt-0.5';
-                    subEl.setAttribute('dir', 'auto');
+                    subEl.setAttribute('dir', eduDir);
+                    subEl.style.textAlign = eduAlign;
                     subEl.textContent = subtitle;
                     box.appendChild(subEl);
                 }

@@ -59,6 +59,13 @@ export function isPaid(): boolean {
   return isUnlocked();
 }
 
+/** Milliseconds remaining in the paid session (0 if expired). */
+export function getPaidRemainingMs(): number {
+  const until = getPaidUntil();
+  if (!until) return 0;
+  return Math.max(0, until - Date.now());
+}
+
 export function unlock(): void {
   const until = Date.now() + PAID_SESSION_MS;
   memoryUnlocked = true;

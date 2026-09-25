@@ -4824,6 +4824,203 @@
         #download-step .pay-success-check {
             animation: pay-success-pop 0.45s ease-out both;
         }
+
+        /* ── 24h paid-session hourglass ── */
+        :root {
+            --qc-sand-top: 1;
+            --qc-sand-bot: 0;
+        }
+        .qc-hourglass-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-rows: auto auto;
+            gap: 0.65rem 0.9rem;
+            align-items: center;
+            margin: 0.15rem 0 0.35rem;
+            padding: 0.85rem 1rem;
+            border-radius: 1.15rem;
+            background:
+                linear-gradient(145deg, rgba(16, 185, 129, 0.18), rgba(245, 158, 11, 0.12)),
+                rgba(2, 6, 23, 0.55);
+            border: 1px solid rgba(52, 211, 153, 0.35);
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+                0 12px 28px rgba(0, 0, 0, 0.28);
+        }
+        .qc-hourglass-card.is-expired {
+            border-color: rgba(248, 113, 113, 0.4);
+            background:
+                linear-gradient(145deg, rgba(248, 113, 113, 0.12), rgba(15, 23, 42, 0.6));
+        }
+        .qc-hourglass {
+            grid-row: 1 / span 2;
+            color: #fbbf24;
+            filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.35));
+            animation: qc-hg-breathe 2.8s ease-in-out infinite;
+        }
+        .qc-hourglass-card.is-expired .qc-hourglass {
+            color: #f87171;
+            animation: none;
+            filter: none;
+            opacity: 0.7;
+        }
+        .qc-hourglass-svg {
+            display: block;
+        }
+        .qc-hg-frame {
+            color: #fde68a;
+        }
+        .qc-hg-sand-fill-top,
+        .qc-hg-sand-fill-bot {
+            color: #f59e0b;
+            transform-box: fill-box;
+            transition: transform 0.9s linear;
+        }
+        .qc-hg-sand-fill-top {
+            transform-origin: center bottom;
+            transform: scaleY(var(--qc-sand-top, 1));
+        }
+        .qc-hg-sand-fill-bot {
+            transform-origin: center top;
+            transform: scaleY(max(0.04, var(--qc-sand-bot, 0)));
+        }
+        .qc-hg-stream {
+            color: #fbbf24;
+            stroke-dasharray: 2 3;
+            animation: qc-hg-stream 0.85s linear infinite;
+            opacity: 0.95;
+        }
+        .qc-hourglass-card.is-expired .qc-hg-stream {
+            animation: none;
+            opacity: 0.25;
+        }
+        .qc-hourglass-copy {
+            min-width: 0;
+            text-align: right;
+        }
+        [dir="ltr"] .qc-hourglass-copy {
+            text-align: left;
+        }
+        .qc-hourglass-label {
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #a7f3d0;
+        }
+        .qc-hourglass-card.is-expired .qc-hourglass-label {
+            color: #fecaca;
+        }
+        .qc-hourglass-value {
+            margin: 0.15rem 0 0.1rem;
+            font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+            font-size: 1.55rem;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: 0.06em;
+            color: #fff;
+            text-shadow: 0 0 18px rgba(52, 211, 153, 0.35);
+        }
+        .qc-hourglass-sub {
+            margin: 0;
+            font-size: 0.68rem;
+            font-weight: 600;
+            line-height: 1.35;
+            color: rgba(226, 232, 240, 0.78);
+        }
+        .qc-hourglass-track {
+            grid-column: 2;
+            height: 0.35rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.65);
+            overflow: hidden;
+        }
+        .qc-hourglass-bar {
+            display: block;
+            height: 100%;
+            width: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #10b981, #f59e0b);
+            transform-origin: right center;
+            transform: scaleX(1);
+            transition: transform 0.9s linear;
+        }
+        [dir="ltr"] .qc-hourglass-bar {
+            transform-origin: left center;
+        }
+        .qc-hourglass-card.is-expired .qc-hourglass-bar {
+            background: #f87171;
+            transform: scaleX(0) !important;
+        }
+
+        .qc-hourglass-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.35rem 0.75rem 0.35rem 0.55rem;
+            border-radius: 999px;
+            background: rgba(2, 6, 23, 0.88);
+            color: #fde68a;
+            border: 1px solid rgba(251, 191, 36, 0.45);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+            animation: qc-hg-chip-in 0.45s ease-out both;
+        }
+        .qc-hourglass-chip[hidden],
+        .qc-hourglass-chip.hidden {
+            display: none !important;
+        }
+        .qc-hourglass-chip-ico {
+            display: flex;
+            color: #fbbf24;
+            animation: qc-hg-breathe 2.8s ease-in-out infinite;
+        }
+        .qc-hourglass-chip-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.15;
+            gap: 0.05rem;
+        }
+        .qc-hourglass-chip-text span {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            color: #a7f3d0;
+            text-transform: uppercase;
+        }
+        .qc-hourglass-chip-text strong {
+            font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+            font-size: 0.92rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            color: #fff;
+        }
+        @keyframes qc-hg-breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.045); }
+        }
+        @keyframes qc-hg-stream {
+            to { stroke-dashoffset: -10; }
+        }
+        @keyframes qc-hg-chip-in {
+            from { opacity: 0; transform: translateY(-4px) scale(0.94); }
+            to { opacity: 1; transform: none; }
+        }
+        @media (max-width: 480px) {
+            .qc-hourglass-card {
+                padding: 0.75rem 0.85rem;
+                gap: 0.5rem 0.7rem;
+            }
+            .qc-hourglass-value {
+                font-size: 1.3rem;
+            }
+            .qc-hourglass-svg {
+                width: 36px;
+                height: 50px;
+            }
+        }
+
         #payment-modal #btn-download-cv-pdf,
         #payment-modal .btn-download-cv-pdf {
             display: flex !important;

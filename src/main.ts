@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import App from "./App.jsx";
 import { initTemplateSelector } from "./templates/selector";
-import { clearPersistedUnlock, isUnlocked, unlock, unlockWithPaymentToken } from "./access/gate.js";
+import { clearPersistedUnlock, getPaidRemainingMs, getPaidUntil, isUnlocked, unlock, unlockWithPaymentToken, PAID_SESSION_MS } from "./access/gate.js";
 import {
   CHECKOUT,
   REF_CODE_KEY,
@@ -213,11 +213,93 @@ function showDownloadStep() {
   });
   setPaidUi(true);
   fillReferralUi();
+  startPaidSessionTimer();
   const phone = readPersonalPhone();
   const waPhone = document.getElementById("wa-pdf-phone");
   if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
     waPhone.value = phone;
   }
+}
+
+let paidTimerId = 0;
+
+function formatPaidCountdown(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function syncPaidSessionTimerUi() {
+  const remaining = getPaidRemainingMs();
+  const active = remaining > 0;
+  const value = formatPaidCountdown(remaining);
+  const ratio = active ? Math.min(1, remaining / PAID_SESSION_MS) : 0;
+
+  const modalCard = document.getElementById("pay-session-timer");
+  const modalValue = document.getElementById("pay-timer-value");
+  const modalBar = document.getElementById("pay-timer-bar");
+  const modalLabel = document.getElementById("pay-timer-label");
+  const modalSub = document.getElementById("pay-timer-sub");
+  if (modalCard) {
+    modalCard.classList.toggle("is-expired", !active);
+    modalCard.hidden = false;
+    modalCard.classList.remove("hidden");
+  }
+  if (modalValue) modalValue.textContent = active ? value : "00:00:00";
+  if (modalBar instanceof HTMLElement) modalBar.style.transform = `scaleX(${ratio})`;
+  if (modalLabel) {
+    modalLabel.textContent = active
+      ? qcT("payTimerLabel", "זמן גישה שנותר")
+      : qcT("payTimerExpired", "פג תוקף הגישה");
+  }
+  if (modalSub) {
+    modalSub.textContent = active
+      ? qcT("payTimerSub", "עריכה והורדה חופשית לכל התבניות")
+      : qcT("payTimerExpiredSub", "יש לבצע תשלום חדש להורדה");
+  }
+
+  const chip = document.getElementById("studio-session-timer");
+  const chipValue = document.getElementById("studio-timer-value");
+  const chipLabel = document.getElementById("studio-timer-label");
+  if (chip) {
+    chip.hidden = !active;
+    chip.classList.toggle("hidden", !active);
+  }
+  if (chipValue) chipValue.textContent = value;
+  if (chipLabel) {
+    chipLabel.textContent = active
+      ? qcT("studioTimerLabel", "גישה פעילה")
+      : qcT("payTimerExpired", "פג תוקף הגישה");
+  }
+
+  document.documentElement.style.setProperty("--qc-sand-top", String(ratio));
+  document.documentElement.style.setProperty("--qc-sand-bot", String(1 - ratio));
+
+  // While access is live, swap promo CTA for the hourglass chip.
+  document.getElementById("studio-pay-cta")?.classList.toggle("hidden", active);
+  document.getElementById("studio-pay-guarantee")?.classList.toggle("hidden", active);
+
+  if (!active) setPaidUi(false);
+  return active;
+}
+
+function startPaidSessionTimer() {
+  window.clearInterval(paidTimerId);
+  syncPaidSessionTimerUi();
+  if (!getPaidUntil()) return;
+  paidTimerId = window.setInterval(() => {
+    if (!syncPaidSessionTimerUi()) {
+      window.clearInterval(paidTimerId);
+      paidTimerId = 0;
+    }
+  }, 1000);
+}
+
+function stopPaidSessionTimer() {
+  window.clearInterval(paidTimerId);
+  paidTimerId = 0;
 }
 
 function setFeedback(text, ok) {
@@ -1073,7 +1155,13 @@ function onPackChange(e) {
 }
 
 function restoreUnlockUi() {
-  setPaidUi(isUnlocked());
+  const paid = isUnlocked();
+  setPaidUi(paid);
+  if (paid) startPaidSessionTimer();
+  else {
+    stopPaidSessionTimer();
+    syncPaidSessionTimerUi();
+  }
 }
 
 function styleCta(el) {

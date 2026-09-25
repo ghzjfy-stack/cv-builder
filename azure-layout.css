@@ -87,7 +87,8 @@
     font-size: calc(1.85rem * var(--cv-scale));
     letter-spacing: 0;
     line-height: 1.15;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
     min-width: 0;
 }
 .layout-azure #out-title {

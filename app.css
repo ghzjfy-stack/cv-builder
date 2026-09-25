@@ -1761,8 +1761,8 @@
             unicode-bidi: isolate;
             overflow: visible;
             word-wrap: break-word;
-            overflow-wrap: anywhere;
-            word-break: break-word;
+            overflow-wrap: break-word;
+            word-break: normal;
             color: #1e293b;
         }
         #cv-target #out-name,
@@ -1789,8 +1789,8 @@
             min-width: 0;
             max-width: 100%;
             overflow: visible;
-            overflow-wrap: anywhere;
-            word-break: break-word;
+            overflow-wrap: break-word;
+            word-break: normal;
             white-space: normal;
         }
         #cv-target .cv-contact-row,
@@ -2902,7 +2902,8 @@
             letter-spacing: 0.04em;
             line-height: 1.15;
             text-transform: uppercase;
-            overflow-wrap: anywhere;
+            overflow-wrap: break-word;
+            word-break: normal;
         }
         .layout-charcoal #out-title {
             margin-top: 0.7rem;
@@ -3125,6 +3126,103 @@
             display: grid;
             grid-template-columns: minmax(0, 6.4rem) 12px minmax(0, 1fr);
             margin-bottom: 1rem;
+        }
+        /* Education / military reuse .cv-job but are NOT timeline rows — don't force the date|rule|body grid. */
+        #cv-target.layout-charcoal .cv-edu-item,
+        #cv-target.layout-charcoal .cv-military-item,
+        #cv-target.layout-charcoal #sec-education-side .cv-job,
+        #cv-target.layout-charcoal #out-military .cv-job,
+        #cv-target-page2.layout-charcoal .cv-edu-item,
+        #cv-target-page2.layout-charcoal .cv-military-item,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-job,
+        #cv-target-page2.layout-charcoal #out-military .cv-job,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-military-item,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-job,
+        #qc-print-host .cv-print-sheet.layout-charcoal #out-military .cv-job {
+            display: block !important;
+            grid-template-columns: none !important;
+            column-gap: 0 !important;
+            direction: inherit;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-edu-item,
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-military-item,
+        #cv-target:not(.cv-lang-en).layout-charcoal #out-military,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-edu-item,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-military-item,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal #out-military,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-edu-item,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-military-item,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal #out-military {
+            direction: rtl;
+            text-align: right;
+        }
+        #cv-target.cv-lang-en.layout-charcoal .cv-edu-item,
+        #cv-target.cv-lang-en.layout-charcoal .cv-military-item,
+        #cv-target.cv-lang-en.layout-charcoal #out-military,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-edu-item,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-military-item,
+        #cv-target-page2.cv-lang-en.layout-charcoal #out-military,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-edu-item,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-military-item,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal #out-military {
+            direction: ltr;
+            text-align: left;
+        }
+        #cv-target.layout-charcoal .cv-military-item .cv-job-head,
+        #cv-target-page2.layout-charcoal .cv-military-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-military-item .cv-job-head {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: baseline !important;
+            justify-content: space-between !important;
+            gap: 0.25rem 0.65rem !important;
+            width: 100% !important;
+        }
+        #cv-target.layout-charcoal .cv-military-item .cv-military-role,
+        #cv-target.layout-charcoal .cv-military-item .cv-job-title,
+        #cv-target-page2.layout-charcoal .cv-military-item .cv-military-role,
+        #cv-target-page2.layout-charcoal .cv-military-item .cv-job-title,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-military-item .cv-military-role,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-military-item .cv-job-title {
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 100%;
+            font-size: calc(0.86rem * var(--cv-scale));
+            overflow-wrap: break-word;
+            word-break: normal;
+        }
+        #cv-target.layout-charcoal .cv-military-item .cv-military-years,
+        #cv-target.layout-charcoal .cv-military-item .cv-job-date,
+        #cv-target-page2.layout-charcoal .cv-military-item .cv-military-years,
+        #cv-target-page2.layout-charcoal .cv-military-item .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-military-item .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-military-item .cv-job-date {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+            color: #555;
+            font-size: calc(0.62rem * var(--cv-scale));
+        }
+        #cv-target.layout-charcoal #sec-education-side .cv-edu-meta,
+        #cv-target.layout-charcoal #sec-education-side .cv-job-role,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-edu-meta,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-job-role,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-edu-meta,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-job-role {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: break-word;
+            word-break: normal;
+            white-space: normal;
+            unicode-bidi: plaintext;
         }
         .layout-charcoal .cv-job-date {
             font-size: calc(0.62rem * var(--cv-scale));

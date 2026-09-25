@@ -1999,6 +1999,88 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        /* Narrow sidebar education: stack title → dates so mixed HE/EN doesn't crush. */
+        #cv-target #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-job-head,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target.layout-charcoal #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target.layout-azure #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target-page2.layout-azure #sec-education-side .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-azure #sec-education-side .cv-edu-item .cv-job-head {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            gap: 0.12rem !important;
+        }
+        #cv-target #sec-education-side .cv-edu-item .cv-edu-school,
+        #cv-target #sec-education-side .cv-edu-item .cv-job-title,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-edu-school,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-job-title,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-edu-school,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-job-title,
+        #cv-target.layout-charcoal #sec-education-side .cv-edu-item .cv-edu-school,
+        #cv-target.layout-charcoal #sec-education-side .cv-edu-item .cv-job-title,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-edu-item .cv-edu-school,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-edu-item .cv-job-title,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-edu-item .cv-edu-school,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-edu-item .cv-job-title,
+        #cv-target.layout-azure #sec-education-side .cv-edu-item .cv-edu-school,
+        #cv-target.layout-azure #sec-education-side .cv-edu-item .cv-job-title,
+        #cv-target-page2.layout-azure #sec-education-side .cv-edu-item .cv-edu-school,
+        #cv-target-page2.layout-azure #sec-education-side .cv-edu-item .cv-job-title,
+        #qc-print-host .cv-print-sheet.layout-azure #sec-education-side .cv-edu-item .cv-edu-school,
+        #qc-print-host .cv-print-sheet.layout-azure #sec-education-side .cv-edu-item .cv-job-title {
+            flex: none !important;
+            max-width: 100% !important;
+            width: 100%;
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-break: normal;
+            unicode-bidi: plaintext;
+            font-size: calc(0.72rem * var(--cv-scale)) !important;
+            line-height: 1.35;
+        }
+        #cv-target #sec-education-side .cv-edu-item .cv-edu-date,
+        #cv-target #sec-education-side .cv-edu-item .cv-job-date,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-edu-date,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-job-date,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-edu-date,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-job-date,
+        #cv-target.layout-charcoal #sec-education-side .cv-edu-item .cv-edu-date,
+        #cv-target.layout-charcoal #sec-education-side .cv-edu-item .cv-job-date,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-edu-item .cv-edu-date,
+        #cv-target-page2.layout-charcoal #sec-education-side .cv-edu-item .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-edu-item .cv-edu-date,
+        #qc-print-host .cv-print-sheet.layout-charcoal #sec-education-side .cv-edu-item .cv-job-date,
+        #cv-target.layout-azure #sec-education-side .cv-edu-item .cv-edu-date,
+        #cv-target.layout-azure #sec-education-side .cv-edu-item .cv-job-date,
+        #cv-target-page2.layout-azure #sec-education-side .cv-edu-item .cv-edu-date,
+        #cv-target-page2.layout-azure #sec-education-side .cv-edu-item .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-azure #sec-education-side .cv-edu-item .cv-edu-date,
+        #qc-print-host .cv-print-sheet.layout-azure #sec-education-side .cv-edu-item .cv-job-date {
+            flex: none !important;
+            max-width: 100% !important;
+            width: auto;
+            overflow: visible;
+            text-overflow: clip;
+            white-space: nowrap;
+            font-size: calc(0.58rem * var(--cv-scale)) !important;
+            opacity: 0.85;
+        }
+        #cv-target #sec-education-side .cv-edu-item .cv-edu-meta,
+        #cv-target #sec-education-side .cv-edu-item .cv-job-role,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-edu-meta,
+        #cv-target-page2 #sec-education-side .cv-edu-item .cv-job-role,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-edu-meta,
+        #qc-print-host #sec-education-side .cv-edu-item .cv-job-role {
+            font-size: calc(0.62rem * var(--cv-scale)) !important;
+            margin-top: 0.1rem;
+            unicode-bidi: plaintext;
+        }
         #cv-target .cv-edu-school,
         #cv-target-page2 .cv-edu-school,
         #qc-print-host .cv-edu-school,
@@ -2086,13 +2168,13 @@
         #qc-print-host .cv-edu-list,
         #qc-print-host .cv-military-list {
             display: block;
-            list-style-type: disc;
-            list-style-position: outside;
+            list-style: none;
             margin: 0.1rem 0 0;
-            /* Marker gutter on the inline-start side (right in RTL / left in LTR) */
-            padding-inline-start: 1.25rem;
+            padding: 0;
             line-height: 1.45;
         }
+        /* Custom bullets: inline-start = right in Hebrew RTL, left in English LTR.
+           Native disc markers break under charcoal LTR grids / html2canvas PDF. */
         #cv-target .cv-job-list li,
         #cv-target .cv-edu-list li,
         #cv-target .cv-military-list li,
@@ -2102,10 +2184,45 @@
         #qc-print-host .cv-job-list li,
         #qc-print-host .cv-edu-list li,
         #qc-print-host .cv-military-list li {
-            display: list-item;
+            position: relative;
+            display: block;
             margin: 0 0 0.25rem;
-            padding-inline-start: 0;
+            padding-inline-start: 1.1rem;
             line-height: 1.45;
+            list-style: none;
+        }
+        #cv-target .cv-job-list li::before,
+        #cv-target .cv-edu-list li::before,
+        #cv-target .cv-military-list li::before,
+        #cv-target-page2 .cv-job-list li::before,
+        #cv-target-page2 .cv-edu-list li::before,
+        #cv-target-page2 .cv-military-list li::before,
+        #qc-print-host .cv-job-list li::before,
+        #qc-print-host .cv-edu-list li::before,
+        #qc-print-host .cv-military-list li::before {
+            content: "";
+            position: absolute;
+            inset-inline-start: 0.12rem;
+            top: 0.48em;
+            width: 0.28em;
+            height: 0.28em;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+        #cv-target:not(.cv-lang-en) .cv-job-list,
+        #cv-target:not(.cv-lang-en) .cv-edu-list,
+        #cv-target:not(.cv-lang-en) .cv-military-list,
+        #cv-target-page2:not(.cv-lang-en) .cv-job-list,
+        #cv-target-page2:not(.cv-lang-en) .cv-edu-list,
+        #cv-target-page2:not(.cv-lang-en) .cv-military-list,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-edu-list,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-military-list {
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
         }
         #cv-target.cv-lang-en .cv-job-list,
         #cv-target.cv-lang-en .cv-edu-list,
@@ -2116,7 +2233,9 @@
         #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list,
         #qc-print-host .cv-print-sheet.cv-lang-en .cv-edu-list,
         #qc-print-host .cv-print-sheet.cv-lang-en .cv-military-list {
-            padding-inline-start: 1.25rem;
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
         }
         #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure),
         #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) {
@@ -2554,10 +2673,10 @@
         }
         .layout-classic .cv-job-list {
             margin: 0.25rem 0 0;
-            padding-inline-start: 1.25rem;
+            padding: 0;
             font-size: calc(0.78rem * var(--cv-scale));
             color: #334155;
-            list-style-type: disc;
+            list-style: none;
         }
         .layout-classic .cv-job-list li { margin-bottom: 0.2rem; line-height: 1.45; }
 
@@ -2891,26 +3010,29 @@
         .layout-charcoal #sec-education { display: none !important; }
         .layout-charcoal #sec-education-side { display: block; }
         .layout-charcoal .cv-edu-item { margin-bottom: 0.7rem; }
-        /* Match Experience header: title + dates on one baseline row */
+        /* Side education stacks via #sec-education-side rules; keep colors here. */
         .layout-charcoal .cv-edu-item .cv-job-head {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            justify-content: space-between !important;
-            align-items: baseline !important;
-            gap: 0.35rem !important;
             width: 100% !important;
             margin-bottom: 0.12rem;
         }
-        .layout-charcoal .cv-edu-item .cv-edu-school,
-        .layout-charcoal .cv-edu-item .cv-job-title {
+        #cv-target.layout-charcoal .cv-edu-item .cv-edu-school,
+        #cv-target.layout-charcoal .cv-edu-item .cv-job-title,
+        #cv-target-page2.layout-charcoal .cv-edu-item .cv-edu-school,
+        #cv-target-page2.layout-charcoal .cv-edu-item .cv-job-title,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item .cv-edu-school,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item .cv-job-title {
             font-weight: 700;
             color: #fff;
             font-size: calc(0.72rem * var(--cv-scale));
             min-width: 0;
+            unicode-bidi: plaintext;
         }
-        .layout-charcoal .cv-edu-item .cv-job-date,
-        .layout-charcoal .cv-edu-item .cv-edu-date {
+        #cv-target.layout-charcoal .cv-edu-item .cv-job-date,
+        #cv-target.layout-charcoal .cv-edu-item .cv-edu-date,
+        #cv-target-page2.layout-charcoal .cv-edu-item .cv-job-date,
+        #cv-target-page2.layout-charcoal .cv-edu-item .cv-edu-date,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item .cv-edu-date {
             color: rgba(255, 255, 255, 0.72);
             font-size: calc(0.58rem * var(--cv-scale));
             padding-top: 0;
@@ -2918,11 +3040,16 @@
             direction: ltr !important;
             unicode-bidi: isolate;
         }
-        .layout-charcoal .cv-edu-item .cv-edu-meta,
-        .layout-charcoal .cv-edu-item .cv-job-role {
+        #cv-target.layout-charcoal .cv-edu-item .cv-edu-meta,
+        #cv-target.layout-charcoal .cv-edu-item .cv-job-role,
+        #cv-target-page2.layout-charcoal .cv-edu-item .cv-edu-meta,
+        #cv-target-page2.layout-charcoal .cv-edu-item .cv-job-role,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item .cv-edu-meta,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-edu-item .cv-job-role {
             color: rgba(255, 255, 255, 0.82);
             font-size: calc(0.62rem * var(--cv-scale));
             margin-top: 0.12rem;
+            unicode-bidi: plaintext;
         }
         .layout-charcoal #out-skills {
             color: #fff;
@@ -3056,10 +3183,28 @@
         }
         .layout-charcoal .cv-job-list {
             margin: 0.15rem 0 0;
-            padding-inline-start: 1.25rem;
-            list-style: disc;
+            padding: 0;
+            list-style: none;
         }
         .layout-charcoal .cv-job-list li { margin-bottom: 0.18rem; line-height: 1.45; }
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-body,
+        #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-list,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-job-body,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-job-list,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-job-body,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-job-list {
+            direction: rtl;
+            text-align: right;
+        }
+        #cv-target.cv-lang-en.layout-charcoal .cv-job-body,
+        #cv-target.cv-lang-en.layout-charcoal .cv-job-list,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-job-body,
+        #cv-target-page2.cv-lang-en.layout-charcoal .cv-job-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-body,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal .cv-job-list {
+            direction: ltr;
+            text-align: left;
+        }
         .layout-charcoal .cv-ref-item { margin-bottom: 0.75rem; }
         .layout-charcoal .cv-ref-name {
             font-weight: 700;
@@ -3604,8 +3749,8 @@
         }
         .layout-navy .cv-job-list {
             margin: 0.2rem 0 0;
-            padding-inline-start: 1.25rem;
-            list-style: disc;
+            padding: 0;
+            list-style: none;
             color: var(--navy-muted);
         }
         .layout-navy .cv-job-list li { margin-bottom: 0.2rem; unicode-bidi: plaintext; line-height: 1.45; }

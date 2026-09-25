@@ -3128,6 +3128,7 @@
                 if (primaryTitle) {
                     const titleEl = document.createElement('p');
                     titleEl.className = 'cv-job-title cv-edu-school font-bold';
+                    titleEl.setAttribute('dir', 'auto');
                     titleEl.textContent = primaryTitle;
                     head.appendChild(titleEl);
                 }
@@ -3141,6 +3142,7 @@
                 if (subtitle) {
                     const subEl = document.createElement('p');
                     subEl.className = 'cv-job-role cv-edu-meta text-sm text-slate-600 mt-0.5';
+                    subEl.setAttribute('dir', 'auto');
                     subEl.textContent = subtitle;
                     box.appendChild(subEl);
                 }

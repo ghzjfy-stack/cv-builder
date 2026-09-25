@@ -187,32 +187,40 @@
 .layout-azure #sec-references { display: none !important; }
 .layout-azure .cv-edu-item { margin-bottom: 0.7rem; }
 .layout-azure .cv-edu-item .cv-job-head {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: baseline !important;
-    justify-content: space-between !important;
-    gap: 0.35rem;
     width: 100%;
+    margin-bottom: 0.1rem;
 }
-.layout-azure .cv-edu-item .cv-edu-school {
+#cv-target.layout-azure .cv-edu-item .cv-edu-school,
+#cv-target.layout-azure .cv-edu-item .cv-job-title,
+#cv-target-page2.layout-azure .cv-edu-item .cv-edu-school,
+#cv-target-page2.layout-azure .cv-edu-item .cv-job-title,
+#qc-print-host .cv-print-sheet.layout-azure .cv-edu-item .cv-edu-school,
+#qc-print-host .cv-print-sheet.layout-azure .cv-edu-item .cv-job-title {
     font-weight: 700;
     color: var(--azure-ink);
-    font-size: calc(0.78rem * var(--cv-scale));
-    flex: 1 1 auto;
+    font-size: calc(0.72rem * var(--cv-scale));
+    flex: none;
     min-width: 0;
+    unicode-bidi: plaintext;
 }
-.layout-azure .cv-edu-item .cv-edu-date,
-.layout-azure .cv-edu-item .cv-job-date {
-    flex: 0 0 auto;
+#cv-target.layout-azure .cv-edu-item .cv-edu-date,
+#cv-target.layout-azure .cv-edu-item .cv-job-date,
+#cv-target-page2.layout-azure .cv-edu-item .cv-edu-date,
+#cv-target-page2.layout-azure .cv-edu-item .cv-job-date,
+#qc-print-host .cv-print-sheet.layout-azure .cv-edu-item .cv-edu-date,
+#qc-print-host .cv-print-sheet.layout-azure .cv-edu-item .cv-job-date {
+    flex: none;
     white-space: nowrap;
     color: var(--azure-muted);
-    font-size: calc(0.62rem * var(--cv-scale));
+    font-size: calc(0.58rem * var(--cv-scale));
 }
-.layout-azure .cv-edu-item .cv-edu-meta {
+#cv-target.layout-azure .cv-edu-item .cv-edu-meta,
+#cv-target-page2.layout-azure .cv-edu-item .cv-edu-meta,
+#qc-print-host .cv-print-sheet.layout-azure .cv-edu-item .cv-edu-meta {
     color: var(--azure-muted);
-    font-size: calc(0.7rem * var(--cv-scale));
+    font-size: calc(0.62rem * var(--cv-scale));
     margin-top: 0.12rem;
+    unicode-bidi: plaintext;
 }
 .layout-azure #out-skills,
 .layout-azure #out-languages,
@@ -233,8 +241,8 @@
 .layout-azure .cv-skill-list,
 .layout-azure .cv-extra-list,
 .layout-azure .cv-job-list {
-    list-style: disc;
-    padding-inline-start: 1.1rem;
+    list-style: none;
+    padding: 0;
     margin: 0;
     font-size: calc(0.74rem * var(--cv-scale));
 }
@@ -311,8 +319,9 @@
     line-height: 1.4;
 }
 .layout-azure .cv-job-list {
-    padding-inline-start: 1.25rem;
+    padding: 0;
     margin-top: 0.2rem;
+    list-style: none;
 }
 .layout-azure .cv-main,
 .layout-azure .cv-sidebar,

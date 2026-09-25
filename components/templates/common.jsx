@@ -430,14 +430,9 @@ export function CvEntryItem({
         <p className="cv-job-role text-sm text-slate-600 mt-0.5">{subtitle}</p>
       ) : null}
       {descriptions?.length > 0 ? (
-        <ul
-          className={`${listClassName} list-disc list-outside mt-2 text-sm text-slate-700`}
-          style={{ paddingInlineStart: '1.25rem' }}
-        >
+        <ul className={`${listClassName} mt-2 text-sm text-slate-700`}>
           {descriptions.map((desc, dIdx) => (
-            <li key={dIdx} style={{ marginBottom: '0.25rem' }}>
-              {desc}
-            </li>
+            <li key={dIdx}>{desc}</li>
           ))}
         </ul>
       ) : null}

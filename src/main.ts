@@ -193,6 +193,14 @@ function showDownloadStep() {
   step?.classList.remove("hidden");
   const title = document.getElementById("pay-success-title");
   if (title) title.textContent = qcT("paySuccess", "התשלום אושר בהצלחה!");
+  const access = document.getElementById("pay-access-notice");
+  if (access) {
+    access.textContent = qcT(
+      "payAccessNotice",
+      "תודה! הרכישה מקנה לך גישה חופשית לעריכה והורדה של כל התבניות ל-24 השעות הקרובות.",
+    );
+    access.classList.remove("hidden");
+  }
   const mark = step?.querySelector(".pay-success-check");
   if (mark instanceof HTMLElement) {
     mark.style.animation = "none";
@@ -476,6 +484,10 @@ function syncCheckoutPhoneFromForm() {
 }
 
 function startCheckoutVerification() {
+  if (isUnlocked()) {
+    setPaidUi(true);
+    return;
+  }
   showPayStep();
   showAutoVerifyStatus();
   const contact = syncCheckoutPhoneFromForm();
@@ -488,6 +500,11 @@ function startCheckoutVerification() {
 }
 
 async function proceedToPayment() {
+  if (isUnlocked()) {
+    setPaidUi(true);
+    showDownloadStep();
+    return null;
+  }
   const contact = syncCheckoutPhoneFromForm();
   if (phoneDigits(contact).length < 9) {
     setCheckoutPhoneFieldVisible(true);
@@ -934,6 +951,15 @@ function assertCheckoutReady(): boolean {
 
 function openCheckoutModal() {
   if (!assertCheckoutReady()) return;
+  // Valid 24h paid session: skip Bit/Telegram and go straight to download UI.
+  if (isUnlocked()) {
+    setPaidUi(true);
+    openModal();
+    setFeedback("", false);
+    applyPackUi();
+    showDownloadStep();
+    return;
+  }
   openModal();
   setFeedback("", false);
   selectedPack = "basic";

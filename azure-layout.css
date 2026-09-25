@@ -186,10 +186,28 @@
 .layout-azure #sec-military,
 .layout-azure #sec-references { display: none !important; }
 .layout-azure .cv-edu-item { margin-bottom: 0.7rem; }
+.layout-azure .cv-edu-item .cv-job-head {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 0.35rem;
+    width: 100%;
+}
 .layout-azure .cv-edu-item .cv-edu-school {
     font-weight: 700;
     color: var(--azure-ink);
     font-size: calc(0.78rem * var(--cv-scale));
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.layout-azure .cv-edu-item .cv-edu-date,
+.layout-azure .cv-edu-item .cv-job-date {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    color: var(--azure-muted);
+    font-size: calc(0.62rem * var(--cv-scale));
 }
 .layout-azure .cv-edu-item .cv-edu-meta {
     color: var(--azure-muted);

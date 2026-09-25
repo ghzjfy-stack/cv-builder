@@ -1231,6 +1231,7 @@
             <div id="download-step" class="hidden space-y-4">
                 <div class="pay-success-check mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-white text-3xl shadow-lg shadow-emerald-500/40" aria-hidden="true">✓</div>
                 <h3 id="pay-success-title" class="text-xl font-extrabold text-white">התשלום אושר בהצלחה!</h3>
+                <p id="pay-access-notice" class="text-xs text-emerald-200 font-semibold leading-relaxed px-1">תודה! הרכישה מקנה לך גישה חופשית לעריכה והורדה של כל התבניות ל-24 השעות הקרובות.</p>
                 <p id="pay-success-hint" class="text-xs text-slate-300">במחשב ההורדה מתחילה אוטומטית. בנייד (בעיקר Safari) לחצו על הכפתור הירוק אם הקובץ לא נשמר.</p>
                 <p id="download-complete-note" class="hidden text-xs text-amber-200 font-semibold">נכלל מכתב מקדים — אפשר להוריד אותו למטה.</p>
                 <button type="button" id="btn-download-cv-pdf" class="btn-download-cv-pdf w-full min-h-14 bg-emerald-500 hover:bg-emerald-400 text-white font-black py-4 px-4 rounded-2xl text-base sm:text-lg">
@@ -4098,8 +4099,8 @@
             if (navy) {
                 if (hasExp) paintExperienceJobs(expOut, expJobs, { timeline: true });
                 else paintPreviewSkeleton(expOut, 'job');
-                if (eduVal) renderTimeline(eduOut, eduVal, 'edu');
-                else paintPreviewSkeleton(eduOut, 'edu');
+                // Same horizontal title|dates education header as other templates (not vertical stack).
+                if (eduOut) paintEducationItems(eduOut, eduVal);
                 if (eduSide) eduSide.replaceChildren();
                 showSec(expSec, true);
                 markSecSkel(expSec, !hasExp);

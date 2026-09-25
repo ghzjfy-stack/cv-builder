@@ -193,15 +193,24 @@ function lockCaptureSheetHeight(host) {
   const sidebarish = isSidebarLayout(sheet) || isFullBleedLayout(sheet);
   // Measure natural content height first (overflow hidden would clip the measure).
   sheet.style.height = "auto";
-  sheet.style.minHeight = `${A4_CSS_H}px`;
+  sheet.style.minHeight = "0px";
+  sheet.style.maxHeight = "none";
   sheet.style.overflow = "visible";
   void sheet.offsetHeight;
-  const needed = Math.max(A4_CSS_H, Math.ceil(sheet.scrollHeight || 0), Math.ceil(sheet.offsetHeight || 0));
+  const contentH = Math.max(
+    1,
+    Math.ceil(sheet.scrollHeight || 0),
+    Math.ceil(sheet.offsetHeight || 0),
+  );
+  // Content that fits on one A4 must stay exactly one page (avoid a stub page 2).
+  const fitsOne = contentH <= A4_CSS_H + 12;
+  const needed = fitsOne ? A4_CSS_H : contentH;
   sheet.style.minHeight = `${needed}px`;
   sheet.style.height = `${needed}px`;
+  sheet.style.overflow = "hidden";
   host.style.minHeight = `${needed}px`;
+  host.style.height = fitsOne ? `${needed}px` : "auto";
   if (sidebarish) {
-    sheet.style.overflow = "hidden";
     sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner, .cv-main, .cv-columns, .cv-photo-block, #cv-header").forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
       if (el.classList.contains("cv-photo") || el.closest?.(".cv-photo")) return;
@@ -475,43 +484,81 @@ function isCanvasRegionBlank(canvas, y0, height) {
   return true;
 }
 
+/** Crop tiny bottom overflow so one-page CVs don't sprout a stub page 2. */
+function clampCanvasToPageBounds(canvas) {
+  if (!canvas?.width || !canvas?.height) return canvas;
+  const pagePxH = Math.max(1, Math.floor((PAGE_H_MM * canvas.width) / PAGE_W_MM));
+  if (canvas.height <= pagePxH + 1) {
+    if (canvas.height !== pagePxH && canvas.height >= pagePxH - 2) {
+      const exact = document.createElement("canvas");
+      exact.width = canvas.width;
+      exact.height = pagePxH;
+      const ctx = exact.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, exact.width, exact.height);
+      ctx.drawImage(canvas, 0, 0);
+      return exact;
+    }
+    return canvas;
+  }
+  const overflow = canvas.height - pagePxH;
+  // Anything under ~10% of a page is almost always capture bleed / sidebar stub.
+  if (overflow <= Math.ceil(pagePxH * 0.1)) {
+    const cropped = document.createElement("canvas");
+    cropped.width = canvas.width;
+    cropped.height = pagePxH;
+    const ctx = cropped.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, cropped.width, cropped.height);
+    ctx.drawImage(canvas, 0, 0, canvas.width, pagePxH, 0, 0, canvas.width, pagePxH);
+    return cropped;
+  }
+  return canvas;
+}
+
 function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
   const marginMm = opts.marginMm ?? 0;
   const startNewPage = !!opts.startNewPage;
   const usableW = PAGE_W_MM - marginMm * 2;
   const usableH = PAGE_H_MM - marginMm * 2;
-  const pxPerMm = canvas.width / usableW;
+  const source = clampCanvasToPageBounds(canvas);
+  const pxPerMm = source.width / usableW;
   const pagePxH = Math.floor(usableH * pxPerMm);
-  const sx = canvas.width / Math.max(1, hostWidth);
-  const sy = canvas.height / Math.max(1, hostHeight);
+  const sx = source.width / Math.max(1, hostWidth);
+  const sy = source.height / Math.max(1, hostHeight);
   let y = 0;
   let first = !startNewPage;
+  const totalH = source.height;
 
-  while (y < canvas.height - 1) {
-    const remaining = canvas.height - y;
-    if (remaining < Math.max(10, pagePxH * 0.03) && isCanvasRegionBlank(canvas, y, remaining)) {
+  while (y < totalH - 1) {
+    const remaining = totalH - y;
+    // Never create a near-empty trailing page from leftover pixels.
+    if (y > 0 && remaining < pagePxH * 0.1) break;
+    if (remaining < Math.max(10, pagePxH * 0.03) && isCanvasRegionBlank(source, y, remaining)) {
       break;
     }
-    let next = Math.min(canvas.height, y + pagePxH);
-    if (next < canvas.height) {
-      next = findSplitY(canvas, next, y + Math.floor(pagePxH * 0.55));
+    let next = Math.min(totalH, y + pagePxH);
+    if (next < totalH) {
+      next = findSplitY(source, next, y + Math.floor(pagePxH * 0.55));
+      // If the split would leave only a stub, absorb into this page / stop.
+      if (totalH - next < pagePxH * 0.1) next = totalH;
     }
     const sliceH = Math.max(1, next - y);
-    if (isCanvasRegionBlank(canvas, y, sliceH)) {
+    if (isCanvasRegionBlank(source, y, sliceH)) {
       if (!first || startNewPage) break;
     }
 
     const slice = document.createElement("canvas");
-    slice.width = canvas.width;
+    slice.width = source.width;
     slice.height = sliceH;
     const ctx = slice.getContext("2d");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, slice.width, slice.height);
-    ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+    ctx.drawImage(source, 0, y, source.width, sliceH, 0, 0, slice.width, sliceH);
 
     if (!first) pdf.addPage();
     first = false;
-    const sliceMm = sliceH / pxPerMm;
+    const sliceMm = Math.min(usableH, sliceH / pxPerMm);
     pdf.addImage(
       slice.toDataURL("image/jpeg", 0.98),
       "JPEG",
@@ -553,8 +600,15 @@ async function captureToCanvas(el) {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     lockCaptureSheetHeight(el);
     let linkMeta = measureLinks(el);
-    const width = Math.max(A4_CSS_PX, Math.ceil(el.scrollWidth || el.offsetWidth || A4_CSS_PX));
-    const height = Math.max(A4_CSS_H, Math.ceil(el.scrollHeight || el.offsetHeight || 1));
+    const sheet = el.querySelector?.(".cv-print-sheet");
+    const lockedH =
+      sheet instanceof HTMLElement ? Math.ceil(parseFloat(sheet.style.height) || sheet.offsetHeight || 0) : 0;
+    const width = Math.max(A4_CSS_PX, Math.ceil(el.offsetWidth || el.scrollWidth || A4_CSS_PX));
+    // Prefer the locked sheet height so overflow:hidden one-pagers don't grow a stub page.
+    const height = Math.max(
+      A4_CSS_H,
+      lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
+    );
     // Prefer print-like DPI; keep mobile under memory limits.
     const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2.25 : 3);
     const scale = Math.min(Math.max(dpr, isMobileUa() ? 2 : 2.75), MAX_CANVAS / width, MAX_CANVAS / height);

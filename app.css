@@ -1953,6 +1953,52 @@
             min-width: 0;
             max-width: 100%;
         }
+        /* Education: title + dates on one horizontal row in every template / PDF */
+        #cv-target .cv-edu-item .cv-job-head,
+        #cv-target-page2 .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-edu-item .cv-job-head,
+        .layout-charcoal .cv-edu-item .cv-job-head,
+        .layout-navy .cv-edu-item .cv-job-head,
+        .layout-azure .cv-edu-item .cv-job-head,
+        .layout-sidebar .cv-edu-item .cv-job-head,
+        .layout-split .cv-edu-item .cv-job-head,
+        .layout-classic .cv-edu-item .cv-job-head,
+        .layout-minimal .cv-edu-item .cv-job-head,
+        .layout-modern .cv-edu-item .cv-job-head,
+        .layout-executive .cv-edu-item .cv-job-head,
+        .layout-compact .cv-edu-item .cv-job-head {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: baseline !important;
+            justify-content: space-between !important;
+            gap: 0.35rem 0.65rem !important;
+            width: 100% !important;
+        }
+        #cv-target .cv-edu-item .cv-job-head .cv-edu-school,
+        #cv-target .cv-edu-item .cv-job-head .cv-job-title,
+        #cv-target-page2 .cv-edu-item .cv-job-head .cv-edu-school,
+        #cv-target-page2 .cv-edu-item .cv-job-head .cv-job-title,
+        #qc-print-host .cv-edu-item .cv-job-head .cv-edu-school,
+        #qc-print-host .cv-edu-item .cv-job-head .cv-job-title {
+            display: block;
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 100%;
+        }
+        #cv-target .cv-edu-item .cv-job-head .cv-edu-date,
+        #cv-target .cv-edu-item .cv-job-head .cv-job-date,
+        #cv-target-page2 .cv-edu-item .cv-job-head .cv-edu-date,
+        #cv-target-page2 .cv-edu-item .cv-job-head .cv-job-date,
+        #qc-print-host .cv-edu-item .cv-job-head .cv-edu-date,
+        #qc-print-host .cv-edu-item .cv-job-head .cv-job-date {
+            display: inline-block;
+            flex: 0 0 auto;
+            white-space: nowrap;
+            max-width: 42%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         #cv-target .cv-edu-school,
         #cv-target-page2 .cv-edu-school,
         #qc-print-host .cv-edu-school,
@@ -2847,12 +2893,13 @@
         .layout-charcoal .cv-edu-item { margin-bottom: 0.7rem; }
         /* Match Experience header: title + dates on one baseline row */
         .layout-charcoal .cv-edu-item .cv-job-head {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 0.35rem;
-            width: 100%;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            align-items: baseline !important;
+            gap: 0.35rem !important;
+            width: 100% !important;
             margin-bottom: 0.12rem;
         }
         .layout-charcoal .cv-edu-item .cv-edu-school,

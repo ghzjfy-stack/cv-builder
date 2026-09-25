@@ -38,6 +38,8 @@ declare global {
     CV_SAMPLES?: Record<string, Record<string, string>>;
     QCExample?: string;
     QCCvLang?: string;
+    QCIsPaid?: boolean;
+    QCPaidUntil?: number;
     resetForm?: () => void;
     clearCvForm?: () => void;
     QCStrength?: {

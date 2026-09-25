@@ -1124,11 +1124,14 @@ function assertCheckoutReady(): boolean {
 
 function openCheckoutModal() {
   if (!assertCheckoutReady()) return;
-  // Valid 24h paid session: skip Bit/pay UI and download directly.
+  // Valid 24h paid session: show the post-pay success screen (download / WhatsApp), never Bit.
   if (isUnlocked()) {
     setPaidUi(true);
+    openModal();
+    setFeedback("", false);
+    applyPackUi();
+    showDownloadStep();
     startPaidSessionTimer();
-    triggerPDFDownload();
     return;
   }
   openModal();
@@ -1160,10 +1163,7 @@ function onDownloadPdfClick(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
   if (!assertCheckoutReady()) return;
-  if (isUnlocked()) {
-    triggerPDFDownload();
-    return;
-  }
+  // Paid or unpaid: open checkout/success UI (Bit only when unpaid).
   openCheckoutModal();
 }
 

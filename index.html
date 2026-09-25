@@ -4539,14 +4539,6 @@
             markStep(step);
             if (typeof syncStudioStepChrome === 'function') syncStudioStepChrome();
             if (step === 3) {
-                if (isQcPaidSession()) {
-                    if (typeof window.triggerPDFDownload === 'function') {
-                        window.triggerPDFDownload();
-                    } else {
-                        openPaymentModal();
-                    }
-                    return;
-                }
                 openPaymentModal();
                 return;
             }
@@ -4729,18 +4721,35 @@
             }
         }
 
+        /** Post-pay success UI (green check, PDF, WhatsApp) — no Bit while session is live. */
+        function openPaidSessionDownloadModal() {
+            const el = document.getElementById('payment-modal');
+            if (!el) return;
+            document.body.classList.add('qc-checkout-open');
+            document.documentElement.classList.add('qc-paid');
+            document.documentElement.classList.remove('qc-unpaid');
+            try { window.QCIsPaid = true; } catch (err) { /* ignore */ }
+            lockQcModalScroll('payment');
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+            el.style.display = 'flex';
+            el.style.zIndex = '10050';
+            el.setAttribute('aria-hidden', 'false');
+            document.getElementById('pay-step')?.classList.add('hidden');
+            document.getElementById('pay-wait-step')?.classList.add('hidden');
+            const step = document.getElementById('download-step');
+            step?.classList.remove('hidden');
+            applyMobilePayCopy();
+            if (typeof window.QCSyncPaidAccessChrome === 'function') window.QCSyncPaidAccessChrome(true);
+            window.setTimeout(function () { document.getElementById('btn-close-modal')?.focus(); }, 30);
+        }
+
         function openPaymentModal() {
             if (!guardCheckout()) return;
-            // 24h paid session: never show Bit / pay-again UI.
+            // 24h paid session: same success screen as after first payment, without Bit.
             if (isQcPaidSession()) {
-                if (typeof window.triggerPDFDownload === 'function') {
-                    window.triggerPDFDownload();
-                    return;
-                }
-                if (typeof window.onDownloadPdfClick === 'function') {
-                    window.onDownloadPdfClick();
-                    return;
-                }
+                openPaidSessionDownloadModal();
+                return;
             }
             const el = document.getElementById('payment-modal');
             if (!el) return;

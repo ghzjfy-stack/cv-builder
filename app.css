@@ -675,20 +675,22 @@
             .home-nav .lang-chip .lang-chip-short { display: inline; }
             .home-nav-cta {
                 min-height: 2.25rem;
-                padding: 0.35rem 0.55rem;
+                padding: 0.35rem 0.65rem;
                 font-size: 0.72rem;
                 border-radius: 0.6rem;
+                white-space: nowrap;
             }
             .home-nav-cta .home-nav-cta-long { display: none; }
-            .home-nav-cta .home-nav-cta-short { display: inline; }
+            .home-nav-cta .home-nav-cta-short { display: inline; white-space: nowrap; }
         }
         @media (max-width: 380px) {
             .home-brand-name {
                 display: none;
             }
             .home-nav-cta {
-                padding: 0.35rem 0.5rem;
-                font-size: 0.68rem;
+                padding: 0.35rem 0.55rem;
+                font-size: 0.7rem;
+                white-space: nowrap;
             }
         }
 

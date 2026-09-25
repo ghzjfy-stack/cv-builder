@@ -890,6 +890,28 @@ function readPersonalPhone() {
   return String(fromWaField || fromForm || fromCheckout || fromData || "").trim();
 }
 
+function openExternalUrl(url) {
+  const href = String(url || "").trim();
+  if (!href) return false;
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
+  // After async work, popups are often blocked — on mobile navigate this tab to WhatsApp.
+  if (mobile) {
+    location.assign(href);
+    return true;
+  }
+  const win = window.open(href, "_blank", "noopener,noreferrer");
+  if (win) return true;
+  const a = document.createElement("a");
+  a.href = href;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  return true;
+}
+
 async function createCvDownloadShareUrl() {
   try {
     window.QCDraft?.save?.();
@@ -904,6 +926,8 @@ async function createCvDownloadShareUrl() {
   }
   const safe = { ...(draft || {}) };
   delete safe.photo;
+
+  // Prefer a short handoff id — long ?d= drafts break wa.me (white error page).
   try {
     const res = await fetch("/api/handoff", {
       method: "POST",
@@ -913,25 +937,21 @@ async function createCvDownloadShareUrl() {
     });
     const data = await res.json().catch(() => null);
     if (data?.ok && data.id) {
-      const url = new URL(location.href);
-      url.hash = "studio";
-      url.search = `?h=${encodeURIComponent(data.id)}`;
-      return url.toString();
+      return `${location.origin}/?h=${encodeURIComponent(data.id)}#studio`;
     }
   } catch {
     /* fall through */
   }
+
   try {
     const json = JSON.stringify(safe);
     const encoded = btoa(unescape(encodeURIComponent(json)))
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/g, "");
-    if (encoded.length <= 12000) {
-      const url = new URL(location.href);
-      url.hash = "studio";
-      url.search = `?d=${encodeURIComponent(encoded)}`;
-      return url.toString();
+    // Keep WhatsApp deep links short; otherwise wa.me shows a blank/error page.
+    if (encoded.length <= 1800) {
+      return `${location.origin}/?d=${encodeURIComponent(encoded)}#studio`;
     }
   } catch {
     /* fall through */
@@ -952,67 +972,69 @@ async function sendPdfToWhatsApp(e) {
   if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
     waPhone.value = phone;
   }
-
-  // Open a tab synchronously so popup blockers don't kill WhatsApp after the PDF build.
-  const waWin = window.open("about:blank", "_blank");
-  if (status) status.textContent = qcT("waPreparing", "מכין PDF לשליחה...");
+  const english = window.QCCvLang === "en";
+  if (status) status.textContent = qcT("waPreparing", "מכין לשליחה בוואטסאפ...");
 
   try {
-    const result = await exportHighResPdf({ download: false });
-    const blob = result?.blob;
-    const filename = String(result?.filename || "cv.pdf");
-    if (!blob) throw new Error("empty pdf");
+    // Mobile file share (actual PDF) when the browser supports it — no blank tabs.
+    const canFileShare =
+      typeof navigator !== "undefined" &&
+      typeof navigator.share === "function" &&
+      typeof navigator.canShare === "function";
 
-    const english = window.QCCvLang === "en";
-
-    // Mobile / supporting browsers: native share sheet with the actual PDF file.
-    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+    if (canFileShare) {
       try {
-        const file = new File([blob], filename, { type: "application/pdf" });
-        const canFiles = typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] });
-        if (canFiles) {
-          if (waWin && !waWin.closed) waWin.close();
-          await navigator.share({
-            files: [file],
-            title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
-            text: english ? "Resume from QuickCV" : "קורות חיים מ-QuickCV",
-          });
-          if (status) {
-            status.textContent = qcT("waShared", "בחרו WhatsApp בחלון השיתוף כדי לשלוח את ה-PDF.");
+        const result = await exportHighResPdf({ download: false });
+        const blob = result?.blob;
+        const filename = String(result?.filename || "cv.pdf");
+        if (blob) {
+          const file = new File([blob], filename, { type: "application/pdf" });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
+              text: english ? "Resume from QuickCV" : "קורות חיים מ-QuickCV",
+            });
+            if (status) {
+              status.textContent = qcT(
+                "waShared",
+                "בחרו WhatsApp בחלון השיתוף כדי לשלוח את ה-PDF.",
+              );
+            }
+            return;
           }
-          return;
         }
       } catch (shareErr) {
         if (shareErr && shareErr.name === "AbortError") {
           if (status) status.textContent = "";
-          if (waWin && !waWin.closed) waWin.close();
           return;
         }
         /* fall through to wa.me link */
       }
     }
 
+    // Reliable path: open WhatsApp chat with a short view/save link (current template).
     const downloadUrl = await createCvDownloadShareUrl();
     const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
-    if (waWin && !waWin.closed) {
-      waWin.location.href = waUrl;
-    } else {
-      const a = document.createElement("a");
-      a.href = waUrl;
-      a.target = "_blank";
-      a.rel = "noopener";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
+    openExternalUrl(waUrl);
     if (status) {
       status.textContent = phone
         ? qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
         : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
     }
   } catch {
-    if (waWin && !waWin.closed) waWin.close();
-    if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
+    try {
+      const fallback = whatsappSelfPdfUrl(phone, `${location.origin}/#studio`, english);
+      openExternalUrl(fallback);
+      if (status) {
+        status.textContent = qcT(
+          "waLinkShareOpened",
+          "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.",
+        );
+      }
+    } catch {
+      if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
+    }
   }
 }
 

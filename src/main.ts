@@ -277,8 +277,8 @@ function syncPaidSessionTimerUi() {
   document.documentElement.style.setProperty("--qc-sand-top", String(ratio));
   document.documentElement.style.setProperty("--qc-sand-bot", String(1 - ratio));
 
-  // While access is live, swap promo CTA for the hourglass chip.
-  document.getElementById("studio-pay-cta")?.classList.toggle("hidden", active);
+  // While access is live, swap promo CTA for the hourglass chip (CSS also hides pay CTA).
+  document.getElementById("studio-pay-cta")?.classList.toggle("is-paid-session", active);
   document.getElementById("studio-pay-guarantee")?.classList.toggle("hidden", active);
 
   if (!active) setPaidUi(false);
@@ -320,6 +320,96 @@ function setPaidUi(paid) {
   document.body.classList.toggle("paid", paid);
   document.documentElement.classList.toggle("qc-paid", paid);
   document.documentElement.classList.toggle("qc-unpaid", !paid);
+  try {
+    (window as Window & { QCIsPaid?: boolean }).QCIsPaid = Boolean(paid);
+  } catch {
+    /* ignore */
+  }
+  syncPaidAccessChrome(Boolean(paid));
+}
+
+/** Swap price CTAs for free-download copy while the 24h session is live. */
+function syncPaidAccessChrome(paid = isUnlocked()) {
+  const en = (window as Window & { QCCvLang?: string }).QCCvLang === "en";
+  const amount = displayAmountValue(CHECKOUT.amountIls);
+  const freeDl = en ? "Download PDF" : "הורד PDF";
+  const paidGuarantee = en
+    ? "Access active • Free download for every template"
+    : "גישה פעילה • הורדה חופשית לכל התבניות";
+  const paidPromo = en
+    ? "Access active — free edit & download for 24 hours"
+    : "גישה פעילה — עריכה והורדה חופשית ל-24 שעות";
+  const unpaidDlPrefix = en ? "Download PDF · " : "הורד PDF ב-";
+  const unpaidPayBefore = en ? "Pay " : "לשלם ";
+  const unpaidPayAfter = en ? " ₪ & download" : " ₪ ולהוריד";
+  const unpaidPromoBefore = en ? "Professional resume for only " : "קורות חיים מקצועיים ב-";
+  const unpaidPromoAfter = en ? " ₪" : " ₪ בלבד";
+  const unpaidGuarantee = en
+    ? "One-time payment • No subscription"
+    : "תשלום חד-פעמי • ללא מנוי וללא התחייבות";
+  const unpaidFormGuarantee = en
+    ? "One-time payment • No subscription • Instant download"
+    : "תשלום חד-פעמי • ללא מנוי • הורדה מיידית";
+
+  const pricedHtml = `${unpaidDlPrefix}<span data-price>${amount}</span> ₪`;
+
+  const downloadCta = document.getElementById("btn-download-pdf");
+  if (downloadCta) downloadCta.innerHTML = paid ? freeDl : pricedHtml;
+
+  const mobileLabel = document.getElementById("mobile-download-label");
+  if (mobileLabel) {
+    mobileLabel.innerHTML = paid ? freeDl : pricedHtml;
+    mobileLabel.setAttribute("dir", en ? "ltr" : "rtl");
+  }
+
+  const sampleDl = document.getElementById("btn-sample-pdf-download");
+  if (sampleDl) sampleDl.innerHTML = paid ? freeDl : pricedHtml;
+
+  const formGuarantee = document.getElementById("form-pay-guarantee");
+  if (formGuarantee) {
+    formGuarantee.textContent = paid ? paidGuarantee : unpaidFormGuarantee;
+    formGuarantee.classList.toggle("is-paid-session", paid);
+  }
+
+  const studioGuarantee = document.getElementById("studio-pay-guarantee");
+  if (studioGuarantee) studioGuarantee.textContent = paid ? paidGuarantee : unpaidGuarantee;
+
+  const promoTitle = document.getElementById("studio-promo-title");
+  if (promoTitle) {
+    promoTitle.innerHTML = paid
+      ? paidPromo
+      : `${unpaidPromoBefore}<span data-price>${amount}</span>${unpaidPromoAfter}`;
+  }
+
+  document.querySelectorAll(".studio-pay").forEach((el) => {
+    if (paid) {
+      el.innerHTML = freeDl;
+      el.setAttribute("aria-label", freeDl);
+    } else {
+      el.innerHTML = `${unpaidPayBefore}<span data-price>${amount}</span>${unpaidPayAfter}`;
+    }
+  });
+
+  // Paid session: header pay CTA is hidden via CSS; keep download path direct.
+  document.getElementById("studio-pay-cta")?.classList.toggle("is-paid-session", paid);
+}
+
+(window as Window & { QCSyncPaidAccessChrome?: (paid?: boolean) => void }).QCSyncPaidAccessChrome = syncPaidAccessChrome;
+
+function wirePaidStudioPayCta() {
+  const btn = document.getElementById("studio-pay-cta");
+  if (!btn || btn.dataset.qcPaidWired === "1") return;
+  btn.dataset.qcPaidWired = "1";
+  btn.addEventListener(
+    "click",
+    (e) => {
+      if (!isUnlocked()) return;
+      e.preventDefault();
+      e.stopPropagation();
+      onDownloadPdfClick(e);
+    },
+    true,
+  );
 }
 
 function trapFocus(e) {
@@ -1275,6 +1365,7 @@ function bind() {
   fillCheckoutUi();
   fillReferralUi();
   restoreUnlockUi();
+  wirePaidStudioPayCta();
   bindPreviewGuard();
   document.getElementById("pdf-spinner")?.classList.add("hidden");
   document.getElementById("pdf-spinner")?.classList.remove("flex");

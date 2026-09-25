@@ -2116,6 +2116,9 @@
                 const amount = (document.querySelector('#btn-download-pdf [data-price], [data-price]') || {}).textContent || '10';
                 sampleDl.innerHTML = (pack.downloadPdfCta || pack.samplePdfDownload || '') + '<span data-price>' + String(amount).trim() + '</span> ₪';
             }
+            if ((document.documentElement.classList.contains('qc-paid') || window.QCIsPaid) && typeof window.QCSyncPaidAccessChrome === 'function') {
+                window.QCSyncPaidAccessChrome(true);
+            }
             document.querySelectorAll('.density-chip').forEach((el) => {
                 const key = el.getAttribute('data-density');
                 if (key === 'compact') el.textContent = pack.densityCompact;
@@ -2172,6 +2175,9 @@
                 const price = downloadCta.querySelector('[data-price]');
                 const amount = (price && price.textContent) || '10';
                 downloadCta.innerHTML = (pack.downloadPdfCta || '') + '<span data-price>' + amount + '</span> ₪';
+            }
+            if ((document.documentElement.classList.contains('qc-paid') || window.QCIsPaid) && typeof window.QCSyncPaidAccessChrome === 'function') {
+                window.QCSyncPaidAccessChrome(true);
             }
             document.querySelectorAll('[data-ats-badge]').forEach((el) => {
                 el.textContent = lang === 'en'
@@ -4789,6 +4795,15 @@
         function syncMobilePayLabel() {
             const wrap = document.getElementById('mobile-download-label');
             if (!wrap) return;
+            const paid = document.documentElement.classList.contains('qc-paid') || !!window.QCIsPaid;
+            if (paid) {
+                if (typeof window.QCSyncPaidAccessChrome === 'function') {
+                    window.QCSyncPaidAccessChrome(true);
+                } else {
+                    wrap.textContent = window.QCCvLang === 'en' ? 'Download PDF' : 'הורד PDF';
+                }
+                return;
+            }
             const priceEl = wrap.querySelector('[data-price]');
             const price = (priceEl && priceEl.textContent) || '10';
             const en = window.QCCvLang === 'en';

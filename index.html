@@ -1099,10 +1099,6 @@
                                 <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="languages">שפות</h3>
                                 <div id="out-languages" class="text-slate-700"></div>
                             </div>
-                            <div id="sec-extras-side">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">פרטים נוספים</h3>
-                                <div id="out-extras-side"></div>
-                            </div>
                             </div>
                         </aside>
                     </div>
@@ -4109,9 +4105,11 @@
                 const summaryLabel = document.querySelector('#cv-target [data-i18n="summary"]');
                 const expLabel = document.querySelector('#cv-target [data-i18n="experience"]');
                 const skillsLabel = document.querySelector('#cv-target [data-i18n="skills"]');
+                const milLabel = document.querySelector('#cv-target [data-i18n="military"]');
                 if (summaryLabel) summaryLabel.textContent = lang === 'en' ? 'Career Summary' : 'תקציר הקריירה';
                 if (expLabel) expLabel.textContent = lang === 'en' ? 'Professional Experience' : 'ניסיון מקצועי';
                 if (skillsLabel) skillsLabel.textContent = lang === 'en' ? 'Skills' : 'מיומנויות';
+                if (milLabel) milLabel.textContent = lang === 'en' ? 'Military / National Service' : 'שירות צבאי / לאומי';
 
                 if (expOut) {
                     if (hasExp) paintExperienceJobs(expOut, expJobs);
@@ -4134,46 +4132,28 @@
 
                 if (langOut) {
                     langOut.replaceChildren();
+                    const langDir = lang === 'en' ? 'ltr' : 'rtl';
                     splitListItems(langVal).forEach((entry) => {
                         const parsed = parseLangEntry(entry);
-                        const line = document.createElement('p');
-                        line.className = 'cv-lang-line';
-                        line.textContent = parsed.levelLabel ? (parsed.name + ' - ' + parsed.levelLabel) : parsed.name;
-                        langOut.appendChild(line);
+                        const row = document.createElement('div');
+                        row.className = 'cv-lang-row';
+                        row.setAttribute('dir', langDir);
+                        const label = document.createElement('span');
+                        label.className = 'cv-lang-name';
+                        label.textContent = parsed.name;
+                        row.appendChild(label);
+                        if (parsed.levelLabel) {
+                            const level = document.createElement('span');
+                            level.className = 'cv-lang-level';
+                            level.textContent = parsed.levelLabel;
+                            row.appendChild(level);
+                        }
+                        langOut.appendChild(row);
                     });
                 }
                 showSec(langSec, !!langVal);
-
-                if (extrasOut) {
-                    extrasOut.replaceChildren();
-                    const mil = militaryFromState();
-                    const dummyOnly = !(mil.role || mil.years) && useDummyPreview();
-                    const row = (mil.role || mil.years) ? mil : (dummyOnly ? (function () {
-                        const raw = dummyValueFor('in-military');
-                        const blocks = typeof parseDatedBlocks === 'function' ? parseDatedBlocks(raw) : [];
-                        if (blocks[0]) {
-                            return {
-                                role: String(blocks[0].title || blocks[0].role || '').trim(),
-                                years: String(blocks[0].date || '').trim()
-                            };
-                        }
-                        return { role: '', years: '' };
-                    }()) : { role: '', years: '' });
-                    const bits = [row.role, row.years].filter(Boolean);
-                    if (bits.length) {
-                        const ul = document.createElement('ul');
-                        ul.className = 'cv-extra-list';
-                        bits.forEach((item) => {
-                            const li = document.createElement('li');
-                            li.textContent = item;
-                            ul.appendChild(li);
-                        });
-                        extrasOut.appendChild(ul);
-                    }
-                    showSec(extrasSec, bits.length > 0);
-                } else {
-                    showSec(extrasSec, false);
-                }
+                if (extrasOut) extrasOut.replaceChildren();
+                showSec(extrasSec, false);
                 renderReferences(false);
                 return;
             }

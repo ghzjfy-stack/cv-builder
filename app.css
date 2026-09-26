@@ -5412,12 +5412,43 @@
             display: flex !important;
             align-items: center;
             justify-content: center;
+            gap: 0.55rem;
             min-height: 3.6rem;
             font-size: 1.05rem;
             letter-spacing: 0.01em;
             box-shadow: 0 12px 28px rgba(16, 185, 129, 0.38);
             visibility: visible !important;
             opacity: 1 !important;
+        }
+        .is-pdf-loading,
+        button.is-pdf-loading,
+        #btn-download-cv-pdf.is-pdf-loading,
+        #btn-download-pdf.is-pdf-loading,
+        #btn-download-pdf-mobile.is-pdf-loading {
+            pointer-events: none !important;
+            cursor: wait !important;
+            opacity: 0.88 !important;
+        }
+        .qc-btn-spinner {
+            display: inline-block;
+            width: 1.05rem;
+            height: 1.05rem;
+            border-radius: 999px;
+            border: 2.5px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #fff;
+            animation: qc-btn-spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+        #btn-download-pdf.is-pdf-loading .qc-btn-spinner,
+        #btn-sample-pdf-download.is-pdf-loading .qc-btn-spinner {
+            border-color: rgba(15, 23, 42, 0.25);
+            border-top-color: #0f172a;
+        }
+        @keyframes qc-btn-spin {
+            to { transform: rotate(360deg); }
+        }
+        html.qc-pdf-busy {
+            cursor: progress;
         }
         /* Shared mobile-safe modal shell: fixed overlay, internal panel scroll */
         html.qc-modal-open,

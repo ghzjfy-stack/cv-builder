@@ -102,12 +102,17 @@ async function waitForCvFonts() {
 }
 
 function setSpinner(on) {
+  const busy = !!on;
+  window.__qcPdfBusy = busy;
+  document.documentElement.classList.toggle("qc-pdf-busy", busy);
+
   const el = document.getElementById("pdf-spinner");
-  if (!el) return;
-  el.classList.toggle("hidden", !on);
-  el.classList.toggle("flex", on);
+  if (el) {
+    el.classList.toggle("hidden", !busy);
+    el.classList.toggle("flex", busy);
+  }
   const lead = document.getElementById("pdf-spin-lead");
-  if (lead && on) {
+  if (lead && busy) {
     const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
     lead.textContent = mobile
       ? window.QCCvLang === "en"
@@ -117,6 +122,25 @@ function setSpinner(on) {
         ? "Your file will download in a moment"
         : "הקובץ יורד למחשב בעוד רגע";
   }
+
+  const label =
+    window.QCCvLang === "en" ? "Preparing PDF…" : "מכין PDF…";
+  const btnIds = ["btn-download-cv-pdf", "btn-download-pdf", "btn-download-pdf-mobile", "btn-sample-pdf-download"];
+  btnIds.forEach((id) => {
+    const btn = document.getElementById(id);
+    if (!(btn instanceof HTMLElement)) return;
+    btn.toggleAttribute("disabled", busy);
+    btn.setAttribute("aria-busy", busy ? "true" : "false");
+    btn.classList.toggle("is-pdf-loading", busy);
+    if (busy) {
+      if (!btn.dataset.pdfLabel) btn.dataset.pdfLabel = btn.innerHTML;
+      btn.innerHTML =
+        '<span class="qc-btn-spinner" aria-hidden="true"></span><span>' + label + "</span>";
+    } else if (btn.dataset.pdfLabel != null) {
+      btn.innerHTML = btn.dataset.pdfLabel;
+      delete btn.dataset.pdfLabel;
+    }
+  });
 }
 
 function flattenUnsupportedColors(root, view) {
@@ -557,14 +581,14 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
     first = false;
     const sliceMm = Math.min(usableH, sliceH / pxPerMm);
     pdf.addImage(
-      slice.toDataURL("image/jpeg", 0.98),
+      slice.toDataURL("image/jpeg", 0.995),
       "JPEG",
       marginMm,
       marginMm,
       usableW,
       sliceMm,
       undefined,
-      "MEDIUM",
+      "SLOW",
     );
     overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm, marginMm);
     y += sliceH;
@@ -607,10 +631,11 @@ async function captureToCanvas(el) {
     );
     // Prefer print-like DPI; keep mobile under memory limits.
     const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2.25 : 3);
+    // Floor scale for crisp text; true vector export would rewrite the pipeline.
     const scale = Math.min(Math.max(dpr, isMobileUa() ? 2 : 2.75), MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await html2canvas(el, {
-      scale: Math.max(2, scale),
+      scale: Math.max(isMobileUa() ? 2 : 2.5, scale),
       useCORS: true,
       allowTaint: false,
       backgroundColor: "#ffffff",
@@ -677,6 +702,9 @@ async function captureToCanvas(el) {
 export async function exportHighResPdf(opts = {}) {
   if (!isUnlocked()) {
     throw new Error("payment required");
+  }
+  if (window.__qcPdfBusy) {
+    return;
   }
   const download = opts.download !== false;
 

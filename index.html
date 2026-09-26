@@ -12,10 +12,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@300;400;500;600;700&family=David+Libre:wght@400;500;700&family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@300;400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" rel="stylesheet">
+    <!-- Critical UI + CV fonts only; display=swap + async stylesheet load -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Lato:wght@400;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Lato:wght@400;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Lato:wght@400;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=pdf-wysiwyg1">
+    <link rel="stylesheet" href="./app.css?v=pdf-busy1">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -1052,7 +1055,7 @@
                         <aside class="cv-sidebar">
                             <div class="cv-photo-block" aria-hidden="true">
                                 <div class="cv-photo">
-                                    <img id="out-photo" alt="" hidden>
+                                    <img id="out-photo" alt="" hidden decoding="async" loading="lazy">
                                     <svg id="out-photo-fallback" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
                                         <rect width="120" height="120" fill="#9a9a9a"/>
                                         <ellipse cx="60" cy="128" rx="46" ry="38" fill="#2f2f2f"/>
@@ -1219,7 +1222,7 @@
 
                 <div class="pay-bit-block">
                     <figure class="pay-qr-wrap">
-                        <img id="bit-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https%3A%2F%2Fwww.bitpay.co.il%2Fapp%2Fme%2FE4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F%3Fsum%3D10.00%26amount%3D10.00&amp;ecc=M" alt="קוד QR לתשלום 10 ₪ ב-Bit" width="168" height="168">
+                        <img id="bit-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;data=https%3A%2F%2Fwww.bitpay.co.il%2Fapp%2Fme%2FE4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F%3Fsum%3D10.00%26amount%3D10.00&amp;ecc=M" alt="קוד QR לתשלום 10 ₪ ב-Bit" width="168" height="168" loading="lazy" decoding="async">
                         <figcaption id="pay-qr-caption">Bit · 10 ₪</figcaption>
                     </figure>
                     <a id="btn-open-bit" href="https://www.bitpay.co.il/app/me/E4F7DC01-399F-3467-8DB6-0EC0B9DF1ACDF11F?sum=10.00&amp;amount=10.00" rel="noopener" class="pay-deeplink pay-deeplink-bit" hidden aria-hidden="true">שלמו 10 ₪ ב-Bit</a>
@@ -1317,7 +1320,7 @@
     <script src="lib/security/log.js"></script>
     <script src="lib/security/rateLimit.js"></script>
     <script src="lib/siteI18n.js?v=site-i18n1"></script>
-    <script src="lib/draft.js?v=mil1"></script>
+    <script src="lib/draft.js?v=autosave2"></script>
     <script src="lib/cvStrength.js"></script>
     <script src="lib/experienceEditor.js?v=exp-ui8"></script>
     <script src="lib/addJobBoot.js?v=exp-ui6"></script>
@@ -1935,13 +1938,28 @@
 
         function preloadCvFonts() {
             if (!document.fonts || !document.fonts.load) return;
-            CV_FONTS.forEach(function (font) {
+            // Eager-load only the default UI/CV faces; other option fonts load on select.
+            ['Rubik', 'Heebo'].forEach(function (name) {
                 ['400', '500', '700'].forEach(function (weight) {
-                    document.fonts.load(weight + " 16px '" + font.value + "'").catch(function () {});
+                    document.fonts.load(weight + " 16px '" + name + "'").catch(function () {});
                 });
             });
         }
         preloadCvFonts();
+
+        /** Lazy-decode / defer offscreen images without changing markup elsewhere. */
+        function optimizeMediaLoading() {
+            document.querySelectorAll('img:not([loading])').forEach(function (img) {
+                if (img.id === 'out-photo') return;
+                img.setAttribute('loading', 'lazy');
+                if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', optimizeMediaLoading);
+        } else {
+            optimizeMediaLoading();
+        }
 
         function patchSectionPlaceholders(lang) {
             const en = lang === 'en';

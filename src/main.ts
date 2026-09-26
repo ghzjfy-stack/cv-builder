@@ -1119,6 +1119,7 @@ function onOrderBumpChange() {
 }
 
 async function runHighResExport() {
+  if (window.__qcPdfBusy) return;
   const status = document.getElementById("download-status");
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {
@@ -1236,6 +1237,7 @@ function onDownloadPdfClick(e) {
 
 function downloadFormat(kind) {
   if (!assertCheckoutReady()) return;
+  if (kind === "pdf" && window.__qcPdfBusy) return;
   if (!isUnlocked()) {
     openCheckoutModal();
     setFeedback(qcT("needPayBeforeDl", "יש לאמת תשלום או קוד לפני ההורדה."), false);

@@ -353,11 +353,29 @@
 #cv-target:not(.cv-lang-en).layout-azure #cv-header,
 #cv-target-page2:not(.cv-lang-en).layout-azure #cv-header,
 #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure #cv-header {
-    direction: rtl;
-    text-align: right;
+    /* Keep the grid physical so the wide column stays on the right. */
+    direction: ltr;
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas:
         "contact name"
         "contact title";
+}
+#cv-target:not(.cv-lang-en).layout-azure #out-name,
+#cv-target:not(.cv-lang-en).layout-azure #out-title,
+#cv-target-page2:not(.cv-lang-en).layout-azure #out-name,
+#cv-target-page2:not(.cv-lang-en).layout-azure #out-title,
+#qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure #out-name,
+#qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure #out-title {
+    direction: rtl;
+    text-align: right;
+}
+#cv-target:not(.cv-lang-en).layout-azure .cv-contact-header,
+#cv-target-page2:not(.cv-lang-en).layout-azure .cv-contact-header,
+#qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure .cv-contact-header {
+    direction: rtl;
+    text-align: right;
+    justify-self: start;
+    align-items: flex-start;
 }
 #cv-target.cv-lang-en.layout-azure #cv-header,
 #cv-target-page2.cv-lang-en.layout-azure #cv-header,

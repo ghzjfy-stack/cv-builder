@@ -430,9 +430,15 @@ export function CvEntryItem({
         <p className="cv-job-role text-sm text-slate-600 mt-0.5">{subtitle}</p>
       ) : null}
       {descriptions?.length > 0 ? (
-        <ul className={`${listClassName} mt-2 text-sm text-slate-700`}>
+        <ul
+          className={`${listClassName} mt-2 text-sm text-slate-700`}
+          dir={typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'ltr' : 'rtl'}
+        >
           {descriptions.map((desc, dIdx) => (
-            <li key={dIdx}>
+            <li
+              key={dIdx}
+              dir={typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'ltr' : 'rtl'}
+            >
               <span className="cv-li-mark" aria-hidden="true" />
               <span className="cv-li-text">{String(desc || '').replace(/^[•\-*\u2022·]+\s*/, '').trim()}</span>
             </li>

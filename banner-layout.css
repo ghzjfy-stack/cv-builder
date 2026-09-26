@@ -88,6 +88,7 @@
 #cv-target.cv-lang-en.layout-banner,
 #cv-target-page2.cv-lang-en.layout-banner,
 #qc-print-host .cv-print-sheet.cv-lang-en.layout-banner {
+    grid-template-columns: minmax(0, 0.68fr) minmax(0, 0.32fr);
     grid-template-areas:
         "header header"
         "main side";

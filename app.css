@@ -2301,9 +2301,8 @@
             box-sizing: border-box;
         }
         /*
-          PDF-safe bullets: physical right/left (not flex + direction).
-          html2canvas forces document LTR during capture, which made flex markers
-          jump to the left outside the job body.
+          Inline "• text" bullets (no absolute/flex markers).
+          Absolute marks drifted up / left under html2canvas PDF capture.
         */
         #cv-target .cv-job-list li,
         #cv-target .cv-edu-list li,
@@ -2314,18 +2313,14 @@
         #qc-print-host .cv-job-list li,
         #qc-print-host .cv-edu-list li,
         #qc-print-host .cv-military-list li {
-            position: relative;
+            position: static;
             display: block;
             margin: 0 0 0.28rem;
             padding: 0;
-            padding-right: 0.95rem;
-            padding-left: 0;
             line-height: 1.45;
             list-style: none;
             max-width: 100%;
             box-sizing: border-box;
-            direction: rtl;
-            text-align: right;
         }
         #cv-target .cv-job-list li::before,
         #cv-target .cv-edu-list li::before,
@@ -2335,115 +2330,72 @@
         #cv-target-page2 .cv-military-list li::before,
         #qc-print-host .cv-job-list li::before,
         #qc-print-host .cv-edu-list li::before,
-        #qc-print-host .cv-military-list li::before {
-            content: none;
-            display: none;
-        }
+        #qc-print-host .cv-military-list li::before,
         #cv-target .cv-li-mark,
         #cv-target-page2 .cv-li-mark,
         #qc-print-host .cv-li-mark {
-            position: absolute;
-            top: 0.48em;
-            right: 0.05rem;
-            left: auto;
-            width: 0.3em;
-            height: 0.3em;
-            border-radius: 2px;
-            background: currentColor;
-            opacity: 0.8;
-            pointer-events: none;
-            display: block;
+            content: none !important;
+            display: none !important;
         }
-        #cv-target .cv-li-text,
-        #cv-target-page2 .cv-li-text,
-        #qc-print-host .cv-li-text {
-            display: block;
-            min-width: 0;
-            max-width: 100%;
-            overflow-wrap: break-word;
-            word-break: normal;
-        }
-        /* Hebrew / RTL: marker on the right, text indented from the right */
         #cv-target:not(.cv-lang-en) .cv-job-list,
         #cv-target:not(.cv-lang-en) .cv-edu-list,
         #cv-target:not(.cv-lang-en) .cv-military-list,
-        #cv-target-page2:not(.cv-lang-en) .cv-job-list,
-        #cv-target-page2:not(.cv-lang-en) .cv-edu-list,
-        #cv-target-page2:not(.cv-lang-en) .cv-military-list,
-        #qc-print-host[dir="rtl"] .cv-job-list,
-        #qc-print-host[dir="rtl"] .cv-edu-list,
-        #qc-print-host[dir="rtl"] .cv-military-list,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-edu-list,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-military-list {
-            direction: rtl !important;
-            text-align: right !important;
-            unicode-bidi: isolate;
-        }
         #cv-target:not(.cv-lang-en) .cv-job-list li,
         #cv-target:not(.cv-lang-en) .cv-edu-list li,
         #cv-target:not(.cv-lang-en) .cv-military-list li,
+        #cv-target-page2:not(.cv-lang-en) .cv-job-list,
+        #cv-target-page2:not(.cv-lang-en) .cv-edu-list,
+        #cv-target-page2:not(.cv-lang-en) .cv-military-list,
         #cv-target-page2:not(.cv-lang-en) .cv-job-list li,
         #cv-target-page2:not(.cv-lang-en) .cv-edu-list li,
         #cv-target-page2:not(.cv-lang-en) .cv-military-list li,
+        #qc-print-host[dir="rtl"] .cv-job-list,
+        #qc-print-host[dir="rtl"] .cv-edu-list,
+        #qc-print-host[dir="rtl"] .cv-military-list,
         #qc-print-host[dir="rtl"] .cv-job-list li,
         #qc-print-host[dir="rtl"] .cv-edu-list li,
         #qc-print-host[dir="rtl"] .cv-military-list li,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-edu-list,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-military-list,
         #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list li,
         #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-edu-list li,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-military-list li {
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-military-list li,
+        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list,
+        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list li {
             direction: rtl !important;
             text-align: right !important;
-            padding-right: 0.95rem !important;
-            padding-left: 0 !important;
+            unicode-bidi: isolate;
         }
-        #cv-target:not(.cv-lang-en) .cv-li-mark,
-        #cv-target-page2:not(.cv-lang-en) .cv-li-mark,
-        #qc-print-host[dir="rtl"] .cv-li-mark,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-li-mark {
-            right: 0.05rem;
-            left: auto;
-        }
-        /* English / LTR */
         #cv-target.cv-lang-en .cv-job-list,
         #cv-target.cv-lang-en .cv-edu-list,
         #cv-target.cv-lang-en .cv-military-list,
-        #cv-target-page2.cv-lang-en .cv-job-list,
-        #cv-target-page2.cv-lang-en .cv-edu-list,
-        #cv-target-page2.cv-lang-en .cv-military-list,
-        #qc-print-host[dir="ltr"] .cv-job-list,
-        #qc-print-host[dir="ltr"] .cv-edu-list,
-        #qc-print-host[dir="ltr"] .cv-military-list,
-        #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list,
-        #qc-print-host .cv-print-sheet.cv-lang-en .cv-edu-list,
-        #qc-print-host .cv-print-sheet.cv-lang-en .cv-military-list {
-            direction: ltr !important;
-            text-align: left !important;
-            unicode-bidi: isolate;
-        }
         #cv-target.cv-lang-en .cv-job-list li,
         #cv-target.cv-lang-en .cv-edu-list li,
         #cv-target.cv-lang-en .cv-military-list li,
+        #cv-target-page2.cv-lang-en .cv-job-list,
+        #cv-target-page2.cv-lang-en .cv-edu-list,
+        #cv-target-page2.cv-lang-en .cv-military-list,
         #cv-target-page2.cv-lang-en .cv-job-list li,
         #cv-target-page2.cv-lang-en .cv-edu-list li,
         #cv-target-page2.cv-lang-en .cv-military-list li,
+        #qc-print-host[dir="ltr"] .cv-job-list,
+        #qc-print-host[dir="ltr"] .cv-edu-list,
+        #qc-print-host[dir="ltr"] .cv-military-list,
         #qc-print-host[dir="ltr"] .cv-job-list li,
         #qc-print-host[dir="ltr"] .cv-edu-list li,
         #qc-print-host[dir="ltr"] .cv-military-list li,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-edu-list,
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-military-list,
         #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list li,
         #qc-print-host .cv-print-sheet.cv-lang-en .cv-edu-list li,
-        #qc-print-host .cv-print-sheet.cv-lang-en .cv-military-list li {
+        #qc-print-host .cv-print-sheet.cv-lang-en .cv-military-list li,
+        html.qc-exporting #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list,
+        html.qc-exporting #qc-print-host .cv-print-sheet.cv-lang-en .cv-job-list li {
             direction: ltr !important;
             text-align: left !important;
-            padding-left: 0.95rem !important;
-            padding-right: 0 !important;
-        }
-        #cv-target.cv-lang-en .cv-li-mark,
-        #cv-target-page2.cv-lang-en .cv-li-mark,
-        #qc-print-host[dir="ltr"] .cv-li-mark,
-        #qc-print-host .cv-print-sheet.cv-lang-en .cv-li-mark {
-            left: 0.05rem;
-            right: auto;
+            unicode-bidi: isolate;
         }
         #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure),
         #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) {
@@ -3499,36 +3451,13 @@
         .layout-charcoal .cv-job-list li {
             margin-bottom: 0.22rem;
             line-height: 1.45;
+            position: static;
+            padding: 0;
         }
-        .layout-charcoal .cv-job-list .cv-li-mark {
-            width: 0.3em;
-            height: 0.3em;
-            margin-top: 0;
-            background: #2f2f2f;
-            opacity: 0.8;
-            border-radius: 2px;
-        }
+        .layout-charcoal .cv-job-list .cv-li-mark,
         .layout-charcoal .cv-job-list li::before {
-            content: none;
-            display: none;
-        }
-        /* Keep charcoal Hebrew bullets pinned to the physical right in PDF capture too */
-        #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-list .cv-li-mark,
-        #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-job-list .cv-li-mark,
-        #qc-print-host[dir="rtl"] .layout-charcoal .cv-job-list .cv-li-mark,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal .cv-job-list .cv-li-mark,
-        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list .cv-li-mark {
-            right: 0.05rem !important;
-            left: auto !important;
-        }
-        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list,
-        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list li {
-            direction: rtl !important;
-            text-align: right !important;
-        }
-        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en) .cv-job-list li {
-            padding-right: 0.95rem !important;
-            padding-left: 0 !important;
+            content: none !important;
+            display: none !important;
         }
         #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-body,
         #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-list,

@@ -434,15 +434,18 @@ export function CvEntryItem({
           className={`${listClassName} mt-2 text-sm text-slate-700`}
           dir={typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'ltr' : 'rtl'}
         >
-          {descriptions.map((desc, dIdx) => (
-            <li
-              key={dIdx}
-              dir={typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'ltr' : 'rtl'}
-            >
-              <span className="cv-li-mark" aria-hidden="true" />
-              <span className="cv-li-text">{String(desc || '').replace(/^[•\-*\u2022·]+\s*/, '').trim()}</span>
-            </li>
-          ))}
+          {descriptions.map((desc, dIdx) => {
+            const clean = String(desc || '').replace(/^[•\-*\u2022·]+\s*/, '').trim();
+            if (!clean) return null;
+            return (
+              <li
+                key={dIdx}
+                dir={typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'ltr' : 'rtl'}
+              >
+                {'\u2022\u00A0' + clean}
+              </li>
+            );
+          })}
         </ul>
       ) : null}
     </div>

@@ -158,8 +158,8 @@
                 </button>
                 <div class="home-nav-actions shrink-0">
                     <div class="lang-switch shrink-0" id="home-lang-switch" role="group" aria-label="שפת האתר">
-                        <button type="button" id="home-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
-                        <button type="button" id="home-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
+                        <button type="button" id="home-lang-he" data-lang="he" onclick="requestCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
+                        <button type="button" id="home-lang-en" data-lang="en" onclick="requestCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
                     </div>
                     <button type="button" class="home-link hidden sm:inline-flex js-nav-examples" onclick="openExamplesModal()">דוגמאות</button>
                     <button type="button" class="home-nav-cta shrink-0" onclick="showStudio()">
@@ -525,8 +525,8 @@
                 </button>
                 <div class="home-nav-actions shrink-0">
                     <div class="lang-switch shrink-0" role="group" aria-label="שפת האתר">
-                        <button type="button" id="seo-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
-                        <button type="button" id="seo-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
+                        <button type="button" id="seo-lang-he" data-lang="he" onclick="requestCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
+                        <button type="button" id="seo-lang-en" data-lang="en" onclick="requestCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
                     </div>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/tech" data-seo-landing data-i18n-footer-cat="tech">הייטק</a>
                     <a class="home-link hidden sm:inline-flex" href="/cv-templates/sales" data-seo-landing data-i18n-footer-cat="sales">מכירות</a>
@@ -609,8 +609,8 @@
 
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 min-w-0">
                 <div class="lang-switch shrink-0" role="group" aria-label="שפת קורות החיים">
-                    <button type="button" id="cv-lang-he" data-lang="he" onclick="setCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
-                    <button type="button" id="cv-lang-en" data-lang="en" onclick="setCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
+                    <button type="button" id="cv-lang-he" data-lang="he" onclick="requestCvLang('he')" class="lang-chip" aria-pressed="true"><span class="lang-chip-full">עברית</span><span class="lang-chip-short" aria-hidden="true">עב</span></button>
+                    <button type="button" id="cv-lang-en" data-lang="en" onclick="requestCvLang('en')" class="lang-chip" aria-pressed="false"><span class="lang-chip-full">English</span><span class="lang-chip-short" aria-hidden="true">EN</span></button>
                 </div>
                 <button type="button" onclick="openExamplesModal()" class="hidden sm:inline-flex text-xs font-semibold border border-slate-700 hover:border-slate-500 bg-slate-900 px-3 py-2 rounded-xl min-h-11 js-nav-examples">
                     דוגמאות
@@ -874,8 +874,8 @@
                 <div>
                     <p class="block text-xs text-slate-300 mb-2" id="cv-lang-legend">שפת קורות החיים</p>
                     <div class="flex flex-wrap gap-2" role="group" aria-labelledby="cv-lang-legend">
-                        <button type="button" id="design-lang-he" class="lang-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-lang="he" aria-pressed="true" onclick="setCvLang('he')">עברית – יישור לימין</button>
-                        <button type="button" id="design-lang-en" class="lang-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-lang="en" aria-pressed="false" onclick="setCvLang('en')">אנגלית – יישור לשמאל</button>
+                        <button type="button" id="design-lang-he" class="lang-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-lang="he" aria-pressed="true" onclick="requestCvLang('he')">עברית – יישור לימין</button>
+                        <button type="button" id="design-lang-en" class="lang-chip min-h-11 px-3 rounded-xl border border-slate-600 text-xs font-semibold" data-lang="en" aria-pressed="false" onclick="requestCvLang('en')">אנגלית – יישור לשמאל</button>
                     </div>
                     <p class="text-[11px] text-slate-400 mt-2" id="design-lang-hint">הכותרות, היישור והדוגמאות מתעדכנים לפי השפה. טקסט שערכתם נשמר.</p>
                 </div>
@@ -1556,6 +1556,8 @@
                 quickDesign: 'עיצוב וצבעים 🎨',
                 clearForm: 'נקה טופס',
                 clearFormConfirm: 'למחוק את כל השדות ולשחזר טופס ריק?',
+                langSwitchToEnConfirm: 'מעבר לשפה האנגלית ינקה את הטופס הנוכחי. מאשר?',
+                langSwitchToHeConfirm: 'מעבר לשפה העברית ינקה את הטופס הנוכחי. מאשר?',
                 photoChoose: 'בחירת קובץ',
                 photoNone: 'לא נבחר קובץ',
                 downloadPdfCta: 'הורד PDF ב-',
@@ -1678,6 +1680,8 @@
                 quickDesign: 'Design & colors 🎨',
                 clearForm: 'Clear form',
                 clearFormConfirm: 'Clear all fields and start with an empty form?',
+                langSwitchToEnConfirm: 'Switching to English will clear the current form. Continue?',
+                langSwitchToHeConfirm: 'Switching to Hebrew will clear the current form. Continue?',
                 photoChoose: 'Choose file',
                 photoNone: 'No file chosen',
                 downloadPdfCta: 'Download PDF · ',
@@ -2550,6 +2554,25 @@
                 return QCPhrases.forLang(window.QCCvLang) || {};
             }
             return window.QCPhrases || {};
+        }
+
+        function requestCvLang(lang) {
+            const next = lang === 'en' ? 'en' : 'he';
+            const prev = window.QCCvLang === 'en' ? 'en' : 'he';
+            if (next === prev) return;
+            const pack = CV_I18N[prev] || CV_I18N.he || {};
+            const msg = next === 'en'
+                ? (pack.langSwitchToEnConfirm || (prev === 'en'
+                    ? 'Switching to English will clear the current form. Continue?'
+                    : 'מעבר לשפה האנגלית ינקה את הטופס הנוכחי. מאשר?'))
+                : (pack.langSwitchToHeConfirm || (prev === 'en'
+                    ? 'Switching to Hebrew will clear the current form. Continue?'
+                    : 'מעבר לשפה העברית ינקה את הטופס הנוכחי. מאשר?'));
+            if (!window.confirm(msg)) return;
+            // Clear current inputs, then switch UI/placeholders to the new language.
+            // Keep QCDraft save path intact via resetForm + setCvLang.
+            resetForm();
+            setCvLang(next);
         }
 
         function setCvLang(lang, opts) {
@@ -5864,6 +5887,7 @@
         window.setCvSkin = setCvSkin;
         window.setCvFont = setCvFont;
         window.setCvLang = setCvLang;
+        window.requestCvLang = requestCvLang;
         window.loadExample = loadExample;
         window.lockQcModalScroll = lockQcModalScroll;
         window.unlockQcModalScroll = unlockQcModalScroll;

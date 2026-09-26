@@ -356,9 +356,11 @@
         #cv-preview-wrapper:has(.layout-charcoal),
         #cv-preview-wrapper:has(.layout-navy),
         #cv-preview-wrapper:has(.layout-azure),
+        #cv-preview-wrapper:has(.layout-banner),
         #cv-preview-page-2:has(.layout-charcoal),
         #cv-preview-page-2:has(.layout-navy),
-        #cv-preview-page-2:has(.layout-azure) {
+        #cv-preview-page-2:has(.layout-azure),
+        #cv-preview-page-2:has(.layout-banner) {
             padding: 0 !important;
         }
         #cv-preview-wrapper #cv-target,
@@ -1751,9 +1753,9 @@
         .dynamic-icon { color: var(--accent); }
 
         /* Candidate name stays classic dark ink — accent is for headers, rules, icons, skills. */
-        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
-        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
-        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
+        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-banner) #out-name,
+        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-banner) #out-name,
+        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-banner) #out-name,
         #cl-target #cl-out-name {
             color: #1e293b;
         }
@@ -1903,18 +1905,18 @@
         #qc-print-host .whitespace-pre-line {
             line-height: var(--line-height, var(--cv-leading));
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > .cv-columns,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > .cv-columns {
             padding-inline: 1.35rem;
             box-sizing: border-box;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header {
             padding-top: 1.15rem;
         }
         #cv-target .cv-job,
@@ -2397,13 +2399,13 @@
             text-align: left !important;
             unicode-bidi: isolate;
         }
-        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure),
-        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) {
+        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner),
+        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) {
             display: flex;
             flex-direction: column;
         }
-        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) .cv-columns,
-        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) .cv-columns {
+        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) .cv-columns,
+        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) .cv-columns {
             flex: 1 1 auto;
             min-height: 0;
             align-items: stretch;

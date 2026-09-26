@@ -198,7 +198,8 @@ function isSidebarLayout(el) {
     el.classList.contains("layout-split") ||
     el.classList.contains("layout-charcoal") ||
     el.classList.contains("layout-navy") ||
-    el.classList.contains("layout-azure")
+    el.classList.contains("layout-azure") ||
+    el.classList.contains("layout-banner")
   );
 }
 
@@ -206,7 +207,8 @@ function isFullBleedLayout(el) {
   return (
     el.classList.contains("layout-charcoal") ||
     el.classList.contains("layout-navy") ||
-    el.classList.contains("layout-azure")
+    el.classList.contains("layout-azure") ||
+    el.classList.contains("layout-banner")
   );
 }
 

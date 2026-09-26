@@ -18,7 +18,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Lato:wght@400;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=bullets-rtl2">
+    <link rel="stylesheet" href="./app.css?v=bullets-flex3">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -4012,7 +4012,13 @@
                 ul.className = 'cv-job-list';
                 lines.forEach((b) => {
                     const li = document.createElement('li');
-                    li.textContent = b;
+                    const mark = document.createElement('span');
+                    mark.className = 'cv-li-mark';
+                    mark.setAttribute('aria-hidden', 'true');
+                    const text = document.createElement('span');
+                    text.className = 'cv-li-text';
+                    text.textContent = String(b || '').replace(/^[•\-*\u2022·]+\s*/, '').trim();
+                    li.append(mark, text);
                     ul.appendChild(li);
                 });
                 body.appendChild(ul);

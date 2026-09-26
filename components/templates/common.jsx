@@ -432,7 +432,10 @@ export function CvEntryItem({
       {descriptions?.length > 0 ? (
         <ul className={`${listClassName} mt-2 text-sm text-slate-700`}>
           {descriptions.map((desc, dIdx) => (
-            <li key={dIdx}>{desc}</li>
+            <li key={dIdx}>
+              <span className="cv-li-mark" aria-hidden="true" />
+              <span className="cv-li-text">{String(desc || '').replace(/^[•\-*\u2022·]+\s*/, '').trim()}</span>
+            </li>
           ))}
         </ul>
       ) : null}

@@ -2294,12 +2294,12 @@
         #qc-print-host .cv-military-list {
             display: block;
             list-style: none;
-            margin: 0.1rem 0 0;
+            margin: 0.15rem 0 0;
             padding: 0;
             line-height: 1.45;
         }
-        /* Custom bullets: inline-start = right in Hebrew RTL, left in English LTR.
-           Native disc markers break under charcoal LTR grids / html2canvas PDF. */
+        /* Grid bullets: marker sits in a fixed start column (right in RTL / left in LTR)
+           so dots align under titles instead of hanging in the margin. */
         #cv-target .cv-job-list li,
         #cv-target .cv-edu-list li,
         #cv-target .cv-military-list li,
@@ -2310,9 +2310,13 @@
         #qc-print-host .cv-edu-list li,
         #qc-print-host .cv-military-list li {
             position: relative;
-            display: block;
-            margin: 0 0 0.25rem;
-            padding-inline-start: 1.1rem;
+            display: grid;
+            grid-template-columns: 0.7rem minmax(0, 1fr);
+            column-gap: 0.35rem;
+            align-items: start;
+            margin: 0 0 0.28rem;
+            padding: 0;
+            padding-inline-start: 0;
             line-height: 1.45;
             list-style: none;
         }
@@ -2326,15 +2330,17 @@
         #qc-print-host .cv-edu-list li::before,
         #qc-print-host .cv-military-list li::before {
             content: "";
-            position: absolute;
-            inset-inline-start: 0.12rem;
-            top: 0.48em;
+            position: static;
+            inset: auto;
             width: 0.28em;
             height: 0.28em;
+            margin-top: 0.5em;
             border-radius: 50%;
             background: currentColor;
-            opacity: 0.85;
+            opacity: 0.8;
             pointer-events: none;
+            justify-self: center;
+            flex-shrink: 0;
         }
         #cv-target:not(.cv-lang-en) .cv-job-list,
         #cv-target:not(.cv-lang-en) .cv-edu-list,
@@ -3376,19 +3382,21 @@
             justify-self: center;
         }
         .layout-charcoal .cv-job-body {
-            padding-inline-start: 0.55rem;
+            padding-inline-start: 0.15rem;
+            padding-inline-end: 0;
             direction: rtl;
             text-align: right;
             display: flex;
             flex-direction: column;
             gap: 0.2rem;
+            min-width: 0;
         }
         .layout-charcoal .cv-job-head {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             gap: 0.12rem;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.15rem;
         }
         .layout-charcoal .cv-job-title {
             font-weight: 700;
@@ -3405,11 +3413,25 @@
             line-height: 1.4;
         }
         .layout-charcoal .cv-job-list {
-            margin: 0.15rem 0 0;
+            margin: 0.12rem 0 0;
             padding: 0;
             list-style: none;
+            width: 100%;
         }
-        .layout-charcoal .cv-job-list li { margin-bottom: 0.18rem; line-height: 1.45; }
+        .layout-charcoal .cv-job-list li {
+            margin-bottom: 0.2rem;
+            line-height: 1.45;
+            grid-template-columns: 0.65rem minmax(0, 1fr);
+            column-gap: 0.3rem;
+        }
+        .layout-charcoal .cv-job-list li::before {
+            width: 0.26em;
+            height: 0.26em;
+            margin-top: 0.48em;
+            background: #2f2f2f;
+            opacity: 0.75;
+            border-radius: 2px;
+        }
         #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-body,
         #cv-target:not(.cv-lang-en).layout-charcoal .cv-job-list,
         #cv-target-page2:not(.cv-lang-en).layout-charcoal .cv-job-body,

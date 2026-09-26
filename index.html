@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Lato:wght@400;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Lato:wght@400;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
+    <link rel="stylesheet" href="./banner-layout.css?v=poster1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
     <link rel="stylesheet" href="./app.css?v=bullets-inline5">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
@@ -986,7 +987,7 @@
             <div id="cv-preview-wrapper" class="relative overflow-hidden p-4 md:p-5 rounded-2xl shadow-2xl border border-slate-700 text-slate-800 transition-all bg-preview-white" dir="rtl">
                 <div id="cv-watermark" class="cv-watermark no-print" aria-hidden="true"><span id="cv-watermark-text">תצוגה מקדימה - QUICKCV</span></div>
                 <div id="cv-shield" class="cv-shield no-print" aria-hidden="true"><div id="cv-shield-grid"></div></div>
-                <div id="cv-target" class="layout-classic spacing-normal bg-preview-white" dir="rtl">
+                <div id="cv-target" class="layout-banner skin-lagoon spacing-normal bg-preview-white" dir="rtl">
                     <div id="cv-header" class="border-b-2 dynamic-border pb-4 mb-5">
                         <h1 id="out-name" class="text-3xl font-bold">ישראל ישראלי</h1>
                         <p id="out-title" class="text-sm font-semibold text-slate-600 mt-1">מנהל פרויקטים</p>
@@ -1098,10 +1099,6 @@
                             <div id="sec-languages">
                                 <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="languages">שפות</h3>
                                 <div id="out-languages" class="text-slate-700"></div>
-                            </div>
-                            <div id="sec-extras-side">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">פרטים נוספים</h3>
-                                <div id="out-extras-side"></div>
                             </div>
                             </div>
                         </aside>
@@ -1456,14 +1453,15 @@
             spacious: { scale: 105, leading: 176 }
         };
         window.QCCvDensity = 'regular';
-        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'blush', 'mint', 'terracotta', 'cream', 'midnight', 'emerald'];
+        const CV_SKINS = ['espresso', 'sage', 'slate', 'wine', 'forest', 'midnight', 'emerald', 'lagoon', 'plum', 'noir', 'coral', 'indigo'];
         const BG_CLASSES = [
             'bg-preview-white', 'bg-preview-slate', 'bg-preview-cream', 'bg-preview-linen',
             'bg-preview-mint', 'bg-preview-blush', 'bg-preview-pearl', 'bg-preview-dots',
             'bg-preview-grid', 'bg-preview-lines', 'bg-preview-stone', 'bg-preview-navy',
             'bg-preview-sage'
         ];
-        const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal', 'azure', 'navy'];
+        const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal', 'azure', 'navy', 'banner'];
+        const RETIRED_LAYOUTS = { azure: 'banner', classic: 'banner', minimal: 'banner', modern: 'banner', executive: 'navy', compact: 'navy' };
         const CV_FONT_ALIASES = {
             'Frank Ruhl Hofshi': 'Frank Ruhl Libre',
             'Frank Ruhl': 'Frank Ruhl Libre',
@@ -1477,7 +1475,23 @@
             { value: 'Frank Ruhl Libre', fallback: 'serif', he: 'פרנק רול — קלאסי ומכובד', en: 'Frank Ruhl — classic and distinguished' }
         ];
 
-        const TEMPLATE_ALIASES = { sales: 'sage', tech: 'slate', marketing: 'wine' };
+        const TEMPLATE_ALIASES = {
+            sales: 'sage',
+            tech: 'indigo',
+            marketing: 'wine',
+            midnight: 'navy',
+            charcoal: 'sage',
+            espresso: 'wine',
+            slate: 'indigo',
+            forest: 'sage',
+            azure: 'lagoon',
+            mint: 'lagoon',
+            blush: 'plum',
+            terracotta: 'coral',
+            cream: 'lagoon',
+            europass: 'lagoon',
+            clinic: 'sage'
+        };
         window.TEMPLATE_ALIASES = TEMPLATE_ALIASES;
 
         const CV_SAMPLE_IDS = ['in-name', 'in-title', 'in-phone', 'in-email', 'in-location', 'in-linkedin', 'in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-languages'];
@@ -2674,14 +2688,24 @@
 
         function setLayout(layout, btn, opts) {
             const target = document.getElementById('cv-target');
+            let next = layout;
+            let keepSkin = !!(opts && opts.keepSkin);
+            if (RETIRED_LAYOUTS[next]) {
+                next = RETIRED_LAYOUTS[next];
+                keepSkin = false;
+            }
+            if (LAYOUTS.indexOf(next) < 0) {
+                next = 'banner';
+                keepSkin = false;
+            }
             LAYOUTS.forEach((name) => target.classList.remove('layout-' + name));
-            target.classList.add('layout-' + layout);
-            if (!(opts && opts.keepSkin)) setCvSkin('');
+            target.classList.add('layout-' + next);
+            if (!keepSkin) setCvSkin('');
             const header = document.getElementById('cv-header');
-            if (layout === 'minimal' || layout === 'compact') header.className = 'border-b dynamic-border pb-3 mb-6';
-            else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal' || layout === 'navy' || layout === 'azure') header.className = 'pb-4 mb-5';
+            if (next === 'minimal' || next === 'compact') header.className = 'border-b dynamic-border pb-3 mb-6';
+            else if (next === 'executive' || next === 'modern' || next === 'charcoal' || next === 'navy' || next === 'azure' || next === 'banner') header.className = 'pb-4 mb-5';
             else header.className = 'border-b-2 dynamic-border pb-4 mb-5';
-            window.QCLayout = layout;
+            window.QCLayout = next;
             applyCvI18n(window.QCCvLang === 'en' ? 'en' : 'he');
             updateCV();
         }
@@ -2874,6 +2898,10 @@
 
         function isAzureLayout() {
             return currentLayoutName() === 'azure';
+        }
+
+        function isBannerLayout() {
+            return currentLayoutName() === 'banner';
         }
 
         function parseDatedBlocks(text) {
@@ -4056,6 +4084,7 @@
             const charcoal = isCharcoalLayout();
             const navy = isNavyLayout();
             const azure = isAzureLayout();
+            const banner = isBannerLayout();
             const milVal = readMilitaryText();
             const extrasOut = cvOut('out-extras-side');
             const extrasSec = document.getElementById('sec-extras-side');
@@ -4077,6 +4106,49 @@
 
             function showSec(sec, on) {
                 if (sec) sec.style.display = on ? 'block' : 'none';
+            }
+
+            if (banner) {
+                if (expOut) {
+                    if (hasExp) paintExperienceJobs(expOut, expJobs);
+                    else paintPreviewSkeleton(expOut, 'job');
+                }
+                if (eduOut) paintEducationItems(eduOut, eduVal);
+                if (eduSide) eduSide.replaceChildren();
+                showSec(expSec, true);
+                markSecSkel(expSec, !hasExp);
+                showSec(eduSec, true);
+                markSecSkel(eduSec, !eduVal);
+                showSec(eduSideSec, false);
+                markSecSkel(eduSideSec, false);
+                if (skillOut) paintSkillBadges(skillOut, skillVal);
+                showSec(skillSec, !!skillVal);
+                if (langOut) {
+                    langOut.replaceChildren();
+                    const langDir = (window.QCCvLang || 'he') === 'en' ? 'ltr' : 'rtl';
+                    splitListItems(langVal).forEach((entry) => {
+                        const parsed = parseLangEntry(entry);
+                        const row = document.createElement('div');
+                        row.className = 'cv-lang-row';
+                        row.setAttribute('dir', langDir);
+                        const label = document.createElement('span');
+                        label.className = 'cv-lang-name';
+                        label.textContent = parsed.name;
+                        row.appendChild(label);
+                        if (parsed.levelLabel) {
+                            const level = document.createElement('span');
+                            level.className = 'cv-lang-level';
+                            level.textContent = parsed.levelLabel;
+                            row.appendChild(level);
+                        }
+                        langOut.appendChild(row);
+                    });
+                }
+                showSec(langSec, !!langVal);
+                if (extrasOut) extrasOut.replaceChildren();
+                showSec(extrasSec, false);
+                renderReferences(false);
+                return;
             }
 
             if (!charcoal && !navy && !azure) {
@@ -4109,9 +4181,11 @@
                 const summaryLabel = document.querySelector('#cv-target [data-i18n="summary"]');
                 const expLabel = document.querySelector('#cv-target [data-i18n="experience"]');
                 const skillsLabel = document.querySelector('#cv-target [data-i18n="skills"]');
+                const milLabel = document.querySelector('#cv-target [data-i18n="military"]');
                 if (summaryLabel) summaryLabel.textContent = lang === 'en' ? 'Career Summary' : 'תקציר הקריירה';
                 if (expLabel) expLabel.textContent = lang === 'en' ? 'Professional Experience' : 'ניסיון מקצועי';
                 if (skillsLabel) skillsLabel.textContent = lang === 'en' ? 'Skills' : 'מיומנויות';
+                if (milLabel) milLabel.textContent = lang === 'en' ? 'Military / National Service' : 'שירות צבאי / לאומי';
 
                 if (expOut) {
                     if (hasExp) paintExperienceJobs(expOut, expJobs);
@@ -4134,46 +4208,28 @@
 
                 if (langOut) {
                     langOut.replaceChildren();
+                    const langDir = lang === 'en' ? 'ltr' : 'rtl';
                     splitListItems(langVal).forEach((entry) => {
                         const parsed = parseLangEntry(entry);
-                        const line = document.createElement('p');
-                        line.className = 'cv-lang-line';
-                        line.textContent = parsed.levelLabel ? (parsed.name + ' - ' + parsed.levelLabel) : parsed.name;
-                        langOut.appendChild(line);
+                        const row = document.createElement('div');
+                        row.className = 'cv-lang-row';
+                        row.setAttribute('dir', langDir);
+                        const label = document.createElement('span');
+                        label.className = 'cv-lang-name';
+                        label.textContent = parsed.name;
+                        row.appendChild(label);
+                        if (parsed.levelLabel) {
+                            const level = document.createElement('span');
+                            level.className = 'cv-lang-level';
+                            level.textContent = parsed.levelLabel;
+                            row.appendChild(level);
+                        }
+                        langOut.appendChild(row);
                     });
                 }
                 showSec(langSec, !!langVal);
-
-                if (extrasOut) {
-                    extrasOut.replaceChildren();
-                    const mil = militaryFromState();
-                    const dummyOnly = !(mil.role || mil.years) && useDummyPreview();
-                    const row = (mil.role || mil.years) ? mil : (dummyOnly ? (function () {
-                        const raw = dummyValueFor('in-military');
-                        const blocks = typeof parseDatedBlocks === 'function' ? parseDatedBlocks(raw) : [];
-                        if (blocks[0]) {
-                            return {
-                                role: String(blocks[0].title || blocks[0].role || '').trim(),
-                                years: String(blocks[0].date || '').trim()
-                            };
-                        }
-                        return { role: '', years: '' };
-                    }()) : { role: '', years: '' });
-                    const bits = [row.role, row.years].filter(Boolean);
-                    if (bits.length) {
-                        const ul = document.createElement('ul');
-                        ul.className = 'cv-extra-list';
-                        bits.forEach((item) => {
-                            const li = document.createElement('li');
-                            li.textContent = item;
-                            ul.appendChild(li);
-                        });
-                        extrasOut.appendChild(ul);
-                    }
-                    showSec(extrasSec, bits.length > 0);
-                } else {
-                    showSec(extrasSec, false);
-                }
+                if (extrasOut) extrasOut.replaceChildren();
+                showSec(extrasSec, false);
                 renderReferences(false);
                 return;
             }
@@ -4280,7 +4336,7 @@
 
             // Ensure section order: Recommendations is always the very last section at the bottom
             try {
-                const isSidebarLayout = ['sidebar', 'split', 'charcoal', 'azure', 'navy'].includes(currentLayoutName());
+                const isSidebarLayout = ['sidebar', 'split', 'charcoal', 'azure', 'navy', 'banner'].includes(currentLayoutName());
                 const cvMain = document.querySelector('#cv-target .cv-main');
                 const cvColumns = document.querySelector('#cv-target .cv-columns');
                 if (isSidebarLayout && cvMain && sec.parentElement !== cvMain) {

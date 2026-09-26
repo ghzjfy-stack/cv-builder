@@ -349,6 +349,34 @@ function splitInner(tpl: CvTemplate, paper: string, ink: string, accent: string,
   );
 }
 
+function bannerInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number): string {
+  const side =
+    tpl.skin === "plum" ? "#f8eef4" :
+    tpl.skin === "noir" ? "#f6f1e6" :
+    tpl.skin === "coral" ? "#fbf1ea" :
+    tpl.skin === "indigo" ? "#eef1f8" :
+    "#e7f3ef";
+  const title =
+    tpl.skin === "plum" ? "#f3b6c8" :
+    tpl.skin === "coral" ? "#f6d2b0" :
+    "#e2b657";
+  const headH = 28;
+  return (
+    r(0, 0, W, H, paper) +
+    r(0, 0, W, headH, accent) +
+    r(34, 6.5, 30, 4.4, "#ffffff", `rx="0.4"`) +
+    r(40, 13.2, 24, 1.7, title) +
+    r(6, 8, 16, 1.3, "#ffffff", `opacity="0.9"`) +
+    r(6, 11.4, 13, 1, "#ffffff", `opacity="0.55"`) +
+    r(6, 14.6, 11, 1, "#ffffff", `opacity="0.55"`) +
+    r(0, headH, 22, H - headH, side) +
+    r(3.5, headH + 5, 12, 1.6, accent, `opacity="0.85"`) +
+    lines(3.5, headH + 10, 15, 5, 6.4, ink, 0.32, s) +
+    r(27, headH + 5, 16, 1.7, accent) +
+    lines(27, headH + 10, 38, 9, 5, ink, 0.22, s + 2)
+  );
+}
+
 function innerFor(tpl: CvTemplate, lang: ThumbLang): string {
   const paper = paperOf(tpl);
   const ink = inkOf(tpl);
@@ -358,6 +386,7 @@ function innerFor(tpl: CvTemplate, lang: ThumbLang): string {
   const layout = tpl.layout;
   const style = tpl.layoutStyle;
 
+  if (layout === "banner") return bannerInner(tpl, paper, ink, accent, s);
   if (layout === "navy") return navyInner(tpl, paper, ink, s);
   if (layout === "charcoal") return charcoalInner(tpl, paper, ink, s);
   if (layout === "sidebar" || style === "two-column-left") return sidebarInner(tpl, paper, ink, accent, s, rtl);

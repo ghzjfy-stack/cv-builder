@@ -377,7 +377,8 @@
         #cv-preview-wrapper #cv-target.layout-split,
         #cv-preview-wrapper #cv-target.layout-charcoal,
         #cv-preview-wrapper #cv-target.layout-azure,
-        #cv-preview-wrapper #cv-target.layout-navy {
+        #cv-preview-wrapper #cv-target.layout-navy,
+        #cv-preview-wrapper #cv-target.layout-premium {
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -1903,18 +1904,18 @@
         #qc-print-host .whitespace-pre-line {
             line-height: var(--line-height, var(--cv-leading));
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > .cv-columns {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > .cv-columns,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > .cv-columns {
             padding-inline: 1.35rem;
             box-sizing: border-box;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure) > #cv-header {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header {
             padding-top: 1.15rem;
         }
         #cv-target .cv-job,
@@ -2001,6 +2002,7 @@
         .layout-azure .cv-edu-item .cv-job-head,
         .layout-sidebar .cv-edu-item .cv-job-head,
         .layout-split .cv-edu-item .cv-job-head,
+        .layout-premium .cv-edu-item .cv-job-head,
         .layout-classic .cv-edu-item .cv-job-head,
         .layout-minimal .cv-edu-item .cv-job-head,
         .layout-modern .cv-edu-item .cv-job-head,
@@ -2410,8 +2412,10 @@
         }
         #cv-preview-wrapper .layout-sidebar .cv-sidebar,
         #cv-preview-wrapper .layout-split .cv-sidebar,
+        #cv-preview-wrapper .layout-premium .cv-sidebar,
         #cv-preview-page-2 .layout-sidebar .cv-sidebar,
-        #cv-preview-page-2 .layout-split .cv-sidebar {
+        #cv-preview-page-2 .layout-split .cv-sidebar,
+        #cv-preview-page-2 .layout-premium .cv-sidebar {
             align-self: stretch;
             height: 100%;
             min-height: 100%;
@@ -2856,6 +2860,153 @@
             border-radius: 0.75rem;
             padding: calc(0.9rem * var(--cv-scale));
             border-inline-end: 4px solid var(--accent);
+        }
+
+        /* Premium / Executive Split — left rail + spacious main, ATS-friendly */
+        #cv-target.layout-premium,
+        #cv-target-page2.layout-premium,
+        #qc-print-host .cv-print-sheet.layout-premium {
+            --premium-ink: #1a2332;
+            --premium-muted: #5b6777;
+            --premium-rail: #f4f6f8;
+            --premium-line: rgba(26, 35, 50, 0.12);
+            padding: 0 !important;
+        }
+        .layout-premium .cv-columns {
+            display: grid;
+            grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr);
+            grid-template-areas: "side main";
+            gap: 0;
+            align-items: stretch;
+            direction: ltr;
+            min-height: 100%;
+            flex: 1 1 auto;
+        }
+        .layout-premium .cv-sidebar { grid-area: side; }
+        .layout-premium .cv-main { grid-area: main; }
+        .layout-premium .cv-col-rule { display: none; }
+        .layout-premium .cv-contact-header { display: none; }
+        .layout-premium .cv-contact-sidebar { display: flex; }
+        #cv-target.layout-premium > #cv-header,
+        #cv-target-page2.layout-premium > #cv-header,
+        #qc-print-host .cv-print-sheet.layout-premium > #cv-header {
+            border: none;
+            border-bottom: 1px solid var(--premium-line);
+            padding: calc(0.85rem * var(--cv-scale)) calc(1.15rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale));
+            margin: 0 !important;
+            background: #fff;
+        }
+        .layout-premium #out-name {
+            font-weight: 750;
+            letter-spacing: -0.02em;
+            color: var(--premium-ink);
+            font-size: calc(1.55rem * var(--cv-scale));
+            line-height: 1.15;
+        }
+        .layout-premium #out-title {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: calc(0.92rem * var(--cv-scale));
+            margin-top: 0.2rem;
+        }
+        .layout-premium .cv-sidebar {
+            background: var(--premium-rail);
+            border-radius: 0;
+            padding: calc(0.95rem * var(--cv-scale)) calc(0.8rem * var(--cv-scale));
+            border-inline-start: 3px solid var(--accent);
+            box-sizing: border-box;
+        }
+        .layout-premium .cv-sidebar-inner {
+            display: flex;
+            flex-direction: column;
+            gap: calc(0.85rem * var(--cv-scale));
+        }
+        .layout-premium .cv-main {
+            padding: calc(0.95rem * var(--cv-scale)) calc(1.15rem * var(--cv-scale)) calc(1.1rem * var(--cv-scale));
+            box-sizing: border-box;
+        }
+        .layout-premium .cv-section-title {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: calc(0.68rem * var(--cv-scale));
+            font-weight: 750;
+            color: var(--premium-ink);
+            border-bottom: 1px solid var(--premium-line);
+            padding-bottom: 0.28rem;
+            margin-bottom: 0.45rem;
+        }
+        .layout-premium .cv-sidebar .cv-section-title {
+            color: var(--premium-ink);
+            border-bottom-color: rgba(26, 35, 50, 0.14);
+        }
+        .layout-premium #sec-education-side { display: none !important; }
+        .layout-premium .cv-contact-row {
+            color: var(--premium-muted);
+            font-size: calc(0.68rem * var(--cv-scale));
+            line-height: 1.45;
+        }
+        .layout-premium .cv-contact-ico {
+            color: var(--accent);
+            opacity: 0.9;
+        }
+        .layout-premium .cv-skill-badge {
+            background: #fff;
+            border: 1px solid rgba(26, 35, 50, 0.12);
+            color: var(--premium-ink);
+            border-radius: 0.35rem;
+            font-size: calc(0.62rem * var(--cv-scale));
+            padding: 0.22rem 0.45rem;
+        }
+        .layout-premium #out-summary,
+        .layout-premium #out-languages {
+            color: var(--premium-muted);
+            font-size: calc(0.78rem * var(--cv-scale));
+            line-height: 1.55;
+        }
+        .layout-premium .cv-job {
+            margin-bottom: calc(0.85rem * var(--cv-scale));
+        }
+        .layout-premium .cv-job-title {
+            font-weight: 700;
+            color: var(--premium-ink);
+            font-size: calc(0.92rem * var(--cv-scale));
+        }
+        .layout-premium .cv-job-role {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: calc(0.72rem * var(--cv-scale));
+        }
+        .layout-premium .cv-job-date {
+            color: var(--premium-muted);
+            font-size: calc(0.68rem * var(--cv-scale));
+        }
+        .layout-premium .cv-job-list {
+            color: var(--premium-muted);
+            font-size: calc(0.74rem * var(--cv-scale));
+        }
+        #cv-target:not(.cv-lang-en).layout-premium #cv-header,
+        #cv-target:not(.cv-lang-en).layout-premium .cv-main,
+        #cv-target:not(.cv-lang-en).layout-premium .cv-sidebar-inner,
+        #cv-target-page2:not(.cv-lang-en).layout-premium #cv-header,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .cv-main,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium #cv-header,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-main,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-sidebar-inner {
+            direction: rtl;
+            text-align: right;
+        }
+        #cv-target.cv-lang-en.layout-premium #cv-header,
+        #cv-target.cv-lang-en.layout-premium .cv-main,
+        #cv-target.cv-lang-en.layout-premium .cv-sidebar-inner,
+        #cv-target-page2.cv-lang-en.layout-premium #cv-header,
+        #cv-target-page2.cv-lang-en.layout-premium .cv-main,
+        #cv-target-page2.cv-lang-en.layout-premium .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium #cv-header,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-main,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-sidebar-inner {
+            direction: ltr;
+            text-align: left;
         }
 
         .layout-executive #cv-header {
@@ -6709,11 +6860,13 @@
         #qc-print-host.qc-capturing .cv-print-sheet.layout-azure,
         #qc-print-host.qc-capturing .cv-print-sheet.layout-sidebar,
         #qc-print-host.qc-capturing .cv-print-sheet.layout-split,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-premium,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-charcoal,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-azure,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-sidebar,
-        html.qc-exporting #qc-print-host .cv-print-sheet.layout-split {
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-split,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-premium {
             padding: 0 !important;
             overflow: hidden !important;
             min-height: 1123px !important;
@@ -6757,11 +6910,13 @@
         #qc-print-host.qc-capturing .layout-azure .cv-sidebar,
         #qc-print-host.qc-capturing .layout-sidebar .cv-sidebar,
         #qc-print-host.qc-capturing .layout-split .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-navy .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-charcoal .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-azure .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-sidebar .cv-sidebar,
-        html.qc-exporting #qc-print-host .layout-split .cv-sidebar {
+        html.qc-exporting #qc-print-host .layout-split .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar {
             height: 100% !important;
             min-height: 100% !important;
             align-self: stretch !important;
@@ -6885,7 +7040,8 @@
                 display: flex !important;
             }
 
-            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns {
+            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-columns {
                 display: grid !important;
             }
 
@@ -6976,11 +7132,13 @@
         #cv-preview-wrapper #cv-target.layout-azure,
         #cv-preview-wrapper #cv-target.layout-sidebar,
         #cv-preview-wrapper #cv-target.layout-split,
+        #cv-preview-wrapper #cv-target.layout-premium,
         #cv-preview-page-2 #cv-target-page2.layout-charcoal,
         #cv-preview-page-2 #cv-target-page2.layout-navy,
         #cv-preview-page-2 #cv-target-page2.layout-azure,
         #cv-preview-page-2 #cv-target-page2.layout-sidebar,
-        #cv-preview-page-2 #cv-target-page2.layout-split {
+        #cv-preview-page-2 #cv-target-page2.layout-split,
+        #cv-preview-page-2 #cv-target-page2.layout-premium {
             height: 100% !important;
             min-height: 100% !important;
             max-height: 100% !important;
@@ -6993,11 +7151,13 @@
         #cv-preview-wrapper .layout-azure .cv-sidebar,
         #cv-preview-wrapper .layout-sidebar .cv-sidebar,
         #cv-preview-wrapper .layout-split .cv-sidebar,
+        #cv-preview-wrapper .layout-premium .cv-sidebar,
         #cv-preview-page-2 .layout-charcoal .cv-sidebar,
         #cv-preview-page-2 .layout-navy .cv-sidebar-inner,
         #cv-preview-page-2 .layout-azure .cv-sidebar,
         #cv-preview-page-2 .layout-sidebar .cv-sidebar,
-        #cv-preview-page-2 .layout-split .cv-sidebar {
+        #cv-preview-page-2 .layout-split .cv-sidebar,
+        #cv-preview-page-2 .layout-premium .cv-sidebar {
             height: 100% !important;
             min-height: 100% !important;
             align-self: stretch;

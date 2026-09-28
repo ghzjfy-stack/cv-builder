@@ -72,6 +72,7 @@ const BADGES: Record<string, BadgeSpec> = {
   forest: { kind: "consulting", he: "ייעוץ", en: "Consulting" },
   sand: { kind: "sidebar", he: "עיצוב פנים", en: "Interior" },
   split: { kind: "split", he: "משפטים", en: "Legal" },
+  premium: { kind: "executive", he: "פרימיום", en: "Premium" },
   "teal-sidebar": { kind: "sidebar", he: "שירות", en: "Service" },
   "ink-exec": { kind: "executive", he: "הנהלה", en: "Executive" },
   "student-modern": { kind: "student", he: "סטודנט", en: "Student" },
@@ -349,6 +350,21 @@ function splitInner(tpl: CvTemplate, paper: string, ink: string, accent: string,
   );
 }
 
+function premiumInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number): string {
+  const sw = 22;
+  const rail = "#eef1f4";
+  return (
+    r(0, 0, W, H, paper) +
+    r(8, 5, 34, 3.2, ink, `rx="0.4"`) +
+    r(8, 9.5, 18, 1.2, accent) +
+    r(0, 14, sw, H - 14, rail) +
+    r(0, 14, 2.4, H - 14, accent) +
+    lines(3.5, 20, sw - 6, 8, 6.2, accent, 0.5, s) +
+    sectionRule(sw + 5, 20, 14, accent) +
+    lines(sw + 5, 26, 38, 11, 4.8, ink, 0.2, s + 3)
+  );
+}
+
 function innerFor(tpl: CvTemplate, lang: ThumbLang): string {
   const paper = paperOf(tpl);
   const ink = inkOf(tpl);
@@ -360,6 +376,7 @@ function innerFor(tpl: CvTemplate, lang: ThumbLang): string {
 
   if (layout === "navy") return navyInner(tpl, paper, ink, s);
   if (layout === "charcoal") return charcoalInner(tpl, paper, ink, s);
+  if (layout === "premium") return premiumInner(tpl, paper, ink, accent, s);
   if (layout === "sidebar" || style === "two-column-left") return sidebarInner(tpl, paper, ink, accent, s, rtl);
   if (layout === "split" || style === "two-column-right") return splitInner(tpl, paper, ink, accent, s, rtl);
   if (layout === "azure") return azureInner(tpl, paper, ink, accent, s);

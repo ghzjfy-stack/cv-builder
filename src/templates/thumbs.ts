@@ -352,16 +352,20 @@ function splitInner(tpl: CvTemplate, paper: string, ink: string, accent: string,
 
 function premiumInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number): string {
   const sw = 22;
-  const rail = "#eef1f4";
+  const rail = "#4a4a4a";
   return (
     r(0, 0, W, H, paper) +
-    r(8, 5, 34, 3.2, ink, `rx="0.4"`) +
-    r(8, 9.5, 18, 1.2, accent) +
-    r(0, 14, sw, H - 14, rail) +
-    r(0, 14, 2.4, H - 14, accent) +
-    lines(3.5, 20, sw - 6, 8, 6.2, accent, 0.5, s) +
-    sectionRule(sw + 5, 20, 14, accent) +
-    lines(sw + 5, 26, 38, 11, 4.8, ink, 0.2, s + 3)
+    r(0, 0, sw, H, rail) +
+    photoCircle(sw / 2, 14, 6.2, "#cfcfcf") +
+    lines(3.5, 26, sw - 7, 4, 5.4, "#ffffff", 0.45, s) +
+    r(3.5, 50, sw - 7, 1.2, "#ffffff", `opacity="0.35"`) +
+    r(3.5, 54, sw - 7, 1.6, "#ffffff", `opacity="0.75"`) +
+    r(3.5, 58, (sw - 7) * 0.72, 1.6, "#ffffff", `opacity="0.75"`) +
+    r(sw + 5, 8, 34, 3.4, ink, `rx="0.4"`) +
+    r(sw + 5, 13, 18, 1.2, ink, `opacity="0.4"`) +
+    sectionRule(sw + 5, 22, 16, rail) +
+    r(sw + 5, 28, 38, 4.2, "#efefef", `rx="0.4"`) +
+    lines(sw + 5, 36, 38, 10, 4.6, ink, 0.2, s + 3)
   );
 }
 

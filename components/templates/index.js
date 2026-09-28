@@ -2,8 +2,9 @@ import Template1 from './Template1';
 import Template2 from './Template2';
 import SidebarTemplate from './SidebarTemplate';
 import ModernTemplate from './ModernTemplate';
+import ExecutiveSplitTemplate from './ExecutiveSplitTemplate';
 
-export { Template1, Template2, SidebarTemplate, ModernTemplate };
+export { Template1, Template2, SidebarTemplate, ModernTemplate, ExecutiveSplitTemplate };
 export * from './common';
 
 export const TEMPLATES_MAP = {
@@ -14,6 +15,9 @@ export const TEMPLATES_MAP = {
   sidebar: SidebarTemplate,
   split: SidebarTemplate,
   modern: ModernTemplate,
+  premium: ExecutiveSplitTemplate,
+  'executive-split': ExecutiveSplitTemplate,
+  'executive_split': ExecutiveSplitTemplate,
 };
 
 export function getTemplateComponent(name) {
@@ -27,5 +31,6 @@ export default {
   Template2,
   SidebarTemplate,
   ModernTemplate,
+  ExecutiveSplitTemplate,
   getTemplateComponent,
 };

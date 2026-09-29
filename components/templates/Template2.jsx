@@ -2,6 +2,7 @@ import React from 'react';
 import {
   CvEntryItem,
   ContactRow,
+  SkillBadgeList,
   normalizeJobItem,
   normalizeEducationItem,
   normalizeMilitaryItem,
@@ -179,19 +180,13 @@ export default function Template2({
           <h2 className="cv-section-title font-bold text-xs uppercase tracking-wider text-slate-900 border-b pb-1 mb-2">
             {isEnglish ? 'Skills & Languages' : 'כישורים ושפות'}
           </h2>
-          <div className="flex flex-wrap gap-2 text-xs">
-            {skills.map((skill, idx) => (
-              <span
-                key={idx}
-                className="px-2 py-1 rounded bg-slate-100 text-slate-700 font-medium"
-              >
-                {typeof skill === 'string' ? skill : skill.name}
-              </span>
-            ))}
+          <div className="flex flex-wrap gap-2 text-xs pt-1">
+            <SkillBadgeList skills={skills} />
             {languages.map((lang, idx) => (
               <span
                 key={`lang-${idx}`}
-                className="px-2 py-1 rounded bg-slate-200 text-slate-800 font-medium"
+                className="cv-skill-badge"
+                dir="auto"
               >
                 {typeof lang === 'string' ? lang : lang.name}
               </span>

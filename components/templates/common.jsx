@@ -452,8 +452,7 @@ export function CvEntryItem({
   );
 }
 
-export const SKILL_BADGE_CLASS =
-  'cv-skill-badge bg-white/10 px-2.5 py-1 rounded text-xs inline-block m-0.5 border border-white/20';
+export const SKILL_BADGE_CLASS = 'cv-skill-badge';
 
 /**
  * Sleek sidebar skill pill. `dir="auto"` keeps mixed Hebrew/English

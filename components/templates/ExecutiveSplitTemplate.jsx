@@ -29,8 +29,7 @@ function langLevelLabel(level, isEnglish) {
   const low = raw.toLowerCase();
   if (!low) return '';
   let id = '';
-  if (/אם נוספת|bilingual/.test(low)) id = 'bilingual';
-  else if (/אם|native|mother/.test(low)) id = 'native';
+  if (/אם נוספת|bilingual|אם|native|mother/.test(low)) id = 'native';
   else if (/מקצוע|professional|c2|full professional|טכני|technical/.test(low)) id = 'professional';
   else if (/שוטפ|fluent|גבוה|advanced|high|c1/.test(low)) id = 'fluent';
   else if (/בינונ|intermediate|b1|b2|טוב|good/.test(low)) id = 'intermediate';
@@ -38,7 +37,6 @@ function langLevelLabel(level, isEnglish) {
   else return raw;
   const labels = {
     native: { he: 'שפת אם', en: 'Native' },
-    bilingual: { he: 'שפת אם נוספת', en: 'Bilingual' },
     professional: { he: 'שליטה מקצועית', en: 'Professional' },
     fluent: { he: 'שליטה גבוהה', en: 'Fluent' },
     intermediate: { he: 'שליטה בינונית', en: 'Intermediate' },

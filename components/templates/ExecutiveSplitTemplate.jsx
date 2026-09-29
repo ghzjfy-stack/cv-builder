@@ -273,20 +273,38 @@ export default function ExecutiveSplitTemplate({
                 {isEnglish ? 'Military / National Service' : 'שירות צבאי / לאומי'}
               </h3>
               {military.map((m, idx) => (
-                <div key={`${m.role}-${idx}`} className="cv-job cv-military-item" dir={dir}>
-                  <div className="cv-job-head cv-military-head" dir={dir}>
-                    <p className="cv-job-title cv-military-role">{m.role || m.title}</p>
-                    {m.dates || m.years ? (
-                      <span className="cv-job-date cv-military-years" dir="ltr">
-                        {formatCleanDates(m.dates || m.years, isEnglish)}
-                      </span>
-                    ) : null}
+                <div
+                  key={`${m.role}-${idx}`}
+                  className="cv-job cv-military-item"
+                  dir={dir}
+                  style={{ display: 'block', flex: '0 0 auto', height: 'auto', margin: '0 0 0.35rem' }}
+                >
+                  <div className="cv-job-title cv-military-role" style={{ display: 'block', width: '100%', margin: 0 }}>
+                    {m.role || m.title}
                   </div>
+                  {m.dates || m.years ? (
+                    <div
+                      className="cv-job-date cv-military-years"
+                      dir="ltr"
+                      style={{
+                        display: 'block',
+                        width: 'fit-content',
+                        margin: '0.12rem 0 0',
+                        whiteSpace: 'nowrap',
+                        direction: 'ltr',
+                        unicodeBidi: 'isolate',
+                        textAlign: 'left',
+                      }}
+                    >
+                      {formatCleanDates(m.dates || m.years, isEnglish)}
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </section>
           ) : null}
         </div>
+        <div className="cv-sidebar-rail-pad" aria-hidden="true" />
       </aside>
 
       <header className="exs-header" id="cv-header">

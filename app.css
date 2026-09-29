@@ -323,8 +323,8 @@
             /* One fixed A4 sheet: 210mm × 297mm. */
             aspect-ratio: 1 / 1.414;
             width: 100%;
-            height: 100%;
-            min-height: 297mm;
+            height: auto;
+            min-height: 0;
             max-height: none;
             padding: 0 !important;
             background-color: #fff;
@@ -2958,8 +2958,7 @@
             color: #f6f6f6;
             border: 0;
             border-radius: 0;
-            /* Fixed bottom inset — not scaled — so years never kiss the rail edge */
-            padding: 0 0 2.15rem !important;
+            padding: 0 !important;
             margin: 0 !important;
             min-width: 0;
             max-width: 100%;
@@ -2974,18 +2973,61 @@
             z-index: 2;
             isolation: isolate;
         }
-        /* Extra flex-safe spacer (kept even if padding is overridden elsewhere). */
-        .layout-premium .cv-sidebar::after {
-            content: "" !important;
+        /* Real DOM footer pad — survives overflow clipping and display:contents flattening. */
+        #cv-preview-wrapper #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        #cv-preview-page-2 #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad {
             display: block !important;
-            flex: 0 0 0.35rem !important;
+            flex: 0 0 2.75rem !important;
+            flex-grow: 0 !important;
             flex-shrink: 0 !important;
-            width: 100%;
-            height: 0.35rem !important;
-            min-height: 0.35rem !important;
-            background: transparent;
-            order: 100;
-            pointer-events: none;
+            width: 100% !important;
+            height: 2.75rem !important;
+            min-height: 2.75rem !important;
+            max-height: 2.75rem !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: var(--premium-rail, #454545) !important;
+            pointer-events: none !important;
+            order: 999 !important;
+            box-sizing: border-box !important;
+        }
+        /* Never let the military block stretch or pin years to the rail floor. */
+        #cv-target.layout-premium #sec-extras-side,
+        #cv-target.layout-premium #out-extras-side,
+        #cv-target.layout-premium #sec-extras-side .cv-extra-list,
+        #cv-target-page2.layout-premium #sec-extras-side,
+        #cv-target-page2.layout-premium #out-extras-side,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side,
+        #qc-print-host .cv-print-sheet.layout-premium #out-extras-side {
+            display: block !important;
+            flex: 0 0 auto !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
+            justify-content: flex-start !important;
+            align-content: flex-start !important;
+            align-items: stretch !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            align-self: flex-start !important;
+        }
+        #cv-target.layout-premium .cv-military-years,
+        #cv-target-page2.layout-premium .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-military-years {
+            position: static !important;
+            top: auto !important;
+            bottom: auto !important;
+            margin-top: 0.12rem !important;
+            margin-bottom: 0 !important;
+        }
+        .layout-premium .cv-sidebar::after {
+            content: none !important;
+            display: none !important;
         }
         .layout-premium .cv-photo-block {
             display: flex !important;
@@ -3038,11 +3080,12 @@
         }
         .layout-premium .cv-sidebar-inner {
             display: flex !important;
-            flex-direction: column;
+            flex-direction: column !important;
             flex: 1 1 0 !important;
-            justify-content: flex-start;
-            gap: calc(0.65rem * var(--cv-scale));
-            padding: calc(0.75rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) 0 !important;
+            justify-content: flex-start !important;
+            align-content: flex-start !important;
+            gap: calc(0.55rem * var(--cv-scale));
+            padding: calc(0.7rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) 0.35rem !important;
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -3053,14 +3096,28 @@
             overflow: hidden !important;
             background: var(--premium-rail);
         }
+        #cv-preview-wrapper #cv-target.layout-premium .cv-sidebar-inner,
+        #cv-preview-page-2 #cv-target-page2.layout-premium .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar-inner {
+            display: flex !important;
+            flex: 1 1 0 !important;
+            min-height: 0 !important;
+            max-height: none !important;
+        }
         .layout-premium .cv-sidebar-inner > :last-child {
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
         }
         .layout-premium #sec-extras-side {
-            margin-bottom: 0 !important;
-            padding-bottom: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
             flex: 0 0 auto !important;
+            flex-grow: 0 !important;
+            margin-top: 0 !important;
+            height: auto !important;
+            min-height: 0 !important;
         }
         .layout-premium #sec-extras-side .cv-military-item:last-child,
         .layout-premium #sec-extras-side .cv-job:last-child,
@@ -3071,7 +3128,7 @@
         .layout-premium #sec-extras-side .cv-job-date,
         .layout-premium #sec-extras-side .cv-military-years,
         .layout-premium .cv-sidebar .cv-military-years {
-            margin-bottom: 0 !important;
+            margin: 0.12rem 0 0 !important;
             line-height: 1.35;
         }
         #cv-target.layout-premium .cv-sidebar,
@@ -3425,9 +3482,7 @@
             color: var(--premium-ink);
         }
         .layout-premium .cv-edu-item .cv-job-head,
-        .layout-premium .cv-military-item .cv-job-head,
-        .layout-premium #sec-education .cv-job-head,
-        .layout-premium #sec-military .cv-job-head {
+        .layout-premium #sec-education .cv-job-head {
             display: flex;
             align-items: baseline;
             justify-content: space-between;
@@ -3439,9 +3494,27 @@
             box-sizing: border-box;
             margin: 0 0 0.15rem;
         }
+        .layout-premium .cv-military-item .cv-job-head,
+        .layout-premium #sec-military .cv-job-head,
+        .layout-premium #sec-extras-side .cv-job-head,
+        .layout-premium .cv-sidebar .cv-military-head {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            gap: 0.12rem !important;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            height: auto !important;
+            min-height: 0 !important;
+            flex: 0 0 auto !important;
+            box-sizing: border-box;
+            margin: 0 !important;
+        }
         .layout-premium .cv-edu-item .cv-job-title,
         .layout-premium .cv-edu-item .cv-edu-school,
-        .layout-premium .cv-military-item .cv-job-title,
         .layout-premium #sec-military .cv-job-title {
             font-family: var(--premium-serif);
             font-weight: 700;
@@ -3453,9 +3526,21 @@
             flex: 1 1 10rem;
             overflow-wrap: anywhere;
         }
+        .layout-premium .cv-sidebar .cv-military-role,
+        .layout-premium .cv-sidebar .cv-military-item .cv-job-title,
+        .layout-premium #sec-extras-side .cv-military-role {
+            font-family: var(--premium-sans);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95) !important;
+            font-size: calc(0.66rem * var(--cv-scale));
+            line-height: 1.35;
+            margin: 0 !important;
+            min-width: 0;
+            flex: none !important;
+            overflow-wrap: anywhere;
+        }
         .layout-premium .cv-edu-item .cv-job-date,
         .layout-premium .cv-edu-item .cv-edu-date,
-        .layout-premium .cv-military-item .cv-job-date,
         .layout-premium #sec-military .cv-job-date {
             color: var(--premium-muted);
             font-size: calc(0.64rem * var(--cv-scale));
@@ -3481,6 +3566,10 @@
             max-width: 100%;
             overflow-wrap: anywhere;
         }
+
+        /* Hide rail pad outside premium (other layouts use different sidebars). */
+        .cv-sidebar-rail-pad { display: none !important; }
+        .layout-premium .cv-sidebar > .cv-sidebar-rail-pad { display: block !important; }
 
         /* Sidebar education / military — stack & wrap inside the rail */
         #cv-target.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
@@ -3581,7 +3670,7 @@
             text-align: left !important;
             line-height: 1.35;
         }
-        /* Keep military block compact — years sit directly under the unit/role */
+        /* Keep military block compact — role then years stacked, never stretched */
         #cv-target.layout-premium .cv-sidebar .cv-military-item,
         #cv-target.layout-premium #sec-extras-side,
         #cv-target-page2.layout-premium .cv-sidebar .cv-military-item,
@@ -3589,9 +3678,12 @@
         #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item,
         #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side,
         .layout-premium.exs-root .cv-sidebar .cv-military-item {
+            display: block !important;
             flex: 0 0 auto !important;
+            flex-grow: 0 !important;
             height: auto !important;
             min-height: 0 !important;
+            max-height: none !important;
             margin-top: 0 !important;
         }
         #cv-target.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
@@ -3607,7 +3699,7 @@
             flex-wrap: nowrap !important;
             align-items: flex-start !important;
             justify-content: flex-start !important;
-            gap: 0.14rem !important;
+            gap: 0.12rem !important;
             flex: 0 0 auto !important;
             height: auto !important;
             min-height: 0 !important;
@@ -3622,6 +3714,21 @@
             width: 100%;
             max-width: 100%;
             margin: 0 !important;
+            float: none !important;
+            position: static !important;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-military-years,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-years,
+        .layout-premium.exs-root .cv-sidebar .cv-military-years {
+            display: block !important;
+            position: static !important;
+            float: none !important;
+            width: fit-content !important;
+            margin: 0.12rem 0 0 !important;
+            padding: 0 !important;
+            align-self: flex-start !important;
+            flex: none !important;
         }
         #cv-target.layout-premium .cv-sidebar .cv-edu-meta,
         #cv-target.layout-premium .cv-sidebar .cv-job-role,
@@ -5770,7 +5877,7 @@
                 align-items: center;
                 gap: 0.85rem;
                 overflow-x: hidden;
-                overflow-y: auto;
+                overflow-y: hidden;
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior: contain;
             }
@@ -5779,11 +5886,12 @@
             #preview-column #cl-preview-wrapper {
                 width: 100%;
                 max-width: 100%;
-                height: 100%;
-                min-height: 297mm;
+                height: auto;
+                min-height: 0 !important;
+                max-height: 100%;
                 aspect-ratio: 1 / 1.414;
                 overflow: hidden !important;
-                flex: 0 0 auto;
+                flex: 0 1 auto;
             }
         }
 
@@ -7649,18 +7757,23 @@
             height: 100% !important;
             min-height: 100% !important;
             max-height: 100% !important;
-            padding-bottom: 2.15rem !important;
+            padding-bottom: 0 !important;
             box-sizing: border-box !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar::after,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar::after {
-            content: "" !important;
+            content: none !important;
+            display: none !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
             display: block !important;
-            flex: 0 0 0.35rem !important;
+            flex: 0 0 2.75rem !important;
             flex-shrink: 0 !important;
-            height: 0.35rem !important;
-            min-height: 0.35rem !important;
-            background: transparent !important;
+            height: 2.75rem !important;
+            min-height: 2.75rem !important;
+            max-height: 2.75rem !important;
+            background: #454545 !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
@@ -7668,7 +7781,7 @@
             min-height: 0 !important;
             max-height: none !important;
             height: auto !important;
-            padding-bottom: 0 !important;
+            padding-bottom: 0.35rem !important;
         }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {

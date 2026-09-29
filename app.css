@@ -2957,7 +2957,7 @@
             color: #f6f6f6;
             border: 0;
             border-radius: 0;
-            padding: 0;
+            padding: 0 0 calc(1.55rem * var(--cv-scale));
             margin: 0 !important;
             min-width: 0;
             max-width: 100%;
@@ -3026,7 +3026,7 @@
             flex-direction: column;
             flex: 1 1 auto;
             gap: calc(0.72rem * var(--cv-scale));
-            padding: calc(0.8rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) calc(1.25rem * var(--cv-scale));
+            padding: calc(0.8rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) calc(1.1rem * var(--cv-scale));
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -3035,6 +3035,22 @@
             max-height: 100%;
             overflow: hidden !important;
             background: var(--premium-rail);
+        }
+        .layout-premium .cv-sidebar-inner > :last-child {
+            margin-bottom: 0;
+            padding-bottom: calc(0.35rem * var(--cv-scale));
+        }
+        .layout-premium #sec-extras-side .cv-military-item:last-child,
+        .layout-premium #sec-extras-side .cv-job:last-child,
+        .layout-premium .cv-sidebar .cv-military-item:last-child {
+            margin-bottom: calc(0.45rem * var(--cv-scale)) !important;
+            padding-bottom: calc(0.2rem * var(--cv-scale));
+        }
+        .layout-premium #sec-extras-side .cv-job-date,
+        .layout-premium #sec-extras-side .cv-military-years,
+        .layout-premium .cv-sidebar .cv-military-years {
+            margin-bottom: 0.15rem;
+            line-height: 1.35;
         }
         #cv-target.layout-premium .cv-sidebar,
         #cv-target-page2.layout-premium .cv-sidebar,
@@ -7555,6 +7571,15 @@
             min-height: 100% !important;
             max-height: 100% !important;
             overflow: hidden !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar {
+            padding-bottom: 1.55rem !important;
+            box-sizing: border-box !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
+            padding-bottom: 1.1rem !important;
         }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {

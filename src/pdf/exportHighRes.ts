@@ -400,7 +400,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
       WebkitPrintColorAdjust: "exact",
       printColorAdjust: "exact",
     });
-    const paintRail = (el, bg) => {
+    const paintRail = (el: Element | null, bg: string) => {
       if (!(el instanceof HTMLElement)) return;
       el.style.background = bg;
       el.style.WebkitPrintColorAdjust = "exact";
@@ -416,14 +416,38 @@ function prepareCaptureClone(sourceId = "cv-target") {
         height: "100%",
         minHeight: "100%",
         maxHeight: "100%",
+        paddingBottom: "0",
+        boxSizing: "border-box",
         background: "#454545",
         color: "#f6f6f6",
         WebkitPrintColorAdjust: "exact",
         printColorAdjust: "exact",
       });
-      paintRail(sidebar.querySelector(".cv-sidebar-inner"), "#454545");
+      const inner = sidebar.querySelector(".cv-sidebar-inner");
+      paintRail(inner, "#454545");
+      if (inner instanceof HTMLElement) {
+        Object.assign(inner.style, {
+          paddingTop: "0.55rem",
+          paddingLeft: "0.75rem",
+          paddingRight: "0.75rem",
+          paddingBottom: "1.25rem",
+          boxSizing: "border-box",
+        });
+      }
       paintRail(sidebar.querySelector(".cv-photo-block"), "#3a3a3a");
-      paintRail(sidebar.querySelector(".cv-sidebar-rail-pad"), "#454545");
+      const railPad = sidebar.querySelector(".cv-sidebar-rail-pad");
+      paintRail(railPad, "#454545");
+      if (railPad instanceof HTMLElement) {
+        Object.assign(railPad.style, {
+          display: "block",
+          flex: "0 0 3.5rem",
+          flexShrink: "0",
+          height: "3.5rem",
+          minHeight: "3.5rem",
+          maxHeight: "3.5rem",
+          width: "100%",
+        });
+      }
     }
     const header = clone.querySelector("#cv-header");
     if (header instanceof HTMLElement) header.style.gridArea = "head";

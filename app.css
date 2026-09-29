@@ -3126,20 +3126,20 @@
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
-        /* Real DOM footer pad — survives overflow clipping and display:contents flattening. */
+        /* Real DOM footer pad — keeps languages/recommendations clear of the sheet edge in PDF. */
         #cv-preview-wrapper #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         #cv-preview-page-2 #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad {
             display: block !important;
-            flex: 0 0 2.75rem !important;
+            flex: 0 0 3.5rem !important;
             flex-grow: 0 !important;
             flex-shrink: 0 !important;
             width: 100% !important;
-            height: 2.75rem !important;
-            min-height: 2.75rem !important;
-            max-height: 2.75rem !important;
+            height: 3.5rem !important;
+            min-height: 3.5rem !important;
+            max-height: 3.5rem !important;
             margin: 0 !important;
             padding: 0 !important;
             background: var(--premium-rail, #454545) !important;
@@ -3190,7 +3190,7 @@
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
-            padding: calc(1.15rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale));
+            padding: calc(1.05rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(0.95rem * var(--cv-scale));
             margin: 0;
             background: var(--premium-rail-deep);
             position: relative;
@@ -3237,8 +3237,9 @@
             flex: 1 1 0 !important;
             justify-content: flex-start !important;
             align-content: flex-start !important;
-            gap: calc(0.55rem * var(--cv-scale));
-            padding: calc(0.7rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) 0.35rem !important;
+            gap: calc(0.68rem * var(--cv-scale));
+            /* Safe bottom padding so last sections never kiss the rail floor / PDF edge. */
+            padding: calc(0.55rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(1.25rem * var(--cv-scale)) !important;
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -3256,6 +3257,7 @@
             flex: 1 1 0 !important;
             min-height: 0 !important;
             max-height: none !important;
+            padding-bottom: calc(1.25rem * var(--cv-scale)) !important;
         }
         .layout-premium .cv-sidebar-inner > :last-child {
             margin-bottom: 0 !important;
@@ -3292,8 +3294,8 @@
         .layout-premium .cv-contact-sidebar {
             display: flex !important;
             flex-direction: column;
-            gap: 0.42rem;
-            margin: 0;
+            gap: 0.48rem;
+            margin: 0 0 calc(0.12rem * var(--cv-scale));
             order: 1;
             min-width: 0;
             max-width: 100%;
@@ -8035,11 +8037,11 @@
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
             display: block !important;
-            flex: 0 0 2.75rem !important;
+            flex: 0 0 3.5rem !important;
             flex-shrink: 0 !important;
-            height: 2.75rem !important;
-            min-height: 2.75rem !important;
-            max-height: 2.75rem !important;
+            height: 3.5rem !important;
+            min-height: 3.5rem !important;
+            max-height: 3.5rem !important;
             background: #454545 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -8050,7 +8052,9 @@
             min-height: 0 !important;
             max-height: none !important;
             height: auto !important;
-            padding-bottom: 0.35rem !important;
+            padding-top: calc(0.55rem * var(--cv-scale, 1)) !important;
+            padding-inline: calc(0.75rem * var(--cv-scale, 1)) !important;
+            padding-bottom: 1.25rem !important;
             background: #454545 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -8372,6 +8376,27 @@
                 color: #f6f6f6 !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+            /* Keep sidebar footer text clear of the A4 edge when printing / PDF. */
+            #cv-target.layout-premium .cv-sidebar-inner,
+            #cv-target-page2.layout-premium .cv-sidebar-inner,
+            .layout-premium.exs-root .cv-sidebar-inner,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar-inner {
+                padding-top: 0.55rem !important;
+                padding-inline: 0.75rem !important;
+                padding-bottom: 1.25rem !important;
+                box-sizing: border-box !important;
+            }
+            #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
+                display: block !important;
+                flex: 0 0 3.5rem !important;
+                flex-shrink: 0 !important;
+                height: 3.5rem !important;
+                min-height: 3.5rem !important;
+                max-height: 3.5rem !important;
             }
             #cv-target.layout-premium .cv-photo-block,
             #cv-target-page2.layout-premium .cv-photo-block,

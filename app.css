@@ -2784,7 +2784,6 @@
         .cv-columns { display: flex; flex-direction: column; gap: calc(1rem * var(--cv-scale)); }
         .cv-sidebar, .cv-main { display: flex; flex-direction: column; gap: calc(0.9rem * var(--cv-scale)); }
         .cv-contact-sidebar { display: none; }
-        .layout-classic .cv-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
         .layout-sidebar .cv-columns {
             display: grid;
@@ -2820,6 +2819,64 @@
 
         .layout-classic #cv-header { text-align: center; }
         .layout-classic .cv-contact-header { justify-content: center; }
+        .layout-classic .cv-col-rule { display: none !important; }
+        .layout-classic .cv-sidebar {
+            display: none !important;
+        }
+        .layout-classic .cv-main {
+            display: flex;
+            flex-direction: column;
+            gap: calc(0.85rem * var(--cv-scale));
+            width: 100%;
+            max-width: 100%;
+        }
+        .layout-classic #sec-skills,
+        .layout-classic #sec-languages,
+        .layout-classic #sec-references,
+        .layout-classic #sec-summary,
+        .layout-classic #sec-experience,
+        .layout-classic #sec-education,
+        .layout-classic #sec-military {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+        .layout-classic .cv-ats-plain,
+        .layout-classic #out-skills,
+        .layout-classic #out-languages,
+        .layout-classic #out-references {
+            color: #334155;
+            font-size: calc(0.8rem * var(--cv-scale));
+            line-height: 1.5;
+            margin: 0;
+        }
+        .layout-classic .cv-ats-lang-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .layout-classic .cv-ats-lang-item {
+            margin: 0 0 0.2rem;
+            line-height: 1.45;
+            color: #334155;
+            font-size: calc(0.8rem * var(--cv-scale));
+        }
+        .layout-classic .cv-ats-lang-item:last-child { margin-bottom: 0; }
+        .layout-classic .cv-ref-item { margin: 0 0 0.55rem; }
+        .layout-classic .cv-ref-item:last-child { margin-bottom: 0; }
+        .layout-classic .cv-ref-name {
+            margin: 0;
+            font-weight: 700;
+            color: #0f172a;
+            font-size: calc(0.84rem * var(--cv-scale));
+        }
+        .layout-classic .cv-ref-role,
+        .layout-classic .cv-ref-line {
+            margin: 0.12rem 0 0;
+            color: #475569;
+            font-size: calc(0.78rem * var(--cv-scale));
+            line-height: 1.4;
+        }
         .layout-classic .cv-job { margin-bottom: 1rem; }
         .layout-classic .cv-job-title {
             font-weight: 700;
@@ -4841,6 +4898,9 @@
                 "photo main"
                 "head main"
                 "side main";
+            column-gap: 0 !important;
+            row-gap: 0 !important;
+            gap: 0 !important;
             min-height: 0;
             height: 100%;
             max-height: 100%;
@@ -4851,6 +4911,19 @@
             font-size: calc(0.72rem * var(--cv-scale));
             line-height: var(--cv-leading);
             overflow: hidden;
+        }
+        /* Continuous dark rail behind photo + header + sidebar (kills white hairlines). */
+        #cv-target.layout-navy::before,
+        #cv-target-page2.layout-navy::before,
+        #qc-print-host .cv-print-sheet.layout-navy::before {
+            content: "";
+            grid-column: photo;
+            grid-row: 1 / -1;
+            background: var(--navy, #12192b);
+            z-index: 0;
+            pointer-events: none;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
         #qc-print-host .cv-print-sheet.layout-navy {
             --navy: #12192b;
@@ -4863,6 +4936,9 @@
                 "photo main"
                 "head main"
                 "side main";
+            column-gap: 0 !important;
+            row-gap: 0 !important;
+            gap: 0 !important;
             min-height: 297mm;
             height: auto;
             background: #fff;
@@ -4885,6 +4961,10 @@
             align-items: flex-end;
             background: var(--navy);
             padding: 1.55rem 1rem 0.35rem;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             z-index: 1;
         }
         .layout-navy .cv-photo {
@@ -4907,14 +4987,22 @@
             object-fit: cover;
             display: block;
         }
+        #cv-target.layout-navy #cv-header,
+        #cv-target-page2.layout-navy #cv-header,
+        #qc-print-host .cv-print-sheet.layout-navy #cv-header,
         .layout-navy #cv-header {
             grid-area: head;
             background: var(--navy);
             color: #fff;
-            border: 0;
-            border-radius: 0;
-            margin: 0;
-            padding: 0.65rem 1.15rem 1.15rem;
+            border: 0 !important;
+            border-bottom: 0 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+            padding: 0.65rem 1.15rem 1.15rem !important;
+            box-shadow: none !important;
+            outline: none !important;
             text-align: center;
             z-index: 1;
         }
@@ -4948,6 +5036,10 @@
             background: var(--navy);
             color: #fff;
             padding: 0.35rem 1.25rem 1.7rem;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             min-height: 100%;
             height: 100%;
             align-self: stretch;

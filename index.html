@@ -18,7 +18,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=premium18">
+    <link rel="stylesheet" href="./app.css?v=premium20">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -2757,7 +2757,8 @@
             if (!(opts && opts.keepSkin)) setCvSkin('');
             const header = document.getElementById('cv-header');
             if (layout === 'minimal' || layout === 'compact') header.className = 'border-b dynamic-border pb-3 mb-6';
-            else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal' || layout === 'navy' || layout === 'azure' || layout === 'premium') header.className = 'pb-4 mb-5';
+            else if (layout === 'navy') header.className = '';
+            else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal' || layout === 'azure' || layout === 'premium') header.className = 'pb-4 mb-5';
             else header.className = 'border-b-2 dynamic-border pb-4 mb-5';
             window.QCLayout = layout;
             syncPhotoFieldVisibility(layout);
@@ -2956,6 +2957,106 @@
         }
         function isPremiumLayout() {
             return currentLayoutName() === 'premium';
+        }
+
+        function isClassicLayout() {
+            return currentLayoutName() === 'classic';
+        }
+
+        /** Express / ATS: stack skills, languages, and references in the main column. */
+        function ensureClassicLinearSections() {
+            const main = document.querySelector('#cv-target .cv-main');
+            if (!main) return;
+            const mil = document.getElementById('sec-military');
+            const skills = document.getElementById('sec-skills');
+            const langs = document.getElementById('sec-languages');
+            const refs = document.getElementById('sec-references');
+            let insertAfter = mil && mil.parentElement === main ? mil : null;
+            [skills, langs, refs].filter(Boolean).forEach((sec) => {
+                if (insertAfter && insertAfter.nextSibling) main.insertBefore(sec, insertAfter.nextSibling);
+                else main.appendChild(sec);
+                insertAfter = sec;
+            });
+        }
+
+        /** Restore skills/languages into the sidebar after leaving Express/classic. */
+        function restoreSidebarSkillSections() {
+            const sidebarInner = document.querySelector('#cv-target .cv-sidebar-inner')
+                || document.querySelector('#cv-target .cv-sidebar');
+            if (!sidebarInner) return;
+            const skills = document.getElementById('sec-skills');
+            const langs = document.getElementById('sec-languages');
+            const eduSide = document.getElementById('sec-education-side');
+            const extras = document.getElementById('sec-extras-side');
+            // Keep the common sidebar order: contact → education → skills → languages → extras
+            const contact = sidebarInner.querySelector('.cv-contact-sidebar');
+            let insertAfter = contact || null;
+            [eduSide, skills, langs, extras].filter(Boolean).forEach((sec) => {
+                if (sec.parentElement === sidebarInner && insertAfter && insertAfter.nextSibling === sec) {
+                    insertAfter = sec;
+                    return;
+                }
+                if (insertAfter && insertAfter.nextSibling) sidebarInner.insertBefore(sec, insertAfter.nextSibling);
+                else sidebarInner.appendChild(sec);
+                insertAfter = sec;
+            });
+        }
+
+        function paintAtsSkills(container, raw) {
+            if (!container) return;
+            container.replaceChildren();
+            container.classList.remove('whitespace-pre-line');
+            const items = splitListItems(raw);
+            if (!items.length) return;
+            const p = document.createElement('p');
+            p.className = 'cv-ats-plain';
+            p.setAttribute('dir', 'auto');
+            p.textContent = items.join(', ');
+            container.appendChild(p);
+        }
+
+        function paintAtsLanguages(container, raw, entries) {
+            if (!container) return;
+            container.replaceChildren();
+            container.classList.remove('whitespace-pre-line');
+            const isEnglish = window.QCCvLang === 'en';
+            let rows = [];
+            if (Array.isArray(entries) && entries.length) {
+                rows = entries.map((row) => {
+                    const localized = typeof localizeLangEntry === 'function'
+                        ? localizeLangEntry(row, isEnglish)
+                        : null;
+                    if (localized && localized.name) return localized;
+                    return {
+                        name: String(row.language || row.name || row.customName || '').trim(),
+                        levelLabel: String(row.proficiency || row.level || row.levelLabel || '').trim()
+                    };
+                }).filter((row) => row && row.name);
+            } else {
+                rows = splitListItems(raw).map((entry) => parseLangEntry(entry)).filter((row) => row && row.name);
+            }
+            if (!rows.length) {
+                if (raw) {
+                    const p = document.createElement('p');
+                    p.className = 'cv-ats-plain';
+                    p.setAttribute('dir', 'auto');
+                    p.textContent = String(raw).trim();
+                    container.appendChild(p);
+                }
+                return;
+            }
+            const list = document.createElement('ul');
+            list.className = 'cv-ats-lang-list';
+            list.setAttribute('dir', isEnglish ? 'ltr' : 'rtl');
+            rows.forEach((row) => {
+                const li = document.createElement('li');
+                li.className = 'cv-ats-lang-item';
+                li.setAttribute('dir', 'auto');
+                const level = String(row.levelLabel || '').trim();
+                li.textContent = level ? (row.name + ' — ' + level) : row.name;
+                list.appendChild(li);
+            });
+            container.appendChild(list);
         }
 
         function parseDatedBlocks(text) {
@@ -4207,6 +4308,7 @@
             }
 
             if (premium && window.QCPremiumExecutive && typeof QCPremiumExecutive.render === 'function') {
+                restoreSidebarSkillSections();
                 QCPremiumExecutive.render({
                     root: document.getElementById('cv-target'),
                     isEnglish: window.QCCvLang === 'en',
@@ -4248,6 +4350,10 @@
             }
 
             if (!charcoal && !navy && !azure) {
+                const classic = isClassicLayout();
+                if (classic) ensureClassicLinearSections();
+                else restoreSidebarSkillSections();
+
                 if (expOut) {
                     if (hasExp) paintExperienceJobs(expOut, expJobs, { dateInBody: true });
                     else paintPreviewSkeleton(expOut, 'job');
@@ -4256,8 +4362,13 @@
                     paintEducationItems(eduOut, eduVal);
                 }
                 if (eduSide) eduSide.replaceChildren();
-                if (skillOut) paintSkillBadges(skillOut, skillVal);
-                if (langOut) langOut.textContent = langVal;
+                if (classic) {
+                    if (skillOut) paintAtsSkills(skillOut, skillVal);
+                    if (langOut) paintAtsLanguages(langOut, langVal, langEntries);
+                } else {
+                    if (skillOut) paintSkillBadges(skillOut, skillVal);
+                    if (langOut) langOut.textContent = langVal;
+                }
                 showSec(expSec, true);
                 markSecSkel(expSec, !hasExp);
                 showSec(eduSec, true);
@@ -4265,7 +4376,7 @@
                 showSec(eduSideSec, false);
                 markSecSkel(eduSideSec, false);
                 showSec(skillSec, !!skillVal);
-                showSec(langSec, !!langVal);
+                showSec(langSec, !!langVal || !!(langEntries && langEntries.length));
                 if (extrasOut) extrasOut.replaceChildren();
                 showSec(extrasSec, false);
                 renderReferences(false);
@@ -4273,6 +4384,7 @@
             }
 
             if (azure) {
+                restoreSidebarSkillSections();
                 const lang = window.QCCvLang || 'he';
                 const summaryLabel = document.querySelector('#cv-target [data-i18n="summary"]');
                 const expLabel = document.querySelector('#cv-target [data-i18n="experience"]');
@@ -4348,6 +4460,7 @@
 
             showSec(extrasSec, false);
             applyCvI18n(window.QCCvLang || 'he');
+            restoreSidebarSkillSections();
 
             function renderTimeline(container, text, kind) {
                 if (!container) return;
@@ -4447,19 +4560,21 @@
             sec.style.display = 'block';
 
             // Premium: keep recommendations in the sidebar rail.
+            // Classic/Express: keep them last in the main column (linear ATS flow).
             // Other split layouts: recommendations stay last in the main column.
             try {
                 const layout = currentLayoutName();
                 const isPremium = layout === 'premium';
+                const isClassic = layout === 'classic';
                 const isSidebarLayout = ['sidebar', 'split', 'charcoal', 'azure', 'navy', 'premium'].includes(layout);
                 const cvMain = document.querySelector('#cv-target .cv-main');
                 const cvSidebarInner = document.querySelector('#cv-target .cv-sidebar-inner');
                 const cvColumns = document.querySelector('#cv-target .cv-columns');
                 if (isPremium && cvSidebarInner && sec.parentElement !== cvSidebarInner) {
                     cvSidebarInner.appendChild(sec);
-                } else if (!isPremium && isSidebarLayout && cvMain && sec.parentElement !== cvMain) {
+                } else if ((isClassic || (!isPremium && isSidebarLayout)) && cvMain && sec.parentElement !== cvMain) {
                     cvMain.appendChild(sec);
-                } else if (!isSidebarLayout && cvColumns && sec.parentElement !== cvColumns) {
+                } else if (!isClassic && !isSidebarLayout && cvColumns && sec.parentElement !== cvColumns) {
                     cvColumns.appendChild(sec);
                 }
             } catch (err) { /* ignore DOM order errors */ }

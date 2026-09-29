@@ -93,6 +93,8 @@ function markSelected(key: string): void {
   document.querySelectorAll(".template-card[data-example]").forEach((el) => {
     el.setAttribute("aria-pressed", el.getAttribute("data-example") === key ? "true" : "false");
   });
+  const sync = (window as Window & { syncPhotoFieldVisibility?: () => void }).syncPhotoFieldVisibility;
+  if (typeof sync === "function") sync();
 }
 
 export function renderTemplateGalleries(): void {

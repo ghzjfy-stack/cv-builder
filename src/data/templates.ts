@@ -81,6 +81,8 @@ export type CvTemplate = {
   field: string;
   preferredLang: "he" | "en";
   atsOptimized: boolean;
+  /** Whether the live CV layout renders a user profile photo. */
+  supportsPhoto: boolean;
   he: SamplePack;
   en: SamplePack;
 };
@@ -104,6 +106,7 @@ type Seed = {
   field: string;
   preferredLang?: "he" | "en";
   atsOptimized: boolean;
+  supportsPhoto?: boolean;
   pack: "tech" | "sales" | "mgmt" | "creative" | "student" | "entry" | "academic" | "cs" | "finance" | "health" | "ops" | "legal";
   subHe: string;
   subEn: string;
@@ -510,6 +513,7 @@ const SEEDS: Seed[] = [
     thumb: "lay-premium",
     field: "ops",
     atsOptimized: true,
+    supportsPhoto: true,
     pack: "ops",
     subHe: "יונתן • סמנכ״ל תפעול",
     subEn: "Jonathan • VP Operations",
@@ -528,6 +532,7 @@ const SEEDS: Seed[] = [
     field: "marketing",
     preferredLang: "en",
     atsOptimized: false,
+    supportsPhoto: false,
     pack: "sales",
     subHe: "רועי • מנהל מוצר",
     subEn: "Roy • Product Manager",
@@ -546,6 +551,7 @@ const SEEDS: Seed[] = [
     thumb: "lay-emerald",
     field: "ops",
     atsOptimized: false,
+    supportsPhoto: true,
     pack: "mgmt",
     subHe: "נועה • שיווק ודיגיטל",
     subEn: "Noa • Marketing & Digital",
@@ -563,6 +569,7 @@ const SEEDS: Seed[] = [
     thumb: "lay-simple",
     field: "edu",
     atsOptimized: true,
+    supportsPhoto: false,
     pack: "academic",
     subHe: "יעל • מורה",
     subEn: "Yael • Teacher",
@@ -658,6 +665,9 @@ function buildTemplate(seed: Seed): CvTemplate {
     field: seed.field,
     preferredLang: seed.preferredLang || "he",
     atsOptimized: seed.atsOptimized,
+    supportsPhoto: typeof seed.supportsPhoto === "boolean"
+      ? seed.supportsPhoto
+      : seed.layout === "premium" || seed.layout === "navy",
     he: packs.he,
     en: packs.en,
   };

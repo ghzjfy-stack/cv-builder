@@ -3253,6 +3253,11 @@
             min-width: 0;
             max-width: 100%;
         }
+        .layout-premium #sec-references {
+            order: 6;
+            min-width: 0;
+            max-width: 100%;
+        }
         .layout-premium #sec-education,
         .layout-premium #sec-military {
             display: none !important;
@@ -3294,8 +3299,7 @@
         .layout-premium .cv-main > section,
         .layout-premium .cv-main .exs-sec,
         .layout-premium #sec-summary,
-        .layout-premium #sec-experience,
-        .layout-premium #sec-references {
+        .layout-premium #sec-experience {
             margin: 0;
             padding: 0;
             min-width: 0;
@@ -3466,6 +3470,42 @@
             max-width: 100%;
             overflow-wrap: anywhere;
             word-break: break-word;
+        }
+        .layout-premium #out-languages,
+        .layout-premium #out-skills,
+        .layout-premium #out-references {
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .layout-premium .exs-ref-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+        }
+        .layout-premium .exs-ref-item,
+        .layout-premium .exs-ref-plain {
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .layout-premium .exs-ref-name {
+            margin: 0;
+            font-size: calc(0.66rem * var(--cv-scale));
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.35;
+        }
+        .layout-premium .exs-ref-role,
+        .layout-premium .exs-ref-line,
+        .layout-premium .exs-ref-plain {
+            margin: 0.1rem 0 0;
+            font-size: calc(0.58rem * var(--cv-scale));
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.68);
+            line-height: 1.4;
         }
         .layout-premium #out-summary {
             color: var(--premium-muted);
@@ -3914,6 +3954,7 @@
         .layout-premium #sec-languages,
         .layout-premium #sec-education-side,
         .layout-premium #sec-extras-side,
+        .layout-premium #sec-references,
         .layout-premium .exs-side-sec {
             width: 100%;
             max-width: 100%;
@@ -5547,6 +5588,10 @@
         }
         .photo-upload {
             position: relative;
+        }
+        .photo-upload[hidden],
+        .photo-upload.is-photo-disabled {
+            display: none !important;
         }
         .photo-upload-row {
             display: flex;

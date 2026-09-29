@@ -18,7 +18,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=premium16">
+    <link rel="stylesheet" href="./app.css?v=premium18">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -683,11 +683,11 @@
                             <label class="block text-xs text-white mb-1" for="in-linkedin" id="label-linkedin">קישור ל-LinkedIn / אתר</label>
                             <input type="text" id="in-linkedin" name="url" inputmode="url" value="" placeholder="linkedin.com/in/..." oninput="updateCV()" class="w-full studio-field bg-slate-900/60 border border-slate-600 p-2.5 text-sm rounded-lg text-white outline-none min-h-11">
                         </div>
-                        <div class="photo-upload">
+                        <div class="photo-upload" id="photo-upload-field" data-photo-field hidden aria-hidden="true">
                             <label class="block text-xs text-white mb-1" for="in-photo" id="label-photo">תמונת פרופיל</label>
                             <div class="photo-upload-row">
-                                <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="photo-upload-input">
-                                <button type="button" id="btn-photo-pick" class="photo-upload-btn" onclick="document.getElementById('in-photo').click()">בחירת קובץ</button>
+                                <input type="file" id="in-photo" accept="image/png,image/jpeg,image/jpg,image/webp" onchange="onPhotoChange(event)" class="photo-upload-input" disabled tabindex="-1">
+                                <button type="button" id="btn-photo-pick" class="photo-upload-btn" onclick="document.getElementById('in-photo').click()" disabled aria-disabled="true">בחירת קובץ</button>
                                 <span id="photo-file-status" class="photo-upload-status">לא נבחר קובץ</span>
                             </div>
                         </div>
@@ -1329,7 +1329,7 @@
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=core4"></script>
     <script src="lib/templateThumbs.js?v=premium2"></script>
-    <script src="lib/premiumExecutive.js?v=premium7"></script>
+    <script src="lib/premiumExecutive.js?v=premium9"></script>
     <script src="lib/export.js?v=pdf2"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
     <script src="lib/seoLandings.js?v=i18n1"></script>
@@ -1466,6 +1466,8 @@
             'bg-preview-sage'
         ];
         const LAYOUTS = ['classic', 'sidebar', 'minimal', 'executive', 'modern', 'compact', 'split', 'charcoal', 'azure', 'navy', 'premium'];
+        /** Layouts that offer a real profile-photo slot in the CV (premium + navy/emerald). */
+        const PHOTO_LAYOUTS = ['premium', 'navy'];
         const CV_FONT_ALIASES = {
             'Frank Ruhl Hofshi': 'Frank Ruhl Libre',
             'Frank Ruhl': 'Frank Ruhl Libre',
@@ -2714,6 +2716,40 @@
             window.QCSkin = skin && CV_SKINS.indexOf(skin) >= 0 ? skin : '';
         }
 
+        function layoutSupportsPhoto(layout) {
+            const exampleKey = String(window.QCExample || '').trim();
+            if (exampleKey) {
+                const id = resolveTemplateId(exampleKey);
+                const tpl = (window.QCTemplates || {})[id];
+                if (tpl && typeof tpl.supportsPhoto === 'boolean') return !!tpl.supportsPhoto;
+            }
+            const name = String(layout || currentLayoutName() || window.QCLayout || '').trim();
+            return PHOTO_LAYOUTS.indexOf(name) >= 0;
+        }
+
+        function syncPhotoFieldVisibility(layout) {
+            const wrap = document.getElementById('photo-upload-field')
+                || document.querySelector('[data-photo-field], .photo-upload');
+            if (!wrap) return;
+            const show = layoutSupportsPhoto(layout);
+            wrap.hidden = !show;
+            wrap.setAttribute('aria-hidden', show ? 'false' : 'true');
+            wrap.classList.toggle('is-photo-disabled', !show);
+            const input = document.getElementById('in-photo');
+            const btn = document.getElementById('btn-photo-pick');
+            if (input) {
+                input.disabled = !show;
+                if (!show) input.setAttribute('tabindex', '-1');
+                else input.removeAttribute('tabindex');
+            }
+            if (btn) {
+                btn.disabled = !show;
+                btn.setAttribute('aria-disabled', show ? 'false' : 'true');
+            }
+        }
+        window.syncPhotoFieldVisibility = syncPhotoFieldVisibility;
+        window.layoutSupportsPhoto = layoutSupportsPhoto;
+
         function setLayout(layout, btn, opts) {
             const target = document.getElementById('cv-target');
             LAYOUTS.forEach((name) => target.classList.remove('layout-' + name));
@@ -2724,6 +2760,7 @@
             else if (layout === 'executive' || layout === 'modern' || layout === 'charcoal' || layout === 'navy' || layout === 'azure' || layout === 'premium') header.className = 'pb-4 mb-5';
             else header.className = 'border-b-2 dynamic-border pb-4 mb-5';
             window.QCLayout = layout;
+            syncPhotoFieldVisibility(layout);
             applyCvI18n(window.QCCvLang === 'en' ? 'en' : 'he');
             updateCV();
         }
@@ -3294,7 +3331,7 @@
 
         function parseLangEntry(entry) {
             const raw = String(entry || '').trim();
-            const dash = raw.match(/^(.*?)\s+[—–]\s+(.+)$/);
+            const dash = raw.match(/^(.*?)\s+[—–\-]\s+(.+)$/);
             if (dash) return { name: dash[1].trim(), levelLabel: dash[2].trim() };
             const m = raw.match(/^(.*?)(?:\((.*)\))?$/);
             const name = (m && m[1] ? m[1] : entry).trim();
@@ -3481,6 +3518,48 @@
             const el = formField('in-languages');
             if (!el) return;
             el.value = serializeLanguageField(cvLangEntries, cvUiLang());
+        }
+
+        function localizeLangEntry(row, isEnglish) {
+            if (!row) return null;
+            const ui = isEnglish ? 'en' : 'he';
+            let name = '';
+            let levelLabel = '';
+            if (row.langId) {
+                const opt = findLangOption(row.langId);
+                if (opt) name = langOptionLabel(opt, ui);
+            }
+            if (!name) {
+                const rawName = String(row.name || row.language || row.customName || '').trim();
+                const matched = matchLangOption(rawName);
+                name = matched ? langOptionLabel(matched, ui) : rawName;
+            }
+            if (!name) return null;
+            if (row.levelId) {
+                const lvl = findLangLevel(row.levelId);
+                if (lvl) levelLabel = langLevelLabel(lvl, ui);
+            }
+            if (!levelLabel) {
+                levelLabel = String(row.levelLabel || row.proficiency || row.level || '').trim();
+            }
+            return { name: name, levelLabel: levelLabel };
+        }
+
+        function readLanguageEntriesPreview() {
+            if (Array.isArray(cvLangEntries) && cvLangEntries.length) {
+                return cvLangEntries.slice();
+            }
+            const raw = previewVal('in-languages');
+            if (!raw) return [];
+            return parseLanguageField(raw);
+        }
+
+        function readLanguagesPreview() {
+            if (Array.isArray(cvLangEntries) && cvLangEntries.length) {
+                writeLanguageField();
+                return serializeLanguageField(cvLangEntries, cvUiLang());
+            }
+            return previewVal('in-languages');
         }
 
         function selectedLangIds() {
@@ -4109,7 +4188,9 @@
             const hasExp = expJobs.length > 0;
             const eduVal = readEducationText();
             const skillVal = previewVal('in-skills');
-            const langVal = previewVal('in-languages');
+            const langVal = readLanguagesPreview();
+            const langEntries = readLanguageEntriesPreview();
+            const refVal = getVal('in-references');
             const expOut = cvOut('out-experience');
             const eduOut = cvOut('out-education');
             const eduSide = cvOut('out-education-side');
@@ -4127,17 +4208,22 @@
 
             if (premium && window.QCPremiumExecutive && typeof QCPremiumExecutive.render === 'function') {
                 QCPremiumExecutive.render({
+                    root: document.getElementById('cv-target'),
                     isEnglish: window.QCCvLang === 'en',
                     jobs: expJobs,
                     education: eduVal,
                     skills: skillVal,
                     languages: langVal,
+                    languageEntries: langEntries,
+                    references: refVal,
                     military: milVal,
                     expOut: expOut,
                     eduOut: eduOut,
                     eduSide: eduSide,
                     skillOut: skillOut,
                     langOut: langOut,
+                    refOut: cvOut('out-references'),
+                    refSec: document.getElementById('sec-references'),
                     milOut: cvOut('out-military'),
                     milSec: document.getElementById('sec-military'),
                     expSec: expSec,
@@ -4152,9 +4238,10 @@
                     paintEducationItems: paintEducationItems,
                     paintPreviewSkeleton: paintPreviewSkeleton,
                     paintMilitaryPreview: paintMilitaryPreview,
-                    renderReferences: renderReferences,
                     setDateRangeEl: setDateRangeEl,
                     parseLangEntry: parseLangEntry,
+                    parseReferenceBlocks: parseReferenceBlocks,
+                    localizeLangEntry: localizeLangEntry,
                     languageLevel: languageLevel
                 });
                 return;
@@ -4359,17 +4446,31 @@
             }
             sec.style.display = 'block';
 
-            // Ensure section order: Recommendations is always the very last section at the bottom
+            // Premium: keep recommendations in the sidebar rail.
+            // Other split layouts: recommendations stay last in the main column.
             try {
-                const isSidebarLayout = ['sidebar', 'split', 'charcoal', 'azure', 'navy', 'premium'].includes(currentLayoutName());
+                const layout = currentLayoutName();
+                const isPremium = layout === 'premium';
+                const isSidebarLayout = ['sidebar', 'split', 'charcoal', 'azure', 'navy', 'premium'].includes(layout);
                 const cvMain = document.querySelector('#cv-target .cv-main');
+                const cvSidebarInner = document.querySelector('#cv-target .cv-sidebar-inner');
                 const cvColumns = document.querySelector('#cv-target .cv-columns');
-                if (isSidebarLayout && cvMain && sec.parentElement !== cvMain) {
+                if (isPremium && cvSidebarInner && sec.parentElement !== cvSidebarInner) {
+                    cvSidebarInner.appendChild(sec);
+                } else if (!isPremium && isSidebarLayout && cvMain && sec.parentElement !== cvMain) {
                     cvMain.appendChild(sec);
                 } else if (!isSidebarLayout && cvColumns && sec.parentElement !== cvColumns) {
                     cvColumns.appendChild(sec);
                 }
             } catch (err) { /* ignore DOM order errors */ }
+
+            if (isPremiumLayout() && window.QCPremiumExecutive && typeof QCPremiumExecutive.paintReferences === 'function') {
+                QCPremiumExecutive.paintReferences(out, val, {
+                    isEnglish: window.QCCvLang === 'en',
+                    parseReferenceBlocks: parseReferenceBlocks
+                });
+                return;
+            }
 
             if (!structured) {
                 out.classList.add('whitespace-pre-line');
@@ -5146,6 +5247,7 @@
             document.querySelectorAll('.template-card[data-example]').forEach((el) => {
                 el.setAttribute('aria-pressed', el.getAttribute('data-example') === key ? 'true' : 'false');
             });
+            syncPhotoFieldVisibility();
             if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
         }
 
@@ -6052,8 +6154,10 @@
             }
             setPreviewBg('bg-preview-white', null, { silent: true });
             refreshSectionEditors();
+            syncPhotoFieldVisibility();
         } catch (err) {
             console.error('studio init failed', err);
+            try { syncPhotoFieldVisibility(); } catch (syncErr) { /* ignore */ }
         }
         applyStudioStep(1, { silent: true });
         if (typeof syncCheckoutGate === 'function') syncCheckoutGate();

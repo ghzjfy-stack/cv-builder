@@ -2952,12 +2952,14 @@
             grid-area: side !important;
             display: flex !important;
             flex-direction: column;
+            justify-content: flex-start !important;
             gap: 0;
             background: var(--premium-rail);
             color: #f6f6f6;
             border: 0;
             border-radius: 0;
-            padding: 0 0 calc(1.55rem * var(--cv-scale));
+            /* Fixed bottom inset — not scaled — so years never kiss the rail edge */
+            padding: 0 0 2.15rem !important;
             margin: 0 !important;
             min-width: 0;
             max-width: 100%;
@@ -2971,6 +2973,19 @@
             overflow: hidden !important;
             z-index: 2;
             isolation: isolate;
+        }
+        /* Extra flex-safe spacer (kept even if padding is overridden elsewhere). */
+        .layout-premium .cv-sidebar::after {
+            content: "" !important;
+            display: block !important;
+            flex: 0 0 0.35rem !important;
+            flex-shrink: 0 !important;
+            width: 100%;
+            height: 0.35rem !important;
+            min-height: 0.35rem !important;
+            background: transparent;
+            order: 100;
+            pointer-events: none;
         }
         .layout-premium .cv-photo-block {
             display: flex !important;
@@ -3024,32 +3039,39 @@
         .layout-premium .cv-sidebar-inner {
             display: flex !important;
             flex-direction: column;
-            flex: 1 1 auto;
-            gap: calc(0.72rem * var(--cv-scale));
-            padding: calc(0.8rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) calc(1.1rem * var(--cv-scale));
+            flex: 1 1 0 !important;
+            justify-content: flex-start;
+            gap: calc(0.65rem * var(--cv-scale));
+            padding: calc(0.75rem * var(--cv-scale)) calc(0.7rem * var(--cv-scale)) 0 !important;
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
             min-width: 0;
-            min-height: 0;
-            max-height: 100%;
+            min-height: 0 !important;
+            max-height: none !important;
+            height: auto !important;
             overflow: hidden !important;
             background: var(--premium-rail);
         }
         .layout-premium .cv-sidebar-inner > :last-child {
-            margin-bottom: 0;
-            padding-bottom: calc(0.35rem * var(--cv-scale));
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .layout-premium #sec-extras-side {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+            flex: 0 0 auto !important;
         }
         .layout-premium #sec-extras-side .cv-military-item:last-child,
         .layout-premium #sec-extras-side .cv-job:last-child,
         .layout-premium .cv-sidebar .cv-military-item:last-child {
-            margin-bottom: calc(0.45rem * var(--cv-scale)) !important;
-            padding-bottom: calc(0.2rem * var(--cv-scale));
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
         }
         .layout-premium #sec-extras-side .cv-job-date,
         .layout-premium #sec-extras-side .cv-military-years,
         .layout-premium .cv-sidebar .cv-military-years {
-            margin-bottom: 0.15rem;
+            margin-bottom: 0 !important;
             line-height: 1.35;
         }
         #cv-target.layout-premium .cv-sidebar,
@@ -7620,19 +7642,33 @@
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
-            height: 100% !important;
-            min-height: 100% !important;
-            max-height: 100% !important;
             overflow: hidden !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar {
-            padding-bottom: 1.55rem !important;
+            height: 100% !important;
+            min-height: 100% !important;
+            max-height: 100% !important;
+            padding-bottom: 2.15rem !important;
             box-sizing: border-box !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar::after,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar::after {
+            content: "" !important;
+            display: block !important;
+            flex: 0 0 0.35rem !important;
+            flex-shrink: 0 !important;
+            height: 0.35rem !important;
+            min-height: 0.35rem !important;
+            background: transparent !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
-            padding-bottom: 1.1rem !important;
+            flex: 1 1 0 !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            height: auto !important;
+            padding-bottom: 0 !important;
         }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {

@@ -42,6 +42,16 @@ const FONT_FILES = {
       "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
     ],
   },
+  Alef: {
+    regular: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/alef/Alef-Regular.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Regular.ttf",
+    ],
+    bold: [
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/alef/Alef-Bold.ttf",
+      "https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansHebrew/hinted/ttf/NotoSansHebrew-Bold.ttf",
+    ],
+  },
   "Varela Round": {
     regular: [
       "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/varelaround/VarelaRound-Regular.ttf",

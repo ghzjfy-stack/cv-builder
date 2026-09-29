@@ -1327,7 +1327,7 @@
     <script src="lib/addJobBoot.js?v=exp-ui6"></script>
     <script src="lib/entryEditor.js?v=exp-ui6"></script>
     <script src="lib/phrases.js?v=tpl-he3"></script>
-    <script src="lib/templates.js?v=premium2"></script>
+    <script src="lib/templates.js?v=core4"></script>
     <script src="lib/templateThumbs.js?v=premium2"></script>
     <script src="lib/premiumExecutive.js?v=premium7"></script>
     <script src="lib/export.js?v=pdf2"></script>
@@ -1479,8 +1479,21 @@
             { value: 'Frank Ruhl Libre', fallback: 'serif', he: 'פרנק רול — קלאסי ומכובד', en: 'Frank Ruhl — classic and distinguished' }
         ];
 
-        const TEMPLATE_ALIASES = { sales: 'sage', tech: 'slate', marketing: 'wine' };
+        const TEMPLATE_ALIASES = window.QCTemplateAliases || {
+            sales: 'charcoal', tech: 'charcoal', marketing: 'charcoal',
+            midnight: 'emerald', navy: 'emerald', petra: 'emerald',
+            azure: 'charcoal', mint: 'charcoal', blush: 'charcoal',
+            ink: 'simple', harvard: 'simple', compact: 'simple', ivory: 'simple'
+        };
         window.TEMPLATE_ALIASES = TEMPLATE_ALIASES;
+        function resolveTemplateId(id) {
+            if (typeof window.QCResolveTemplateId === 'function') return window.QCResolveTemplateId(id);
+            id = String(id || '').trim();
+            if (TEMPLATE_ALIASES[id]) id = TEMPLATE_ALIASES[id];
+            if ((window.QCTemplates || {})[id]) return id;
+            return (window.QCTemplateOrder && window.QCTemplateOrder[0]) || 'premium';
+        }
+        window.resolveTemplateId = resolveTemplateId;
 
         const CV_SAMPLE_IDS = ['in-name', 'in-title', 'in-phone', 'in-email', 'in-location', 'in-linkedin', 'in-summary', 'in-experience', 'in-education', 'in-military', 'in-skills', 'in-languages'];
         const CV_SAMPLES = {
@@ -4534,7 +4547,7 @@
         }
 
         function isTemplateSelected() {
-            const id = String(window.QCExample || '').trim();
+            const id = resolveTemplateId(window.QCExample || '');
             if (!id) return false;
             const bank = window.QCTemplates || {};
             if (bank[id]) return true;
@@ -5128,6 +5141,7 @@
         }
 
         function markTemplateCards(key) {
+            key = key ? resolveTemplateId(key) : '';
             window.QCExample = key || '';
             document.querySelectorAll('.template-card[data-example]').forEach((el) => {
                 el.setAttribute('aria-pressed', el.getAttribute('data-example') === key ? 'true' : 'false');
@@ -5243,11 +5257,11 @@
 
         function loadExample(key) {
             if (!key) return;
+            key = resolveTemplateId(key);
             if (typeof window.applyCvTemplate === 'function') {
                 window.applyCvTemplate(key);
                 return;
             }
-            if (TEMPLATE_ALIASES[key]) key = TEMPLATE_ALIASES[key];
             const tpl = (window.QCTemplates || {})[key];
             if (!tpl) return;
             const fromHome = document.body.classList.contains('on-home');
@@ -5899,6 +5913,7 @@
             renderRoleTitleChips();
             applyRoleExample({ replace: true });
             var layoutId = window.QCSeoPresets && QCSeoPresets.layoutFor(fieldId);
+            if (layoutId) layoutId = resolveTemplateId(layoutId);
             var tpl = layoutId && (window.QCTemplates || {})[layoutId];
             if (tpl) {
                 if (tpl.layout) setLayout(tpl.layout, null, { keepSkin: true });

@@ -15,9 +15,12 @@ export const TEMPLATES_MAP = {
   sidebar: SidebarTemplate,
   split: SidebarTemplate,
   modern: ModernTemplate,
+  charcoal: SidebarTemplate,
+  navy: SidebarTemplate,
   premium: ExecutiveSplitTemplate,
   'executive-split': ExecutiveSplitTemplate,
   'executive_split': ExecutiveSplitTemplate,
+  emerald: SidebarTemplate,
 };
 
 export function getTemplateComponent(name) {

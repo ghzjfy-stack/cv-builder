@@ -4,6 +4,7 @@ import {
   TEMPLATES,
   TEMPLATE_ORDER,
   registerQcTemplates,
+  resolveTemplateId,
   type CvTemplate,
 } from "../data/templates";
 import { badgeHtml, badgeOf, homeThumbHtml, thumbHtml } from "./thumbs";
@@ -87,6 +88,7 @@ function updateCountCopy(_n: number): void {
 }
 
 function markSelected(key: string): void {
+  key = key ? resolveTemplateId(key) : "";
   (window as Window & { QCExample?: string }).QCExample = key || "";
   document.querySelectorAll(".template-card[data-example]").forEach((el) => {
     el.setAttribute("aria-pressed", el.getAttribute("data-example") === key ? "true" : "false");
@@ -221,8 +223,7 @@ function applyDesign(tpl: CvTemplate): void {
 }
 
 function applyTemplate(key: string): void {
-  const aliases = (window as Window & { TEMPLATE_ALIASES?: Record<string, string> }).TEMPLATE_ALIASES || {};
-  if (aliases[key]) key = aliases[key];
+  key = resolveTemplateId(key);
   const tpl = TEMPLATES[key] || ((window as Window & { QCTemplates?: Record<string, CvTemplate> }).QCTemplates || {})[key];
   if (!tpl) return;
 

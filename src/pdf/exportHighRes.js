@@ -188,20 +188,89 @@ function prepareCaptureRoot(root, view) {
       node.id === "out-photo" ||
       node.id === "out-photo-fallback" ||
       Boolean(node.closest?.(".cv-photo"));
-    if (!keepClip) {
+    // Premium rail must keep overflow clipping so footer pad is not painted off-sheet.
+    const premiumRail =
+      node.classList.contains("cv-sidebar") ||
+      node.classList.contains("cv-sidebar-inner") ||
+      node.classList.contains("cv-sidebar-rail-pad") ||
+      Boolean(node.closest?.(".layout-premium > .cv-sidebar"));
+    if (keepClip || (premiumRail && node.closest?.(".layout-premium"))) {
+      if (keepClip || node.classList.contains("cv-sidebar") || node.classList.contains("cv-sidebar-inner")) {
+        node.style.overflow = "hidden";
+      }
+      if (keepClip) node.style.maxHeight = "";
+    } else {
       node.style.overflow = "visible";
       node.style.overflowX = "visible";
       node.style.overflowY = "visible";
       node.style.maxHeight = "none";
-    } else {
-      node.style.overflow = "hidden";
-      node.style.maxHeight = "";
     }
     node.style.textOverflow = "clip";
     node.style.boxShadow = "none";
     node.style.transform = "none";
   });
   flattenUnsupportedColors(root, win);
+}
+
+/** Keep Executive Split sidebar footer text clear of the A4 edge during capture. */
+function ensurePremiumSidebarFooter(sheet) {
+  if (!(sheet instanceof HTMLElement) || !sheet.classList.contains("layout-premium")) return;
+  const sidebar = sheet.querySelector(".cv-sidebar");
+  if (!(sidebar instanceof HTMLElement)) return;
+
+  sidebar.style.setProperty("display", "flex", "important");
+  sidebar.style.setProperty("flex-direction", "column", "important");
+  sidebar.style.setProperty("height", "100%", "important");
+  sidebar.style.setProperty("min-height", "100%", "important");
+  sidebar.style.setProperty("max-height", "100%", "important");
+  sidebar.style.setProperty("padding-bottom", "2rem", "important");
+  sidebar.style.setProperty("box-sizing", "border-box", "important");
+  sidebar.style.setProperty("overflow", "hidden", "important");
+  sidebar.style.setProperty("background", "#454545", "important");
+
+  const inner = sidebar.querySelector(".cv-sidebar-inner");
+  if (inner instanceof HTMLElement) {
+    // MUST stay auto/flex — height:100% eats the rail pad and clips recommendations.
+    inner.style.setProperty("flex", "1 1 0", "important");
+    inner.style.setProperty("height", "auto", "important");
+    inner.style.setProperty("min-height", "0", "important");
+    inner.style.setProperty("max-height", "none", "important");
+    inner.style.setProperty("overflow", "hidden", "important");
+    inner.style.setProperty("padding-top", "0.55rem", "important");
+    inner.style.setProperty("padding-left", "0.75rem", "important");
+    inner.style.setProperty("padding-right", "0.75rem", "important");
+    inner.style.setProperty("padding-bottom", "2.25rem", "important");
+    inner.style.setProperty("box-sizing", "border-box", "important");
+    inner.style.setProperty("background", "#454545", "important");
+  }
+
+  let railPad = sidebar.querySelector(".cv-sidebar-rail-pad");
+  if (!(railPad instanceof HTMLElement)) {
+    railPad = (sheet.ownerDocument || document).createElement("div");
+    railPad.className = "cv-sidebar-rail-pad";
+    railPad.setAttribute("aria-hidden", "true");
+    sidebar.appendChild(railPad);
+  }
+  railPad.style.setProperty("display", "block", "important");
+  railPad.style.setProperty("flex", "0 0 5rem", "important");
+  railPad.style.setProperty("flex-grow", "0", "important");
+  railPad.style.setProperty("flex-shrink", "0", "important");
+  railPad.style.setProperty("width", "100%", "important");
+  railPad.style.setProperty("height", "5rem", "important");
+  railPad.style.setProperty("min-height", "5rem", "important");
+  railPad.style.setProperty("max-height", "5rem", "important");
+  railPad.style.setProperty("margin", "0", "important");
+  railPad.style.setProperty("padding", "0", "important");
+  railPad.style.setProperty("background", "#454545", "important");
+  railPad.style.setProperty("order", "999", "important");
+  railPad.style.setProperty("pointer-events", "none", "important");
+
+  const refs = sidebar.querySelector("#sec-references");
+  if (refs instanceof HTMLElement) {
+    refs.style.setProperty("margin-bottom", "0.75rem", "important");
+    refs.style.setProperty("padding-bottom", "0.25rem", "important");
+    refs.style.setProperty("flex-shrink", "0", "important");
+  }
 }
 
 function isSidebarLayout(el) {
@@ -264,13 +333,23 @@ function lockCaptureSheetHeight(host) {
       if (el.classList.contains("cv-photo") || el.closest?.(".cv-photo")) return;
       el.style.alignSelf = "stretch";
     });
-    sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner").forEach((el) => {
+    sheet.querySelectorAll(".cv-sidebar").forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
       el.style.height = "100%";
       el.style.minHeight = "100%";
       el.style.maxHeight = "100%";
       el.style.overflow = "hidden";
     });
+    // Non-premium: stretch inner to fill. Premium must keep flex+auto so rail-pad survives.
+    if (!premium) {
+      sheet.querySelectorAll(".cv-sidebar-inner").forEach((el) => {
+        if (!(el instanceof HTMLElement)) return;
+        el.style.height = "100%";
+        el.style.minHeight = "100%";
+        el.style.maxHeight = "100%";
+        el.style.overflow = "hidden";
+      });
+    }
   }
 
   if (premium) {
@@ -279,6 +358,7 @@ function lockCaptureSheetHeight(host) {
       el.style.overflow = "hidden";
       el.style.maxHeight = "100%";
     });
+    ensurePremiumSidebarFooter(sheet);
   }
 }
 
@@ -416,7 +496,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
         height: "100%",
         minHeight: "100%",
         maxHeight: "100%",
-        paddingBottom: "1.75rem",
+        paddingBottom: "2rem",
         boxSizing: "border-box",
         background: "#454545",
         color: "#f6f6f6",
@@ -430,8 +510,12 @@ function prepareCaptureClone(sourceId = "cv-target") {
           paddingTop: "0.55rem",
           paddingLeft: "0.75rem",
           paddingRight: "0.75rem",
-          paddingBottom: "2rem",
+          paddingBottom: "2.25rem",
           boxSizing: "border-box",
+          height: "auto",
+          minHeight: "0",
+          maxHeight: "none",
+          flex: "1 1 0",
         });
       }
       paintRail(sidebar.querySelector(".cv-photo-block"), "#3a3a3a");
@@ -440,11 +524,11 @@ function prepareCaptureClone(sourceId = "cv-target") {
       if (railPad instanceof HTMLElement) {
         Object.assign(railPad.style, {
           display: "block",
-          flex: "0 0 4.5rem",
+          flex: "0 0 5rem",
           flexShrink: "0",
-          height: "4.5rem",
-          minHeight: "4.5rem",
-          maxHeight: "4.5rem",
+          height: "5rem",
+          minHeight: "5rem",
+          maxHeight: "5rem",
           width: "100%",
         });
       }
@@ -904,6 +988,7 @@ async function captureToCanvas(el) {
               host.style.height = A4_CSS_H + "px";
               host.style.maxHeight = A4_CSS_H + "px";
               host.style.overflow = "hidden";
+              ensurePremiumSidebarFooter(sheet);
             }
             const cloned = measureLinks(host);
             if (cloned.links.length) linkMeta = cloned;

@@ -375,9 +375,103 @@ function prepareCaptureClone(sourceId = "cv-target") {
     transform: "none",
     boxShadow: "none",
   });
-  // Premium grid placement is authored in LTR column order; keep clone writing mode LTR.
-  if (clone.classList.contains("layout-premium")) {
+  // Keep grid anatomy LTR; place the rail by language (HE right / EN left).
+  const english = clone.classList.contains("cv-lang-en");
+  if (
+    clone.classList.contains("layout-premium") ||
+    clone.classList.contains("layout-charcoal") ||
+    clone.classList.contains("layout-navy") ||
+    clone.classList.contains("layout-azure") ||
+    clone.classList.contains("layout-sidebar") ||
+    clone.classList.contains("layout-split")
+  ) {
     clone.style.direction = "ltr";
+  }
+  if (clone.classList.contains("layout-premium")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "30% 70%" : "70% 30%",
+      gridTemplateRows: "auto minmax(0, 1fr)",
+      gridTemplateAreas: english ? '"side head" "side main"' : '"head side" "main side"',
+      columnGap: "0",
+      rowGap: "0",
+      background: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
+    });
+    const paintRail = (el, bg) => {
+      if (!(el instanceof HTMLElement)) return;
+      el.style.background = bg;
+      el.style.WebkitPrintColorAdjust = "exact";
+      el.style.printColorAdjust = "exact";
+    };
+    const sidebar = clone.querySelector(".cv-sidebar");
+    if (sidebar instanceof HTMLElement) {
+      Object.assign(sidebar.style, {
+        gridArea: "side",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        minHeight: "100%",
+        maxHeight: "100%",
+        background: "#454545",
+        color: "#f6f6f6",
+        WebkitPrintColorAdjust: "exact",
+        printColorAdjust: "exact",
+      });
+      paintRail(sidebar.querySelector(".cv-sidebar-inner"), "#454545");
+      paintRail(sidebar.querySelector(".cv-photo-block"), "#3a3a3a");
+      paintRail(sidebar.querySelector(".cv-sidebar-rail-pad"), "#454545");
+    }
+    const header = clone.querySelector("#cv-header");
+    if (header instanceof HTMLElement) header.style.gridArea = "head";
+    const main = clone.querySelector(".cv-main");
+    if (main instanceof HTMLElement) {
+      main.style.gridArea = "main";
+      main.style.background = "#ffffff";
+    }
+  } else if (clone.classList.contains("layout-charcoal")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "minmax(0, 0.34fr) minmax(0, 1fr)" : "minmax(0, 1fr) minmax(0, 0.34fr)",
+      gridTemplateRows: "auto 1fr",
+      gridTemplateAreas: english ? '"side head" "side main"' : '"head side" "main side"',
+    });
+  } else if (clone.classList.contains("layout-navy")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "minmax(0, 0.36fr) minmax(0, 0.64fr)" : "minmax(0, 0.64fr) minmax(0, 0.36fr)",
+      gridTemplateRows: "auto auto 1fr",
+      gridTemplateAreas: english
+        ? '"photo main" "head main" "side main"'
+        : '"main photo" "main head" "main side"',
+    });
+  } else if (clone.classList.contains("layout-azure")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english
+        ? "minmax(0, 0.4fr) 1px minmax(0, 1fr)"
+        : "minmax(0, 1fr) 1px minmax(0, 0.4fr)",
+      gridTemplateRows: "auto 1fr",
+      gridTemplateAreas: english
+        ? '"head head head" "side rule main"'
+        : '"head head head" "main rule side"',
+    });
+  } else if (clone.classList.contains("layout-sidebar") || clone.classList.contains("layout-split")) {
+    const cols = clone.querySelector(".cv-columns");
+    if (cols instanceof HTMLElement) {
+      Object.assign(cols.style, {
+        direction: "ltr",
+        display: "grid",
+        gridTemplateColumns: english ? "minmax(0, 0.34fr) minmax(0, 1fr)" : "minmax(0, 1fr) minmax(0, 0.34fr)",
+        gridTemplateAreas: english ? '"side main"' : '"main side"',
+      });
+    }
   }
   if (!fullBleed && !isSidebarLayout(clone)) {
     clone.style.display = "block";

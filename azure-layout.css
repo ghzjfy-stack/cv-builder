@@ -331,6 +331,23 @@
     direction: rtl;
     text-align: right;
 }
+#cv-target:not(.cv-lang-en).layout-azure,
+#cv-target-page2:not(.cv-lang-en).layout-azure,
+#qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure {
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 0.4fr) !important;
+    grid-template-areas:
+        "head head head"
+        "main rule side" !important;
+}
+#cv-target.cv-lang-en.layout-azure,
+#cv-target-page2.cv-lang-en.layout-azure,
+#qc-print-host .cv-print-sheet.cv-lang-en.layout-azure {
+    grid-template-columns: minmax(0, 0.4fr) 1px minmax(0, 1fr) !important;
+    grid-template-areas:
+        "head head head"
+        "side rule main" !important;
+}
+
 #cv-target:not(.cv-lang-en).layout-azure #cv-header,
 #cv-target-page2:not(.cv-lang-en).layout-azure #cv-header,
 #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure #cv-header {
@@ -374,14 +391,23 @@
 @media print {
     html.qc-print-mode #qc-print-host .layout-azure {
         display: grid !important;
-        grid-template-columns: minmax(0, 1fr) 1px minmax(0, 0.4fr) !important;
         grid-template-rows: auto 1fr !important;
-        grid-template-areas:
-            "head head head"
-            "main rule side" !important;
+        direction: ltr !important;
         background: #fff !important;
         min-height: 277mm !important;
         color: #1a1a1a !important;
+    }
+    html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-azure {
+        grid-template-columns: minmax(0, 1fr) 1px minmax(0, 0.4fr) !important;
+        grid-template-areas:
+            "head head head"
+            "main rule side" !important;
+    }
+    html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-azure {
+        grid-template-columns: minmax(0, 0.4fr) 1px minmax(0, 1fr) !important;
+        grid-template-areas:
+            "head head head"
+            "side rule main" !important;
     }
     html.qc-print-mode #qc-print-host .layout-azure .cv-columns {
         display: contents !important;

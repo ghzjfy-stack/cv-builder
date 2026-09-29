@@ -38,16 +38,27 @@ function skillPct(label, index) {
   return 62 + ((hash + index * 17) % 31);
 }
 
-function langStars(level) {
-  const low = String(level || '').toLowerCase();
-  let pct = 70;
-  if (/אם|native|mother/.test(low)) pct = 100;
-  else if (/מקצוע|c2|full professional/.test(low)) pct = 92;
-  else if (/fluent|שוטפת|גבוה|advanced|high/.test(low)) pct = 86;
-  else if (/טוב|good/.test(low)) pct = 68;
-  else if (/בינונ|intermediate/.test(low)) pct = 52;
-  else if (/בסיס|basic/.test(low)) pct = 34;
-  return Math.max(1, Math.min(5, Math.round(pct / 20)));
+function langLevelLabel(level, isEnglish) {
+  const raw = String(level || '').trim();
+  const low = raw.toLowerCase();
+  if (!low) return '';
+  let id = '';
+  if (/אם נוספת|bilingual/.test(low)) id = 'bilingual';
+  else if (/אם|native|mother/.test(low)) id = 'native';
+  else if (/מקצוע|professional|c2|full professional|טכני|technical/.test(low)) id = 'professional';
+  else if (/שוטפ|fluent|גבוה|advanced|high|c1/.test(low)) id = 'fluent';
+  else if (/בינונ|intermediate|b1|b2|טוב|good/.test(low)) id = 'intermediate';
+  else if (/בסיס|basic|a1|a2|beginner/.test(low)) id = 'basic';
+  else return raw;
+  const labels = {
+    native: { he: 'שפת אם', en: 'Native' },
+    bilingual: { he: 'שפת אם נוספת', en: 'Bilingual' },
+    professional: { he: 'שליטה מקצועית', en: 'Professional' },
+    fluent: { he: 'שליטה גבוהה', en: 'Fluent' },
+    intermediate: { he: 'שליטה בינונית', en: 'Intermediate' },
+    basic: { he: 'שליטה בסיסית', en: 'Basic' },
+  };
+  return isEnglish ? labels[id].en : labels[id].he;
 }
 
 function boldMetrics(line) {
@@ -189,19 +200,17 @@ export default function ExecutiveSplitTemplate({
               <h3 className="cv-section-title">{isEnglish ? 'Languages' : 'שפות'}</h3>
               <div className="exs-lang-list">
                 {languages.map((lang) => {
-                  const filled = langStars(lang.level || lang.name);
+                  const levelText = langLevelLabel(lang.level, isEnglish);
                   return (
                     <div key={lang.name} className="exs-lang-row">
                       <span className="exs-lang-name" dir="auto">
                         {lang.name}
                       </span>
-                      <span className="exs-lang-stars" aria-label={lang.level || lang.name}>
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} className={`exs-star${i < filled ? ' is-on' : ''}`} aria-hidden="true">
-                            ★
-                          </span>
-                        ))}
-                      </span>
+                      {levelText ? (
+                        <span className="exs-lang-level" dir="auto">
+                          {levelText}
+                        </span>
+                      ) : null}
                     </div>
                   );
                 })}

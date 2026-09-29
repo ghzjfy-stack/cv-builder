@@ -262,10 +262,6 @@ function lockCaptureSheetHeight(host) {
   }
 
   if (premium) {
-    // Keep education / military in the main column for capture clones.
-    sheet.querySelectorAll("#sec-education-side, #sec-extras-side").forEach((el) => {
-      if (el instanceof HTMLElement) el.style.display = "none";
-    });
     sheet.querySelectorAll(".cv-main").forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
       el.style.overflow = "hidden";

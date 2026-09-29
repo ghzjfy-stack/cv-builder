@@ -273,8 +273,8 @@ export default function ExecutiveSplitTemplate({
                 {isEnglish ? 'Military / National Service' : 'שירות צבאי / לאומי'}
               </h3>
               {military.map((m, idx) => (
-                <div key={`${m.role}-${idx}`} className="cv-job cv-military-item">
-                  <div className="cv-job-head">
+                <div key={`${m.role}-${idx}`} className="cv-job cv-military-item" dir={dir}>
+                  <div className="cv-job-head cv-military-head" dir={dir}>
                     <p className="cv-job-title cv-military-role">{m.role || m.title}</p>
                     {m.dates || m.years ? (
                       <span className="cv-job-date cv-military-years" dir="ltr">

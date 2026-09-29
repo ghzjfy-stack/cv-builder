@@ -3477,13 +3477,16 @@
         .layout-premium.exs-root .cv-sidebar .cv-military-item .cv-job-head {
             display: flex !important;
             flex-direction: column !important;
-            align-items: stretch !important;
+            align-items: flex-start !important;
             justify-content: flex-start !important;
             flex-wrap: nowrap !important;
-            gap: 0.12rem !important;
+            gap: 0.14rem !important;
             width: 100%;
             max-width: 100%;
             min-width: 0;
+            min-height: 0 !important;
+            height: auto !important;
+            flex: 0 0 auto !important;
             box-sizing: border-box;
         }
         #cv-target.layout-premium .cv-sidebar .cv-job,
@@ -3541,12 +3544,62 @@
             color: rgba(255, 255, 255, 0.58) !important;
             font-size: calc(0.56rem * var(--cv-scale));
             font-weight: 500;
-            white-space: normal !important;
+            white-space: nowrap !important;
             max-width: 100%;
+            width: fit-content !important;
             overflow: visible !important;
             text-overflow: unset !important;
             direction: ltr !important;
             unicode-bidi: isolate;
+            align-self: flex-start !important;
+            flex: 0 0 auto !important;
+            margin: 0.08rem 0 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            text-align: left !important;
+            line-height: 1.35;
+        }
+        /* Keep military block compact — years sit directly under the unit/role */
+        #cv-target.layout-premium .cv-sidebar .cv-military-item,
+        #cv-target.layout-premium #sec-extras-side,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item,
+        #cv-target-page2.layout-premium #sec-extras-side,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item {
+            flex: 0 0 auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin-top: 0 !important;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #cv-target.layout-premium .cv-sidebar .cv-military-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-head,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item .cv-job-head,
+        .layout-premium.exs-root .cv-sidebar .cv-military-head {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            gap: 0.14rem !important;
+            flex: 0 0 auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            width: 100%;
+            max-width: 100%;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-military-role,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-role,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-role,
+        .layout-premium.exs-root .cv-sidebar .cv-military-role {
+            display: block !important;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 !important;
         }
         #cv-target.layout-premium .cv-sidebar .cv-edu-meta,
         #cv-target.layout-premium .cv-sidebar .cv-job-role,

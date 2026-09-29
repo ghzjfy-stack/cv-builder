@@ -343,6 +343,10 @@ function prepareCaptureClone(sourceId = "cv-target") {
     transform: "none",
     boxShadow: "none",
   });
+  // Premium grid placement is authored in LTR column order; keep clone writing mode LTR.
+  if (clone.classList.contains("layout-premium")) {
+    clone.style.direction = "ltr";
+  }
   if (!fullBleed && !isSidebarLayout(clone)) {
     clone.style.display = "block";
   }

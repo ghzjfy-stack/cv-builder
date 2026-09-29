@@ -2881,8 +2881,12 @@
             --premium-serif: 'Playfair Display', 'Frank Ruhl Libre', 'Times New Roman', serif;
             --premium-sans: Inter, Heebo, 'Segoe UI', sans-serif;
             --premium-pad-x: calc(1.2rem * var(--cv-scale));
+            --premium-side: minmax(0, 30%);
+            --premium-main: minmax(0, 70%);
             display: grid;
-            grid-template-columns: minmax(0, 0.3fr) minmax(0, 0.7fr);
+            /* Keep grid writing mode LTR so column placement is explicit (not flipped by dir=rtl). */
+            direction: ltr !important;
+            grid-template-columns: var(--premium-side) var(--premium-main);
             grid-template-rows: auto 1fr;
             grid-template-areas: "side head" "side main";
             column-gap: 0;
@@ -2893,7 +2897,6 @@
             padding: 0 !important;
             margin: 0;
             background: #fff;
-            direction: ltr;
             text-align: start;
             font-family: var(--cv-font), var(--premium-sans);
             font-size: calc(0.74rem * var(--cv-scale));
@@ -2902,19 +2905,20 @@
             color: var(--premium-ink);
             box-sizing: border-box;
         }
-        /* HE: mirror columns — dark rail on the reading start (right) */
+        /* Hebrew (RTL): sidebar 30% on the right, main 70% on the left */
         #cv-target:not(.cv-lang-en).layout-premium,
         #cv-target-page2:not(.cv-lang-en).layout-premium,
         #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium,
         .layout-premium.exs-root:not(.cv-lang-en) {
-            grid-template-columns: minmax(0, 0.7fr) minmax(0, 0.3fr);
+            grid-template-columns: var(--premium-main) var(--premium-side);
             grid-template-areas: "head side" "main side";
         }
+        /* English (LTR): sidebar 30% on the left, main 70% on the right */
         #cv-target.cv-lang-en.layout-premium,
         #cv-target-page2.cv-lang-en.layout-premium,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium,
         .layout-premium.exs-root.cv-lang-en {
-            grid-template-columns: minmax(0, 0.3fr) minmax(0, 0.7fr);
+            grid-template-columns: var(--premium-side) var(--premium-main);
             grid-template-areas: "side head" "side main";
         }
         #qc-print-host .cv-print-sheet.layout-premium {
@@ -3152,12 +3156,26 @@
             overflow-wrap: anywhere;
         }
         .layout-premium .exs-skill-track {
-            display: block;
+            display: flex;
             width: 100%;
             height: 5px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.2);
             overflow: hidden;
+            direction: ltr;
+            unicode-bidi: isolate;
+        }
+        #cv-target:not(.cv-lang-en).layout-premium .exs-skill-track,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .exs-skill-track,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .exs-skill-track,
+        .layout-premium.exs-root:not(.cv-lang-en) .exs-skill-track {
+            justify-content: flex-end;
+        }
+        #cv-target.cv-lang-en.layout-premium .exs-skill-track,
+        #cv-target-page2.cv-lang-en.layout-premium .exs-skill-track,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .exs-skill-track,
+        .layout-premium.exs-root.cv-lang-en .exs-skill-track {
+            justify-content: flex-start;
         }
         .layout-premium .exs-skill-fill {
             display: block;
@@ -3165,6 +3183,7 @@
             border-radius: inherit;
             background: #ffffff;
             max-width: 100%;
+            flex: 0 0 auto;
         }
         .layout-premium .exs-lang-row {
             display: flex;
@@ -3319,9 +3338,14 @@
         #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium #cv-header,
         #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-main,
         #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-sidebar,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-sidebar-inner {
-            direction: rtl;
-            text-align: right;
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-sidebar-inner,
+        .layout-premium.exs-root:not(.cv-lang-en) > #cv-header,
+        .layout-premium.exs-root:not(.cv-lang-en) .cv-main,
+        .layout-premium.exs-root:not(.cv-lang-en) .cv-sidebar,
+        .layout-premium.exs-root:not(.cv-lang-en) .cv-sidebar-inner {
+            direction: rtl !important;
+            text-align: right !important;
+            unicode-bidi: isolate;
         }
         #cv-target.cv-lang-en.layout-premium #cv-header,
         #cv-target.cv-lang-en.layout-premium .cv-main,
@@ -3334,9 +3358,26 @@
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium #cv-header,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-main,
         #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-sidebar,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-sidebar-inner {
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-sidebar-inner,
+        .layout-premium.exs-root.cv-lang-en > #cv-header,
+        .layout-premium.exs-root.cv-lang-en .cv-main,
+        .layout-premium.exs-root.cv-lang-en .cv-sidebar,
+        .layout-premium.exs-root.cv-lang-en .cv-sidebar-inner {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: isolate;
+        }
+        /* Sidebar internals stay tidy in both directions */
+        .layout-premium .cv-photo-block {
             direction: ltr;
-            text-align: left;
+        }
+        .layout-premium .cv-contact-sidebar,
+        .layout-premium #sec-skills,
+        .layout-premium #sec-languages,
+        .layout-premium .exs-side-sec {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .layout-premium .exs-name {
@@ -7412,9 +7453,19 @@
                 display: flex !important;
             }
 
-            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns,
             html.qc-print-mode #qc-print-host .layout-premium .cv-columns {
-                display: grid !important;
+                display: contents !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium {
+                direction: ltr !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium {
+                grid-template-columns: 70% 30% !important;
+                grid-template-areas: "head side" "main side" !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium {
+                grid-template-columns: 30% 70% !important;
+                grid-template-areas: "side head" "side main" !important;
             }
 
             html.qc-print-mode #qc-print-host .layout-charcoal {

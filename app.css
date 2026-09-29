@@ -2923,9 +2923,9 @@
         }
         #qc-print-host .cv-print-sheet.layout-premium {
             min-height: 297mm;
-            height: auto;
-            max-height: none;
-            overflow: visible;
+            height: 297mm;
+            max-height: 297mm;
+            overflow: hidden;
         }
         .layout-premium .cv-columns { display: contents; }
         .layout-premium .cv-col-rule { display: none !important; }
@@ -7525,6 +7525,33 @@
             padding: 0 !important;
             overflow: hidden !important;
             min-height: 1123px !important;
+        }
+        /* Premium: hard-lock capture to one A4 — prevents blank page-2 sidebar stubs */
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-premium,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-premium {
+            height: 1123px !important;
+            max-height: 1123px !important;
+        }
+        #qc-print-host.qc-capturing:has(.layout-premium),
+        html.qc-exporting #qc-print-host:has(.layout-premium) {
+            height: 1123px !important;
+            max-height: 1123px !important;
+            overflow: hidden !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
+            height: 100% !important;
+            min-height: 100% !important;
+            max-height: 100% !important;
+            overflow: hidden !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium #sec-education-side,
+        #qc-print-host.qc-capturing .layout-premium #sec-extras-side,
+        html.qc-exporting #qc-print-host .layout-premium #sec-education-side,
+        html.qc-exporting #qc-print-host .layout-premium #sec-extras-side {
+            display: none !important;
         }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {

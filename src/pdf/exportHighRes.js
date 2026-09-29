@@ -217,6 +217,8 @@ function lockCaptureSheetHeight(host) {
   const sheet = host?.querySelector?.(".cv-print-sheet");
   if (!(sheet instanceof HTMLElement)) return;
   const sidebarish = isSidebarLayout(sheet) || isFullBleedLayout(sheet);
+  const premium = sheet.classList.contains("layout-premium");
+
   // Measure natural content height first (overflow hidden would clip the measure).
   sheet.style.height = "auto";
   sheet.style.minHeight = "0px";
@@ -228,14 +230,22 @@ function lockCaptureSheetHeight(host) {
     Math.ceil(sheet.scrollHeight || 0),
     Math.ceil(sheet.offsetHeight || 0),
   );
-  // Content that fits on one A4 must stay exactly one page (avoid a stub page 2).
-  const fitsOne = contentH <= A4_CSS_H + 12;
+
+  // Executive Split is always a single A4 sheet. Other sidebar layouts get a small slack
+  // so tiny measurement noise does not spawn a blank stub page 2.
+  const slack = premium ? 220 : 12;
+  const fitsOne = premium || contentH <= A4_CSS_H + slack;
   const needed = fitsOne ? A4_CSS_H : contentH;
+
   sheet.style.minHeight = `${needed}px`;
   sheet.style.height = `${needed}px`;
+  sheet.style.maxHeight = fitsOne ? `${needed}px` : "none";
   sheet.style.overflow = "hidden";
   host.style.minHeight = `${needed}px`;
   host.style.height = fitsOne ? `${needed}px` : "auto";
+  host.style.maxHeight = fitsOne ? `${needed}px` : "none";
+  host.style.overflow = fitsOne ? "hidden" : "visible";
+
   if (sidebarish) {
     sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner, .cv-main, .cv-columns, .cv-photo-block, #cv-header").forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
@@ -246,6 +256,20 @@ function lockCaptureSheetHeight(host) {
       if (!(el instanceof HTMLElement)) return;
       el.style.height = "100%";
       el.style.minHeight = "100%";
+      el.style.maxHeight = "100%";
+      el.style.overflow = "hidden";
+    });
+  }
+
+  if (premium) {
+    // Keep education / military in the main column for capture clones.
+    sheet.querySelectorAll("#sec-education-side, #sec-extras-side").forEach((el) => {
+      if (el instanceof HTMLElement) el.style.display = "none";
+    });
+    sheet.querySelectorAll(".cv-main").forEach((el) => {
+      if (!(el instanceof HTMLElement)) return;
+      el.style.overflow = "hidden";
+      el.style.maxHeight = "100%";
     });
   }
 }
@@ -532,7 +556,9 @@ function clampCanvasToPageBounds(canvas) {
     return canvas;
   }
   const overflow = canvas.height - pagePxH;
-  if (overflow <= Math.ceil(pagePxH * 0.1)) {
+  // Crop larger stubs too when the overflow is only a sidebar fragment / blank margin.
+  const softLimit = Math.ceil(pagePxH * 0.22);
+  if (overflow <= softLimit || isCanvasRegionBlank(canvas, pagePxH, overflow) || isSidebarStubSlice(canvas, pagePxH, overflow)) {
     const cropped = document.createElement("canvas");
     cropped.width = canvas.width;
     cropped.height = pagePxH;
@@ -543,6 +569,32 @@ function clampCanvasToPageBounds(canvas) {
     return cropped;
   }
   return canvas;
+}
+
+/** True when leftover pixels are only a dark sidebar strip (blank stub page 2). */
+function isSidebarStubSlice(canvas, y0, height) {
+  const h = Math.min(canvas.height - y0, Math.max(0, Math.ceil(height)));
+  if (h <= 0) return true;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return false;
+  const { width } = canvas;
+  const data = ctx.getImageData(0, Math.max(0, Math.floor(y0)), width, h).data;
+  const sideW = Math.ceil(width * 0.34);
+  let inkSide = 0;
+  let inkMid = 0;
+  for (let row = 0; row < h; row += 2) {
+    for (let x = 0; x < width; x += 3) {
+      const i = (row * width + x) * 4;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      if (r > 245 && g > 245 && b > 245) continue;
+      if (x < sideW || x >= width - sideW) inkSide += 1;
+      else inkMid += 1;
+      if (inkMid > 35) return false;
+    }
+  }
+  return inkMid <= 35 && inkSide >= 0;
 }
 
 function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
@@ -563,6 +615,10 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
     const remaining = totalH - y;
     if (y > 0 && remaining < pagePxH * 0.1) break;
     if (remaining < Math.max(10, pagePxH * 0.03) && isCanvasRegionBlank(source, y, remaining)) {
+      break;
+    }
+    // Drop blank / sidebar-fragment continuation pages.
+    if (y > 0 && (isCanvasRegionBlank(source, y, remaining) || isSidebarStubSlice(source, y, remaining))) {
       break;
     }
     let next = Math.min(totalH, y + pagePxH);
@@ -628,13 +684,16 @@ async function captureToCanvas(el) {
     lockCaptureSheetHeight(el);
     let linkMeta = measureLinks(el);
     const sheet = el.querySelector?.(".cv-print-sheet");
+    const premium = sheet instanceof HTMLElement && sheet.classList.contains("layout-premium");
     const lockedH =
       sheet instanceof HTMLElement ? Math.ceil(parseFloat(sheet.style.height) || sheet.offsetHeight || 0) : 0;
     const width = Math.max(A4_CSS_PX, Math.ceil(el.offsetWidth || el.scrollWidth || A4_CSS_PX));
-    const height = Math.max(
-      A4_CSS_H,
-      lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
-    );
+    const height = premium
+      ? A4_CSS_H
+      : Math.max(
+          A4_CSS_H,
+          lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
+        );
     // Prefer print-like DPI; keep mobile under memory limits.
     const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2.25 : 3);
     // Floor scale for crisp text; true vector export would rewrite the pipeline.
@@ -683,15 +742,29 @@ async function captureToCanvas(el) {
           const sheet = host.querySelector(".cv-print-sheet");
           if (sheet instanceof HTMLElement) {
             const fullBleed = isFullBleedLayout(sheet) || isSidebarLayout(sheet);
+            const premium = sheet.classList.contains("layout-premium");
             sheet.style.minHeight = A4_CSS_H + "px";
             sheet.style.height = A4_CSS_H + "px";
-            sheet.style.maxHeight = "none";
-            sheet.style.overflow = fullBleed ? "hidden" : "visible";
+            sheet.style.maxHeight = premium || fullBleed ? A4_CSS_H + "px" : "none";
+            sheet.style.overflow = fullBleed || premium ? "hidden" : "visible";
             sheet.style.transform = "none";
-            if (fullBleed) sheet.style.padding = "0";
+            if (fullBleed || premium) sheet.style.padding = "0";
+            if (premium) {
+              host.style.height = A4_CSS_H + "px";
+              host.style.maxHeight = A4_CSS_H + "px";
+              host.style.overflow = "hidden";
+            }
           }
           prepareCaptureRoot(host, doc.defaultView);
           lockCaptureSheetHeight(host);
+          if (sheet instanceof HTMLElement && sheet.classList.contains("layout-premium")) {
+            sheet.style.height = A4_CSS_H + "px";
+            sheet.style.maxHeight = A4_CSS_H + "px";
+            sheet.style.overflow = "hidden";
+            host.style.height = A4_CSS_H + "px";
+            host.style.maxHeight = A4_CSS_H + "px";
+            host.style.overflow = "hidden";
+          }
           const cloned = measureLinks(host);
           if (cloned.links.length) linkMeta = cloned;
         }

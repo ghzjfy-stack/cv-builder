@@ -13,9 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Critical UI + CV fonts only; display=swap + async stylesheet load -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=skills-chips1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
     <link rel="stylesheet" href="./app.css?v=premium29">
@@ -925,9 +925,10 @@
                     <label class="block text-xs text-white mb-1" for="font-select" id="font-select-label">טיפוגרפיה עברית</label>
                     <select id="font-select" onchange="setCvFont(this.value)" class="studio-field w-full bg-slate-900/60 border border-slate-600 text-sm rounded-lg p-2.5 text-white outline-none min-h-11">
                         <option value="Rubik" selected style="font-family:'Rubik',sans-serif">רוביק — מודרני וחד</option>
+                        <option value="Alef" style="font-family:'Alef',sans-serif">אלף — גיאומטרי ומדויק</option>
                         <option value="Heebo" style="font-family:'Heebo',sans-serif">היבו — נקי ומקצועי</option>
-                        <option value="Assistant" style="font-family:'Assistant',sans-serif">אסיסטנט — אלגנטי ונגיש</option>
-                        <option value="Varela Round" style="font-family:'Varela Round',sans-serif">ורלה — רך וידידותי</option>
+                        <option value="Assistant" style="font-family:'Assistant',sans-serif">אסיסטנט — חם וקריא</option>
+                        <option value="Varela Round" style="font-family:'Varela Round',sans-serif">ורלה — עגול וידידותי</option>
                         <option value="Frank Ruhl Libre" style="font-family:'Frank Ruhl Libre',serif">פרנק רול — קלאסי ומכובד</option>
                     </select>
                 </div>
@@ -1481,9 +1482,10 @@
         };
         const CV_FONTS = [
             { value: 'Rubik', fallback: 'sans-serif', he: 'רוביק — מודרני וחד', en: 'Rubik — modern and sharp' },
+            { value: 'Alef', fallback: 'sans-serif', he: 'אלף — גיאומטרי ומדויק', en: 'Alef — geometric and precise' },
             { value: 'Heebo', fallback: 'sans-serif', he: 'היבו — נקי ומקצועי', en: 'Heebo — clean and professional' },
-            { value: 'Assistant', fallback: 'sans-serif', he: 'אסיסטנט — אלגנטי ונגיש', en: 'Assistant — elegant and accessible' },
-            { value: 'Varela Round', fallback: 'sans-serif', he: 'ורלה — רך וידידותי', en: 'Varela — soft and friendly' },
+            { value: 'Assistant', fallback: 'sans-serif', he: 'אסיסטנט — חם וקריא', en: 'Assistant — warm and readable' },
+            { value: 'Varela Round', fallback: 'sans-serif', he: 'ורלה — עגול וידידותי', en: 'Varela — round and friendly' },
             { value: 'Frank Ruhl Libre', fallback: 'serif', he: 'פרנק רול — קלאסי ומכובד', en: 'Frank Ruhl — classic and distinguished' }
         ];
 

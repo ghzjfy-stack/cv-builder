@@ -416,7 +416,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
         height: "100%",
         minHeight: "100%",
         maxHeight: "100%",
-        paddingBottom: "0",
+        paddingBottom: "1.75rem",
         boxSizing: "border-box",
         background: "#454545",
         color: "#f6f6f6",
@@ -430,7 +430,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
           paddingTop: "0.55rem",
           paddingLeft: "0.75rem",
           paddingRight: "0.75rem",
-          paddingBottom: "1.25rem",
+          paddingBottom: "2rem",
           boxSizing: "border-box",
         });
       }
@@ -440,11 +440,11 @@ function prepareCaptureClone(sourceId = "cv-target") {
       if (railPad instanceof HTMLElement) {
         Object.assign(railPad.style, {
           display: "block",
-          flex: "0 0 3.5rem",
+          flex: "0 0 4.5rem",
           flexShrink: "0",
-          height: "3.5rem",
-          minHeight: "3.5rem",
-          maxHeight: "3.5rem",
+          height: "4.5rem",
+          minHeight: "4.5rem",
+          maxHeight: "4.5rem",
           width: "100%",
         });
       }

@@ -3109,7 +3109,7 @@
             color: #f6f6f6;
             border: 0;
             border-radius: 0;
-            padding: 0 !important;
+            padding: 0 0 1.75rem !important;
             margin: 0 !important;
             min-width: 0;
             max-width: 100%;
@@ -3133,13 +3133,13 @@
         .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad {
             display: block !important;
-            flex: 0 0 3.5rem !important;
+            flex: 0 0 4.5rem !important;
             flex-grow: 0 !important;
             flex-shrink: 0 !important;
             width: 100% !important;
-            height: 3.5rem !important;
-            min-height: 3.5rem !important;
-            max-height: 3.5rem !important;
+            height: 4.5rem !important;
+            min-height: 4.5rem !important;
+            max-height: 4.5rem !important;
             margin: 0 !important;
             padding: 0 !important;
             background: var(--premium-rail, #454545) !important;
@@ -3239,7 +3239,7 @@
             align-content: flex-start !important;
             gap: calc(0.68rem * var(--cv-scale));
             /* Safe bottom padding so last sections never kiss the rail floor / PDF edge. */
-            padding: calc(0.55rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(1.25rem * var(--cv-scale)) !important;
+            padding: calc(0.55rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(2rem * var(--cv-scale)) !important;
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -3257,10 +3257,10 @@
             flex: 1 1 0 !important;
             min-height: 0 !important;
             max-height: none !important;
-            padding-bottom: calc(1.25rem * var(--cv-scale)) !important;
+            padding-bottom: calc(2rem * var(--cv-scale)) !important;
         }
         .layout-premium .cv-sidebar-inner > :last-child {
-            margin-bottom: 0 !important;
+            margin-bottom: 0.65rem !important;
             padding-bottom: 0 !important;
             flex-grow: 0 !important;
             flex-shrink: 0 !important;
@@ -3316,6 +3316,8 @@
             order: 6;
             min-width: 0;
             max-width: 100%;
+            margin-bottom: 0.65rem !important;
+            padding-bottom: 0.15rem !important;
         }
         .layout-premium #sec-education,
         .layout-premium #sec-military {
@@ -8013,7 +8015,7 @@
             height: 100% !important;
             min-height: 100% !important;
             max-height: 100% !important;
-            padding-bottom: 0 !important;
+            padding-bottom: 1.75rem !important;
             box-sizing: border-box !important;
             background: #454545 !important;
             color: #f6f6f6 !important;
@@ -8037,11 +8039,11 @@
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
             display: block !important;
-            flex: 0 0 3.5rem !important;
+            flex: 0 0 4.5rem !important;
             flex-shrink: 0 !important;
-            height: 3.5rem !important;
-            min-height: 3.5rem !important;
-            max-height: 3.5rem !important;
+            height: 4.5rem !important;
+            min-height: 4.5rem !important;
+            max-height: 4.5rem !important;
             background: #454545 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -8054,7 +8056,7 @@
             height: auto !important;
             padding-top: calc(0.55rem * var(--cv-scale, 1)) !important;
             padding-inline: calc(0.75rem * var(--cv-scale, 1)) !important;
-            padding-bottom: 1.25rem !important;
+            padding-bottom: 2rem !important;
             background: #454545 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -8346,7 +8348,7 @@
                 min-height: 100% !important;
                 max-height: 100% !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: 0 0 1.75rem !important;
                 overflow: hidden !important;
                 background: #454545 !important;
                 color: #f6f6f6 !important;
@@ -8378,13 +8380,20 @@
                 print-color-adjust: exact !important;
             }
             /* Keep sidebar footer text clear of the A4 edge when printing / PDF. */
+            #cv-target.layout-premium .cv-sidebar,
+            #cv-target-page2.layout-premium .cv-sidebar,
+            .layout-premium.exs-root .cv-sidebar,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar {
+                padding-bottom: 1.75rem !important;
+                box-sizing: border-box !important;
+            }
             #cv-target.layout-premium .cv-sidebar-inner,
             #cv-target-page2.layout-premium .cv-sidebar-inner,
             .layout-premium.exs-root .cv-sidebar-inner,
             html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar-inner {
                 padding-top: 0.55rem !important;
                 padding-inline: 0.75rem !important;
-                padding-bottom: 1.25rem !important;
+                padding-bottom: 2rem !important;
                 box-sizing: border-box !important;
             }
             #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
@@ -8392,11 +8401,11 @@
             .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad,
             html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
                 display: block !important;
-                flex: 0 0 3.5rem !important;
+                flex: 0 0 4.5rem !important;
                 flex-shrink: 0 !important;
-                height: 3.5rem !important;
-                min-height: 3.5rem !important;
-                max-height: 3.5rem !important;
+                height: 4.5rem !important;
+                min-height: 4.5rem !important;
+                max-height: 4.5rem !important;
             }
             #cv-target.layout-premium .cv-photo-block,
             #cv-target-page2.layout-premium .cv-photo-block,

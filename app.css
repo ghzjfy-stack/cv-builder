@@ -5877,7 +5877,7 @@
                 align-items: center;
                 gap: 0.85rem;
                 overflow-x: hidden;
-                overflow-y: hidden;
+                overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 overscroll-behavior: contain;
             }
@@ -5887,11 +5887,10 @@
                 width: 100%;
                 max-width: 100%;
                 height: auto;
-                min-height: 0 !important;
-                max-height: 100%;
+                min-height: 0;
                 aspect-ratio: 1 / 1.414;
                 overflow: hidden !important;
-                flex: 0 1 auto;
+                flex: 0 0 auto;
             }
         }
 

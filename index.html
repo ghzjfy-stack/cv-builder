@@ -18,7 +18,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=premium15">
+    <link rel="stylesheet" href="./app.css?v=premium16">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -1335,7 +1335,7 @@
     <script src="lib/seoLandings.js?v=i18n1"></script>
     <script src="lib/seoPresets.js"></script>
     <script src="lib/spellcheck.js"></script>
-    <script src="lib/pageFit.js?v=a4space2"></script>
+    <script src="lib/pageFit.js?v=a4space3"></script>
     <script src="lib/handoff.js?v=import3"></script>
     <script src="lib/samplePreview.js?v=accent-scope1"></script>
     <script type="module" src="./src/main.ts"></script>
@@ -5701,14 +5701,26 @@
             return w < 1024;
         }
 
+        let _qcNarrowLatch = null;
+        let _qcNarrowTimer = 0;
         function syncNarrowStudio() {
-            const narrow = isNarrowStudio();
+            const w = Math.min(window.innerWidth || 0, document.documentElement.clientWidth || window.innerWidth || 0);
+            /* Hysteresis around the desktop breakpoint so scrollbar/layout jitter cannot open/close the live preview. */
+            let narrow;
+            if (_qcNarrowLatch === true) narrow = w < 1040;
+            else if (_qcNarrowLatch === false) narrow = w < 1008;
+            else narrow = w < 1024;
+            _qcNarrowLatch = narrow;
             document.documentElement.classList.toggle('qc-narrow', narrow);
             const col = document.getElementById('preview-column');
             if (!narrow) closeMobilePreview();
             else if (col && !col.classList.contains('mobile-preview-open')) {
                 col.setAttribute('aria-hidden', 'true');
             }
+        }
+        function syncNarrowStudioSoon() {
+            window.clearTimeout(_qcNarrowTimer);
+            _qcNarrowTimer = window.setTimeout(syncNarrowStudio, 120);
         }
 
         function applyView(mode) {
@@ -6119,7 +6131,7 @@
             const page = window.QCLandings && QCLandings.fromPath(href);
             if (page) showSeoLanding(page);
         });
-        window.addEventListener('resize', syncNarrowStudio);
+        window.addEventListener('resize', syncNarrowStudioSoon);
         window.addEventListener('orientationchange', function () {
             window.setTimeout(syncNarrowStudio, 80);
         });

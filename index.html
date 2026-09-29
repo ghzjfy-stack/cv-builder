@@ -18,7 +18,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=a4fill2-i18n">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=premium5">
+    <link rel="stylesheet" href="./app.css?v=premium6">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -1100,7 +1100,7 @@
                                 <div id="out-languages" class="text-slate-700"></div>
                             </div>
                             <div id="sec-extras-side">
-                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1">פרטים נוספים</h3>
+                                <h3 class="cv-section-title font-bold uppercase tracking-wider dynamic-text border-b border-slate-200 pb-1 mb-1" data-i18n="military">שירות צבאי / לאומי</h3>
                                 <div id="out-extras-side"></div>
                             </div>
                             </div>
@@ -1328,7 +1328,7 @@
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=premium2"></script>
     <script src="lib/templateThumbs.js?v=premium2"></script>
-    <script src="lib/premiumExecutive.js?v=premium3"></script>
+    <script src="lib/premiumExecutive.js?v=premium4"></script>
     <script src="lib/export.js?v=pdf2"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
     <script src="lib/seoLandings.js?v=i18n1"></script>
@@ -4091,11 +4091,14 @@
                     education: eduVal,
                     skills: skillVal,
                     languages: langVal,
+                    military: milVal,
                     expOut: expOut,
                     eduOut: eduOut,
                     eduSide: eduSide,
                     skillOut: skillOut,
                     langOut: langOut,
+                    milOut: cvOut('out-military'),
+                    milSec: document.getElementById('sec-military'),
                     expSec: expSec,
                     eduSec: eduSec,
                     eduSideSec: eduSideSec,
@@ -4107,6 +4110,7 @@
                     markSecSkel: markSecSkel,
                     paintEducationItems: paintEducationItems,
                     paintPreviewSkeleton: paintPreviewSkeleton,
+                    paintMilitaryPreview: paintMilitaryPreview,
                     renderReferences: renderReferences,
                     setDateRangeEl: setDateRangeEl,
                     parseLangEntry: parseLangEntry,

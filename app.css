@@ -2945,14 +2945,14 @@
             margin: 0;
             min-width: 0;
             max-width: 100%;
+            width: 100%;
             min-height: 100%;
             height: 100%;
             align-self: stretch;
             box-sizing: border-box;
-            overflow: hidden;
             overflow-x: clip;
+            overflow-y: visible;
             z-index: 1;
-            contain: inline-size;
         }
         .layout-premium .cv-photo-block {
             display: flex !important;
@@ -3007,15 +3007,15 @@
             display: flex !important;
             flex-direction: column;
             flex: 1 1 auto;
-            gap: calc(1rem * var(--cv-scale));
-            padding: calc(0.9rem * var(--cv-scale)) calc(0.8rem * var(--cv-scale)) calc(1.2rem * var(--cv-scale));
+            gap: calc(0.9rem * var(--cv-scale));
+            padding: calc(0.85rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(1.4rem * var(--cv-scale));
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
             min-width: 0;
             min-height: 0;
-            overflow: hidden;
             overflow-x: clip;
+            overflow-y: visible;
         }
         #cv-target.layout-premium .cv-sidebar,
         #cv-target-page2.layout-premium .cv-sidebar,
@@ -3029,11 +3029,26 @@
             margin: 0;
             order: 1;
             min-width: 0;
+            max-width: 100%;
         }
-        .layout-premium #sec-languages { order: 2; min-width: 0; }
-        .layout-premium #sec-skills { order: 3; min-width: 0; }
-        .layout-premium #sec-education-side,
-        .layout-premium #sec-extras-side { order: 9; display: none !important; }
+        .layout-premium #sec-languages { order: 2; min-width: 0; max-width: 100%; }
+        .layout-premium #sec-skills { order: 3; min-width: 0; max-width: 100%; }
+        .layout-premium #sec-education-side {
+            order: 4;
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .layout-premium #sec-extras-side {
+            order: 5;
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .layout-premium #sec-education,
+        .layout-premium #sec-military {
+            display: none !important;
+        }
 
         #cv-target.layout-premium > #cv-header,
         #cv-target-page2.layout-premium > #cv-header,
@@ -3302,30 +3317,36 @@
             overflow-wrap: anywhere;
         }
         .layout-premium .exs-achievements {
-            margin-top: 0.45rem;
-            padding: 0.42rem 0.55rem 0.45rem;
-            background: #fafafa;
-            border: 1px solid var(--premium-line);
-            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            padding: 0.35rem 0 0;
+            background: transparent;
+            border: 0;
+            border-top: 1px solid var(--premium-line);
+            border-radius: 0;
             min-width: 0;
             box-sizing: border-box;
         }
         .layout-premium .exs-achievements-title {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            margin: 0 0 0.28rem;
-            font-family: var(--premium-serif);
+            display: inline-block;
+            margin: 0 0 0.35rem;
+            padding: 0.12rem 0;
+            font-family: var(--premium-sans);
             font-weight: 700;
-            font-size: calc(0.74rem * var(--cv-scale));
+            font-size: calc(0.62rem * var(--cv-scale));
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             color: var(--premium-ink);
+            border-bottom: 1.5px solid var(--premium-ink);
+            line-height: 1.3;
         }
-        .layout-premium .exs-achievements-ico {
-            color: #c9a227;
-            font-size: 0.8rem;
-            line-height: 1;
-            flex: 0 0 auto;
+        #cv-target:not(.cv-lang-en).layout-premium .exs-achievements-title,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .exs-achievements-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .exs-achievements-title,
+        .layout-premium.exs-root:not(.cv-lang-en) .exs-achievements-title {
+            letter-spacing: 0.03em;
+            text-transform: none;
         }
+        .layout-premium .exs-achievements-ico { display: none !important; }
         .layout-premium .exs-metric {
             font-weight: 700;
             color: var(--premium-ink);
@@ -3333,6 +3354,7 @@
         .layout-premium .cv-edu-item {
             margin: 0 0 0.55rem;
             min-width: 0;
+            max-width: 100%;
         }
         .layout-premium .cv-edu-item .cv-job-title,
         .layout-premium .cv-edu-item .cv-edu-school {
@@ -3344,6 +3366,129 @@
         .layout-premium .cv-edu-item .cv-edu-meta {
             color: var(--premium-muted);
             font-size: calc(0.72rem * var(--cv-scale));
+        }
+
+        /* Sidebar education / military — stack & wrap inside the rail */
+        #cv-target.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target.layout-premium #sec-extras-side .cv-job-head,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-item .cv-job-head,
+        #cv-target.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #cv-target-page2.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target-page2.layout-premium #sec-extras-side .cv-job-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-item .cv-job-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-item .cv-job-head,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item .cv-job-head {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            justify-content: flex-start !important;
+            flex-wrap: nowrap !important;
+            gap: 0.12rem !important;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-job,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-item,
+        #cv-target.layout-premium .cv-sidebar .cv-military-item,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-item,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-item,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item,
+        .layout-premium.exs-root .cv-sidebar .cv-job,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-item,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin: 0 0 0.55rem;
+            box-sizing: border-box;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-job-title,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-school,
+        #cv-target.layout-premium .cv-sidebar .cv-military-role,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job-title,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-school,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-role,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job-title,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-school,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-role,
+        .layout-premium.exs-root .cv-sidebar .cv-job-title,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-school,
+        .layout-premium.exs-root .cv-sidebar .cv-military-role {
+            color: rgba(255, 255, 255, 0.95) !important;
+            font-family: var(--premium-sans);
+            font-weight: 600;
+            font-size: calc(0.66rem * var(--cv-scale));
+            line-height: 1.35;
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-job-date,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-date,
+        #cv-target.layout-premium .cv-sidebar .cv-military-years,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job-date,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-date,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-date,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-years,
+        .layout-premium.exs-root .cv-sidebar .cv-job-date,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-date,
+        .layout-premium.exs-root .cv-sidebar .cv-military-years {
+            color: rgba(255, 255, 255, 0.58) !important;
+            font-size: calc(0.56rem * var(--cv-scale));
+            font-weight: 500;
+            white-space: normal !important;
+            max-width: 100%;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-edu-meta,
+        #cv-target.layout-premium .cv-sidebar .cv-job-role,
+        #cv-target.layout-premium .cv-sidebar .cv-military-sub,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-meta,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job-role,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-sub,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-meta,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job-role,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-sub,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-meta,
+        .layout-premium.exs-root .cv-sidebar .cv-job-role,
+        .layout-premium.exs-root .cv-sidebar .cv-military-sub {
+            color: rgba(255, 255, 255, 0.72) !important;
+            font-size: calc(0.58rem * var(--cv-scale));
+            line-height: 1.35;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            margin: 0.1rem 0 0;
+        }
+        .layout-premium .cv-sidebar .cv-extra-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+        .layout-premium .cv-sidebar .cv-extra-list li {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: calc(0.64rem * var(--cv-scale));
+            line-height: 1.4;
+            margin: 0 0 0.3rem;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
         /* Text direction: panels follow CV language; grid column order mirrored above */
@@ -3397,11 +3542,14 @@
         .layout-premium .cv-contact-sidebar > *,
         .layout-premium #sec-skills,
         .layout-premium #sec-languages,
+        .layout-premium #sec-education-side,
+        .layout-premium #sec-extras-side,
         .layout-premium .exs-side-sec {
             width: 100%;
             max-width: 100%;
             min-width: 0;
             box-sizing: border-box;
+            overflow-wrap: anywhere;
         }
         .layout-premium .cv-sidebar .cv-section-title {
             max-width: 100%;
@@ -3433,7 +3581,8 @@
         .layout-premium .exs-side-sec {
             min-width: 0;
             max-width: 100%;
-            overflow: hidden;
+            overflow-x: clip;
+            overflow-y: visible;
         }
 
         /* Prevent density header spacing from crushing premium header */

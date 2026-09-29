@@ -87,23 +87,43 @@ async function waitForCvFonts() {
   const name = selectedCvFontName();
   const loads = [];
   if (document.fonts?.load) {
-    ["400", "500", "600", "700"].forEach((weight) => {
+    ["400", "700"].forEach((weight) => {
       loads.push(document.fonts.load(`${weight} 16px "${name}"`));
     });
   }
   if (document.fonts?.ready) loads.push(document.fonts.ready);
   if (loads.length) {
     try {
-      await Promise.all(loads);
+      await Promise.race([
+        Promise.all(loads),
+        new Promise((resolve) => setTimeout(resolve, 2500)),
+      ]);
     } catch {
       /* fallback glyphs are fine */
     }
   }
 }
 
+function withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(label || "timeout")), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
+
 function setSpinner(on) {
   const busy = !!on;
   window.__qcPdfBusy = busy;
+  window.__qcPdfBusyAt = busy ? Date.now() : 0;
   document.documentElement.classList.toggle("qc-pdf-busy", busy);
 
   const el = document.getElementById("pdf-spinner");
@@ -145,23 +165,15 @@ function setSpinner(on) {
 
 function flattenUnsupportedColors(root, view) {
   const win = view || window;
-  const nodes = [root, ...root.querySelectorAll("*")];
-  nodes.forEach((node) => {
-    if (!(node instanceof HTMLElement)) return;
+  const nodes = root.querySelectorAll("*");
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (!(node instanceof HTMLElement)) continue;
     const cs = win.getComputedStyle(node);
-    node.style.color = cs.color;
-    if (cs.backgroundColor && cs.backgroundColor !== "rgba(0, 0, 0, 0)") {
-      node.style.backgroundColor = cs.backgroundColor;
-    }
-    node.style.borderTopColor = cs.borderTopColor;
-    node.style.borderRightColor = cs.borderRightColor;
-    node.style.borderBottomColor = cs.borderBottomColor;
-    node.style.borderLeftColor = cs.borderLeftColor;
-    node.style.fontFamily = cs.fontFamily;
-    // html2canvas often drops filter/blur — strip for fidelity.
+    // Strip filters only — full color flatten on every node is too slow for large CVs.
     if (cs.filter && cs.filter !== "none") node.style.filter = "none";
     if (cs.backdropFilter && cs.backdropFilter !== "none") node.style.backdropFilter = "none";
-  });
+  }
 }
 
 function prepareCaptureRoot(root, view) {
@@ -395,52 +407,57 @@ function isIOS() {
 
 /**
  * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Prefer Web Share on mobile (saves to Files / opens share sheet);
- * fall back to <a download> + temporary tab open on iOS.
+ * Use exactly one primary path — firing anchor + pdf.save together can cancel the download.
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
 
-  const file = new File([blob], filename, { type: "application/pdf" });
-  if (isMobileUa() && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: filename });
-      return "shared";
-    } catch (err) {
-      if (err && err.name === "AbortError") return "aborted";
-      /* fall through to classic download */
-    }
-  }
-
-  if (pdf && typeof pdf.save === "function" && !isIOS()) {
-    try {
-      pdf.save(filename);
-      return "saved";
-    } catch {
-      /* fall through */
+  if (isMobileUa()) {
+    const file = new File([blob], filename, { type: "application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: filename });
+        return "shared";
+      } catch (err) {
+        if (err && err.name === "AbortError") return "aborted";
+        /* fall through */
+      }
     }
   }
 
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.rel = "noopener";
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-  if (isIOS()) {
-    try {
-      window.open(url, "_blank", "noopener");
-    } catch {
-      /* Safari may block without a gesture — green button remains. */
+    if (isIOS()) {
+      try {
+        window.open(url, "_blank", "noopener");
+        return "tab";
+      } catch {
+        /* keep anchor */
+      }
     }
+    return "anchor";
+  } catch {
+    if (pdf && typeof pdf.save === "function") {
+      try {
+        pdf.save(filename);
+        return "saved";
+      } catch {
+        /* ignore */
+      }
+    }
+    throw new Error("pdf-download-failed");
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 20000);
   }
-
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 12000);
-  return "anchor";
 }
 
 function isMostlyBlankRow(data, width, y) {
@@ -603,13 +620,33 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
   const pagePxH = Math.floor(usableH * pxPerMm);
   const sx = source.width / Math.max(1, hostWidth);
   const sy = source.height / Math.max(1, hostHeight);
+
+  const pushJpeg = (imgCanvas, sliceMm, linkY0, linkY1) => {
+    pdf.addImage(
+      imgCanvas.toDataURL("image/jpeg", 0.9),
+      "JPEG",
+      marginMm,
+      marginMm,
+      usableW,
+      sliceMm,
+      undefined,
+      "FAST",
+    );
+    overlayPdfLinks(pdf, links, linkY0, linkY1, sx, sy, pxPerMm, marginMm);
+  };
+
+  /* Single A4 sheet — skip blank-row scanning and extra canvas copies. */
+  if (!startNewPage && source.height <= pagePxH + 2) {
+    pushJpeg(source, Math.min(usableH, source.height / pxPerMm), 0, source.height);
+    return;
+  }
+
   let y = 0;
   let first = !startNewPage;
   const totalH = source.height;
 
   while (y < totalH - 1) {
     const remaining = totalH - y;
-    // Never create a near-empty trailing page from leftover pixels.
     if (y > 0 && remaining < pagePxH * 0.1) break;
     if (remaining < Math.max(10, pagePxH * 0.03) && isCanvasRegionBlank(source, y, remaining)) {
       break;
@@ -621,7 +658,6 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
     let next = Math.min(totalH, y + pagePxH);
     if (next < totalH) {
       next = findSplitY(source, next, y + Math.floor(pagePxH * 0.55));
-      // If the split would leave only a stub, absorb into this page / stop.
       if (totalH - next < pagePxH * 0.1) next = totalH;
     }
     const sliceH = Math.max(1, next - y);
@@ -635,22 +671,11 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
     const ctx = slice.getContext("2d");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, slice.width, slice.height);
-    ctx.drawImage(source, 0, y, source.width, sliceH, 0, 0, slice.width, sliceH);
+    ctx.drawImage(source, 0, y, source.width, sliceH, 0, 0, source.width, sliceH);
 
     if (!first) pdf.addPage();
     first = false;
-    const sliceMm = Math.min(usableH, sliceH / pxPerMm);
-    pdf.addImage(
-      slice.toDataURL("image/jpeg", 0.995),
-      "JPEG",
-      marginMm,
-      marginMm,
-      usableW,
-      sliceMm,
-      undefined,
-      "SLOW",
-    );
-    overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm, marginMm);
+    pushJpeg(slice, Math.min(usableH, sliceH / pxPerMm), y, y + sliceH);
     y += sliceH;
   }
 }
@@ -677,7 +702,6 @@ async function captureToCanvas(el) {
   }
 
   try {
-    await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     lockCaptureSheetHeight(el);
     let linkMeta = measureLinks(el);
@@ -686,89 +710,91 @@ async function captureToCanvas(el) {
     const lockedH =
       sheet instanceof HTMLElement ? Math.ceil(parseFloat(sheet.style.height) || sheet.offsetHeight || 0) : 0;
     const width = Math.max(A4_CSS_PX, Math.ceil(el.offsetWidth || el.scrollWidth || A4_CSS_PX));
-    // Prefer the locked sheet height so overflow:hidden one-pagers don't grow a stub page.
     const height = premium
       ? A4_CSS_H
       : Math.max(
           A4_CSS_H,
           lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
         );
-    // Prefer print-like DPI; keep mobile under memory limits.
-    const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2.25 : 3);
-    // Floor scale for crisp text; true vector export would rewrite the pipeline.
-    const scale = Math.min(Math.max(dpr, isMobileUa() ? 2 : 2.75), MAX_CANVAS / width, MAX_CANVAS / height);
+    // ~150–160 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
+    const mobile = isMobileUa();
+    const scale = Math.min(mobile ? 1.75 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
 
-    const canvas = await html2canvas(el, {
-      scale: Math.max(isMobileUa() ? 2 : 2.5, scale),
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: "#ffffff",
-      logging: false,
-      width,
-      height,
-      windowWidth: Math.max(width, A4_CSS_PX),
-      windowHeight: Math.max(height, A4_CSS_H),
-      scrollX: 0,
-      scrollY: 0,
-      imageTimeout: 15000,
-      onclone: (doc) => {
-        doc.documentElement.setAttribute("dir", "ltr");
-        doc.documentElement.style.direction = "ltr";
-        doc.documentElement.classList.add("qc-exporting");
-        copyCssVars(document.documentElement, doc.documentElement);
-        const host = doc.getElementById("qc-print-host");
-        if (host instanceof HTMLElement) {
-          host.classList.add("qc-capturing");
-          host.setAttribute("dir", cvCaptureDir());
-          Object.assign(host.style, {
-            display: "block",
-            position: "static",
-            left: "auto",
-            top: "auto",
-            width: A4_CSS_PX + "px",
-            minWidth: A4_CSS_PX + "px",
-            maxWidth: A4_CSS_PX + "px",
-            height: "auto",
-            minHeight: A4_CSS_H + "px",
-            maxHeight: "none",
-            padding: "0",
-            margin: "0",
-            background: "#ffffff",
-            overflow: "visible",
-            transform: "none",
-            direction: cvCaptureDir(),
-          });
-          const sheet = host.querySelector(".cv-print-sheet");
-          if (sheet instanceof HTMLElement) {
-            const fullBleed = isFullBleedLayout(sheet) || isSidebarLayout(sheet);
-            const premium = sheet.classList.contains("layout-premium");
-            sheet.style.minHeight = A4_CSS_H + "px";
-            sheet.style.height = A4_CSS_H + "px";
-            sheet.style.maxHeight = premium || fullBleed ? A4_CSS_H + "px" : "none";
-            sheet.style.overflow = fullBleed || premium ? "hidden" : "visible";
-            sheet.style.transform = "none";
-            if (fullBleed || premium) sheet.style.padding = "0";
-            if (premium) {
+    const canvas = await withTimeout(
+      html2canvas(el, {
+        scale,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#ffffff",
+        logging: false,
+        width,
+        height,
+        windowWidth: Math.max(width, A4_CSS_PX),
+        windowHeight: Math.max(height, A4_CSS_H),
+        scrollX: 0,
+        scrollY: 0,
+        imageTimeout: 6000,
+        onclone: (doc) => {
+          doc.documentElement.setAttribute("dir", "ltr");
+          doc.documentElement.style.direction = "ltr";
+          doc.documentElement.classList.add("qc-exporting");
+          copyCssVars(document.documentElement, doc.documentElement);
+          const host = doc.getElementById("qc-print-host");
+          if (host instanceof HTMLElement) {
+            host.classList.add("qc-capturing");
+            host.setAttribute("dir", cvCaptureDir());
+            Object.assign(host.style, {
+              display: "block",
+              position: "static",
+              left: "auto",
+              top: "auto",
+              width: A4_CSS_PX + "px",
+              minWidth: A4_CSS_PX + "px",
+              maxWidth: A4_CSS_PX + "px",
+              height: "auto",
+              minHeight: A4_CSS_H + "px",
+              maxHeight: "none",
+              padding: "0",
+              margin: "0",
+              background: "#ffffff",
+              overflow: "visible",
+              transform: "none",
+              direction: cvCaptureDir(),
+            });
+            const sheet = host.querySelector(".cv-print-sheet");
+            if (sheet instanceof HTMLElement) {
+              const fullBleed = isFullBleedLayout(sheet) || isSidebarLayout(sheet);
+              const premium = sheet.classList.contains("layout-premium");
+              sheet.style.minHeight = A4_CSS_H + "px";
+              sheet.style.height = A4_CSS_H + "px";
+              sheet.style.maxHeight = premium || fullBleed ? A4_CSS_H + "px" : "none";
+              sheet.style.overflow = fullBleed || premium ? "hidden" : "visible";
+              sheet.style.transform = "none";
+              if (fullBleed || premium) sheet.style.padding = "0";
+              if (premium) {
+                host.style.height = A4_CSS_H + "px";
+                host.style.maxHeight = A4_CSS_H + "px";
+                host.style.overflow = "hidden";
+              }
+            }
+            prepareCaptureRoot(host, doc.defaultView);
+            lockCaptureSheetHeight(host);
+            if (sheet instanceof HTMLElement && sheet.classList.contains("layout-premium")) {
+              sheet.style.height = A4_CSS_H + "px";
+              sheet.style.maxHeight = A4_CSS_H + "px";
+              sheet.style.overflow = "hidden";
               host.style.height = A4_CSS_H + "px";
               host.style.maxHeight = A4_CSS_H + "px";
               host.style.overflow = "hidden";
             }
+            const cloned = measureLinks(host);
+            if (cloned.links.length) linkMeta = cloned;
           }
-          prepareCaptureRoot(host, doc.defaultView);
-          lockCaptureSheetHeight(host);
-          if (sheet instanceof HTMLElement && sheet.classList.contains("layout-premium")) {
-            sheet.style.height = A4_CSS_H + "px";
-            sheet.style.maxHeight = A4_CSS_H + "px";
-            sheet.style.overflow = "hidden";
-            host.style.height = A4_CSS_H + "px";
-            host.style.maxHeight = A4_CSS_H + "px";
-            host.style.overflow = "hidden";
-          }
-          const cloned = measureLinks(host);
-          if (cloned.links.length) linkMeta = cloned;
-        }
-      },
-    });
+        },
+      }),
+      40000,
+      "pdf-capture-timeout",
+    );
     return { canvas, ...linkMeta };
   } finally {
     if (prevDir == null) html.removeAttribute("dir");
@@ -782,7 +808,9 @@ export async function exportHighResPdf(opts = {}) {
     throw new Error("payment required");
   }
   if (window.__qcPdfBusy) {
-    return;
+    const started = Number(window.__qcPdfBusyAt || 0);
+    if (started && Date.now() - started < 90000) return;
+    setSpinner(false);
   }
   const download = opts.download !== false;
 
@@ -804,13 +832,11 @@ export async function exportHighResPdf(opts = {}) {
   }
 
   try {
-    if (document.fonts?.ready) await document.fonts.ready;
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await new Promise((resolve) => setTimeout(resolve, 80));
     lockCaptureSheetHeight(host);
 
-    const captured = await captureToCanvas(host);
+    const captured = await withTimeout(captureToCanvas(host), 45000, "pdf-export-timeout");
     const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
@@ -833,7 +859,7 @@ export async function exportHighResPdf(opts = {}) {
       window.QCCoverLetter.render?.();
       const letterHost = prepareCaptureClone("cl-target");
       if (letterHost) {
-        const letterCap = await captureToCanvas(letterHost);
+        const letterCap = await withTimeout(captureToCanvas(letterHost), 30000, "pdf-letter-timeout");
         if (letterCap.canvas?.width) {
           addCanvasPages(pdf, letterCap.canvas, letterCap.links, letterCap.width, letterCap.height, {
             marginMm: 0,

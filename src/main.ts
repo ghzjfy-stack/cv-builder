@@ -1119,7 +1119,8 @@ function onOrderBumpChange() {
 }
 
 async function runHighResExport() {
-  if (window.__qcPdfBusy) return;
+  const busyAt = Number(window.__qcPdfBusyAt || 0);
+  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < 90000) return;
   const status = document.getElementById("download-status");
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {
@@ -1237,7 +1238,10 @@ function onDownloadPdfClick(e) {
 
 function downloadFormat(kind) {
   if (!assertCheckoutReady()) return;
-  if (kind === "pdf" && window.__qcPdfBusy) return;
+  if (kind === "pdf" && window.__qcPdfBusy) {
+    const busyAt = Number(window.__qcPdfBusyAt || 0);
+    if (busyAt && Date.now() - busyAt < 90000) return;
+  }
   if (!isUnlocked()) {
     openCheckoutModal();
     setFeedback(qcT("needPayBeforeDl", "יש לאמת תשלום או קוד לפני ההורדה."), false);

@@ -16,6 +16,7 @@ declare global {
     QCExport?: Record<string, () => Promise<void> | void>;
     QCHighResPdf?: (opts?: { download?: boolean }) => Promise<{ blob: Blob; filename: string } | void>;
     __qcPdfBusy?: boolean;
+    __qcPdfBusyAt?: number;
     QCCoverLetter?: {
       download?: () => void;
       buildText?: () => string;

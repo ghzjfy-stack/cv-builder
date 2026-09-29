@@ -312,12 +312,24 @@
     unicode-bidi: isolate;
     text-align: end;
 }
-.layout-azure .cv-job-role {
+.layout-azure .cv-job-role:not(.cv-job-company) {
     color: #5a5a5a;
     font-size: calc(0.74rem * var(--cv-scale));
     margin: 0;
     font-weight: 500;
     line-height: 1.4;
+    border-bottom: 0;
+    padding: 0;
+}
+.layout-azure .cv-job > .cv-job-company,
+.layout-azure .cv-job-body > .cv-job-company {
+    color: #1e293b;
+    font-size: calc(0.86rem * var(--cv-scale));
+    font-weight: 700;
+    margin: 0.12rem 0 0.42rem;
+    padding: 0 0 0.16rem;
+    line-height: 1.35;
+    border-bottom: 1px solid rgba(90, 90, 90, 0.22);
 }
 .layout-azure .cv-job-list {
     padding: 0;

@@ -1986,15 +1986,82 @@
         #cv-target-page2 .cv-job-body > .cv-job-company,
         #qc-print-host .cv-job-body > .cv-job-company {
             display: block;
-            margin: 0.12rem 0 0.42rem;
-            padding: 0;
-            font-weight: 600;
-            font-size: calc(0.86rem * var(--cv-scale));
+            margin: 0.14rem 0 0.45rem;
+            padding: 0 0 0.18rem;
+            font-weight: 700;
+            font-size: calc(0.88rem * var(--cv-scale));
             line-height: 1.35;
-            color: #1e293b;
-            letter-spacing: 0.01em;
+            color: #0f172a;
+            letter-spacing: 0.012em;
             max-width: 100%;
             overflow-wrap: anywhere;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.45);
+        }
+
+        /* Per-layout company headings (all templates) */
+        .layout-classic .cv-job > .cv-job-company,
+        .layout-classic .cv-job-body > .cv-job-company,
+        .layout-sidebar .cv-job > .cv-job-company,
+        .layout-sidebar .cv-job-body > .cv-job-company,
+        .layout-split .cv-job > .cv-job-company,
+        .layout-split .cv-job-body > .cv-job-company {
+            font-weight: 700;
+            font-size: calc(0.9rem * var(--cv-scale));
+            color: #0f172a;
+            margin: 0.14rem 0 0.42rem;
+            padding: 0 0 0.16rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+            line-height: 1.35;
+        }
+        .layout-charcoal .cv-job > .cv-job-company,
+        .layout-charcoal .cv-job-body > .cv-job-company,
+        #cv-target.layout-charcoal .cv-job > .cv-job-company,
+        #cv-target.layout-charcoal .cv-job-body > .cv-job-company,
+        #cv-target-page2.layout-charcoal .cv-job > .cv-job-company,
+        #cv-target-page2.layout-charcoal .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-job > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-job-body > .cv-job-company {
+            font-weight: 700 !important;
+            font-size: calc(0.82rem * var(--cv-scale)) !important;
+            color: #2f2f2f !important;
+            margin: 0.1rem 0 0.4rem !important;
+            padding: 0 0 0.14rem !important;
+            line-height: 1.35 !important;
+            letter-spacing: 0.01em;
+            border-bottom: 1px solid rgba(80, 80, 80, 0.22);
+        }
+        .layout-navy .cv-job > .cv-job-company,
+        .layout-navy .cv-job-body > .cv-job-company,
+        #cv-target.layout-navy .cv-job > .cv-job-company,
+        #cv-target.layout-navy .cv-job-body > .cv-job-company,
+        #cv-target-page2.layout-navy .cv-job > .cv-job-company,
+        #cv-target-page2.layout-navy .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-navy .cv-job > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-navy .cv-job-body > .cv-job-company {
+            font-weight: 700 !important;
+            font-size: calc(0.84rem * var(--cv-scale)) !important;
+            color: var(--navy, #12192b) !important;
+            margin: 0.12rem 0 0.42rem !important;
+            padding: 0 0 0.16rem !important;
+            line-height: 1.35 !important;
+            letter-spacing: 0.01em;
+            border-bottom: 1px solid color-mix(in srgb, var(--navy, #12192b) 18%, transparent);
+        }
+        .layout-azure .cv-job > .cv-job-company,
+        .layout-azure .cv-job-body > .cv-job-company,
+        #cv-target.layout-azure .cv-job > .cv-job-company,
+        #cv-target.layout-azure .cv-job-body > .cv-job-company,
+        #cv-target-page2.layout-azure .cv-job > .cv-job-company,
+        #cv-target-page2.layout-azure .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-azure .cv-job > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-azure .cv-job-body > .cv-job-company {
+            font-weight: 700 !important;
+            font-size: calc(0.86rem * var(--cv-scale)) !important;
+            color: #1e293b !important;
+            margin: 0.12rem 0 0.42rem !important;
+            padding: 0 0 0.16rem !important;
+            line-height: 1.35 !important;
+            border-bottom: 1px solid rgba(90, 90, 90, 0.22);
         }
         #cv-target .cv-edu-item,
         #cv-target-page2 .cv-edu-item,
@@ -2904,11 +2971,13 @@
         }
         .layout-classic .cv-job > .cv-job-company,
         .layout-classic .cv-job-body > .cv-job-company {
-            font-weight: 600;
-            font-size: calc(0.88rem * var(--cv-scale));
+            font-weight: 700;
+            font-size: calc(0.9rem * var(--cv-scale));
             color: #0f172a;
-            margin: 0.14rem 0 0.4rem;
+            margin: 0.14rem 0 0.42rem;
+            padding: 0 0 0.16rem;
             line-height: 1.35;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.4);
         }
         .layout-classic .cv-job-role:not(.cv-job-company),
         .layout-classic .cv-job-date,
@@ -3624,14 +3693,14 @@
         .layout-premium .cv-job-body > .cv-job-company {
             font-family: var(--premium-sans);
             font-weight: 700;
-            font-size: calc(0.78rem * var(--cv-scale));
+            font-size: calc(0.82rem * var(--cv-scale));
             color: var(--premium-ink, #1a1a1a);
-            letter-spacing: 0.015em;
-            margin: 0 0 0.48rem;
-            padding: 0 0 0.2rem;
+            letter-spacing: 0.02em;
+            margin: 0 0 0.5rem;
+            padding: 0 0 0.22rem;
             max-width: 100%;
             line-height: 1.35;
-            border-bottom: 1px solid color-mix(in srgb, var(--premium-line, #d4d4d4) 85%, transparent);
+            border-bottom: 1px solid color-mix(in srgb, var(--premium-line, #d4d4d4) 90%, transparent);
         }
         .layout-premium .exs-job-list,
         .layout-premium .exs-achievements-list {
@@ -4643,12 +4712,14 @@
             line-height: 1.35;
             margin: 0;
         }
-        .layout-charcoal .cv-job-role {
+        .layout-charcoal .cv-job-role:not(.cv-job-company) {
             color: #5a5a5a;
             font-size: calc(0.68rem * var(--cv-scale));
             font-weight: 500;
             margin: 0;
             line-height: 1.4;
+            border-bottom: 0;
+            padding: 0;
         }
         .layout-charcoal .cv-job-list {
             margin: 0.18rem 0 0;
@@ -5246,7 +5317,7 @@
             line-height: 1.35;
             margin: 0;
         }
-        .layout-navy .cv-job-role,
+        .layout-navy .cv-job-role:not(.cv-job-company),
         .layout-navy .cv-job-date {
             color: var(--navy);
             font-size: calc(0.72rem * var(--cv-scale));
@@ -5254,6 +5325,8 @@
             line-height: 1.4;
             font-weight: 500;
             margin: 0;
+            border-bottom: 0;
+            padding: 0;
         }
         .layout-navy .cv-job-date {
             white-space: normal;

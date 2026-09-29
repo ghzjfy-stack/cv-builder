@@ -140,7 +140,7 @@ export default function ExecutiveSplitTemplate({
 
   return (
     <div
-      className={`layout-premium exs-root ${className}`.trim()}
+      className={`layout-premium exs-root ${isEnglish ? 'cv-lang-en' : ''} ${className}`.trim()}
       dir={dir}
       {...props}
     >
@@ -239,16 +239,16 @@ export default function ExecutiveSplitTemplate({
         </div>
       </aside>
 
-      <div className="cv-main exs-main">
-        <header className="exs-header" id="cv-header">
-          <h1 className="exs-name" id="out-name">
-            {data.name || (isEnglish ? 'Jonathan Cohen' : 'יונתן כהן')}
-          </h1>
-          <p className="exs-title" id="out-title">
-            {data.title || ''}
-          </p>
-        </header>
+      <header className="exs-header" id="cv-header">
+        <h1 className="exs-name" id="out-name">
+          {data.name || (isEnglish ? 'Jonathan Cohen' : 'יונתן כהן')}
+        </h1>
+        <p className="exs-title" id="out-title">
+          {data.title || ''}
+        </p>
+      </header>
 
+      <div className="cv-main exs-main">
         {data.summary ? (
           <section className="exs-sec">
             <h3 className="cv-section-title">{isEnglish ? 'Professional Summary' : 'תקציר מקצועי'}</h3>

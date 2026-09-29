@@ -245,47 +245,6 @@ export default function ExecutiveSplitTemplate({
               </div>
             </section>
           ) : null}
-
-          {education.length ? (
-            <section className="exs-side-sec" id="sec-education-side">
-              <h3 className="cv-section-title">{isEnglish ? 'Education' : 'השכלה'}</h3>
-              {education.map((edu, idx) => (
-                <div key={`${edu.school}-${idx}`} className="cv-job cv-edu-item">
-                  <div className="cv-job-head">
-                    <p className="cv-job-title cv-edu-school font-bold">{edu.school || edu.title}</p>
-                    {edu.dates ? (
-                      <span className="cv-job-date cv-edu-date" dir="ltr">
-                        {formatCleanDates(edu.dates, isEnglish)}
-                      </span>
-                    ) : null}
-                  </div>
-                  {edu.degree || edu.meta ? (
-                    <p className="cv-job-role cv-edu-meta">{edu.degree || edu.meta}</p>
-                  ) : null}
-                </div>
-              ))}
-            </section>
-          ) : null}
-
-          {military.length ? (
-            <section className="exs-side-sec" id="sec-extras-side">
-              <h3 className="cv-section-title">
-                {isEnglish ? 'Military / National Service' : 'שירות צבאי / לאומי'}
-              </h3>
-              {military.map((m, idx) => (
-                <div key={`${m.role}-${idx}`} className="cv-job cv-military-item">
-                  <div className="cv-job-head">
-                    <p className="cv-job-title cv-military-role">{m.role || m.title}</p>
-                    {m.dates || m.years ? (
-                      <span className="cv-job-date cv-military-years" dir="ltr">
-                        {formatCleanDates(m.dates || m.years, isEnglish)}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </section>
-          ) : null}
         </div>
       </aside>
 
@@ -345,6 +304,47 @@ export default function ExecutiveSplitTemplate({
                 </article>
               );
             })}
+          </section>
+        ) : null}
+
+        {education.length ? (
+          <section className="exs-sec" id="sec-education">
+            <h3 className="cv-section-title">{isEnglish ? 'Education' : 'השכלה'}</h3>
+            {education.map((edu, idx) => (
+              <div key={`${edu.school}-${idx}`} className="cv-job cv-edu-item">
+                <div className="cv-job-head flex justify-between items-baseline w-full gap-2">
+                  <p className="cv-job-title cv-edu-school font-bold">{edu.school || edu.title}</p>
+                  {edu.dates ? (
+                    <span className="cv-job-date cv-edu-date" dir="ltr">
+                      {formatCleanDates(edu.dates, isEnglish)}
+                    </span>
+                  ) : null}
+                </div>
+                {edu.degree || edu.meta ? (
+                  <p className="cv-job-role cv-edu-meta">{edu.degree || edu.meta}</p>
+                ) : null}
+              </div>
+            ))}
+          </section>
+        ) : null}
+
+        {military.length ? (
+          <section className="exs-sec" id="sec-military">
+            <h3 className="cv-section-title">
+              {isEnglish ? 'Military / National Service' : 'שירות צבאי / לאומי'}
+            </h3>
+            {military.map((m, idx) => (
+              <div key={`${m.role}-${idx}`} className="cv-job cv-military-item">
+                <div className="cv-job-head flex justify-between items-baseline w-full gap-2">
+                  <p className="cv-job-title cv-military-role">{m.role || m.title}</p>
+                  {m.dates || m.years ? (
+                    <span className="cv-job-date cv-military-years" dir="ltr">
+                      {formatCleanDates(m.dates || m.years, isEnglish)}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ))}
           </section>
         ) : null}
 

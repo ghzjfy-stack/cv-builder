@@ -3654,24 +3654,13 @@
             box-sizing: border-box;
         }
         .layout-premium .exs-achievements-title {
-            display: inline-block;
-            margin: 0 0 0.35rem;
-            padding: 0.12rem 0;
-            font-family: var(--premium-sans);
-            font-weight: 700;
-            font-size: calc(0.62rem * var(--cv-scale));
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--premium-ink);
-            border-bottom: 1.5px solid var(--premium-ink);
-            line-height: 1.3;
+            display: none !important;
         }
         #cv-target:not(.cv-lang-en).layout-premium .exs-achievements-title,
         #cv-target-page2:not(.cv-lang-en).layout-premium .exs-achievements-title,
         #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .exs-achievements-title,
         .layout-premium.exs-root:not(.cv-lang-en) .exs-achievements-title {
-            letter-spacing: 0.03em;
-            text-transform: none;
+            display: none !important;
         }
         .layout-premium .exs-achievements-ico { display: none !important; }
         .layout-premium .exs-metric {

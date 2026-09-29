@@ -8,8 +8,6 @@ import {
   formatCleanDates,
 } from './common';
 
-const NUM_RE = /(?:\d+(?:[.,]\d+)?\s*%|\d[\d,]{0,6}|\b(?:SLA|KPI|ROI)\b)/i;
-
 function splitList(value) {
   if (Array.isArray(value)) return value.map((s) => String(s || '').trim()).filter(Boolean);
   return String(value || '')
@@ -78,26 +76,6 @@ function boldMetrics(line) {
   }
   if (last < str.length) parts.push(str.slice(last));
   return parts.length ? parts : str;
-}
-
-function splitAchievements(lines) {
-  const scored = [];
-  const rest = [];
-  lines.forEach((line) => {
-    if (NUM_RE.test(line)) scored.push(line);
-    else rest.push(line);
-  });
-  let achievements = scored.slice(0, 3);
-  if (achievements.length < 2) {
-    const need = 2 - achievements.length;
-    achievements = achievements.concat(rest.slice(0, need));
-    rest.splice(0, need);
-  }
-  if (!achievements.length && lines.length) {
-    achievements = lines.slice(0, Math.min(3, lines.length));
-    return { achievements, rest: lines.slice(achievements.length) };
-  }
-  return { achievements, rest };
 }
 
 function jobLines(job) {
@@ -329,7 +307,6 @@ export default function ExecutiveSplitTemplate({
             <h3 className="cv-section-title">{isEnglish ? 'Work Experience' : 'ניסיון תעסוקתי'}</h3>
             {jobs.map((job, idx) => {
               const lines = jobLines(job);
-              const { achievements, rest } = splitAchievements(lines);
               return (
                 <article key={`${job.company}-${job.position}-${idx}`} className="cv-job exs-job">
                   <div className="exs-job-band">
@@ -341,24 +318,12 @@ export default function ExecutiveSplitTemplate({
                     ) : null}
                   </div>
                   {job.company ? <p className="cv-job-role exs-job-company">{job.company}</p> : null}
-                  {rest.length ? (
+                  {lines.length ? (
                     <ul className="cv-job-list exs-job-list" dir={dir}>
-                      {rest.map((line) => (
+                      {lines.map((line) => (
                         <li key={line}>•&nbsp;{boldMetrics(line)}</li>
                       ))}
                     </ul>
-                  ) : null}
-                  {achievements.length ? (
-                    <div className="exs-achievements">
-                      <p className="exs-achievements-title">
-                        {isEnglish ? 'Key Achievements' : 'הישגים מרכזיים'}
-                      </p>
-                      <ul className="exs-achievements-list" dir={dir}>
-                        {achievements.map((line) => (
-                          <li key={line}>•&nbsp;{boldMetrics(line)}</li>
-                        ))}
-                      </ul>
-                    </div>
                   ) : null}
                 </article>
               );

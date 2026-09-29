@@ -24,18 +24,6 @@ function parseLang(entry) {
   return { name: (m?.[1] || entry).trim(), level: (m?.[2] || '').trim() };
 }
 
-function skillPct(label, index) {
-  const t = String(label || '').toLowerCase();
-  if (/expert|מומחה|native|אם/.test(t)) return 96;
-  if (/advanced|מתקדם|high|גבוה|שוטפ|fluent/.test(t)) return 88;
-  if (/proficient|טוב|good|מקצוע/.test(t)) return 76;
-  if (/intermediate|בינונ/.test(t)) return 58;
-  if (/basic|בסיס|beginner/.test(t)) return 38;
-  let hash = 0;
-  for (let i = 0; i < t.length; i++) hash = (hash * 31 + t.charCodeAt(i)) >>> 0;
-  return 62 + ((hash + index * 17) % 31);
-}
-
 function langLevelLabel(level, isEnglish) {
   const raw = String(level || '').trim();
   const low = raw.toLowerCase();
@@ -199,28 +187,13 @@ export default function ExecutiveSplitTemplate({
           {skills.length ? (
             <section className="exs-side-sec">
               <h3 className="cv-section-title">{isEnglish ? 'Skills' : 'מיומנויות'}</h3>
-              <div className="exs-skill-list">
-                {skills.map((skill, i) => {
-                  const pct = skillPct(skill, i);
-                  return (
-                    <div key={skill} className="exs-skill-row">
-                      <span className="exs-skill-name" dir="auto">
-                        {skill}
-                      </span>
-                      <span
-                        className="exs-skill-track"
-                        role="meter"
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-valuenow={pct}
-                        aria-label={skill}
-                      >
-                        <span className="exs-skill-fill" style={{ width: `${pct}%` }} />
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+              <ul className="exs-skill-list">
+                {skills.map((skill) => (
+                  <li key={skill} className="exs-skill-item" dir="auto">
+                    {skill}
+                  </li>
+                ))}
+              </ul>
             </section>
           ) : null}
 
@@ -317,7 +290,7 @@ export default function ExecutiveSplitTemplate({
                       </span>
                     ) : null}
                   </div>
-                  {job.company ? <p className="cv-job-role exs-job-company">{job.company}</p> : null}
+                  {job.company ? <p className="cv-job-role cv-job-company exs-job-company">{job.company}</p> : null}
                   {lines.length ? (
                     <ul className="cv-job-list exs-job-list" dir={dir}>
                       {lines.map((line) => (

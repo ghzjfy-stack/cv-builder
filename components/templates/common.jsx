@@ -427,7 +427,7 @@ export function CvEntryItem({
     <div className={`cv-job ${className}`.trim()}>
       <EntryFlexHeader title={title} dates={dates} />
       {subtitle ? (
-        <p className="cv-job-role text-sm text-slate-600 mt-0.5">{subtitle}</p>
+        <p className="cv-job-role cv-job-company text-sm mt-0.5">{subtitle}</p>
       ) : null}
       {descriptions?.length > 0 ? (
         <ul

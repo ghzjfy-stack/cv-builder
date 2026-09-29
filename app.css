@@ -1978,6 +1978,24 @@
             line-height: 1.4;
             color: #475569;
         }
+        /* Experience employer — distinct from title above and bullets below */
+        #cv-target .cv-job > .cv-job-company,
+        #cv-target-page2 .cv-job > .cv-job-company,
+        #qc-print-host .cv-job > .cv-job-company,
+        #cv-target .cv-job-body > .cv-job-company,
+        #cv-target-page2 .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-job-body > .cv-job-company {
+            display: block;
+            margin: 0.12rem 0 0.42rem;
+            padding: 0;
+            font-weight: 600;
+            font-size: calc(0.86rem * var(--cv-scale));
+            line-height: 1.35;
+            color: #1e293b;
+            letter-spacing: 0.01em;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
         #cv-target .cv-edu-item,
         #cv-target-page2 .cv-edu-item,
         #qc-print-host .cv-edu-item,
@@ -2884,7 +2902,15 @@
             color: #0f172a;
             line-height: 1.35;
         }
-        .layout-classic .cv-job-role,
+        .layout-classic .cv-job > .cv-job-company,
+        .layout-classic .cv-job-body > .cv-job-company {
+            font-weight: 600;
+            font-size: calc(0.88rem * var(--cv-scale));
+            color: #0f172a;
+            margin: 0.14rem 0 0.4rem;
+            line-height: 1.35;
+        }
+        .layout-classic .cv-job-role:not(.cv-job-company),
         .layout-classic .cv-job-date,
         .layout-classic .cv-job-desc {
             font-size: calc(0.78rem * var(--cv-scale));
@@ -2893,10 +2919,11 @@
             line-height: 1.4;
         }
         .layout-classic .cv-job-list {
-            margin: 0.25rem 0 0;
+            margin: 0.15rem 0 0;
             padding: 0;
             font-size: calc(0.78rem * var(--cv-scale));
-            color: #334155;
+            color: #475569;
+            font-weight: 400;
             list-style: none;
         }
         .layout-classic .cv-job-list li { margin-bottom: 0.2rem; line-height: 1.45; }
@@ -3455,60 +3482,34 @@
         .layout-premium .exs-lang-list {
             display: flex;
             flex-direction: column;
-            gap: 0.55rem;
+            gap: 0.38rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
             min-width: 0;
             max-width: 100%;
             width: 100%;
             box-sizing: border-box;
         }
         .layout-premium .exs-skill-row {
-            display: flex;
-            flex-direction: column;
-            gap: 0.22rem;
+            display: block;
             min-width: 0;
             max-width: 100%;
         }
+        .layout-premium .exs-skill-item,
         .layout-premium .exs-skill-name,
         .layout-premium .exs-lang-name {
             font-size: calc(0.66rem * var(--cv-scale));
             color: rgba(255, 255, 255, 0.94);
-            line-height: 1.3;
+            line-height: 1.35;
             min-width: 0;
             max-width: 100%;
             overflow-wrap: anywhere;
             word-break: break-word;
         }
-        .layout-premium .exs-skill-track {
-            display: flex;
-            width: 100%;
-            max-width: 100%;
-            height: 5px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.2);
-            overflow: hidden;
-            direction: ltr;
-            unicode-bidi: isolate;
-            box-sizing: border-box;
-        }
-        #cv-target:not(.cv-lang-en).layout-premium .exs-skill-track,
-        #cv-target-page2:not(.cv-lang-en).layout-premium .exs-skill-track,
-        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .exs-skill-track,
-        .layout-premium.exs-root:not(.cv-lang-en) .exs-skill-track {
-            justify-content: flex-end;
-        }
-        #cv-target.cv-lang-en.layout-premium .exs-skill-track,
-        #cv-target-page2.cv-lang-en.layout-premium .exs-skill-track,
-        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .exs-skill-track,
-        .layout-premium.exs-root.cv-lang-en .exs-skill-track {
-            justify-content: flex-start;
-        }
+        .layout-premium .exs-skill-track,
         .layout-premium .exs-skill-fill {
-            display: block;
-            height: 100%;
-            border-radius: inherit;
-            background: #ffffff;
-            max-width: 100%;
-            flex: 0 0 auto;
+            display: none !important;
         }
         .layout-premium .exs-lang-row {
             display: flex;
@@ -3618,21 +3619,29 @@
             direction: ltr !important;
             unicode-bidi: isolate;
         }
-        .layout-premium .exs-job-company {
-            color: var(--accent, #2f2f2f);
-            font-weight: 600;
-            font-size: calc(0.72rem * var(--cv-scale));
-            margin: 0 0 0.3rem;
+        .layout-premium .exs-job-company,
+        .layout-premium .cv-job > .cv-job-company,
+        .layout-premium .cv-job-body > .cv-job-company {
+            font-family: var(--premium-sans);
+            font-weight: 700;
+            font-size: calc(0.78rem * var(--cv-scale));
+            color: var(--premium-ink, #1a1a1a);
+            letter-spacing: 0.015em;
+            margin: 0 0 0.48rem;
+            padding: 0 0 0.2rem;
             max-width: 100%;
+            line-height: 1.35;
+            border-bottom: 1px solid color-mix(in srgb, var(--premium-line, #d4d4d4) 85%, transparent);
         }
         .layout-premium .exs-job-list,
         .layout-premium .exs-achievements-list {
-            margin: 0.12rem 0 0;
+            margin: 0.2rem 0 0;
             padding: 0;
             list-style: none;
             color: var(--premium-muted);
             font-family: var(--premium-sans);
             font-size: calc(0.72rem * var(--cv-scale));
+            font-weight: 400;
             line-height: 1.5;
             min-width: 0;
         }

@@ -2828,25 +2828,32 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+            gap: 0.35rem;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
         }
         .cv-skill-badge {
             display: inline-block;
-            padding: 0.25rem 0.625rem;
-            margin: 0.125rem;
-            border-radius: 0.25rem;
-            font-size: calc(0.75rem * var(--cv-scale));
+            padding: 0.22rem 0.55rem;
+            margin: 0;
+            border-radius: 0.3rem;
+            font-size: calc(0.72rem * var(--cv-scale));
+            font-weight: 500;
             line-height: 1.35;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             unicode-bidi: isolate;
             overflow-wrap: anywhere;
             word-break: break-word;
+            max-width: 100%;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-premium) .cv-skill-badge,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-premium) .cv-skill-badge,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-premium) .cv-skill-badge {
             background: rgba(15, 23, 42, 0.06);
-            border-color: rgba(148, 163, 184, 0.35);
+            border-color: rgba(148, 163, 184, 0.4);
+            color: #1e293b;
         }
 
         .cv-ref-item {
@@ -2927,13 +2934,27 @@
             min-width: 0;
         }
         .layout-classic .cv-ats-plain,
-        .layout-classic #out-skills,
         .layout-classic #out-languages,
         .layout-classic #out-references {
             color: #334155;
             font-size: calc(0.8rem * var(--cv-scale));
             line-height: 1.5;
             margin: 0;
+        }
+        .layout-classic #out-skills .cv-skill-badges,
+        .layout-classic .cv-ats-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin: 0.1rem 0 0;
+        }
+        .layout-classic #out-skills .cv-skill-badge,
+        .layout-classic .cv-ats-skills .cv-skill-badge {
+            background: rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            color: #0f172a;
+            font-size: calc(0.76rem * var(--cv-scale));
+            font-weight: 500;
         }
         .layout-classic .cv-ats-lang-list {
             margin: 0;
@@ -3560,6 +3581,13 @@
             width: 100%;
             box-sizing: border-box;
         }
+        .layout-premium .exs-skill-list.cv-skill-badges,
+        .layout-premium #out-skills .cv-skill-badges {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 0.35rem;
+        }
         .layout-premium .exs-skill-row {
             display: block;
             min-width: 0;
@@ -3575,6 +3603,18 @@
             max-width: 100%;
             overflow-wrap: anywhere;
             word-break: break-word;
+        }
+        .layout-premium .exs-skill-item.cv-skill-badge,
+        .layout-premium #out-skills .cv-skill-badge {
+            display: inline-block;
+            margin: 0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.28rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            font-size: calc(0.64rem * var(--cv-scale));
         }
         .layout-premium .exs-skill-track,
         .layout-premium .exs-skill-fill {
@@ -4497,12 +4537,14 @@
         .layout-charcoal .cv-skill-badges {
             display: flex;
             flex-wrap: wrap;
-            margin: 0.1rem -0.125rem;
+            gap: 0.35rem;
+            margin: 0.1rem 0 0;
         }
         .layout-charcoal .cv-skill-badge {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            margin: 0;
         }
         .layout-charcoal .cv-skill-list {
             list-style: none;
@@ -5207,12 +5249,14 @@
         .layout-navy .cv-skill-badges {
             display: flex;
             flex-wrap: wrap;
-            margin: 0.1rem -0.125rem;
+            gap: 0.35rem;
+            margin: 0.1rem 0 0;
         }
         .layout-navy .cv-skill-badge {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            margin: 0;
         }
         .layout-navy .cv-skill-list {
             list-style: none;

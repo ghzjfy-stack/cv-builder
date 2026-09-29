@@ -16,9 +16,9 @@
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
-    <link rel="stylesheet" href="./azure-layout.css?v=company-head1">
+    <link rel="stylesheet" href="./azure-layout.css?v=skills-chips1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
-    <link rel="stylesheet" href="./app.css?v=premium27">
+    <link rel="stylesheet" href="./app.css?v=premium28">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -1329,7 +1329,7 @@
     <script src="lib/phrases.js?v=tpl-he3"></script>
     <script src="lib/templates.js?v=core4"></script>
     <script src="lib/templateThumbs.js?v=premium2"></script>
-    <script src="lib/premiumExecutive.js?v=premium12"></script>
+    <script src="lib/premiumExecutive.js?v=premium13"></script>
     <script src="lib/export.js?v=pdf2"></script>
     <script src="lib/coverLetter.js?v=banner1"></script>
     <script src="lib/seoLandings.js?v=i18n1"></script>
@@ -3008,11 +3008,16 @@
             container.classList.remove('whitespace-pre-line');
             const items = splitListItems(raw);
             if (!items.length) return;
-            const p = document.createElement('p');
-            p.className = 'cv-ats-plain';
-            p.setAttribute('dir', 'auto');
-            p.textContent = items.join(', ');
-            container.appendChild(p);
+            const wrap = document.createElement('div');
+            wrap.className = 'cv-skill-badges cv-ats-skills';
+            items.forEach((s) => {
+                const badge = document.createElement('span');
+                badge.className = 'cv-skill-badge';
+                badge.setAttribute('dir', 'auto');
+                badge.textContent = s;
+                wrap.appendChild(badge);
+            });
+            container.appendChild(wrap);
         }
 
         function paintAtsLanguages(container, raw, entries) {
@@ -3422,7 +3427,7 @@
             wrap.className = 'cv-skill-badges';
             items.forEach((s) => {
                 const badge = document.createElement('span');
-                badge.className = 'cv-skill-badge bg-white/10 px-2.5 py-1 rounded text-xs inline-block m-0.5 border border-white/20';
+                badge.className = 'cv-skill-badge';
                 badge.setAttribute('dir', 'auto');
                 badge.textContent = s;
                 wrap.appendChild(badge);

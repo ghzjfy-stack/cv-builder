@@ -187,13 +187,13 @@ export default function ExecutiveSplitTemplate({
           {skills.length ? (
             <section className="exs-side-sec">
               <h3 className="cv-section-title">{isEnglish ? 'Skills' : 'מיומנויות'}</h3>
-              <ul className="exs-skill-list">
+              <div className="exs-skill-list cv-skill-badges">
                 {skills.map((skill) => (
-                  <li key={skill} className="exs-skill-item" dir="auto">
+                  <span key={skill} className="exs-skill-item cv-skill-badge" dir="auto">
                     {skill}
-                  </li>
+                  </span>
                 ))}
-              </ul>
+              </div>
             </section>
           ) : null}
 

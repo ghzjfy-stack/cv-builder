@@ -232,12 +232,14 @@
 .layout-azure .cv-skill-badges {
     display: flex;
     flex-wrap: wrap;
-    margin: 0.1rem -0.125rem;
+    gap: 0.35rem;
+    margin: 0.1rem 0 0;
 }
 .layout-azure .cv-skill-badge {
     color: var(--azure-ink);
     background: rgba(15, 23, 42, 0.06);
     border: 1px solid rgba(61, 90, 108, 0.22);
+    margin: 0;
 }
 .layout-azure .cv-skill-list,
 .layout-azure .cv-extra-list,

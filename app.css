@@ -7736,28 +7736,63 @@
         /* Premium: hard-lock capture to one A4 — prevents blank page-2 sidebar stubs */
         #qc-print-host.qc-capturing .cv-print-sheet.layout-premium,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-premium {
+            display: grid !important;
+            direction: ltr !important;
             height: 1123px !important;
             max-height: 1123px !important;
+            grid-template-rows: auto minmax(0, 1fr) !important;
+            column-gap: 0 !important;
+            row-gap: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .cv-print-sheet:not(.cv-lang-en).layout-premium,
+        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium {
+            grid-template-columns: 70% 30% !important;
+            grid-template-areas: "head side" "main side" !important;
+        }
+        #qc-print-host.qc-capturing .cv-print-sheet.cv-lang-en.layout-premium,
+        html.qc-exporting #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium {
+            grid-template-columns: 30% 70% !important;
+            grid-template-areas: "side head" "side main" !important;
         }
         #qc-print-host.qc-capturing:has(.layout-premium),
         html.qc-exporting #qc-print-host:has(.layout-premium) {
             height: 1123px !important;
             max-height: 1123px !important;
             overflow: hidden !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
             overflow: hidden !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar {
+            grid-area: side !important;
             height: 100% !important;
             min-height: 100% !important;
             max-height: 100% !important;
             padding-bottom: 0 !important;
             box-sizing: border-box !important;
+            background: #454545 !important;
+            color: #f6f6f6 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium #cv-header,
+        html.qc-exporting #qc-print-host .layout-premium #cv-header {
+            grid-area: head !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-main,
+        html.qc-exporting #qc-print-host .layout-premium .cv-main {
+            grid-area: main !important;
+            background: #ffffff !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar::after,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar::after {
@@ -7773,6 +7808,8 @@
             min-height: 2.75rem !important;
             max-height: 2.75rem !important;
             background: #454545 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
@@ -7781,6 +7818,9 @@
             max-height: none !important;
             height: auto !important;
             padding-bottom: 0.35rem !important;
+            background: #454545 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {
@@ -7803,6 +7843,8 @@
             content: "";
             grid-area: side;
             background: #454545;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
             z-index: 0;
         }
         #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
@@ -7810,7 +7852,13 @@
         html.qc-exporting #qc-print-host .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-premium .cv-photo-block {
             background: #454545 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
             z-index: 1;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-photo-block,
+        html.qc-exporting #qc-print-host .layout-premium .cv-photo-block {
+            background: #3a3a3a !important;
         }
         #qc-print-host.qc-capturing .layout-navy .cv-photo-block,
         #qc-print-host.qc-capturing .layout-navy #cv-header,
@@ -7957,19 +8005,135 @@
                 display: flex !important;
             }
 
+            /* —— Executive Split (layout-premium): print / PDF must match screen —— */
+            #cv-target.layout-premium,
+            #cv-target-page2.layout-premium,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target.layout-premium {
+                display: grid !important;
+                direction: ltr !important;
+                grid-template-rows: auto minmax(0, 1fr) !important;
+                column-gap: 0 !important;
+                row-gap: 0 !important;
+                width: 210mm !important;
+                min-width: 210mm !important;
+                max-width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
+                background: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
             html.qc-print-mode #qc-print-host .layout-premium .cv-columns {
                 display: contents !important;
             }
-            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium {
-                direction: ltr !important;
-            }
-            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium {
+            /* Hebrew RTL: dark rail on the right (30%), white main on the left (70%) */
+            #cv-target:not(.cv-lang-en).layout-premium,
+            #cv-target-page2:not(.cv-lang-en).layout-premium,
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target:not(.cv-lang-en).layout-premium {
                 grid-template-columns: 70% 30% !important;
                 grid-template-areas: "head side" "main side" !important;
             }
-            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium {
+            /* English LTR: dark rail on the left (30%), white main on the right (70%) */
+            #cv-target.cv-lang-en.layout-premium,
+            #cv-target-page2.cv-lang-en.layout-premium,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target.cv-lang-en.layout-premium {
                 grid-template-columns: 30% 70% !important;
                 grid-template-areas: "side head" "side main" !important;
+            }
+            #cv-target.layout-premium .cv-sidebar,
+            #cv-target.layout-premium .cv-main,
+            #cv-target.layout-premium #cv-header,
+            #cv-target-page2.layout-premium .cv-sidebar,
+            #cv-target-page2.layout-premium .cv-main,
+            #cv-target-page2.layout-premium #cv-header,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-main,
+            html.qc-print-mode #qc-print-host .layout-premium #cv-header {
+                position: relative !important;
+                float: none !important;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
+                transform: none !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium .cv-sidebar,
+            #cv-target-page2.layout-premium .cv-sidebar,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar {
+                grid-area: side !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-self: stretch !important;
+                justify-self: stretch !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                background: #454545 !important;
+                color: #f6f6f6 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium .cv-sidebar-inner,
+            #cv-target.layout-premium .cv-photo-block,
+            #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            #cv-target-page2.layout-premium .cv-sidebar-inner,
+            #cv-target-page2.layout-premium .cv-photo-block,
+            #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar-inner,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-photo-block,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
+                background: #454545 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium .cv-photo-block,
+            #cv-target-page2.layout-premium .cv-photo-block,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-photo-block {
+                background: #3a3a3a !important;
+            }
+            #cv-target.layout-premium #cv-header,
+            #cv-target-page2.layout-premium #cv-header,
+            html.qc-print-mode #qc-print-host .layout-premium #cv-header {
+                grid-area: head !important;
+                background: #ffffff !important;
+            }
+            #cv-target.layout-premium .cv-main,
+            #cv-target-page2.layout-premium .cv-main,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-main {
+                grid-area: main !important;
+                background: #ffffff !important;
+                overflow: hidden !important;
+            }
+            #cv-target.layout-premium::before,
+            #cv-target-page2.layout-premium::before,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium::before {
+                content: "" !important;
+                display: block !important;
+                grid-area: side !important;
+                background: #454545 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                z-index: 0 !important;
             }
 
             html.qc-print-mode #qc-print-host .layout-charcoal {

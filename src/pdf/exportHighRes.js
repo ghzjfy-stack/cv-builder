@@ -803,30 +803,106 @@ function isMobileUa() {
   return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
 }
 
-function isIOS() {
-  return /iP(hone|ad|od)/i.test(navigator.userAgent || "");
+function pdfShareTitle(filename) {
+  return window.QCCvLang === "en" ? filename || "Resume.pdf" : filename || "קורות_חיים.pdf";
+}
+
+function makePdfFile(blob, filename) {
+  return new File([blob], filename, { type: "application/pdf" });
+}
+
+function canSharePdfFile(file) {
+  try {
+    return !!(navigator.canShare && navigator.canShare({ files: [file] }));
+  } catch {
+    return false;
+  }
+}
+
+function restorePendingShareButton() {
+  const btn = document.getElementById("btn-download-cv-pdf");
+  if (!(btn instanceof HTMLElement)) return;
+  if (btn.dataset.pdfShareLabel != null) {
+    btn.innerHTML = btn.dataset.pdfShareLabel;
+    delete btn.dataset.pdfShareLabel;
+  }
+}
+
+function clearPendingPdfShare() {
+  window.__qcPendingPdfShare = null;
+  restorePendingShareButton();
+}
+
+function armPendingPdfShare(blob, filename) {
+  const file = makePdfFile(blob, filename);
+  if (!canSharePdfFile(file)) return false;
+
+  const english = window.QCCvLang === "en";
+  const btn = document.getElementById("btn-download-cv-pdf");
+  const status = document.getElementById("download-status");
+  if (status) {
+    status.textContent = english
+      ? "Tap the green button to save the PDF to Files."
+      : "לחצו על הכפתור הירוק כדי לשמור את ה-PDF בקבצים.";
+  }
+  if (btn instanceof HTMLElement) {
+    if (btn.dataset.pdfShareLabel == null) btn.dataset.pdfShareLabel = btn.innerHTML;
+    btn.innerHTML = english ? "Save PDF to Files" : "שמור PDF בקבצים";
+  }
+  window.__qcPendingPdfShare = { blob, filename, file, at: Date.now() };
+  return true;
 }
 
 /**
- * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Use exactly one primary path — firing anchor + pdf.save together can cancel the download.
+ * If a ready PDF is waiting for a fresh tap (iOS user-gesture), share it now.
+ * Returns true when the click was consumed (do not regenerate the PDF).
  */
-async function downloadPdfBlob(blob, filename, pdf) {
-  if (!blob || blob.size < 100) throw new Error("empty pdf");
+export async function consumePendingPdfShare() {
+  const pending = window.__qcPendingPdfShare;
+  if (!pending?.file || !pending?.blob) return false;
+  if (Date.now() - Number(pending.at || 0) > 10 * 60 * 1000) {
+    clearPendingPdfShare();
+    return false;
+  }
 
-  if (isMobileUa()) {
-    const file = new File([blob], filename, { type: "application/pdf" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: filename });
-        return "shared";
-      } catch (err) {
-        if (err && err.name === "AbortError") return "aborted";
-        /* fall through */
+  const status = document.getElementById("download-status");
+  const english = window.QCCvLang === "en";
+  try {
+    if (canSharePdfFile(pending.file)) {
+      await navigator.share({
+        files: [pending.file],
+        title: pdfShareTitle(pending.filename),
+      });
+      clearPendingPdfShare();
+      if (status) {
+        status.textContent = english
+          ? "Choose “Save to Files” in the share sheet."
+          : "בחרו «שמור בקבצים» בחלון השיתוף.";
       }
+      return true;
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      // Keep pending so the user can tap again.
+      if (status) {
+        status.textContent = english
+          ? "Cancelled — tap the green button again to save to Files."
+          : "בוטל — לחצו שוב על הכפתור הירוק כדי לשמור בקבצים.";
+      }
+      return true;
     }
   }
 
+  // Last resort: anchor download only (never open a viewer tab).
+  triggerAnchorDownload(pending.blob, pending.filename);
+  clearPendingPdfShare();
+  if (status) {
+    status.textContent = english ? "Download started." : "ההורדה התחילה.";
+  }
+  return true;
+}
+
+function triggerAnchorDownload(blob, filename) {
   const url = URL.createObjectURL(blob);
   try {
     const a = document.createElement("a");
@@ -837,15 +913,40 @@ async function downloadPdfBlob(blob, filename, pdf) {
     document.body.appendChild(a);
     a.click();
     a.remove();
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 20000);
+  }
+}
 
-    if (isIOS()) {
+/**
+ * Best-effort PDF download across desktop, Android, and iOS Safari.
+ * Prefer the Web Share sheet on mobile ("Save to Files") — never auto-open
+ * the PDF in a viewer tab, which skips the save option.
+ */
+async function downloadPdfBlob(blob, filename, pdf) {
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+
+  if (isMobileUa()) {
+    const file = makePdfFile(blob, filename);
+    if (canSharePdfFile(file)) {
       try {
-        window.open(url, "_blank", "noopener");
-        return "tab";
-      } catch {
-        /* keep anchor */
+        await navigator.share({
+          files: [file],
+          title: pdfShareTitle(filename),
+        });
+        clearPendingPdfShare();
+        return "shared";
+      } catch (err) {
+        if (err && err.name === "AbortError") return "aborted";
+        // Share often fails after a long export (lost user gesture).
+        // Arm a one-tap share on the green button instead of opening a viewer.
+        if (armPendingPdfShare(blob, filename)) return "pending-share";
       }
     }
+  }
+
+  try {
+    triggerAnchorDownload(blob, filename);
     return "anchor";
   } catch {
     if (pdf && typeof pdf.save === "function") {
@@ -857,8 +958,6 @@ async function downloadPdfBlob(blob, filename, pdf) {
       }
     }
     throw new Error("pdf-download-failed");
-  } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 20000);
   }
 }
 

@@ -2241,7 +2241,9 @@
             unicode-bidi: isolate;
         }
         /* In RTL column flex, flex-end is the LEFT edge — that shoved years away from the degree.
-           Use `start` so dates sit under the title on the reading-start side (right in HE, left in EN). */
+           Use `start` so dates sit under the title on the reading-start side (right in HE, left in EN).
+           Do NOT use margin-inline-* here: .cv-edu-date is direction:ltr, so inline-end becomes
+           margin-right and would push years back to the left gutter. */
         #cv-target:not(.cv-lang-en) #sec-education-side .cv-edu-date,
         #cv-target:not(.cv-lang-en) #sec-education-side .cv-job-date,
         #cv-target-page2:not(.cv-lang-en) #sec-education-side .cv-edu-date,
@@ -2252,8 +2254,8 @@
             unicode-bidi: isolate;
             text-align: start !important;
             align-self: start !important;
-            margin-inline-start: 0;
-            margin-inline-end: auto;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
         #cv-target.cv-lang-en #sec-education-side,
         #cv-target.cv-lang-en #sec-education-side .cv-section-title,
@@ -2296,8 +2298,8 @@
             unicode-bidi: isolate;
             text-align: start !important;
             align-self: start !important;
-            margin-inline-start: 0;
-            margin-inline-end: auto;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
         #cv-target .cv-edu-school,
         #cv-target-page2 .cv-edu-school,
@@ -4612,8 +4614,8 @@
             unicode-bidi: isolate;
             align-self: start !important;
             text-align: start !important;
-            margin-inline-start: 0;
-            margin-inline-end: auto;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
         #cv-target.layout-charcoal .cv-edu-item .cv-edu-meta,
         #cv-target.layout-charcoal .cv-edu-item .cv-job-role,

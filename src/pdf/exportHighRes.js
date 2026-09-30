@@ -388,6 +388,155 @@ function stripPreviewChrome(clone) {
   });
 }
 
+/**
+ * Cobalt (and similar) use display:contents for .cv-columns / .cv-sidebar.
+ * html2canvas often skips those promoted grid children — flatten the clone so
+ * photo, header, sidebar-inner, and main are direct grid items with painted rails.
+ */
+function promoteCobaltRailForCapture(clone, english) {
+  const rail = "#2c4a7c";
+  const photo = clone.querySelector(".cv-photo-block");
+  const sideInner = clone.querySelector(".cv-sidebar-inner");
+  const main = clone.querySelector(".cv-main");
+  const header = clone.querySelector("#cv-header");
+  const columns = clone.querySelector(".cv-columns");
+  const sidebar = clone.querySelector(".cv-sidebar");
+
+  // Kill the continuous ::before rail — it stacks above contents in html2canvas.
+  clone.classList.add("qc-cobalt-capture-flat");
+  clone.style.setProperty("--cobalt", rail);
+
+  [photo, header, sideInner, main].forEach((el) => {
+    if (el instanceof HTMLElement) clone.appendChild(el);
+  });
+  sidebar?.remove();
+  columns?.remove();
+  clone.querySelectorAll(".cv-col-rule, .cv-sidebar-rail-pad").forEach((el) => el.remove());
+
+  const paint = (el, extra = {}) => {
+    if (!(el instanceof HTMLElement)) return;
+    Object.assign(el.style, {
+      background: rail,
+      color: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
+      zIndex: "1",
+      ...extra,
+    });
+  };
+
+  if (photo instanceof HTMLElement) {
+    paint(photo, {
+      gridArea: "photo",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "flex-end",
+      padding: "1.35rem 1rem 0.35rem",
+      margin: "0",
+      border: "0",
+      borderRadius: "0",
+      boxShadow: "none",
+    });
+    const avatar = photo.querySelector(".cv-photo");
+    if (avatar instanceof HTMLElement) {
+      Object.assign(avatar.style, {
+        width: "112px",
+        height: "112px",
+        borderRadius: "999px",
+        overflow: "hidden",
+        border: "4px solid #ffffff",
+        background: "#9aa8c2",
+        flex: "0 0 auto",
+      });
+      avatar.querySelectorAll("svg, img").forEach((node) => {
+        if (!(node instanceof HTMLElement)) return;
+        Object.assign(node.style, {
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        });
+      });
+    }
+  }
+
+  if (header instanceof HTMLElement) {
+    paint(header, {
+      gridArea: "head",
+      textAlign: "center",
+      padding: "0.45rem 1.05rem 1rem",
+      margin: "0",
+      border: "0",
+      borderRadius: "0",
+      boxShadow: "none",
+    });
+    header.querySelectorAll("#out-name, #out-title, .dynamic-text").forEach((node) => {
+      if (node instanceof HTMLElement) node.style.color = "#ffffff";
+    });
+  }
+
+  if (sideInner instanceof HTMLElement) {
+    paint(sideInner, {
+      gridArea: "side",
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.95rem",
+      padding: "0.2rem 1.1rem 1.5rem",
+      margin: "0",
+      border: "0",
+      borderRadius: "0",
+      minHeight: "100%",
+      height: "100%",
+      alignSelf: "stretch",
+      direction: english ? "ltr" : "rtl",
+      textAlign: english ? "left" : "right",
+      overflow: "hidden",
+    });
+    sideInner.querySelectorAll(".cv-section-title, .cv-contact-row, .cv-contact-link, .cv-skill-badge, .cv-lang-name, .cv-lang-row, #out-skills, #out-languages").forEach((node) => {
+      if (node instanceof HTMLElement) node.style.color = "#ffffff";
+    });
+    sideInner.querySelectorAll(".cv-skill-badge").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      Object.assign(node.style, {
+        color: "#ffffff",
+        background: "rgba(255,255,255,0.12)",
+        border: "1px solid rgba(255,255,255,0.28)",
+      });
+    });
+    const contact = sideInner.querySelector(".cv-contact-sidebar");
+    if (contact instanceof HTMLElement) {
+      Object.assign(contact.style, {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.45rem",
+        color: "#ffffff",
+        width: "100%",
+      });
+      // Drop emoji prefixes — Cobalt already paints SVG contact icons.
+      contact.querySelectorAll('[id^="out-"]').forEach((slot) => {
+        if (!(slot instanceof HTMLElement)) return;
+        const cleaned = String(slot.textContent || "")
+          .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\s📞✉️📍🔗]+/u, "")
+          .trim();
+        if (cleaned) slot.textContent = cleaned;
+      });
+    }
+  }
+
+  if (main instanceof HTMLElement) {
+    Object.assign(main.style, {
+      gridArea: "main",
+      background: "#ffffff",
+      color: "#1f2937",
+      direction: english ? "ltr" : "rtl",
+      textAlign: english ? "left" : "right",
+      padding: "1.4rem 1.5rem 1.5rem 1.35rem",
+      zIndex: "1",
+      minWidth: "0",
+    });
+  }
+}
+
 function prepareCaptureClone(sourceId = "cv-target") {
   const source = document.getElementById(sourceId);
   if (!source) return null;
@@ -574,6 +723,9 @@ function prepareCaptureClone(sourceId = "cv-target") {
       WebkitPrintColorAdjust: "exact",
       printColorAdjust: "exact",
     });
+    // html2canvas drops most display:contents descendants — promote rail nodes
+    // so photo + contact/skills actually paint into the PDF.
+    promoteCobaltRailForCapture(clone, english);
   } else if (clone.classList.contains("layout-azure")) {
     Object.assign(clone.style, {
       direction: "ltr",

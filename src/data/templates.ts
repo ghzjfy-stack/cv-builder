@@ -32,7 +32,8 @@ export type LayoutStyle =
   | "charcoal"
   | "azure"
   | "navy"
-  | "premium";
+  | "premium"
+  | "cobalt";
 
 export type SamplePack = {
   name: string;
@@ -574,6 +575,25 @@ const SEEDS: Seed[] = [
     subHe: "יעל • מורה",
     subEn: "Yael • Teacher",
   },
+  {
+    id: "cobalt",
+    titleHe: "פרופיל כחול",
+    titleEn: "Blue Profile",
+    category: "modern",
+    styleTags: ["professional", "modern"],
+    layout: "cobalt",
+    layoutStyle: "two-column-left",
+    accent: "#2c4a7c",
+    font: "Heebo",
+    thumb: "lay-cobalt",
+    field: "sales",
+    preferredLang: "he",
+    atsOptimized: false,
+    supportsPhoto: true,
+    pack: "sales",
+    subHe: "דנה • מנהלת לקוחות",
+    subEn: "Dana • Account Manager",
+  },
 ];
 
 /** Legacy template IDs → core IDs (keeps drafts / SEO / bookmarks working). */
@@ -616,7 +636,6 @@ export const TEMPLATE_ALIASES: Record<string, string> = {
   academic: "simple",
   pearl: "simple",
   swiss: "simple",
-  cobalt: "simple",
   ivory: "simple",
   gold: "simple",
   "ink-exec": "simple",

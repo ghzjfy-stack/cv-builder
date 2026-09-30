@@ -17,6 +17,12 @@ declare global {
     QCHighResPdf?: (opts?: { download?: boolean }) => Promise<{ blob: Blob; filename: string } | void>;
     __qcPdfBusy?: boolean;
     __qcPdfBusyAt?: number;
+    __qcPendingPdfShare?: {
+      blob: Blob;
+      filename: string;
+      file: File;
+      at: number;
+    } | null;
     QCCoverLetter?: {
       download?: () => void;
       buildText?: () => string;

@@ -10,7 +10,7 @@ import {
   packAmount,
   whatsappUrl,
 } from "./config/checkout.js";
-import { exportHighResPdf } from "./pdf/exportHighRes.js";
+import { consumePendingPdfShare, exportHighResPdf } from "./pdf/exportHighRes.js";
 import { CODE_FAIL_MSG, verifyDownloadCode } from "./payment/verifyCode.js";
 import { VERIFY_FAIL_MSG, verifyPaymentScreenshot } from "./payment/verifyScreenshot.js";
 
@@ -238,11 +238,16 @@ function openWhatsApp(e) {
 }
 
 async function runHighResExport() {
+  if (await consumePendingPdfShare()) return;
   const status = document.getElementById("download-status");
   if (status) status.textContent = "מכין קובץ PDF...";
   try {
     await exportHighResPdf();
-    if (status) status.textContent = "ההורדה התחילה.";
+    if (status) {
+      status.textContent = window.__qcPendingPdfShare
+        ? "לחצו על הכפתור הירוק כדי לשמור את ה-PDF בקבצים."
+        : "ההורדה התחילה.";
+    }
   } catch {
     if (status) status.textContent = "ההורדה נכשלה. נסו שוב.";
   }

@@ -18,7 +18,7 @@ import {
   whatsappSelfPdfUrl,
   type PackId,
 } from "./config/checkout.js";
-import { exportHighResPdf } from "./pdf/exportHighRes.js";
+import { consumePendingPdfShare, exportHighResPdf } from "./pdf/exportHighRes.js";
 import {
   createManualOrderSession,
   isManualOrderApproved,
@@ -757,15 +757,25 @@ async function attemptApprovedPdfDownload() {
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {
     status.textContent = mobile
-      ? qcT("autoDownloadTryMobile", "מכין PDF… אם לא נפתח שיתוף/הורדה, לחצו על הכפתור הירוק.")
+      ? qcT("autoDownloadTryMobile", "מכין PDF… אחר כך בחרו «שמור בקבצים» או לחצו על הכפתור הירוק.")
       : qcT("autoDownloadTry", "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.");
   }
   try {
     await runHighResExport();
     if (status) {
-      status.textContent = mobile
-        ? qcT("downloadReadyMobile", "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.")
-        : qcT("downloadStarted", "ההורדה התחילה.");
+      if (window.__qcPendingPdfShare) {
+        status.textContent = qcT(
+          "tapToSaveFiles",
+          "לחצו על הכפתור הירוק כדי לשמור את ה-PDF בקבצים.",
+        );
+      } else {
+        status.textContent = mobile
+          ? qcT(
+              "downloadReadyMobile",
+              "ה-PDF מוכן. בחלון השיתוף בחרו «שמור בקבצים».",
+            )
+          : qcT("downloadStarted", "ההורדה התחילה.");
+      }
     }
   } catch {
     if (status) status.textContent = qcT("clickGreenDownload", "לחצו על הכפתור הירוק להורדת ה-PDF.");
@@ -1121,19 +1131,32 @@ function onOrderBumpChange() {
 async function runHighResExport() {
   const busyAt = Number(window.__qcPdfBusyAt || 0);
   if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < 90000) return;
+  // Fresh tap after a long export: open the Save-to-Files share sheet
+  // instead of regenerating (which would lose the user gesture again).
+  if (await consumePendingPdfShare()) return;
   const status = document.getElementById("download-status");
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {
     status.textContent = mobile
-      ? qcT("preparingPdfMobile", "מכין PDF באיכות מלאה לתצוגה שלכם…")
+      ? qcT("preparingPdfMobile", "מכין PDF באיכות מלאה — אחר כך תוכלו לשמור בקבצים…")
       : qcT("preparingPdf", "מכין קובץ PDF...");
   }
   try {
     await exportHighResPdf();
     if (status) {
-      status.textContent = mobile
-        ? qcT("downloadReadyMobile", "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.")
-        : qcT("downloadStarted", "ההורדה התחילה.");
+      if (window.__qcPendingPdfShare) {
+        status.textContent = qcT(
+          "tapToSaveFiles",
+          "לחצו על הכפתור הירוק כדי לשמור את ה-PDF בקבצים.",
+        );
+      } else {
+        status.textContent = mobile
+          ? qcT(
+              "downloadReadyMobile",
+              "ה-PDF מוכן. בחלון השיתוף בחרו «שמור בקבצים».",
+            )
+          : qcT("downloadStarted", "ההורדה התחילה.");
+      }
     }
   } catch {
     if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
@@ -1237,6 +1260,11 @@ function onDownloadPdfClick(e) {
 }
 
 function downloadFormat(kind) {
+  // A ready PDF waiting for Save-to-Files must not be blocked by form gates.
+  if (kind === "pdf" && window.__qcPendingPdfShare) {
+    void runHighResExport();
+    return;
+  }
   if (!assertCheckoutReady()) return;
   if (kind === "pdf" && window.__qcPdfBusy) {
     const busyAt = Number(window.__qcPdfBusyAt || 0);

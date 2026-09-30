@@ -102,23 +102,15 @@ function fileBase() {
 }
 
 function triggerBlobDownload(blob, filename) {
+  // Anchor download only — do not window.open the PDF (opens a viewer without Save to Files).
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.rel = "noopener";
-  a.target = "_blank";
   a.style.display = "none";
   document.body.appendChild(a);
   a.click();
-  const isiOS = /iP(hone|ad|od)/i.test(navigator.userAgent || "");
-  if (isiOS) {
-    try {
-      window.open(url, "_blank", "noopener");
-    } catch {
-      /* Safari may block this without a tap — the green button stays visible. */
-    }
-  }
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 8000);
 }

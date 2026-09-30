@@ -142,19 +142,17 @@ if (!/שמור PDF בקבצים|Save PDF to Files/i.test(result.btnText)) {
   process.exit(1);
 }
 
-// Second tap via consumePendingPdfShare path (green button click handler)
-const second = await page.evaluate(async () => {
-  const { consumePendingPdfShare } = await import("/src/pdf/exportHighRes.js");
-  const consumed = await consumePendingPdfShare();
-  return {
-    consumed,
-    shareCalls: window.__qcShareCalls || 0,
-    openCalls: window.__qcOpenCalls || [],
-    pending: !!window.__qcPendingPdfShare,
-    lastShare: window.__qcLastShare || null,
-    btnText: (document.getElementById("btn-download-cv-pdf")?.textContent || "").trim(),
-  };
-});
+// Second tap: click the green Save button (bypasses form gate when pending share exists).
+await page.locator("#btn-download-cv-pdf").click();
+await page.waitForTimeout(800);
+const second = await page.evaluate(() => ({
+  consumed: (window.__qcShareCalls || 0) >= 2 && !window.__qcPendingPdfShare,
+  shareCalls: window.__qcShareCalls || 0,
+  openCalls: window.__qcOpenCalls || [],
+  pending: !!window.__qcPendingPdfShare,
+  lastShare: window.__qcLastShare || null,
+  btnText: (document.getElementById("btn-download-cv-pdf")?.textContent || "").trim(),
+}));
 
 console.log("after pending share consume:", JSON.stringify(second, null, 2));
 

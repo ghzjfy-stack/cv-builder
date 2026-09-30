@@ -1260,6 +1260,11 @@ function onDownloadPdfClick(e) {
 }
 
 function downloadFormat(kind) {
+  // A ready PDF waiting for Save-to-Files must not be blocked by form gates.
+  if (kind === "pdf" && window.__qcPendingPdfShare) {
+    void runHighResExport();
+    return;
+  }
   if (!assertCheckoutReady()) return;
   if (kind === "pdf" && window.__qcPdfBusy) {
     const busyAt = Number(window.__qcPdfBusyAt || 0);

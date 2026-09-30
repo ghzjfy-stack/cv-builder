@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import App from "./App.jsx";
 import { initTemplateSelector } from "./templates/selector";
-import { clearPersistedUnlock, getPaidRemainingMs, getPaidUntil, isUnlocked, unlock, unlockWithPaymentToken, PAID_SESSION_MS } from "./access/gate.js";
+import { clearPersistedUnlock, getPaidRemainingMs, getPaidUntil, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken, PAID_SESSION_MS } from "./access/gate.js";
 import {
   CHECKOUT,
   REF_CODE_KEY,
@@ -912,7 +912,7 @@ function openExternalUrl(url) {
   return true;
 }
 
-async function createCvDownloadShareUrl() {
+function readShareDraft() {
   try {
     window.QCDraft?.save?.();
   } catch {
@@ -926,6 +926,62 @@ async function createCvDownloadShareUrl() {
   }
   const safe = { ...(draft || {}) };
   delete safe.photo;
+  return safe;
+}
+
+async function blobToBase64(blob) {
+  const buffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const chunk = 0x8000;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+/** Upload a generated PDF and return a direct application/pdf URL for WhatsApp. */
+async function createCvPdfFileShareUrl(blob, filename) {
+  if (!blob || blob.size < 100) return "";
+  const pdfBase64 = await blobToBase64(blob);
+  const draft = readShareDraft();
+  const res = await fetch("/api/handoff-pdf", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify({
+      pdfBase64,
+      filename: filename || "cv.pdf",
+      draft,
+      token: getPaymentToken() || "",
+    }),
+  });
+  const data = await res.json().catch(() => null);
+  if (!data?.ok) return "";
+  if (data.url && /^https?:\/\//i.test(data.url)) return String(data.url);
+  if (data.id) return `${location.origin}/api/handoff-pdf?id=${encodeURIComponent(data.id)}`;
+  return "";
+}
+
+async function createCvDownloadShareUrl(opts = {}) {
+  const preferPdfFile = opts.preferPdfFile !== false;
+
+  // WhatsApp opens real PDFs reliably; studio/?h= links open the editor (often unpaid).
+  if (preferPdfFile && isUnlocked()) {
+    try {
+      const result = await exportHighResPdf({ download: false });
+      const blob = result?.blob;
+      const filename = String(result?.filename || "cv.pdf");
+      if (blob) {
+        const pdfUrl = await createCvPdfFileShareUrl(blob, filename);
+        if (pdfUrl) return pdfUrl;
+      }
+    } catch {
+      /* fall through to studio handoff */
+    }
+  }
+
+  const safe = readShareDraft();
 
   // Prefer a short handoff id — long ?d= drafts break wa.me (white error page).
   try {
@@ -976,50 +1032,70 @@ async function sendPdfToWhatsApp(e) {
   if (status) status.textContent = qcT("waPreparing", "מכין לשליחה בוואטסאפ...");
 
   try {
-    // Mobile file share (actual PDF) when the browser supports it — no blank tabs.
+    // Build the PDF once — reuse for native share or a direct PDF WhatsApp link.
+    let pdfBlob = null;
+    let pdfFilename = "cv.pdf";
+    try {
+      const result = await exportHighResPdf({ download: false });
+      pdfBlob = result?.blob || null;
+      pdfFilename = String(result?.filename || "cv.pdf");
+    } catch {
+      /* continue — link path may still use studio handoff */
+    }
+
+    // Mobile file share (actual PDF attachment) when the browser supports it.
     const canFileShare =
       typeof navigator !== "undefined" &&
       typeof navigator.share === "function" &&
       typeof navigator.canShare === "function";
 
-    if (canFileShare) {
+    if (canFileShare && pdfBlob) {
       try {
-        const result = await exportHighResPdf({ download: false });
-        const blob = result?.blob;
-        const filename = String(result?.filename || "cv.pdf");
-        if (blob) {
-          const file = new File([blob], filename, { type: "application/pdf" });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
-              text: english ? "Resume from QuickCV" : "קורות חיים מ-QuickCV",
-            });
-            if (status) {
-              status.textContent = qcT(
-                "waShared",
-                "בחרו WhatsApp בחלון השיתוף כדי לשלוח את ה-PDF.",
-              );
-            }
-            return;
+        const file = new File([pdfBlob], pdfFilename, { type: "application/pdf" });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
+            text: english ? "Resume from QuickCV" : "קורות חיים מ-QuickCV",
+          });
+          if (status) {
+            status.textContent = qcT(
+              "waShared",
+              "בחרו WhatsApp בחלון השיתוף כדי לשלוח את ה-PDF.",
+            );
           }
+          return;
         }
       } catch (shareErr) {
         if (shareErr && shareErr.name === "AbortError") {
           if (status) status.textContent = "";
           return;
         }
-        /* fall through to wa.me link */
+        /* fall through to wa.me PDF link */
       }
     }
 
-    // Reliable path: open WhatsApp chat with a short view/save link (current template).
-    const downloadUrl = await createCvDownloadShareUrl();
+    // Prefer a direct application/pdf URL — WhatsApp opens that as a file, not the studio.
+    let downloadUrl = "";
+    if (pdfBlob) {
+      try {
+        downloadUrl = await createCvPdfFileShareUrl(pdfBlob, pdfFilename);
+      } catch {
+        downloadUrl = "";
+      }
+    }
+    if (!downloadUrl) {
+      downloadUrl = await createCvDownloadShareUrl({ preferPdfFile: false });
+    }
+
     const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
     openExternalUrl(waUrl);
     if (status) {
+      const isPdfLink = /\/api\/handoff-pdf\b/i.test(downloadUrl);
       status.textContent = phone
-        ? qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
+        ? isPdfLink
+          ? qcT("waPdfLinkOpened", "נפתח WhatsApp עם קישור לקובץ ה-PDF לפתיחה ושמירה.")
+          : qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
         : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
     }
   } catch {

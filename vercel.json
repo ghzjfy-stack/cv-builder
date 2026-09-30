@@ -26,6 +26,13 @@
       "maxDuration": 30,
       "memory": 1024
     },
+    "api/handoff-pdf.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "api/handoff.js": {
+      "maxDuration": 10
+    },
     "api/telegram-webhook.js": {
       "maxDuration": 30
     },

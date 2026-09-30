@@ -126,8 +126,15 @@ export function toWhatsAppIntlPhone(raw) {
 
 export function whatsappSelfPdfMessage(downloadUrl, english = false) {
   const url = String(downloadUrl || "").trim();
-  if (english) return `Here's a link to view and save your QuickCV resume: ${url}`;
-  return `הנה קישור לצפייה ושמירה של קורות החיים שלך מ-QuickCV: ${url}`;
+  const looksLikePdf = /\/api\/handoff-pdf\b|\.pdf(\?|$)/i.test(url);
+  if (english) {
+    return looksLikePdf
+      ? `Here's your QuickCV resume PDF — tap to open and save: ${url}`
+      : `Here's a link to view and save your QuickCV resume: ${url}`;
+  }
+  return looksLikePdf
+    ? `הנה קובץ ה-PDF של קורות החיים מ-QuickCV — לחצו לפתיחה ושמירה: ${url}`
+    : `הנה קישור לצפייה ושמירה של קורות החיים שלך מ-QuickCV: ${url}`;
 }
 
 /** wa.me to the user's own number, or a generic share link when phone is missing. */

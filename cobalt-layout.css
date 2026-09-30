@@ -204,10 +204,10 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     grid-area: side;
     display: flex;
     flex-direction: column;
-    gap: 0.95rem;
+    gap: 1rem;
     background: var(--cobalt);
     color: #fff !important;
-    padding: 0.15rem 1.1rem 1.5rem;
+    padding: 0.2rem 1.15rem 1.55rem;
     margin: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -217,6 +217,7 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     z-index: 1;
     direction: rtl;
     text-align: right;
+    box-sizing: border-box;
 }
 
 .layout-cobalt .cv-contact-sidebar {
@@ -240,13 +241,14 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    align-items: flex-start;
-    gap: 0.55rem;
+    align-items: center;
+    gap: 0.6rem;
     color: #fff !important;
     font-size: calc(0.68rem * var(--cv-scale));
-    line-height: 1.45;
+    line-height: 1.4;
     width: 100%;
     min-width: 0;
+    box-sizing: border-box;
 }
 
 .layout-cobalt .cv-contact-ico {

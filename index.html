@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="./azure-layout.css?v=skills-chips1">
     <link rel="stylesheet" href="./template-skins.css?v=rtl1">
     <link rel="stylesheet" href="./app.css?v=premium29">
-    <link rel="stylesheet" href="./cobalt-layout.css?v=cobalt2">
+    <link rel="stylesheet" href="./cobalt-layout.css?v=cobalt3">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
         /* Early stub: works even when lib/*.js fail to load (404). */
@@ -3215,8 +3215,8 @@
                     if (fromPreview.length) return fromPreview;
                 } catch (err) { /* fall through */ }
             }
-            const cards = document.querySelectorAll('#experience-items .experience-card');
-            if (cards.length) return jobsFromExperienceDom();
+            const fromDom = jobsFromExperienceDom();
+            if (fromDom.length) return fromDom;
             return parseDatedBlocks(getVal('in-experience')).map(mapExperienceJob).filter((job) => (
                 job.company || job.position || job.dates || job.description || (job.bullets && job.bullets.length)
             ));
@@ -3261,8 +3261,10 @@
         }
 
         function typedEducationText() {
-            const eduCards = document.querySelectorAll('#education-items .entry-card, #education-items .experience-card');
-            if (eduCards.length) return serializeEducationPreview(educationFromDom());
+            // Only prefer card DOM when cards actually contain content — empty
+            // scaffold cards must not wipe a filled raw textarea / PDF payload.
+            const fromDom = educationFromDom();
+            if (fromDom.length) return serializeEducationPreview(fromDom);
             if (window.QCCvData && Array.isArray(QCCvData.education)) {
                 try {
                     const text = serializeEducationPreview(QCCvData.education);

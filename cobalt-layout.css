@@ -516,7 +516,7 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     margin: 0;
     border-radius: 999px;
     /* Optical vertical center: UI fonts (esp. Hebrew) sit high in the em-box. */
-    padding: 0.36rem 0.78rem !important;
+    padding: 0.4rem 0.8rem 0.28rem !important;
     font-size: calc(0.66rem * var(--cv-scale));
     line-height: 1;
     font-weight: 500;
@@ -524,7 +524,6 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     white-space: nowrap;
     max-width: 100%;
     text-align: center;
-    transform: translateY(0.06em);
 }
 
 .layout-cobalt #out-linkedin-side {

@@ -1,6 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
-export const TOKEN_TTL_MS = 30 * 60 * 1000;
+export const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
 let bootSecret = "";
 

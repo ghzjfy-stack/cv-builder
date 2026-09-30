@@ -515,8 +515,9 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     border: 1px solid rgba(255, 255, 255, 0.35) !important;
     margin: 0;
     border-radius: 999px;
-    /* Optical vertical center: UI fonts (esp. Hebrew) sit high in the em-box. */
-    padding: 0.4rem 0.8rem 0.28rem !important;
+    /* Fixed chip height + horizontal pad; flex centers the label in the pill. */
+    min-height: calc(1.7rem * var(--cv-scale));
+    padding: 0 0.78rem !important;
     font-size: calc(0.66rem * var(--cv-scale));
     line-height: 1;
     font-weight: 500;

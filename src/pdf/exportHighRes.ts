@@ -161,6 +161,8 @@ function setSpinner(on) {
       delete btn.dataset.pdfLabel;
     }
   });
+  // Spinner restore runs after armPendingPdfShare during export — re-apply Save label.
+  if (!busy && window.__qcPendingPdfShare) applyPendingShareButtonLabel();
 }
 
 function flattenUnsupportedColors(root, view) {
@@ -828,6 +830,21 @@ function restorePendingShareButton() {
   }
 }
 
+function applyPendingShareButtonLabel() {
+  const btn = document.getElementById("btn-download-cv-pdf");
+  if (!(btn instanceof HTMLElement) || !window.__qcPendingPdfShare) return;
+  const english = window.QCCvLang === "en";
+  // Prefer the pre-spinner label so we restore the real CTA later.
+  const original =
+    btn.dataset.pdfLabel != null
+      ? btn.dataset.pdfLabel
+      : btn.dataset.pdfShareLabel != null
+        ? btn.dataset.pdfShareLabel
+        : btn.innerHTML;
+  if (btn.dataset.pdfShareLabel == null) btn.dataset.pdfShareLabel = original;
+  btn.innerHTML = english ? "Save PDF to Files" : "שמור PDF בקבצים";
+}
+
 function clearPendingPdfShare() {
   window.__qcPendingPdfShare = null;
   restorePendingShareButton();
@@ -838,18 +855,15 @@ function armPendingPdfShare(blob, filename) {
   if (!canSharePdfFile(file)) return false;
 
   const english = window.QCCvLang === "en";
-  const btn = document.getElementById("btn-download-cv-pdf");
   const status = document.getElementById("download-status");
   if (status) {
     status.textContent = english
       ? "Tap the green button to save the PDF to Files."
       : "לחצו על הכפתור הירוק כדי לשמור את ה-PDF בקבצים.";
   }
-  if (btn instanceof HTMLElement) {
-    if (btn.dataset.pdfShareLabel == null) btn.dataset.pdfShareLabel = btn.innerHTML;
-    btn.innerHTML = english ? "Save PDF to Files" : "שמור PDF בקבצים";
-  }
   window.__qcPendingPdfShare = { blob, filename, file, at: Date.now() };
+  // Label is applied after the spinner restores button HTML (see setSpinner).
+  applyPendingShareButtonLabel();
   return true;
 }
 

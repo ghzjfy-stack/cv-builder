@@ -137,15 +137,13 @@ export function whatsappSelfPdfMessage(downloadUrl, english = false) {
     : `הנה קישור לצפייה ושמירה של קורות החיים שלך מ-QuickCV: ${url}`;
 }
 
-/** wa.me to the user's own number, or a generic share link when phone is missing. */
-export function whatsappSelfPdfUrl(phoneRaw, downloadUrl, english = false) {
-  const intl = toWhatsAppIntlPhone(phoneRaw);
+/**
+ * Open WhatsApp with a prefilled PDF/share message.
+ * Do NOT deep-link to a phone number — wa.me/{number} often opens WhatsApp
+ * Business (or a chat with that contact) instead of the personal app picker.
+ */
+export function whatsappSelfPdfUrl(_phoneRaw, downloadUrl, english = false) {
   const text = whatsappSelfPdfMessage(downloadUrl, english);
-  const validIl = /^9725\d{8}$/.test(intl);
-  const validIntl = /^\d{10,15}$/.test(intl);
-  if (validIl || (validIntl && intl.length >= 11)) {
-    return `https://wa.me/${intl}?text=${encodeURIComponent(text)}`;
-  }
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
 }
 

@@ -1093,12 +1093,14 @@ async function sendPdfToWhatsApp(e) {
       return;
     }
 
+    // Generic wa.me/?text= (no phone) — avoids forcing WhatsApp Business / a fixed chat.
     const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
     openExternalUrl(waUrl);
     if (status) {
-      status.textContent = phone
-        ? qcT("waPdfLinkOpened", "נפתח WhatsApp עם קישור לקובץ ה-PDF לפתיחה ושמירה.")
-        : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
+      status.textContent = qcT(
+        "waPdfLinkOpened",
+        "נפתח WhatsApp עם קישור לקובץ ה-PDF — בחרו צ'אט לשליחה.",
+      );
     }
   } catch {
     if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");

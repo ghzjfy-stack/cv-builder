@@ -280,7 +280,8 @@ function isSidebarLayout(el) {
     el.classList.contains("layout-charcoal") ||
     el.classList.contains("layout-navy") ||
     el.classList.contains("layout-azure") ||
-    el.classList.contains("layout-premium")
+    el.classList.contains("layout-premium") ||
+    el.classList.contains("layout-cobalt")
   );
 }
 
@@ -289,7 +290,8 @@ function isFullBleedLayout(el) {
     el.classList.contains("layout-charcoal") ||
     el.classList.contains("layout-navy") ||
     el.classList.contains("layout-azure") ||
-    el.classList.contains("layout-premium")
+    el.classList.contains("layout-premium") ||
+    el.classList.contains("layout-cobalt")
   );
 }
 
@@ -462,6 +464,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
     clone.classList.contains("layout-charcoal") ||
     clone.classList.contains("layout-navy") ||
     clone.classList.contains("layout-azure") ||
+    clone.classList.contains("layout-cobalt") ||
     clone.classList.contains("layout-sidebar") ||
     clone.classList.contains("layout-split")
   ) {
@@ -557,6 +560,19 @@ function prepareCaptureClone(sourceId = "cv-target") {
       gridTemplateAreas: english
         ? '"photo main" "head main" "side main"'
         : '"main photo" "main head" "main side"',
+    });
+  } else if (clone.classList.contains("layout-cobalt")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "minmax(0, 0.34fr) minmax(0, 0.66fr)" : "minmax(0, 0.66fr) minmax(0, 0.34fr)",
+      gridTemplateRows: "auto auto 1fr",
+      gridTemplateAreas: english
+        ? '"photo main" "head main" "side main"'
+        : '"main photo" "main head" "main side"',
+      background: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
     });
   } else if (clone.classList.contains("layout-azure")) {
     Object.assign(clone.style, {

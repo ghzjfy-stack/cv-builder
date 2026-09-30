@@ -41,7 +41,7 @@ const BADGES: Record<string, BadgeSpec> = {
   intern: { kind: "student", he: "סטודנט", en: "Student" },
   academic: { kind: "academic", he: "אקדמי", en: "Academic" },
   pearl: { kind: "modern", he: "מודרני", en: "Modern" },
-  cobalt: { kind: "tech", he: "הייטק", en: "Tech" },
+  cobalt: { kind: "photo", he: "עם תמונה", en: "Photo" },
   "entry-clean": { kind: "entry", he: "כניסה", en: "Entry" },
   "heebo-ats": { kind: "ats", he: "מותאם ל-ATS", en: "ATS Friendly" },
   "assistant-ats": { kind: "minimal", he: "נקי", en: "Soft" },
@@ -320,6 +320,20 @@ function navyInner(tpl: CvTemplate, paper: string, ink: string, s: number): stri
   );
 }
 
+function cobaltInner(tpl: CvTemplate, paper: string, ink: string, s: number): string {
+  const side = hex(tpl.accent, "#2c4a7c");
+  const sw = 24;
+  return (
+    r(0, 0, W, H, paper) +
+    r(0, 0, sw, H, side) +
+    photoCircle(sw / 2, 13, 6.8, "#d5dbe8") +
+    r(4, 23, sw - 8, 2.1, "#ffffff", `opacity="0.78"`) +
+    lines(4, 29, sw - 8, 7, 6.2, "#ffffff", 0.42, s) +
+    sectionRule(sw + 6, 10, 18, side) +
+    lines(sw + 6, 16, 36, 13, 4.7, ink, 0.2, s + 2)
+  );
+}
+
 function sidebarInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number, rtl: boolean): string {
   const sw = 22;
   const sideX = rtl ? W - sw : 0;
@@ -379,6 +393,7 @@ function innerFor(tpl: CvTemplate, lang: ThumbLang): string {
   const style = tpl.layoutStyle;
 
   if (layout === "navy") return navyInner(tpl, paper, ink, s);
+  if (layout === "cobalt") return cobaltInner(tpl, paper, ink, s);
   if (layout === "charcoal") return charcoalInner(tpl, paper, ink, s);
   if (layout === "premium") return premiumInner(tpl, paper, ink, accent, s);
   if (layout === "sidebar" || style === "two-column-left") return sidebarInner(tpl, paper, ink, accent, s, rtl);

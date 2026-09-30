@@ -378,7 +378,8 @@
         #cv-preview-wrapper #cv-target.layout-charcoal,
         #cv-preview-wrapper #cv-target.layout-azure,
         #cv-preview-wrapper #cv-target.layout-navy,
-        #cv-preview-wrapper #cv-target.layout-premium {
+        #cv-preview-wrapper #cv-target.layout-premium,
+        #cv-preview-wrapper #cv-target.layout-cobalt {
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -1752,9 +1753,9 @@
         .dynamic-icon { color: var(--accent); }
 
         /* Candidate name stays classic dark ink — accent is for headers, rules, icons, skills. */
-        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
-        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
-        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive) #out-name,
+        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-cobalt) #out-name,
+        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-cobalt) #out-name,
+        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-cobalt) #out-name,
         #cl-target #cl-out-name {
             color: #1e293b;
         }
@@ -1876,13 +1877,13 @@
         }
         #cv-target .cv-columns,
         #cv-target .cv-main,
-        #cv-target:not(.layout-charcoal):not(.layout-premium) .cv-sidebar,
+        #cv-target:not(.layout-charcoal):not(.layout-premium):not(.layout-cobalt) .cv-sidebar,
         #cv-target-page2 .cv-columns,
         #cv-target-page2 .cv-main,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-premium) .cv-sidebar,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-premium):not(.layout-cobalt) .cv-sidebar,
         #qc-print-host .cv-columns,
         #qc-print-host .cv-main,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-premium) .cv-sidebar {
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-premium):not(.layout-cobalt) .cv-sidebar {
             gap: calc(var(--section-gap, 0.85rem) * var(--space-fit, 1));
         }
         #cv-target #cv-header,
@@ -1904,18 +1905,18 @@
         #qc-print-host .whitespace-pre-line {
             line-height: var(--line-height, var(--cv-leading));
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > .cv-columns,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > .cv-columns,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > .cv-columns {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > .cv-columns,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > .cv-columns {
             padding-inline: 1.35rem;
             box-sizing: border-box;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) > #cv-header {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header {
             padding-top: 1.15rem;
         }
         #cv-target .cv-job,
@@ -2484,13 +2485,13 @@
             text-align: left !important;
             unicode-bidi: isolate;
         }
-        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium),
-        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) {
+        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt),
+        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) {
             display: flex;
             flex-direction: column;
         }
-        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) .cv-columns,
-        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium) .cv-columns {
+        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) .cv-columns,
+        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) .cv-columns {
             flex: 1 1 auto;
             min-height: 0;
             align-items: stretch;
@@ -2934,9 +2935,9 @@
             word-break: break-word;
             max-width: 100%;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-premium) .cv-skill-badge,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-premium) .cv-skill-badge,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-premium) .cv-skill-badge {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-premium):not(.layout-cobalt) .cv-skill-badge,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-premium):not(.layout-cobalt) .cv-skill-badge,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-premium):not(.layout-cobalt) .cv-skill-badge {
             background: rgba(15, 23, 42, 0.06);
             border-color: rgba(148, 163, 184, 0.4);
             color: #1e293b;
@@ -3133,18 +3134,21 @@
         #cv-target.layout-navy,
         #cv-target.layout-azure,
         #cv-target.layout-premium,
+        #cv-target.layout-cobalt,
         #cv-target-page2.layout-sidebar,
         #cv-target-page2.layout-split,
         #cv-target-page2.layout-charcoal,
         #cv-target-page2.layout-navy,
         #cv-target-page2.layout-azure,
         #cv-target-page2.layout-premium,
+        #cv-target-page2.layout-cobalt,
         #qc-print-host .cv-print-sheet.layout-sidebar,
         #qc-print-host .cv-print-sheet.layout-split,
         #qc-print-host .cv-print-sheet.layout-charcoal,
         #qc-print-host .cv-print-sheet.layout-navy,
         #qc-print-host .cv-print-sheet.layout-azure,
-        #qc-print-host .cv-print-sheet.layout-premium {
+        #qc-print-host .cv-print-sheet.layout-premium,
+        #qc-print-host .cv-print-sheet.layout-cobalt {
             direction: ltr !important;
         }
 

@@ -236,10 +236,15 @@
     margin: 0.1rem 0 0;
 }
 .layout-azure .cv-skill-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: var(--azure-ink);
     background: rgba(15, 23, 42, 0.06);
     border: 1px solid rgba(61, 90, 108, 0.22);
     margin: 0;
+    line-height: 1.15;
+    text-align: center;
 }
 .layout-azure .cv-skill-list,
 .layout-azure .cv-extra-list,

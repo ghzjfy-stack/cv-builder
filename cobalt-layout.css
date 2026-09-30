@@ -483,9 +483,15 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
 }
 
 .layout-cobalt #out-skills,
-.layout-cobalt #out-languages,
-.layout-cobalt #out-skills *,
-.layout-cobalt #out-languages * {
+.layout-cobalt #out-languages {
+    color: #fff !important;
+    padding: 0;
+}
+
+/* Keep white text on rail children, but do NOT zero padding on skill chips —
+   `#out-skills * { padding:0 }` was stripping badge padding and off-centering labels. */
+.layout-cobalt #out-skills *:not(.cv-skill-badge),
+.layout-cobalt #out-languages *:not(.cv-skill-badge) {
     color: #fff !important;
     padding: 0;
 }
@@ -493,25 +499,32 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
 .layout-cobalt .cv-skill-badges {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.4rem;
     margin: 0.15rem 0 0;
     width: 100%;
 }
 
 .layout-cobalt .cv-skill-badge {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     color: #fff !important;
     background: rgba(255, 255, 255, 0.14) !important;
     border: 1px solid rgba(255, 255, 255, 0.35) !important;
     margin: 0;
     border-radius: 999px;
-    padding: 0.28rem 0.62rem;
+    /* Optical vertical center: UI fonts (esp. Hebrew) sit high in the em-box. */
+    padding: 0.36rem 0.78rem !important;
     font-size: calc(0.66rem * var(--cv-scale));
-    line-height: 1.25;
+    line-height: 1;
     font-weight: 500;
     flex: 0 0 auto;
     white-space: nowrap;
     max-width: 100%;
+    text-align: center;
+    transform: translateY(0.06em);
 }
 
 .layout-cobalt #out-linkedin-side {

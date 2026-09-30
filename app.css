@@ -2921,13 +2921,18 @@
             max-width: 100%;
         }
         .cv-skill-badge {
-            display: inline-block;
-            padding: 0.22rem 0.55rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            /* Extra top padding for optical vertical center (Hebrew glyphs sit high). */
+            padding: 0.34rem 0.62rem 0.26rem;
             margin: 0;
             border-radius: 0.3rem;
             font-size: calc(0.72rem * var(--cv-scale));
             font-weight: 500;
-            line-height: 1.35;
+            line-height: 1;
+            text-align: center;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.22);
             unicode-bidi: isolate;
@@ -3696,15 +3701,20 @@
         }
         .layout-premium .exs-skill-item.cv-skill-badge,
         .layout-premium #out-skills .cv-skill-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
             margin: 0;
-            padding: 0.2rem 0.5rem;
+            padding: 0.26rem 0.55rem;
             border-radius: 0.28rem;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.24);
             color: rgba(255, 255, 255, 0.95);
             font-weight: 500;
             font-size: calc(0.64rem * var(--cv-scale));
+            line-height: 1.15;
+            text-align: center;
         }
         .layout-premium .exs-skill-track,
         .layout-premium .exs-skill-fill {
@@ -4631,10 +4641,15 @@
             margin: 0.1rem 0 0;
         }
         .layout-charcoal .cv-skill-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             color: #fff;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.24);
             margin: 0;
+            line-height: 1.15;
+            text-align: center;
         }
         .layout-charcoal .cv-skill-list {
             list-style: none;
@@ -5343,10 +5358,15 @@
             margin: 0.1rem 0 0;
         }
         .layout-navy .cv-skill-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             color: #fff;
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.24);
             margin: 0;
+            line-height: 1.15;
+            text-align: center;
         }
         .layout-navy .cv-skill-list {
             list-style: none;

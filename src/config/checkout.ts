@@ -132,7 +132,7 @@ export function toWhatsAppIntlPhone(raw: string): string {
 
 export function whatsappSelfPdfMessage(downloadUrl: string, english = false): string {
   const url = String(downloadUrl || "").trim();
-  const looksLikePdf = /\/api\/handoff-pdf\b|\.pdf(\?|$)/i.test(url);
+  const looksLikePdf = /\/api\/handoff\b[^#]*[?&]file=pdf\b|\.pdf(\?|$)/i.test(url);
   if (english) {
     return looksLikePdf
       ? `Here's your QuickCV resume PDF — tap to open and save: ${url}`

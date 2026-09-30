@@ -8,7 +8,6 @@ import { handleSendPdfWhatsappRequest } from "./sendPdfWhatsapp.js";
 import { handleTelegramWebhookRequest } from "./telegramBot.js";
 import { handleVerifyPaymentRequest } from "./verifyPayment.js";
 import { handleHandoffRequest } from "./handoff.js";
-import { handleHandoffPdfRequest } from "./handoffPdf.js";
 import { loadEnv } from "./env.js";
 
 loadEnv();
@@ -28,7 +27,6 @@ const routes = {
   "/api/send-pdf-whatsapp": handleSendPdfWhatsappRequest,
   "/api/telegram-webhook": handleTelegramWebhookRequest,
   "/api/handoff": handleHandoffRequest,
-  "/api/handoff-pdf": handleHandoffPdfRequest,
 };
 
 createServer((req, res) => {

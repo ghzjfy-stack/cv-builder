@@ -945,21 +945,21 @@ async function createCvPdfFileShareUrl(blob, filename) {
   if (!blob || blob.size < 100) return "";
   const pdfBase64 = await blobToBase64(blob);
   const draft = readShareDraft();
-  const res = await fetch("/api/handoff-pdf", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "same-origin",
-    body: JSON.stringify({
+  const res = await fetch("/api/handoff", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({
       pdfBase64,
       filename: filename || "cv.pdf",
       draft,
       token: getPaymentToken() || "",
-    }),
+      }),
   });
   const data = await res.json().catch(() => null);
   if (!data?.ok || !data.id) return "";
   // Always build from the current origin — server url can be wrong behind proxies.
-  return `${location.origin}/api/handoff-pdf?id=${encodeURIComponent(data.id)}`;
+  return `${location.origin}/api/handoff?id=${encodeURIComponent(data.id)}&file=pdf`;
 }
 
 async function createCvDownloadShareUrl(opts = {}) {
@@ -1083,33 +1083,25 @@ async function sendPdfToWhatsApp(e) {
         downloadUrl = "";
       }
     }
-    if (!downloadUrl) {
-      downloadUrl = await createCvDownloadShareUrl({ preferPdfFile: false });
+    if (!downloadUrl || !/\/api\/handoff\b[^#]*[?&]file=pdf\b/i.test(downloadUrl)) {
+      if (status) {
+        status.textContent = qcT(
+          "waSendFail",
+          "לא הצלחנו ליצור קישור לקובץ ה-PDF. נסו הורדה רגילה או שיתוף מהטלפון.",
+        );
+      }
+      return;
     }
 
     const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
     openExternalUrl(waUrl);
     if (status) {
-      const isPdfLink = /\/api\/handoff-pdf\b/i.test(downloadUrl);
       status.textContent = phone
-        ? isPdfLink
-          ? qcT("waPdfLinkOpened", "נפתח WhatsApp עם קישור לקובץ ה-PDF לפתיחה ושמירה.")
-          : qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
+        ? qcT("waPdfLinkOpened", "נפתח WhatsApp עם קישור לקובץ ה-PDF לפתיחה ושמירה.")
         : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
     }
   } catch {
-    try {
-      const fallback = whatsappSelfPdfUrl(phone, `${location.origin}/#studio`, english);
-      openExternalUrl(fallback);
-      if (status) {
-        status.textContent = qcT(
-          "waLinkShareOpened",
-          "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.",
-        );
-      }
-    } catch {
-      if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
-    }
+    if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
   }
 }
 

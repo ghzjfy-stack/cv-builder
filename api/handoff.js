@@ -1,7 +1,8 @@
 import { handleHandoffRequest } from "../server/handoff.js";
 
 export const config = {
-  maxDuration: 10,
+  maxDuration: 30,
+  memory: 1024,
 };
 
 export default async function handler(req, res) {

@@ -609,7 +609,8 @@ function isIOS() {
 
 /**
  * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Use exactly one primary path — firing anchor + pdf.save together can cancel the download.
+ * Caller must hide the busy overlay before this — a full-screen spinner
+ * blocks the iOS/Android share sheet and looks like a permanent hang.
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
@@ -622,7 +623,7 @@ async function downloadPdfBlob(blob, filename, pdf) {
         return "shared";
       } catch (err) {
         if (err && err.name === "AbortError") return "aborted";
-        /* fall through */
+        /* fall through to classic download */
       }
     }
   }
@@ -677,6 +678,8 @@ function isMostlyBlankRow(data, width, y) {
 
 function findSplitY(canvas, idealY, minY) {
   if (idealY >= canvas.height) return canvas.height;
+  // getImageData on large canvases can freeze mobile Safari for tens of seconds.
+  if (isMobileUa()) return idealY;
   const ctx = canvas.getContext("2d");
   const { width } = canvas;
   const search = Math.min(90, Math.max(0, idealY - minY));
@@ -918,9 +921,9 @@ async function captureToCanvas(el) {
           A4_CSS_H,
           lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
         );
-    // ~150–160 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
+    // ~150 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
     const mobile = isMobileUa();
-    const scale = Math.min(mobile ? 1.75 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
+    const scale = Math.min(mobile ? 1.5 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await withTimeout(
       html2canvas(el, {
@@ -1012,7 +1015,9 @@ export async function exportHighResPdf(opts = {}) {
   }
   if (window.__qcPdfBusy) {
     const started = Number(window.__qcPdfBusyAt || 0);
-    if (started && Date.now() - started < 90000) return;
+    // Allow retry sooner on mobile if a previous run looked stuck.
+    const lockMs = isMobileUa() ? 45000 : 90000;
+    if (started && Date.now() - started < lockMs) return;
     setSpinner(false);
   }
   const download = opts.download !== false;
@@ -1028,8 +1033,13 @@ export async function exportHighResPdf(opts = {}) {
   }
 
   setSpinner(true);
+  // Never leave the full-screen spinner up forever (iOS share used to keep it stuck).
+  const hardLimit = setTimeout(() => {
+    if (window.__qcPdfBusy) setSpinner(false);
+  }, 60000);
   const host = prepareCaptureClone();
   if (!host) {
+    clearTimeout(hardLimit);
     setSpinner(false);
     throw new Error("missing cv-target");
   }
@@ -1039,7 +1049,7 @@ export async function exportHighResPdf(opts = {}) {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     lockCaptureSheetHeight(host);
 
-    const captured = await withTimeout(captureToCanvas(host), 45000, "pdf-export-timeout");
+    const captured = await withTimeout(captureToCanvas(host), 40000, "pdf-export-timeout");
     const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
@@ -1062,7 +1072,7 @@ export async function exportHighResPdf(opts = {}) {
       window.QCCoverLetter.render?.();
       const letterHost = prepareCaptureClone("cl-target");
       if (letterHost) {
-        const letterCap = await withTimeout(captureToCanvas(letterHost), 30000, "pdf-letter-timeout");
+        const letterCap = await withTimeout(captureToCanvas(letterHost), 25000, "pdf-letter-timeout");
         if (letterCap.canvas?.width) {
           addCanvasPages(pdf, letterCap.canvas, letterCap.links, letterCap.width, letterCap.height, {
             marginMm: 0,
@@ -1075,11 +1085,22 @@ export async function exportHighResPdf(opts = {}) {
     const filename = fileBase() + ".pdf";
     const blob = pdf.output("blob");
     if (!blob || blob.size < 100) throw new Error("empty pdf");
+
+    // Drop overlay BEFORE share/download so the system sheet is usable on phones.
+    cleanupCapture();
+    setSpinner(false);
+    clearTimeout(hardLimit);
+
     if (download) {
       await downloadPdfBlob(blob, filename, pdf);
     }
     return { blob, filename };
+  } catch (err) {
+    cleanupCapture();
+    setSpinner(false);
+    throw err;
   } finally {
+    clearTimeout(hardLimit);
     cleanupCapture();
     setSpinner(false);
   }

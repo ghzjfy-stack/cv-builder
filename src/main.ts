@@ -1120,7 +1120,8 @@ function onOrderBumpChange() {
 
 async function runHighResExport() {
   const busyAt = Number(window.__qcPdfBusyAt || 0);
-  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < 90000) return;
+  const lockMs = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "") ? 45000 : 90000;
+  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < lockMs) return;
   const status = document.getElementById("download-status");
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {

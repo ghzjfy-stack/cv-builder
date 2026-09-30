@@ -495,12 +495,44 @@ function promoteCobaltRailForCapture(clone, english) {
     sideInner.querySelectorAll(".cv-section-title, .cv-contact-row, .cv-contact-link, .cv-skill-badge, .cv-lang-name, .cv-lang-row, #out-skills, #out-languages").forEach((node) => {
       if (node instanceof HTMLElement) node.style.color = "#ffffff";
     });
+    const badges = sideInner.querySelector(".cv-skill-badges");
+    if (badges instanceof HTMLElement) {
+      Object.assign(badges.style, {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "0.4rem",
+        width: "100%",
+      });
+    }
     sideInner.querySelectorAll(".cv-skill-badge").forEach((node) => {
       if (!(node instanceof HTMLElement)) return;
       Object.assign(node.style, {
         color: "#ffffff",
-        background: "rgba(255,255,255,0.12)",
-        border: "1px solid rgba(255,255,255,0.28)",
+        background: "rgba(255,255,255,0.14)",
+        border: "1px solid rgba(255,255,255,0.35)",
+        flex: "0 0 auto",
+        whiteSpace: "nowrap",
+      });
+    });
+    sideInner.querySelectorAll(".cv-lang-row").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      Object.assign(node.style, {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.28rem",
+        width: "100%",
+        color: "#ffffff",
+      });
+    });
+    sideInner.querySelectorAll(".cv-lang-track").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      Object.assign(node.style, {
+        display: "block",
+        width: "100%",
+        height: "6px",
+        background: "rgba(255,255,255,0.22)",
+        borderRadius: "999px",
+        overflow: "hidden",
       });
     });
     const contact = sideInner.querySelector(".cv-contact-sidebar");

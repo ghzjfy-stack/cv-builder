@@ -525,8 +525,8 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     white-space: nowrap;
     max-width: 100%;
     text-align: center;
-    /* Nudge up slightly — Latin caps sit optically low in the em-box. */
-    transform: translateY(-0.04em);
+    /* Push label down — Hebrew/Latin glyphs sit optically high in these pills. */
+    transform: translateY(0.08em);
 }
 
 .layout-cobalt #out-linkedin-side {

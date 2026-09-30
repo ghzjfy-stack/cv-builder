@@ -26,6 +26,10 @@
       "maxDuration": 30,
       "memory": 1024
     },
+    "api/handoff.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
     "api/telegram-webhook.js": {
       "maxDuration": 30
     },
@@ -37,6 +41,9 @@
     }
   },
   "rewrites": [
-    { "source": "/cv-templates/:path*", "destination": "/index.html" }
+    {
+      "source": "/cv-templates/:path*",
+      "destination": "/index.html"
+    }
   ]
 }

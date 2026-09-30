@@ -957,10 +957,9 @@ async function createCvPdfFileShareUrl(blob, filename) {
     }),
   });
   const data = await res.json().catch(() => null);
-  if (!data?.ok) return "";
-  if (data.url && /^https?:\/\//i.test(data.url)) return String(data.url);
-  if (data.id) return `${location.origin}/api/handoff-pdf?id=${encodeURIComponent(data.id)}`;
-  return "";
+  if (!data?.ok || !data.id) return "";
+  // Always build from the current origin — server url can be wrong behind proxies.
+  return `${location.origin}/api/handoff-pdf?id=${encodeURIComponent(data.id)}`;
 }
 
 async function createCvDownloadShareUrl(opts = {}) {

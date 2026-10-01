@@ -820,29 +820,16 @@ function isIOS() {
 }
 
 /**
- * Save PDF to the device.
- * Prefer a real file download — do NOT use navigator.share here (iOS often attaches the
- * current page URL, which becomes a broken quickcv.co.il link in WhatsApp/Files).
+ * Save PDF via <a download> in the same user-gesture turn when possible.
+ * Never navigator.share here — and never window.open the site/blob as a page.
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
   const safeName = shareSafeFilename(filename);
 
-  if (pdf && typeof pdf.save === "function") {
+  if (pdf && typeof pdf.save === "function" && !isIOS()) {
     try {
       pdf.save(safeName);
-      // On iOS, also open the blob PDF viewer so "Save to Files" is one tap away.
-      if (isIOS()) {
-        const url = URL.createObjectURL(blob);
-        setTimeout(() => {
-          try {
-            window.open(url, "_blank", "noopener");
-          } catch {
-            /* ignore */
-          }
-          setTimeout(() => URL.revokeObjectURL(url), 60000);
-        }, 250);
-      }
       return "saved";
     } catch {
       /* fall through */
@@ -860,20 +847,41 @@ async function downloadPdfBlob(blob, filename, pdf) {
     document.body.appendChild(a);
     a.click();
     a.remove();
-
-    if (isIOS()) {
-      try {
-        window.open(url, "_blank", "noopener");
-      } catch {
-        /* ignore */
-      }
-    }
     return "anchor";
   } catch {
     throw new Error("pdf-download-failed");
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
+}
+
+/** Share ONLY the PDF file (no title/text/url — those make iOS attach the page link). */
+export async function sharePdfFileOnly(blob, filename) {
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+  const safeName = shareSafeFilename(filename);
+  const file = new File([blob], safeName, { type: "application/pdf" });
+  if (!(typeof navigator.canShare === "function" && navigator.canShare({ files: [file] }))) {
+    await downloadPdfBlob(blob, safeName, null);
+    return "download-fallback";
+  }
+  await navigator.share({ files: [file] });
+  return "shared";
+}
+
+/** Immediate save helper for a fresh tap after the PDF was prepared. */
+export async function savePdfFileOnly(blob, filename) {
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+  const safeName = shareSafeFilename(filename);
+  // On iOS, Save to Files lives in the share sheet — but still files-only.
+  if (isIOS()) {
+    try {
+      return await sharePdfFileOnly(blob, safeName);
+    } catch (err) {
+      if (err && err.name === "AbortError") return "aborted";
+      /* fall through to anchor */
+    }
+  }
+  return downloadPdfBlob(blob, safeName, null);
 }
 
 function isMostlyBlankRow(data, width, y) {

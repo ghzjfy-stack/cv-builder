@@ -17,7 +17,7 @@ import {
   whatsappReferralUrl,
   type PackId,
 } from "./config/checkout.js";
-import { exportHighResPdf } from "./pdf/exportHighRes.js";
+import { exportHighResPdf, savePdfFileOnly, sharePdfFileOnly } from "./pdf/exportHighRes.js";
 import {
   createManualOrderSession,
   isManualOrderApproved,
@@ -969,6 +969,119 @@ async function createCvDownloadShareUrl() {
   return `${siteBase}/?view=studio`;
 }
 
+let pendingPdf = null; // { blob, filename }
+
+function isMobileClient() {
+  return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+}
+
+function setPdfReadySheet(open) {
+  const sheet = document.getElementById("pdf-ready-sheet");
+  if (!sheet) return;
+  sheet.hidden = !open;
+  sheet.classList.toggle("hidden", !open);
+  sheet.classList.toggle("flex", !!open);
+  document.documentElement.classList.toggle("qc-modal-open", !!open);
+  document.body.classList.toggle("qc-modal-open", !!open);
+}
+
+function closePdfReadySheet() {
+  setPdfReadySheet(false);
+}
+
+function openPdfReadySheet() {
+  const title = document.getElementById("pdf-ready-title");
+  const lead = document.getElementById("pdf-ready-lead");
+  const saveBtn = document.getElementById("btn-pdf-ready-save");
+  const waBtn = document.getElementById("btn-pdf-ready-whatsapp");
+  const closeBtn = document.getElementById("btn-pdf-ready-close");
+  if (title) title.textContent = qcT("pdfReadyTitle", "ה-PDF מוכן");
+  if (lead) {
+    lead.textContent = qcT(
+      "pdfReadyLead",
+      "באייפון צריך לחיצה נוספת כדי לשמור קובץ או לשלוח בוואטסאפ (בלי קישור לאתר).",
+    );
+  }
+  if (saveBtn) saveBtn.textContent = qcT("pdfReadySave", "שמור PDF לקבצים");
+  if (waBtn) waBtn.textContent = qcT("pdfReadyWa", "שלח בוואטסאפ (בחירת איש קשר)");
+  if (closeBtn) closeBtn.textContent = qcT("pdfReadyClose", "סגור");
+  setPdfReadySheet(true);
+  const status = document.getElementById("download-status");
+  if (status) {
+    status.textContent = qcT(
+      "pdfReadyHint",
+      "ה-PDF מוכן — לחצו שמירה או שליחה בוואטסאפ.",
+    );
+  }
+}
+
+async function preparePendingPdf() {
+  const result = await exportHighResPdf({ download: false });
+  const blob = result?.blob;
+  const filename = String(result?.filename || "QuickCV_Resume.pdf");
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+  pendingPdf = { blob, filename };
+  return pendingPdf;
+}
+
+async function onPdfReadySave(e) {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  const status = document.getElementById("download-status");
+  if (!pendingPdf?.blob) {
+    if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
+    return;
+  }
+  try {
+    // Fresh user gesture — required on iOS for real file save/share.
+    const mode = await savePdfFileOnly(pendingPdf.blob, pendingPdf.filename);
+    if (mode === "aborted") {
+      if (status) status.textContent = "";
+      return;
+    }
+    if (status) {
+      status.textContent = qcT(
+        "downloadReadyMobile",
+        "בחרו «שמירה בקבצים» בחלון שנפתח.",
+      );
+    }
+    closePdfReadySheet();
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      if (status) status.textContent = "";
+      return;
+    }
+    if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
+  }
+}
+
+async function onPdfReadyWhatsApp(e) {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  const status = document.getElementById("download-status");
+  if (!pendingPdf?.blob) {
+    if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
+    return;
+  }
+  try {
+    // Fresh user gesture — share ONLY the PDF file so WhatsApp shows contacts.
+    await sharePdfFileOnly(pendingPdf.blob, pendingPdf.filename);
+    if (status) {
+      status.textContent = qcT(
+        "waShared",
+        "בחרו WhatsApp ואז איש קשר כדי לשלוח את קובץ ה-PDF.",
+      );
+    }
+    closePdfReadySheet();
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      if (status) status.textContent = "";
+      return;
+    }
+    if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
+  }
+}
+
 async function sendPdfToWhatsApp(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
@@ -980,49 +1093,15 @@ async function sendPdfToWhatsApp(e) {
   if (status) status.textContent = qcT("waPreparing", "מכין לשליחה בוואטסאפ...");
 
   try {
-    const result = await exportHighResPdf({ download: false });
-    const blob = result?.blob;
-    if (!blob) throw new Error("empty pdf");
-
-    // ASCII filename only — Hebrew names break WhatsApp file attach on iOS.
-    const filename = String(result?.filename || "QuickCV_Resume.pdf")
-      .replace(/[^\w.\-]+/g, "_")
-      .replace(/_+/g, "_");
-    const safeName = (filename.toLowerCase().endsWith(".pdf") ? filename : `${filename}.pdf`) || "QuickCV_Resume.pdf";
-    const file = new File([blob], safeName, { type: "application/pdf" });
-
-    const canFileShare =
-      typeof navigator !== "undefined" &&
-      typeof navigator.share === "function" &&
-      typeof navigator.canShare === "function" &&
-      navigator.canShare({ files: [file] });
-
-    if (canFileShare) {
-      // ONLY files — no title/text/url or iOS attaches the current page link.
-      await navigator.share({ files: [file] });
-      if (status) {
-        status.textContent = qcT(
-          "waShared",
-          "בחרו WhatsApp ואז איש קשר כדי לשלוח את קובץ ה-PDF.",
-        );
-      }
+    await preparePendingPdf();
+    if (isMobileClient()) {
+      openPdfReadySheet();
+      // Focus WhatsApp action visually by scrolling sheet into view
+      document.getElementById("btn-pdf-ready-whatsapp")?.focus?.();
       return;
     }
-
-    // Desktop fallback: download the file for manual attach.
-    const url = URL.createObjectURL(blob);
-    try {
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = safeName;
-      a.rel = "noopener";
-      a.type = "application/pdf";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } finally {
-      setTimeout(() => URL.revokeObjectURL(url), 20000);
-    }
+    // Desktop: save file for manual attach (no reliable WA contact picker in browser).
+    await savePdfFileOnly(pendingPdf.blob, pendingPdf.filename);
     if (status) {
       status.textContent = qcT(
         "waDownloadedAttach",
@@ -1120,22 +1199,22 @@ function onOrderBumpChange() {
 
 async function runHighResExport() {
   const busyAt = Number(window.__qcPdfBusyAt || 0);
-  const lockMs = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "") ? 45000 : 90000;
+  const lockMs = isMobileClient() ? 45000 : 90000;
   if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < lockMs) return;
   const status = document.getElementById("download-status");
-  const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {
-    status.textContent = mobile
+    status.textContent = isMobileClient()
       ? qcT("preparingPdfMobile", "מכין PDF באיכות מלאה לתצוגה שלכם…")
       : qcT("preparingPdf", "מכין קובץ PDF...");
   }
   try {
-    await exportHighResPdf();
-    if (status) {
-      status.textContent = mobile
-        ? qcT("downloadReadyMobile", "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.")
-        : qcT("downloadStarted", "ההורדה התחילה.");
+    await preparePendingPdf();
+    if (isMobileClient()) {
+      openPdfReadySheet();
+      return;
     }
+    await savePdfFileOnly(pendingPdf.blob, pendingPdf.filename);
+    if (status) status.textContent = qcT("downloadStarted", "ההורדה התחילה.");
   } catch {
     if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
   }
@@ -1494,6 +1573,15 @@ function bind() {
   document.getElementById("btn-open-bit")?.addEventListener("click", openBitApp);
   document.getElementById("btn-copy-bit")?.addEventListener("click", copyBitPhone);
   document.getElementById("btn-send-pdf-whatsapp")?.addEventListener("click", sendPdfToWhatsApp);
+  document.getElementById("btn-pdf-ready-save")?.addEventListener("click", onPdfReadySave);
+  document.getElementById("btn-pdf-ready-whatsapp")?.addEventListener("click", onPdfReadyWhatsApp);
+  document.getElementById("btn-pdf-ready-close")?.addEventListener("click", (e) => {
+    e?.preventDefault?.();
+    closePdfReadySheet();
+  });
+  document.getElementById("pdf-ready-sheet")?.addEventListener("click", (e) => {
+    if (e.target === document.getElementById("pdf-ready-sheet")) closePdfReadySheet();
+  });
   document.getElementById("cover-letter-download")?.addEventListener("click", downloadCoverLetter);
   document.getElementById("btn-copy-referral")?.addEventListener("click", copyReferralLink);
   document.getElementById("btn-download-cv-pdf")?.addEventListener("click", (e) => {

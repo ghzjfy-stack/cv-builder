@@ -977,21 +977,20 @@ async function sendPdfToWhatsApp(e) {
     return;
   }
   const status = document.getElementById("download-status");
-  const phone = readPersonalPhone();
-  const waPhone = document.getElementById("wa-pdf-phone");
-  if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
-    waPhone.value = phone;
-  }
-  const english = window.QCCvLang === "en";
   if (status) status.textContent = qcT("waPreparing", "מכין לשליחה בוואטסאפ...");
 
   try {
     const result = await exportHighResPdf({ download: false });
     const blob = result?.blob;
-    const filename = String(result?.filename || "cv.pdf");
     if (!blob) throw new Error("empty pdf");
 
-    const file = new File([blob], filename, { type: "application/pdf" });
+    // ASCII filename only — Hebrew names break WhatsApp file attach on iOS.
+    const filename = String(result?.filename || "QuickCV_Resume.pdf")
+      .replace(/[^\w.\-]+/g, "_")
+      .replace(/_+/g, "_");
+    const safeName = (filename.toLowerCase().endsWith(".pdf") ? filename : `${filename}.pdf`) || "QuickCV_Resume.pdf";
+    const file = new File([blob], safeName, { type: "application/pdf" });
+
     const canFileShare =
       typeof navigator !== "undefined" &&
       typeof navigator.share === "function" &&
@@ -999,10 +998,8 @@ async function sendPdfToWhatsApp(e) {
       navigator.canShare({ files: [file] });
 
     if (canFileShare) {
-      await navigator.share({
-        files: [file],
-        title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
-      });
+      // ONLY files — no title/text/url or iOS attaches the current page link.
+      await navigator.share({ files: [file] });
       if (status) {
         status.textContent = qcT(
           "waShared",
@@ -1012,12 +1009,12 @@ async function sendPdfToWhatsApp(e) {
       return;
     }
 
-    // Desktop / unsupported share: save the PDF so they can attach it manually.
+    // Desktop fallback: download the file for manual attach.
     const url = URL.createObjectURL(blob);
     try {
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename;
+      a.download = safeName;
       a.rel = "noopener";
       a.type = "application/pdf";
       document.body.appendChild(a);

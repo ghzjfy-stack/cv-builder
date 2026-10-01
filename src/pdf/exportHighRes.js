@@ -21,11 +21,23 @@ function cvCaptureDir() {
 }
 
 function fileBase() {
-  const english = cvCaptureDir() === "ltr";
-  const raw = document.getElementById("in-name")?.value || (english ? "Resume" : "קורות_חיים");
+  const raw = document.getElementById("in-name")?.value || "Resume";
+  // ASCII-only filenames: Hebrew names break iOS/WhatsApp file share and fall back to page links.
   const safe =
-    window.QCSanitize?.filename?.(raw) || String(raw).replace(/[^\w\u0590-\u05FF-]+/g, "_");
-  return (english ? "Resume_" : "קורות_חיים_") + (safe || "resume");
+    window.QCSanitize?.filename?.(raw) ||
+    String(raw)
+      .normalize("NFKD")
+      .replace(/[^\w\-]+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+      .slice(0, 40);
+  return "QuickCV_" + (safe || "Resume");
+}
+
+function shareSafeFilename(name) {
+  const base = String(name || "QuickCV_Resume.pdf").replace(/\.pdf$/i, "");
+  const ascii = base.replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
+  return (ascii || "QuickCV_Resume") + ".pdf";
 }
 
 function cvThemeSource() {
@@ -808,24 +820,32 @@ function isIOS() {
 }
 
 /**
- * Best-effort PDF download across desktop, Android, and iOS Safari.
- * - iOS: Web Share sheet (Save to Files / WhatsApp / etc.) — silent downloads are blocked.
- * - Android/desktop: <a download> saves the file directly.
- * Never share a website URL — only the PDF File.
+ * Save PDF to the device.
+ * Prefer a real file download — do NOT use navigator.share here (iOS often attaches the
+ * current page URL, which becomes a broken quickcv.co.il link in WhatsApp/Files).
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
+  const safeName = shareSafeFilename(filename);
 
-  const file = new File([blob], filename, { type: "application/pdf" });
-
-  // iOS Safari: share sheet is the reliable way to save to Files.
-  if (isIOS() && navigator.canShare && navigator.canShare({ files: [file] })) {
+  if (pdf && typeof pdf.save === "function") {
     try {
-      await navigator.share({ files: [file], title: filename });
-      return "shared";
-    } catch (err) {
-      if (err && err.name === "AbortError") return "aborted";
-      /* fall through to anchor */
+      pdf.save(safeName);
+      // On iOS, also open the blob PDF viewer so "Save to Files" is one tap away.
+      if (isIOS()) {
+        const url = URL.createObjectURL(blob);
+        setTimeout(() => {
+          try {
+            window.open(url, "_blank", "noopener");
+          } catch {
+            /* ignore */
+          }
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }, 250);
+      }
+      return "saved";
+    } catch {
+      /* fall through */
     }
   }
 
@@ -833,35 +853,26 @@ async function downloadPdfBlob(blob, filename, pdf) {
   try {
     const a = document.createElement("a");
     a.href = url;
-    a.download = filename;
+    a.download = safeName;
     a.rel = "noopener";
     a.type = "application/pdf";
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
     a.remove();
-    return "anchor";
-  } catch {
-    if (pdf && typeof pdf.save === "function") {
+
+    if (isIOS()) {
       try {
-        pdf.save(filename);
-        return "saved";
+        window.open(url, "_blank", "noopener");
       } catch {
         /* ignore */
       }
     }
-    // Last resort on Android: share sheet.
-    if (isMobileUa() && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: filename });
-        return "shared";
-      } catch (err) {
-        if (err && err.name === "AbortError") return "aborted";
-      }
-    }
+    return "anchor";
+  } catch {
     throw new Error("pdf-download-failed");
   } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 20000);
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
 }
 

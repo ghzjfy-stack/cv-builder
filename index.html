@@ -1324,6 +1324,16 @@
         </div>
     </div>
 
+    <div id="pdf-ready-sheet" class="fixed inset-0 hidden items-end sm:items-center justify-center bg-slate-950/70 no-print p-3" style="z-index:2147483647" role="dialog" aria-modal="true" aria-labelledby="pdf-ready-title" hidden>
+        <div class="bg-white text-slate-900 rounded-3xl w-full max-w-sm mx-auto p-5 shadow-2xl space-y-3">
+            <p id="pdf-ready-title" class="text-base font-black text-center">ה-PDF מוכן</p>
+            <p id="pdf-ready-lead" class="text-xs text-slate-500 text-center leading-relaxed">באייפון צריך לחיצה נוספת כדי לשמור קובץ או לשלוח בוואטסאפ (בלי קישור לאתר).</p>
+            <button type="button" id="btn-pdf-ready-save" class="w-full min-h-12 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-sm">שמור PDF לקבצים</button>
+            <button type="button" id="btn-pdf-ready-whatsapp" class="w-full min-h-12 rounded-2xl bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold text-sm">שלח בוואטסאפ (בחירת איש קשר)</button>
+            <button type="button" id="btn-pdf-ready-close" class="w-full min-h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">סגור</button>
+        </div>
+    </div>
+
     <script src="lib/security/hash.js"></script>
     <script src="lib/security/sanitize.js"></script>
     <script src="lib/security/log.js"></script>

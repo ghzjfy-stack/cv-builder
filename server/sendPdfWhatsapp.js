@@ -8,7 +8,8 @@ const MAX_PDF = 3 * 1024 * 1024;
 function phoneFromContact(value) {
   const n = normalizeContact(value);
   if (!n || n.includes("@")) return "";
-  if (n.startsWith("972") && n.length >= 11) return n;
+  if (/^9725\d{8}$/.test(n)) return n;
+  if (/^\d{10,15}$/.test(n)) return n;
   return "";
 }
 
@@ -57,7 +58,7 @@ async function uploadMedia(buffer, filename) {
   return { ok: true, id: String(data.id) };
 }
 
-async function sendDocument(mediaId, phone, filename) {
+async function postWhatsAppMessage(body) {
   const token = process.env.WHATSAPP_TOKEN || process.env.WHATSAPP_ACCESS_TOKEN;
   const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const res = await fetch(`https://graph.facebook.com/v21.0/${phoneId}/messages`, {
@@ -66,19 +67,73 @@ async function sendDocument(mediaId, phone, filename) {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err =
+      data?.error?.message ||
+      data?.error?.error_user_msg ||
+      data?.error?.code ||
+      "send_failed";
+    return { ok: false, error: String(err).slice(0, 180) };
+  }
+  return { ok: true };
+}
+
+/**
+ * Prefer an approved document template when configured (cold outbound),
+ * otherwise send a free-form document (works inside the customer-care window).
+ */
+async function sendDocument(mediaId, phone, filename) {
+  const pdfTemplate = String(process.env.WHATSAPP_PDF_TEMPLATE_NAME || "").trim();
+  const lang =
+    process.env.WHATSAPP_PDF_TEMPLATE_LANG ||
+    process.env.WHATSAPP_TEMPLATE_LANG ||
+    "he";
+  const caption = "קורות החיים מ-QuickCV — הקובץ מצורף";
+
+  const attempts = [];
+  if (pdfTemplate) {
+    attempts.push({
       messaging_product: "whatsapp",
       to: phone,
-      type: "document",
-      document: {
-        id: mediaId,
-        filename,
-        caption: "קורות החיים מ-QuickCV",
+      type: "template",
+      template: {
+        name: pdfTemplate,
+        language: { code: lang },
+        components: [
+          {
+            type: "header",
+            parameters: [
+              {
+                type: "document",
+                document: { id: mediaId, filename },
+              },
+            ],
+          },
+        ],
       },
-    }),
+    });
+  }
+  attempts.push({
+    messaging_product: "whatsapp",
+    to: phone,
+    type: "document",
+    document: {
+      id: mediaId,
+      filename,
+      caption,
+    },
   });
-  if (!res.ok) return { ok: false, error: "send_failed" };
-  return { ok: true };
+
+  let lastError = "send_failed";
+  for (const body of attempts) {
+    const result = await postWhatsAppMessage(body);
+    if (result.ok) return { ok: true };
+    lastError = result.error || lastError;
+  }
+  return { ok: false, error: lastError };
 }
 
 /**

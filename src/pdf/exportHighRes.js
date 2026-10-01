@@ -809,21 +809,23 @@ function isIOS() {
 
 /**
  * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Use exactly one primary path — firing anchor + pdf.save together can cancel the download.
+ * - iOS: Web Share sheet (Save to Files / WhatsApp / etc.) — silent downloads are blocked.
+ * - Android/desktop: <a download> saves the file directly.
+ * Never share a website URL — only the PDF File.
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
 
-  if (isMobileUa()) {
-    const file = new File([blob], filename, { type: "application/pdf" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: filename });
-        return "shared";
-      } catch (err) {
-        if (err && err.name === "AbortError") return "aborted";
-        /* fall through */
-      }
+  const file = new File([blob], filename, { type: "application/pdf" });
+
+  // iOS Safari: share sheet is the reliable way to save to Files.
+  if (isIOS() && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return "shared";
+    } catch (err) {
+      if (err && err.name === "AbortError") return "aborted";
+      /* fall through to anchor */
     }
   }
 
@@ -833,19 +835,11 @@ async function downloadPdfBlob(blob, filename, pdf) {
     a.href = url;
     a.download = filename;
     a.rel = "noopener";
+    a.type = "application/pdf";
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
     a.remove();
-
-    if (isIOS()) {
-      try {
-        window.open(url, "_blank", "noopener");
-        return "tab";
-      } catch {
-        /* keep anchor */
-      }
-    }
     return "anchor";
   } catch {
     if (pdf && typeof pdf.save === "function") {
@@ -854,6 +848,15 @@ async function downloadPdfBlob(blob, filename, pdf) {
         return "saved";
       } catch {
         /* ignore */
+      }
+    }
+    // Last resort on Android: share sheet.
+    if (isMobileUa() && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: filename });
+        return "shared";
+      } catch (err) {
+        if (err && err.name === "AbortError") return "aborted";
       }
     }
     throw new Error("pdf-download-failed");
@@ -877,6 +880,8 @@ function isMostlyBlankRow(data, width, y) {
 
 function findSplitY(canvas, idealY, minY) {
   if (idealY >= canvas.height) return canvas.height;
+  // getImageData on large canvases can freeze mobile Safari for tens of seconds.
+  if (isMobileUa()) return idealY;
   const ctx = canvas.getContext("2d");
   const { width } = canvas;
   const search = Math.min(90, Math.max(0, idealY - minY));
@@ -1120,7 +1125,7 @@ async function captureToCanvas(el) {
         );
     // ~150–160 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
     const mobile = isMobileUa();
-    const scale = Math.min(mobile ? 1.75 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
+    const scale = Math.min(mobile ? 1.5 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await withTimeout(
       html2canvas(el, {
@@ -1212,7 +1217,8 @@ export async function exportHighResPdf(opts = {}) {
   }
   if (window.__qcPdfBusy) {
     const started = Number(window.__qcPdfBusyAt || 0);
-    if (started && Date.now() - started < 90000) return;
+    const lockMs = isMobileUa() ? 45000 : 90000;
+    if (started && Date.now() - started < lockMs) return;
     setSpinner(false);
   }
   const download = opts.download !== false;
@@ -1228,8 +1234,12 @@ export async function exportHighResPdf(opts = {}) {
   }
 
   setSpinner(true);
+  const hardLimit = setTimeout(() => {
+    if (window.__qcPdfBusy) setSpinner(false);
+  }, 60000);
   const host = prepareCaptureClone();
   if (!host) {
+    clearTimeout(hardLimit);
     setSpinner(false);
     throw new Error("missing cv-target");
   }
@@ -1239,7 +1249,7 @@ export async function exportHighResPdf(opts = {}) {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     lockCaptureSheetHeight(host);
 
-    const captured = await withTimeout(captureToCanvas(host), 45000, "pdf-export-timeout");
+    const captured = await withTimeout(captureToCanvas(host), 40000, "pdf-export-timeout");
     const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
@@ -1262,7 +1272,7 @@ export async function exportHighResPdf(opts = {}) {
       window.QCCoverLetter.render?.();
       const letterHost = prepareCaptureClone("cl-target");
       if (letterHost) {
-        const letterCap = await withTimeout(captureToCanvas(letterHost), 30000, "pdf-letter-timeout");
+        const letterCap = await withTimeout(captureToCanvas(letterHost), 25000, "pdf-letter-timeout");
         if (letterCap.canvas?.width) {
           addCanvasPages(pdf, letterCap.canvas, letterCap.links, letterCap.width, letterCap.height, {
             marginMm: 0,
@@ -1275,11 +1285,22 @@ export async function exportHighResPdf(opts = {}) {
     const filename = fileBase() + ".pdf";
     const blob = pdf.output("blob");
     if (!blob || blob.size < 100) throw new Error("empty pdf");
+
+    // Drop overlay BEFORE share/download so the system sheet is usable on phones.
+    cleanupCapture();
+    setSpinner(false);
+    clearTimeout(hardLimit);
+
     if (download) {
       await downloadPdfBlob(blob, filename, pdf);
     }
     return { blob, filename };
+  } catch (err) {
+    cleanupCapture();
+    setSpinner(false);
+    throw err;
   } finally {
+    clearTimeout(hardLimit);
     cleanupCapture();
     setSpinner(false);
   }

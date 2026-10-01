@@ -15,7 +15,6 @@ import {
   isPackId,
   packAmount,
   whatsappReferralUrl,
-  whatsappSelfPdfUrl,
   type PackId,
 } from "./config/checkout.js";
 import { exportHighResPdf } from "./pdf/exportHighRes.js";
@@ -927,7 +926,19 @@ async function createCvDownloadShareUrl() {
   const safe = { ...(draft || {}) };
   delete safe.photo;
 
+  const siteBase = (() => {
+    try {
+      if (/quickcv\.(co\.il|app)$/i.test(location.hostname)) {
+        return `${location.protocol}//www.quickcv.co.il`;
+      }
+    } catch {
+      /* ignore */
+    }
+    return location.origin;
+  })();
+
   // Prefer a short handoff id — long ?d= drafts break wa.me (white error page).
+  // Use query ?view=studio (not #studio) — WhatsApp often turns #studio into /studio → 404.
   try {
     const res = await fetch("/api/handoff", {
       method: "POST",
@@ -937,7 +948,7 @@ async function createCvDownloadShareUrl() {
     });
     const data = await res.json().catch(() => null);
     if (data?.ok && data.id) {
-      return `${location.origin}/?h=${encodeURIComponent(data.id)}#studio`;
+      return `${siteBase}/?h=${encodeURIComponent(data.id)}&view=studio`;
     }
   } catch {
     /* fall through */
@@ -949,14 +960,13 @@ async function createCvDownloadShareUrl() {
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/g, "");
-    // Keep WhatsApp deep links short; otherwise wa.me shows a blank/error page.
     if (encoded.length <= 1800) {
-      return `${location.origin}/?d=${encodeURIComponent(encoded)}#studio`;
+      return `${siteBase}/?d=${encodeURIComponent(encoded)}&view=studio`;
     }
   } catch {
     /* fall through */
   }
-  return `${location.origin}/#studio`;
+  return `${siteBase}/?view=studio`;
 }
 
 async function sendPdfToWhatsApp(e) {
@@ -976,65 +986,58 @@ async function sendPdfToWhatsApp(e) {
   if (status) status.textContent = qcT("waPreparing", "מכין לשליחה בוואטסאפ...");
 
   try {
-    // Mobile file share (actual PDF) when the browser supports it — no blank tabs.
+    const result = await exportHighResPdf({ download: false });
+    const blob = result?.blob;
+    const filename = String(result?.filename || "cv.pdf");
+    if (!blob) throw new Error("empty pdf");
+
+    const file = new File([blob], filename, { type: "application/pdf" });
     const canFileShare =
       typeof navigator !== "undefined" &&
       typeof navigator.share === "function" &&
-      typeof navigator.canShare === "function";
+      typeof navigator.canShare === "function" &&
+      navigator.canShare({ files: [file] });
 
     if (canFileShare) {
-      try {
-        const result = await exportHighResPdf({ download: false });
-        const blob = result?.blob;
-        const filename = String(result?.filename || "cv.pdf");
-        if (blob) {
-          const file = new File([blob], filename, { type: "application/pdf" });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
-              text: english ? "Resume from QuickCV" : "קורות חיים מ-QuickCV",
-            });
-            if (status) {
-              status.textContent = qcT(
-                "waShared",
-                "בחרו WhatsApp בחלון השיתוף כדי לשלוח את ה-PDF.",
-              );
-            }
-            return;
-          }
-        }
-      } catch (shareErr) {
-        if (shareErr && shareErr.name === "AbortError") {
-          if (status) status.textContent = "";
-          return;
-        }
-        /* fall through to wa.me link */
-      }
-    }
-
-    // Reliable path: open WhatsApp chat with a short view/save link (current template).
-    const downloadUrl = await createCvDownloadShareUrl();
-    const waUrl = whatsappSelfPdfUrl(phone, downloadUrl, english);
-    openExternalUrl(waUrl);
-    if (status) {
-      status.textContent = phone
-        ? qcT("waLinkOpened", "נפתח WhatsApp עם קישור לצפייה ושמירה של קורות החיים.")
-        : qcT("waLinkShareOpened", "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.");
-    }
-  } catch {
-    try {
-      const fallback = whatsappSelfPdfUrl(phone, `${location.origin}/#studio`, english);
-      openExternalUrl(fallback);
+      await navigator.share({
+        files: [file],
+        title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
+      });
       if (status) {
         status.textContent = qcT(
-          "waLinkShareOpened",
-          "נפתח WhatsApp — בחרו צ'אט כדי לשלוח את הקישור.",
+          "waShared",
+          "בחרו WhatsApp ואז איש קשר כדי לשלוח את קובץ ה-PDF.",
         );
       }
-    } catch {
-      if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
+      return;
     }
+
+    // Desktop / unsupported share: save the PDF so they can attach it manually.
+    const url = URL.createObjectURL(blob);
+    try {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.rel = "noopener";
+      a.type = "application/pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } finally {
+      setTimeout(() => URL.revokeObjectURL(url), 20000);
+    }
+    if (status) {
+      status.textContent = qcT(
+        "waDownloadedAttach",
+        "הקובץ ירד. שלחו אותו בוואטסאפ כקובץ מצורף.",
+      );
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      if (status) status.textContent = "";
+      return;
+    }
+    if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
   }
 }
 
@@ -1120,7 +1123,8 @@ function onOrderBumpChange() {
 
 async function runHighResExport() {
   const busyAt = Number(window.__qcPdfBusyAt || 0);
-  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < 90000) return;
+  const lockMs = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "") ? 45000 : 90000;
+  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < lockMs) return;
   const status = document.getElementById("download-status");
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {

@@ -1285,9 +1285,9 @@
                     הורד קורות חיים ב-PDF
                 </button>
                 <div class="grid grid-cols-1 gap-2 text-right">
-                    <button type="button" id="btn-send-pdf-whatsapp" class="w-full min-h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold py-3 px-4 rounded-xl text-sm">שלח PDF לוואטסאפ שלי</button>
-                    <label for="wa-pdf-phone" id="wa-pdf-phone-label" class="block text-[11px] font-bold text-slate-300">נייד לשליחה</label>
-                    <input type="tel" id="wa-pdf-phone" inputmode="tel" autocomplete="tel" placeholder="054-0000000" class="w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
+                    <button type="button" id="btn-send-pdf-whatsapp" class="w-full min-h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold py-3 px-4 rounded-xl text-sm">שלח PDF בוואטסאפ</button>
+                    <label for="wa-pdf-phone" id="wa-pdf-phone-label" class="block text-[11px] font-bold text-slate-300 hidden">נייד לשליחה</label>
+                    <input type="tel" id="wa-pdf-phone" inputmode="tel" autocomplete="tel" placeholder="054-0000000" class="hidden w-full bg-white/95 text-slate-900 border-2 border-white/20 p-3 text-center font-semibold text-sm rounded-xl outline-none" dir="ltr">
                     <button type="button" id="cover-letter-download" data-pack-extra data-download="cover" class="hidden w-full min-h-12 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-3 px-4 rounded-xl text-sm">הורד מכתב מקדים</button>
                 </div>
                 <div class="text-right rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
@@ -6295,10 +6295,25 @@
             window.scrollTo(0, 0);
         }
 
+        function wantsStudioView() {
+            try {
+                if (location.hash === '#studio') return true;
+                if (location.pathname.indexOf('/cv-templates/') === 0) return true;
+                if (/^\/studio\/?$/i.test(location.pathname)) return true;
+                const params = new URLSearchParams(location.search);
+                if (params.get('view') === 'studio') return true;
+                if (params.get('h') || params.get('d')) return true;
+            } catch (e) { /* ignore */ }
+            return false;
+        }
+
         function showStudio(opts) {
             applyView('studio');
             if (location.hash !== '#studio') {
-                history.replaceState(null, '', '/' + (location.search || '') + '#studio');
+                const params = new URLSearchParams(location.search);
+                if (!params.get('view')) params.set('view', 'studio');
+                const q = params.toString();
+                history.replaceState(null, '', '/' + (q ? '?' + q : '') + '#studio');
             }
             applySeoMeta(null);
             resetStudioScroll();
@@ -6311,8 +6326,8 @@
             applyView('home');
             applySeoMeta(null);
             const search = location.search || '';
-            if (location.hash === '#studio' || location.pathname.indexOf('/cv-templates/') === 0) {
-                history.replaceState(null, '', '/' + search.replace(/^\?$/, ''));
+            if (wantsStudioView()) {
+                history.replaceState(null, '', '/' + search.replace(/^\?$/, '').replace(/([?&])view=studio(&|$)/, '$1').replace(/[?&]$/, ''));
             }
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
@@ -6353,7 +6368,7 @@
         }
 
         function syncAppRoute() {
-            if (location.hash === '#studio' || (window.QCHandoff && QCHandoff.hasPending && QCHandoff.hasPending())) {
+            if (wantsStudioView() || (window.QCHandoff && QCHandoff.hasPending && QCHandoff.hasPending())) {
                 applyView('studio');
                 applySeoMeta(null);
                 return;

@@ -37,6 +37,7 @@
     }
   },
   "rewrites": [
-    { "source": "/cv-templates/:path*", "destination": "/index.html" }
+    { "source": "/cv-templates/:path*", "destination": "/index.html" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

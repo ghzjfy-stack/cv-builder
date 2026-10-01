@@ -928,7 +928,19 @@ async function createCvDownloadShareUrl() {
   const safe = { ...(draft || {}) };
   delete safe.photo;
 
+  const siteBase = (() => {
+    try {
+      if (/quickcv\.(co\.il|app)$/i.test(location.hostname)) {
+        return `${location.protocol}//www.quickcv.co.il`;
+      }
+    } catch {
+      /* ignore */
+    }
+    return location.origin;
+  })();
+
   // Prefer a short handoff id — long ?d= drafts break wa.me (white error page).
+  // Use query ?view=studio (not #studio) — WhatsApp often turns #studio into /studio → 404.
   try {
     const res = await fetch("/api/handoff", {
       method: "POST",
@@ -938,7 +950,7 @@ async function createCvDownloadShareUrl() {
     });
     const data = await res.json().catch(() => null);
     if (data?.ok && data.id) {
-      return `${location.origin}/?h=${encodeURIComponent(data.id)}#studio`;
+      return `${siteBase}/?h=${encodeURIComponent(data.id)}&view=studio`;
     }
   } catch {
     /* fall through */
@@ -950,14 +962,13 @@ async function createCvDownloadShareUrl() {
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/g, "");
-    // Keep WhatsApp deep links short; otherwise wa.me shows a blank/error page.
     if (encoded.length <= 1800) {
-      return `${location.origin}/?d=${encodeURIComponent(encoded)}#studio`;
+      return `${siteBase}/?d=${encodeURIComponent(encoded)}&view=studio`;
     }
   } catch {
     /* fall through */
   }
-  return `${location.origin}/#studio`;
+  return `${siteBase}/?view=studio`;
 }
 
 async function blobToBase64(blob) {
@@ -1159,7 +1170,8 @@ function onOrderBumpChange() {
 
 async function runHighResExport() {
   const busyAt = Number(window.__qcPdfBusyAt || 0);
-  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < 90000) return;
+  const lockMs = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "") ? 45000 : 90000;
+  if (window.__qcPdfBusy && busyAt && Date.now() - busyAt < lockMs) return;
   const status = document.getElementById("download-status");
   const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
   if (status) {

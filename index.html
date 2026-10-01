@@ -6295,10 +6295,25 @@
             window.scrollTo(0, 0);
         }
 
+        function wantsStudioView() {
+            try {
+                if (location.hash === '#studio') return true;
+                if (location.pathname.indexOf('/cv-templates/') === 0) return true;
+                if (/^\/studio\/?$/i.test(location.pathname)) return true;
+                const params = new URLSearchParams(location.search);
+                if (params.get('view') === 'studio') return true;
+                if (params.get('h') || params.get('d')) return true;
+            } catch (e) { /* ignore */ }
+            return false;
+        }
+
         function showStudio(opts) {
             applyView('studio');
             if (location.hash !== '#studio') {
-                history.replaceState(null, '', '/' + (location.search || '') + '#studio');
+                const params = new URLSearchParams(location.search);
+                if (!params.get('view')) params.set('view', 'studio');
+                const q = params.toString();
+                history.replaceState(null, '', '/' + (q ? '?' + q : '') + '#studio');
             }
             applySeoMeta(null);
             resetStudioScroll();
@@ -6311,8 +6326,8 @@
             applyView('home');
             applySeoMeta(null);
             const search = location.search || '';
-            if (location.hash === '#studio' || location.pathname.indexOf('/cv-templates/') === 0) {
-                history.replaceState(null, '', '/' + search.replace(/^\?$/, ''));
+            if (wantsStudioView()) {
+                history.replaceState(null, '', '/' + search.replace(/^\?$/, '').replace(/([?&])view=studio(&|$)/, '$1').replace(/[?&]$/, ''));
             }
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
@@ -6353,7 +6368,7 @@
         }
 
         function syncAppRoute() {
-            if (location.hash === '#studio' || (window.QCHandoff && QCHandoff.hasPending && QCHandoff.hasPending())) {
+            if (wantsStudioView() || (window.QCHandoff && QCHandoff.hasPending && QCHandoff.hasPending())) {
                 applyView('studio');
                 applySeoMeta(null);
                 return;

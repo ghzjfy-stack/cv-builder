@@ -809,7 +809,9 @@ function isIOS() {
 
 /**
  * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Use exactly one primary path — firing anchor + pdf.save together can cancel the download.
+ * Caller should hide the busy overlay before this — a full-screen spinner
+ * blocks the iOS/Android share sheet and looks like a permanent hang.
+ * Only share the PDF File — never a website URL (WhatsApp was opening broken links).
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
@@ -818,11 +820,14 @@ async function downloadPdfBlob(blob, filename, pdf) {
     const file = new File([blob], filename, { type: "application/pdf" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: filename });
+        await navigator.share({
+          files: [file],
+          title: filename,
+        });
         return "shared";
       } catch (err) {
         if (err && err.name === "AbortError") return "aborted";
-        /* fall through */
+        /* fall through to classic download */
       }
     }
   }
@@ -833,19 +838,13 @@ async function downloadPdfBlob(blob, filename, pdf) {
     a.href = url;
     a.download = filename;
     a.rel = "noopener";
+    a.type = "application/pdf";
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
     a.remove();
 
-    if (isIOS()) {
-      try {
-        window.open(url, "_blank", "noopener");
-        return "tab";
-      } catch {
-        /* keep anchor */
-      }
-    }
+    // Avoid window.open(blob) on iOS — it often opens a blank/404 tab instead of saving.
     return "anchor";
   } catch {
     if (pdf && typeof pdf.save === "function") {
@@ -877,6 +876,8 @@ function isMostlyBlankRow(data, width, y) {
 
 function findSplitY(canvas, idealY, minY) {
   if (idealY >= canvas.height) return canvas.height;
+  // getImageData on large canvases can freeze mobile Safari for tens of seconds.
+  if (isMobileUa()) return idealY;
   const ctx = canvas.getContext("2d");
   const { width } = canvas;
   const search = Math.min(90, Math.max(0, idealY - minY));
@@ -1120,7 +1121,7 @@ async function captureToCanvas(el) {
         );
     // ~150–160 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
     const mobile = isMobileUa();
-    const scale = Math.min(mobile ? 1.75 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
+    const scale = Math.min(mobile ? 1.5 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await withTimeout(
       html2canvas(el, {
@@ -1212,7 +1213,8 @@ export async function exportHighResPdf(opts = {}) {
   }
   if (window.__qcPdfBusy) {
     const started = Number(window.__qcPdfBusyAt || 0);
-    if (started && Date.now() - started < 90000) return;
+    const lockMs = isMobileUa() ? 45000 : 90000;
+    if (started && Date.now() - started < lockMs) return;
     setSpinner(false);
   }
   const download = opts.download !== false;
@@ -1228,8 +1230,12 @@ export async function exportHighResPdf(opts = {}) {
   }
 
   setSpinner(true);
+  const hardLimit = setTimeout(() => {
+    if (window.__qcPdfBusy) setSpinner(false);
+  }, 60000);
   const host = prepareCaptureClone();
   if (!host) {
+    clearTimeout(hardLimit);
     setSpinner(false);
     throw new Error("missing cv-target");
   }
@@ -1239,7 +1245,7 @@ export async function exportHighResPdf(opts = {}) {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     lockCaptureSheetHeight(host);
 
-    const captured = await withTimeout(captureToCanvas(host), 45000, "pdf-export-timeout");
+    const captured = await withTimeout(captureToCanvas(host), 40000, "pdf-export-timeout");
     const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
@@ -1262,7 +1268,7 @@ export async function exportHighResPdf(opts = {}) {
       window.QCCoverLetter.render?.();
       const letterHost = prepareCaptureClone("cl-target");
       if (letterHost) {
-        const letterCap = await withTimeout(captureToCanvas(letterHost), 30000, "pdf-letter-timeout");
+        const letterCap = await withTimeout(captureToCanvas(letterHost), 25000, "pdf-letter-timeout");
         if (letterCap.canvas?.width) {
           addCanvasPages(pdf, letterCap.canvas, letterCap.links, letterCap.width, letterCap.height, {
             marginMm: 0,
@@ -1275,11 +1281,22 @@ export async function exportHighResPdf(opts = {}) {
     const filename = fileBase() + ".pdf";
     const blob = pdf.output("blob");
     if (!blob || blob.size < 100) throw new Error("empty pdf");
+
+    // Drop overlay BEFORE share/download so the system sheet is usable on phones.
+    cleanupCapture();
+    setSpinner(false);
+    clearTimeout(hardLimit);
+
     if (download) {
       await downloadPdfBlob(blob, filename, pdf);
     }
     return { blob, filename };
+  } catch (err) {
+    cleanupCapture();
+    setSpinner(false);
+    throw err;
   } finally {
+    clearTimeout(hardLimit);
     cleanupCapture();
     setSpinner(false);
   }

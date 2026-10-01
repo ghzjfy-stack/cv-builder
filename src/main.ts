@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createElement } from "react";
 import App from "./App.jsx";
 import { initTemplateSelector } from "./templates/selector";
-import { clearPersistedUnlock, getPaidRemainingMs, getPaidUntil, getPaymentToken, isUnlocked, unlock, unlockWithPaymentToken, PAID_SESSION_MS } from "./access/gate.js";
+import { clearPersistedUnlock, getPaidRemainingMs, getPaidUntil, isUnlocked, unlock, unlockWithPaymentToken, PAID_SESSION_MS } from "./access/gate.js";
 import {
   CHECKOUT,
   REF_CODE_KEY,
@@ -12,10 +12,8 @@ import {
   bitPayUrl,
   displayAmountValue,
   displayCompareValue,
-  isLikelyIsraeliMobile,
   isPackId,
   packAmount,
-  toWhatsAppIntlPhone,
   whatsappReferralUrl,
   type PackId,
 } from "./config/checkout.js";
@@ -971,38 +969,6 @@ async function createCvDownloadShareUrl() {
   return `${siteBase}/?view=studio`;
 }
 
-async function blobToBase64(blob) {
-  const buffer = await blob.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-  }
-  return btoa(binary);
-}
-
-async function sendPdfViaWhatsAppApi(phone, blob, filename) {
-  const token = getPaymentToken();
-  if (!token) return { ok: false, error: "missing_token", fallback: true };
-  const pdfBase64 = await blobToBase64(blob);
-  const res = await fetch("/api/send-pdf-whatsapp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token,
-      phone,
-      filename,
-      pdfBase64,
-    }),
-  });
-  const data = await res.json().catch(() => null);
-  if (!data || typeof data !== "object") {
-    return { ok: false, error: "bad_response", fallback: true };
-  }
-  return data;
-}
-
 async function sendPdfToWhatsApp(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
@@ -1011,27 +977,12 @@ async function sendPdfToWhatsApp(e) {
     return;
   }
   const status = document.getElementById("download-status");
+  const phone = readPersonalPhone();
   const waPhone = document.getElementById("wa-pdf-phone");
-  const phoneRaw = String(waPhone && "value" in waPhone ? waPhone.value : "").trim() || readPersonalPhone();
-  if (waPhone instanceof HTMLInputElement && phoneRaw && !String(waPhone.value || "").trim()) {
-    waPhone.value = phoneRaw;
+  if (waPhone instanceof HTMLInputElement && phone && !String(waPhone.value || "").trim()) {
+    waPhone.value = phone;
   }
-
-  if (!isLikelyIsraeliMobile(phoneRaw)) {
-    if (status) {
-      status.textContent = qcT(
-        "waNeedPhone",
-        "נא למלא מספר נייד תקין לשליחת ה-PDF (לדוגמה 054-0000000).",
-      );
-    }
-    if (waPhone instanceof HTMLInputElement) {
-      waPhone.focus();
-      waPhone.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    return;
-  }
-
-  const phone = toWhatsAppIntlPhone(phoneRaw);
+  const english = window.QCCvLang === "en";
   if (status) status.textContent = qcT("waPreparing", "מכין לשליחה בוואטסאפ...");
 
   try {
@@ -1040,50 +991,52 @@ async function sendPdfToWhatsApp(e) {
     const filename = String(result?.filename || "cv.pdf");
     if (!blob) throw new Error("empty pdf");
 
-    if (status) {
-      status.textContent = qcT("waSendingApi", "שולח את קובץ ה-PDF למספר שהזנת…");
-    }
+    const file = new File([blob], filename, { type: "application/pdf" });
+    const canFileShare =
+      typeof navigator !== "undefined" &&
+      typeof navigator.share === "function" &&
+      typeof navigator.canShare === "function" &&
+      navigator.canShare({ files: [file] });
 
-    const sent = await sendPdfViaWhatsAppApi(phone, blob, filename);
-    if (sent?.ok && sent?.delivered !== false) {
+    if (canFileShare) {
+      await navigator.share({
+        files: [file],
+        title: english ? "My resume (PDF)" : "קורות החיים שלי (PDF)",
+      });
       if (status) {
         status.textContent = qcT(
-          "waPdfSentToPhone",
-          "ה-PDF נשלח לוואטסאפ במספר שהזנת. בדקו את ההודעות.",
+          "waShared",
+          "בחרו WhatsApp ואז איש קשר כדי לשלוח את קובץ ה-PDF.",
         );
       }
       return;
     }
 
-    // Do not open WhatsApp / Business app chooser — save the already-built PDF instead.
-    if (status) {
-      const reason = String(sent?.error || "");
-      if (reason === "not_configured" || sent?.fallback) {
-        status.textContent = qcT(
-          "waApiUnavailable",
-          "השליחה האוטומטית לא זמינה כרגע. מורידים את ה-PDF למכשיר — אפשר לשלוח אותו ידנית בוואטסאפ.",
-        );
-      } else {
-        status.textContent = qcT(
-          "waSendFailDownload",
-          "לא הצלחנו לשלוח לוואטסאפ. מורידים את ה-PDF למכשיר.",
-        );
-      }
-    }
+    // Desktop / unsupported share: save the PDF so they can attach it manually.
+    const url = URL.createObjectURL(blob);
     try {
-      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       a.rel = "noopener";
+      a.type = "application/pdf";
       document.body.appendChild(a);
       a.click();
       a.remove();
+    } finally {
       setTimeout(() => URL.revokeObjectURL(url), 20000);
-    } catch {
-      await exportHighResPdf({ download: true });
     }
-  } catch {
+    if (status) {
+      status.textContent = qcT(
+        "waDownloadedAttach",
+        "הקובץ ירד. שלחו אותו בוואטסאפ כקובץ מצורף.",
+      );
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      if (status) status.textContent = "";
+      return;
+    }
     if (status) status.textContent = qcT("waSendFail", "לא הצלחנו לשלוח. נסו הורדה רגילה.");
   }
 }

@@ -809,26 +809,23 @@ function isIOS() {
 
 /**
  * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Caller should hide the busy overlay before this — a full-screen spinner
- * blocks the iOS/Android share sheet and looks like a permanent hang.
- * Only share the PDF File — never a website URL (WhatsApp was opening broken links).
+ * - iOS: Web Share sheet (Save to Files / WhatsApp / etc.) — silent downloads are blocked.
+ * - Android/desktop: <a download> saves the file directly.
+ * Never share a website URL — only the PDF File.
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
 
-  if (isMobileUa()) {
-    const file = new File([blob], filename, { type: "application/pdf" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: filename,
-        });
-        return "shared";
-      } catch (err) {
-        if (err && err.name === "AbortError") return "aborted";
-        /* fall through to classic download */
-      }
+  const file = new File([blob], filename, { type: "application/pdf" });
+
+  // iOS Safari: share sheet is the reliable way to save to Files.
+  if (isIOS() && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return "shared";
+    } catch (err) {
+      if (err && err.name === "AbortError") return "aborted";
+      /* fall through to anchor */
     }
   }
 
@@ -843,8 +840,6 @@ async function downloadPdfBlob(blob, filename, pdf) {
     document.body.appendChild(a);
     a.click();
     a.remove();
-
-    // Avoid window.open(blob) on iOS — it often opens a blank/404 tab instead of saving.
     return "anchor";
   } catch {
     if (pdf && typeof pdf.save === "function") {
@@ -853,6 +848,15 @@ async function downloadPdfBlob(blob, filename, pdf) {
         return "saved";
       } catch {
         /* ignore */
+      }
+    }
+    // Last resort on Android: share sheet.
+    if (isMobileUa() && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: filename });
+        return "shared";
+      } catch (err) {
+        if (err && err.name === "AbortError") return "aborted";
       }
     }
     throw new Error("pdf-download-failed");

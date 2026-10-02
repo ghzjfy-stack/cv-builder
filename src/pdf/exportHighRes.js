@@ -313,6 +313,7 @@ function lockCaptureSheetHeight(host) {
   if (!(sheet instanceof HTMLElement)) return;
   const sidebarish = isSidebarLayout(sheet) || isFullBleedLayout(sheet);
   const premium = sheet.classList.contains("layout-premium");
+  const classic = sheet.classList.contains("layout-classic");
 
   // Measure natural content height first (overflow hidden would clip the measure).
   sheet.style.height = "auto";
@@ -326,10 +327,11 @@ function lockCaptureSheetHeight(host) {
     Math.ceil(sheet.offsetHeight || 0),
   );
 
-  // Executive Split is always a single A4 sheet. Other sidebar layouts get a small slack
-  // so tiny measurement noise does not spawn a blank stub page 2.
-  const slack = premium ? 220 : 12;
-  const fitsOne = premium || contentH <= A4_CSS_H + slack;
+  // Executive Split is always a single A4 sheet. Classic must not clip with slack —
+  // tiny overflow used to chop recommendations at the page edge.
+  // Other sidebar layouts get a small slack so measurement noise does not spawn a blank stub page 2.
+  const slack = premium ? 220 : classic ? 0 : 12;
+  const fitsOne = premium || classic || contentH <= A4_CSS_H + slack;
   const needed = fitsOne ? A4_CSS_H : contentH;
 
   sheet.style.minHeight = `${needed}px`;
@@ -373,6 +375,72 @@ function lockCaptureSheetHeight(host) {
       el.style.maxHeight = "100%";
     });
     ensurePremiumSidebarFooter(sheet);
+  }
+}
+
+/**
+ * Express/classic: compress --space-fit (and padding if needed) so the whole CV
+ * fits one A4 sheet — prevents recommendations from being clipped at the bottom.
+ */
+function fitClassicCaptureToOnePage(host) {
+  const sheet = host?.querySelector?.(".cv-print-sheet");
+  if (!(sheet instanceof HTMLElement)) return;
+  if (!sheet.classList.contains("layout-classic")) return;
+
+  const MIN_FIT = 0.56;
+  const measure = () => {
+    sheet.style.height = "auto";
+    sheet.style.minHeight = "0px";
+    sheet.style.maxHeight = "none";
+    sheet.style.overflow = "visible";
+    void sheet.offsetHeight;
+    return Math.max(
+      1,
+      Math.ceil(sheet.scrollHeight || 0),
+      Math.ceil(sheet.offsetHeight || 0),
+    );
+  };
+
+  let fit = parseFloat(sheet.style.getPropertyValue("--space-fit") || "") || 1;
+  if (!Number.isFinite(fit) || fit <= 0) fit = 1;
+  fit = Math.min(1, Math.max(MIN_FIT, fit));
+  sheet.style.setProperty("--space-fit", String(fit));
+  host.style.setProperty("--space-fit", String(fit));
+
+  let h = measure();
+  if (h <= A4_CSS_H) return;
+
+  // Binary search the largest space-fit that still fits one A4.
+  let lo = MIN_FIT;
+  let hi = fit;
+  let best = MIN_FIT;
+  for (let i = 0; i < 10; i++) {
+    const mid = (lo + hi) / 2;
+    sheet.style.setProperty("--space-fit", String(mid));
+    host.style.setProperty("--space-fit", String(mid));
+    h = measure();
+    if (h <= A4_CSS_H) {
+      best = mid;
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  sheet.style.setProperty("--space-fit", String(best));
+  host.style.setProperty("--space-fit", String(best));
+  h = measure();
+  if (h <= A4_CSS_H) return;
+
+  // Still over: tighten classic page padding (design stays the same, just denser).
+  const pads = [
+    [22, 36, 28],
+    [18, 32, 22],
+    [14, 28, 18],
+  ];
+  for (const [pt, px, pb] of pads) {
+    sheet.style.padding = `${pt}px ${px}px ${pb}px`;
+    h = measure();
+    if (h <= A4_CSS_H) return;
   }
 }
 
@@ -817,6 +885,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
   }
 
   prepareCaptureRoot(host, window);
+  fitClassicCaptureToOnePage(host);
   lockCaptureSheetHeight(host);
   return host;
 }
@@ -1148,6 +1217,7 @@ async function captureToCanvas(el) {
 
   try {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    fitClassicCaptureToOnePage(el);
     lockCaptureSheetHeight(el);
     let linkMeta = measureLinks(el);
     const sheet = el.querySelector?.(".cv-print-sheet");
@@ -1285,6 +1355,7 @@ export async function exportHighResPdf(opts = {}) {
   try {
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    fitClassicCaptureToOnePage(host);
     lockCaptureSheetHeight(host);
 
     const captured = await withTimeout(captureToCanvas(host), 40000, "pdf-export-timeout");

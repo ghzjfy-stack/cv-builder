@@ -640,6 +640,22 @@ function promotePhotoRailForCapture(clone, english, theme = "cobalt") {
           .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\s📞✉️📍🔗]+/u, "")
           .trim();
         if (cleaned) slot.textContent = cleaned;
+        else {
+          slot.textContent = "";
+          slot.style.display = "none";
+        }
+      });
+      // Hide empty LinkedIn/website rows (icon-only) in the PDF capture.
+      contact.querySelectorAll(".cv-contact-row").forEach((row) => {
+        if (!(row instanceof HTMLElement)) return;
+        const slot = row.querySelector('[id^="out-"]');
+        const empty =
+          !slot ||
+          (slot instanceof HTMLElement &&
+            (slot.style.display === "none" || !String(slot.textContent || "").trim()));
+        row.classList.toggle("cv-contact-empty", !!empty);
+        row.style.display = empty ? "none" : "";
+        if (empty) row.setAttribute("aria-hidden", "true");
       });
     }
   }

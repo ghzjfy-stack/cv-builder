@@ -237,7 +237,7 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     padding-bottom: 0.32rem !important;
 }
 
-.layout-cobalt .cv-contact-row {
+.layout-cobalt .cv-contact-row:not(.cv-contact-empty) {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -249,6 +249,9 @@ html.qc-exporting #qc-print-host .layout-cobalt .cv-photo img {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
+}
+.layout-cobalt .cv-contact-row.cv-contact-empty {
+    display: none !important;
 }
 
 .layout-cobalt .cv-contact-ico {

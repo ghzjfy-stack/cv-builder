@@ -1449,6 +1449,12 @@
             gap: 1rem;
             direction: rtl;
         }
+        html[lang="en"] .home-steps,
+        html[lang="en"] .home-cards,
+        html[dir="ltr"] .home-steps,
+        html[dir="ltr"] .home-cards {
+            direction: ltr;
+        }
         .home-step,
         .home-card,
         .home-quote {
@@ -1457,6 +1463,7 @@
             border-radius: 0.9rem;
             padding: 1.35rem 1.25rem;
             box-shadow: none;
+            text-align: start;
         }
         .home-step-num {
             display: inline-block;
@@ -1473,11 +1480,15 @@
             font-weight: 700;
             margin-bottom: 0.35rem;
             color: #f4f7fb;
+            text-align: start;
+            unicode-bidi: plaintext;
         }
         .home-step p {
             font-size: 0.9rem;
             line-height: 1.7;
             color: #cbd5e1;
+            text-align: start;
+            unicode-bidi: plaintext;
         }
         .home-card p,
         .home-quote p {
@@ -1658,7 +1669,14 @@
         }
         @media (min-width: 640px) {
             .home-band-row { grid-template-columns: repeat(3, 1fr); }
-            .home-steps { grid-template-columns: repeat(3, 1fr); direction: rtl; }
+            .home-steps {
+                grid-template-columns: repeat(3, 1fr);
+                direction: rtl;
+            }
+            html[lang="en"] .home-steps,
+            html[dir="ltr"] .home-steps {
+                direction: ltr;
+            }
             .home-ats-logos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
             .pay-packs { grid-template-columns: 1fr 1fr; }
             .home-ba-section .ba-compare {

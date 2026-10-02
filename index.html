@@ -2955,8 +2955,10 @@
                 setField('out-linkedin-side', linkedinVal, '🔗 ', linkedinHref);
                 document.querySelectorAll('#cv-target .cv-contact-row').forEach((row) => {
                     const slot = row.querySelector('[id^="out-"]');
-                    const empty = !slot || slot.style.display === 'none' || !slot.textContent.trim();
+                    const empty = !slot || slot.style.display === 'none' || !String(slot.textContent || '').trim();
+                    row.classList.toggle('cv-contact-empty', empty);
                     row.style.display = empty ? 'none' : '';
+                    row.setAttribute('aria-hidden', empty ? 'true' : 'false');
                 });
 
                 setSec('sec-summary', 'out-summary', previewVal('in-summary'));

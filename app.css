@@ -1841,6 +1841,16 @@
             align-items: flex-start;
             gap: 0.4rem;
         }
+        /* Empty LinkedIn/website must stay hidden even when a layout forces display:flex !important */
+        #cv-target .cv-contact-row.cv-contact-empty,
+        #cv-target-page2 .cv-contact-row.cv-contact-empty,
+        #qc-print-host .cv-print-sheet .cv-contact-row.cv-contact-empty,
+        .layout-navy .cv-contact-row.cv-contact-empty,
+        .layout-charcoal .cv-contact-row.cv-contact-empty,
+        .layout-premium .cv-contact-row.cv-contact-empty,
+        .layout-cobalt .cv-contact-row.cv-contact-empty {
+            display: none !important;
+        }
         #cv-target .cv-contact-row > span:last-child,
         #cv-target .cv-contact-link,
         #cv-target-page2 .cv-contact-row > span:last-child,

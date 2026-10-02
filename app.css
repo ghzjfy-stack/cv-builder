@@ -1203,6 +1203,10 @@
         .home-ba-section .ba-panel {
             direction: rtl;
         }
+        html[lang="en"] .home-ba-section .ba-panel,
+        html[dir="ltr"] .home-ba-section .ba-panel {
+            direction: ltr;
+        }
         .home-ba-section .ba-panel-after { grid-area: quick; }
         .home-ba-section .ba-panel-before { grid-area: word; }
         .home-ba-section .ba-vs {
@@ -1719,6 +1723,10 @@
                 padding-top: 3rem;
                 overflow: visible;
                 direction: rtl;
+            }
+            html[lang="en"] .home-hero,
+            html[dir="ltr"] .home-hero {
+                direction: ltr;
             }
             .home-hero > :first-child { flex: 1.08 1 0; min-width: 0; }
             .home-hero > .home-stage { flex: 0.92 1 0; min-width: 0; }

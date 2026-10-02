@@ -8266,6 +8266,14 @@
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
+        /* Flattened navy capture paints rail backgrounds on real nodes — hide ::before. */
+        #qc-print-host .cv-print-sheet.layout-navy.qc-navy-capture-flat::before,
+        .layout-navy.qc-navy-capture-flat::before,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-navy.qc-navy-capture-flat::before,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy.qc-navy-capture-flat::before {
+            content: none !important;
+            display: none !important;
+        }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {
             content: "";

@@ -2046,7 +2046,8 @@
             padding: 0 0 0.16rem !important;
             line-height: 1.35 !important;
             letter-spacing: 0.01em;
-            border-bottom: 1px solid color-mix(in srgb, var(--navy, #12192b) 18%, transparent);
+            /* rgba — html2canvas cannot parse color-mix()/color(srgb…) and aborts Navy PDF export */
+            border-bottom: 1px solid rgba(18, 25, 43, 0.18);
         }
         .layout-azure .cv-job > .cv-job-company,
         .layout-azure .cv-job-body > .cv-job-company,

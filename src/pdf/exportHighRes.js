@@ -401,12 +401,18 @@ function stripPreviewChrome(clone) {
 }
 
 /**
- * Cobalt (and similar) use display:contents for .cv-columns / .cv-sidebar.
+ * Navy / Cobalt use display:contents for .cv-columns / .cv-sidebar.
  * html2canvas often skips those promoted grid children — flatten the clone so
  * photo, header, sidebar-inner, and main are direct grid items with painted rails.
  */
-function promoteCobaltRailForCapture(clone, english) {
-  const rail = "#2c4a7c";
+function promotePhotoRailForCapture(clone, english, theme = "cobalt") {
+  const isNavy = theme === "navy";
+  const rail = isNavy ? "#12192b" : "#2c4a7c";
+  const photoPad = isNavy ? "1.55rem 1rem 0.35rem" : "1.35rem 1rem 0.35rem";
+  const headPad = isNavy ? "0.65rem 1.15rem 1.15rem" : "0.45rem 1.05rem 1rem";
+  const sidePad = isNavy ? "0.35rem 1.25rem 1.7rem" : "0.2rem 1.1rem 1.5rem";
+  const mainPad = isNavy ? "1.55rem 1.7rem 1.7rem 1.45rem" : "1.4rem 1.5rem 1.5rem 1.35rem";
+  const avatarBg = isNavy ? "#8d93a3" : "#9aa8c2";
   const photo = clone.querySelector(".cv-photo-block");
   const sideInner = clone.querySelector(".cv-sidebar-inner");
   const main = clone.querySelector(".cv-main");
@@ -415,8 +421,9 @@ function promoteCobaltRailForCapture(clone, english) {
   const sidebar = clone.querySelector(".cv-sidebar");
 
   // Kill the continuous ::before rail — it stacks above contents in html2canvas.
-  clone.classList.add("qc-cobalt-capture-flat");
-  clone.style.setProperty("--cobalt", rail);
+  clone.classList.add(isNavy ? "qc-navy-capture-flat" : "qc-cobalt-capture-flat");
+  if (isNavy) clone.style.setProperty("--navy", rail);
+  else clone.style.setProperty("--cobalt", rail);
 
   [photo, header, sideInner, main].forEach((el) => {
     if (el instanceof HTMLElement) clone.appendChild(el);
@@ -443,7 +450,7 @@ function promoteCobaltRailForCapture(clone, english) {
       display: "flex",
       justifyContent: "center",
       alignItems: "flex-end",
-      padding: "1.35rem 1rem 0.35rem",
+      padding: photoPad,
       margin: "0",
       border: "0",
       borderRadius: "0",
@@ -452,12 +459,12 @@ function promoteCobaltRailForCapture(clone, english) {
     const avatar = photo.querySelector(".cv-photo");
     if (avatar instanceof HTMLElement) {
       Object.assign(avatar.style, {
-        width: "112px",
-        height: "112px",
+        width: isNavy ? "118px" : "112px",
+        height: isNavy ? "118px" : "112px",
         borderRadius: "999px",
         overflow: "hidden",
-        border: "4px solid #ffffff",
-        background: "#9aa8c2",
+        border: isNavy ? "3px solid rgba(255, 255, 255, 0.92)" : "4px solid #ffffff",
+        background: avatarBg,
         flex: "0 0 auto",
       });
       avatar.querySelectorAll("svg, img").forEach((node) => {
@@ -476,7 +483,7 @@ function promoteCobaltRailForCapture(clone, english) {
     paint(header, {
       gridArea: "head",
       textAlign: "center",
-      padding: "0.45rem 1.05rem 1rem",
+      padding: headPad,
       margin: "0",
       border: "0",
       borderRadius: "0",
@@ -492,8 +499,8 @@ function promoteCobaltRailForCapture(clone, english) {
       gridArea: "side",
       display: "flex",
       flexDirection: "column",
-      gap: "0.95rem",
-      padding: "0.2rem 1.1rem 1.5rem",
+      gap: isNavy ? "1.15rem" : "0.95rem",
+      padding: sidePad,
       margin: "0",
       border: "0",
       borderRadius: "0",
@@ -529,9 +536,11 @@ function promoteCobaltRailForCapture(clone, english) {
     sideInner.querySelectorAll(".cv-lang-row").forEach((node) => {
       if (!(node instanceof HTMLElement)) return;
       Object.assign(node.style, {
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.28rem",
+        display: isNavy ? "grid" : "flex",
+        gridTemplateColumns: isNavy ? "1fr auto" : undefined,
+        flexDirection: isNavy ? undefined : "column",
+        alignItems: isNavy ? "center" : undefined,
+        gap: isNavy ? "0.45rem" : "0.28rem",
         width: "100%",
         color: "#ffffff",
       });
@@ -539,7 +548,7 @@ function promoteCobaltRailForCapture(clone, english) {
     sideInner.querySelectorAll(".cv-lang-track").forEach((node) => {
       if (!(node instanceof HTMLElement)) return;
       Object.assign(node.style, {
-        display: "block",
+        display: isNavy ? "none" : "block",
         width: "100%",
         height: "6px",
         background: "rgba(255,255,255,0.22)",
@@ -556,7 +565,7 @@ function promoteCobaltRailForCapture(clone, english) {
         color: "#ffffff",
         width: "100%",
       });
-      // Drop emoji prefixes — Cobalt already paints SVG contact icons.
+      // Drop emoji prefixes — rail templates already paint SVG contact icons.
       contact.querySelectorAll('[id^="out-"]').forEach((slot) => {
         if (!(slot instanceof HTMLElement)) return;
         const cleaned = String(slot.textContent || "")
@@ -571,14 +580,19 @@ function promoteCobaltRailForCapture(clone, english) {
     Object.assign(main.style, {
       gridArea: "main",
       background: "#ffffff",
-      color: "#1f2937",
+      color: isNavy ? "#333333" : "#1f2937",
       direction: english ? "ltr" : "rtl",
       textAlign: english ? "left" : "right",
-      padding: "1.4rem 1.5rem 1.5rem 1.35rem",
+      padding: mainPad,
       zIndex: "1",
       minWidth: "0",
     });
   }
+}
+
+/** @deprecated Use promotePhotoRailForCapture(..., "cobalt") */
+function promoteCobaltRailForCapture(clone, english) {
+  promotePhotoRailForCapture(clone, english, "cobalt");
 }
 
 function prepareCaptureClone(sourceId = "cv-target") {
@@ -753,7 +767,12 @@ function prepareCaptureClone(sourceId = "cv-target") {
       gridTemplateAreas: english
         ? '"photo main" "head main" "side main"'
         : '"main photo" "main head" "main side"',
+      background: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
     });
+    // Same display:contents pitfall as Cobalt — flatten rail for html2canvas.
+    promotePhotoRailForCapture(clone, english, "navy");
   } else if (clone.classList.contains("layout-cobalt")) {
     Object.assign(clone.style, {
       direction: "ltr",
@@ -769,7 +788,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
     });
     // html2canvas drops most display:contents descendants — promote rail nodes
     // so photo + contact/skills actually paint into the PDF.
-    promoteCobaltRailForCapture(clone, english);
+    promotePhotoRailForCapture(clone, english, "cobalt");
   } else if (clone.classList.contains("layout-azure")) {
     Object.assign(clone.style, {
       direction: "ltr",

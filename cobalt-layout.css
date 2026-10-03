@@ -11,11 +11,11 @@
 #cv-target-page2.layout-cobalt,
 #qc-print-host .cv-print-sheet.layout-cobalt,
 .layout-cobalt {
-    --cobalt: #2c4a7c;
-    --cobalt-deep: #243e6a;
+    --cobalt: var(--accent, #2c4a7c);
+    --cobalt-deep: color-mix(in srgb, var(--accent, #2c4a7c) 78%, #111111);
     --cobalt-ink: #1f2937;
     --cobalt-muted: #4b5563;
-    --cobalt-line: rgba(44, 74, 124, 0.22);
+    --cobalt-line: color-mix(in srgb, var(--accent, #2c4a7c) 22%, transparent);
     --cobalt-soft: #eef2f8;
     display: grid;
     grid-template-columns: minmax(0, 0.34fr) minmax(0, 0.66fr);

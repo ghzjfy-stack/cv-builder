@@ -4369,8 +4369,8 @@
 
         #cv-target.layout-charcoal,
         #cv-target-page2.layout-charcoal {
-            --charcoal: #4c4c4c;
-            --charcoal-deep: #3f3f3f;
+            --charcoal: var(--accent, #4c4c4c);
+            --charcoal-deep: color-mix(in srgb, var(--accent, #4c4c4c) 82%, #111111);
             --charcoal-line: rgba(255, 255, 255, 0.55);
             display: grid;
             grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
@@ -4388,8 +4388,8 @@
             overflow: hidden;
         }
         #qc-print-host .cv-print-sheet.layout-charcoal {
-            --charcoal: #4c4c4c;
-            --charcoal-deep: #3f3f3f;
+            --charcoal: var(--accent, #4c4c4c);
+            --charcoal-deep: color-mix(in srgb, var(--accent, #4c4c4c) 82%, #111111);
             --charcoal-line: rgba(255, 255, 255, 0.55);
             display: grid;
             grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
@@ -5122,7 +5122,7 @@
         }
         #cv-target.layout-navy,
         #cv-target-page2.layout-navy {
-            --navy: #12192b;
+            --navy: var(--accent, #12192b);
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
             display: grid;
@@ -5160,7 +5160,7 @@
             print-color-adjust: exact;
         }
         #qc-print-host .cv-print-sheet.layout-navy {
-            --navy: #12192b;
+            --navy: var(--accent, #12192b);
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
             display: grid;

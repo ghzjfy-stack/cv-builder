@@ -497,7 +497,11 @@ function stripPreviewChrome(clone) {
  */
 function promotePhotoRailForCapture(clone, english, theme = "cobalt") {
   const isNavy = theme === "navy";
-  const rail = isNavy ? "#12192b" : "#2c4a7c";
+  const probe = clone.querySelector(".cv-photo-block") || clone.querySelector("#cv-header") || clone.querySelector(".cv-sidebar-inner");
+  const rail = usablePaint(
+    probe instanceof HTMLElement ? getComputedStyle(probe).backgroundColor : "",
+    isNavy ? "#12192b" : "#2c4a7c"
+  );
   const photoPad = isNavy ? "1.55rem 1rem 0.35rem" : "1.35rem 1rem 0.35rem";
   const headPad = isNavy ? "0.65rem 1.15rem 1.15rem" : "0.45rem 1.05rem 1rem";
   const sidePad = isNavy ? "0.35rem 1.25rem 1.7rem" : "0.2rem 1.1rem 1.5rem";

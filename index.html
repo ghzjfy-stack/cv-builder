@@ -18,7 +18,7 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;700&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@500;600;700&family=Rubik:wght@400;500;600;700&family=Secular+One&family=Varela+Round&display=swap"></noscript>
     <link rel="stylesheet" href="./azure-layout.css?v=skills-chips1">
     <link rel="stylesheet" href="./template-skins.css?v=accent1">
-    <link rel="stylesheet" href="./app.css?v=premium31">
+    <link rel="stylesheet" href="./app.css?v=premium32">
     <link rel="stylesheet" href="./cobalt-layout.css?v=cobalt4">
     <link rel="stylesheet" href="./cro.css?v=preview-step3">
     <script>
@@ -989,6 +989,7 @@
                 <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="burgundy" data-color="#7f1d3a" style="background:#7f1d3a" aria-label="בורדו" aria-pressed="false" onclick="setAccent('#7f1d3a', this)"></button>
                 <button type="button" class="theme-swatch preview-accent-dot" data-accent-dot="slate" data-color="#3e4c58" style="background:#3e4c58" aria-label="צפחה" aria-pressed="false" onclick="setAccent('#3e4c58', this)"></button>
                 <input type="color" id="preview-custom-accent" value="#4c4c4c" oninput="setCustomAccent(this.value)" class="custom-accent-input preview-accent-dot" aria-label="בחירת צבע מותאם">
+                <button type="button" id="preview-accent-reset" class="accent-reset-btn preview-accent-reset" hidden onclick="resetAccentToTemplate()">חזרה לצבע התבנית</button>
             </div>
 
             <div id="cv-preview-stack" class="cv-preview-stack cv-document-container" dir="rtl">
@@ -1939,16 +1940,21 @@
         }
 
         function syncAccentResetControl() {
-            const btn = document.getElementById('accent-reset-btn');
-            if (!btn) return;
+            const buttons = [
+                document.getElementById('accent-reset-btn'),
+                document.getElementById('preview-accent-reset')
+            ].filter(Boolean);
+            if (!buttons.length) return;
             const pack = (window.CV_I18N && CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he']) || {};
-            if (pack.accentReset) btn.textContent = pack.accentReset;
             const current = String(readCvAccentVar() || '').trim().toLowerCase();
             const base = resolveTemplateAccent();
             const changed = !!current && current !== base;
-            btn.hidden = !changed;
-            btn.disabled = !changed;
-            btn.setAttribute('aria-hidden', changed ? 'false' : 'true');
+            buttons.forEach(function (btn) {
+                if (pack.accentReset) btn.textContent = pack.accentReset;
+                btn.hidden = !changed;
+                btn.disabled = !changed;
+                btn.setAttribute('aria-hidden', changed ? 'false' : 'true');
+            });
         }
 
         function resetAccentToTemplate() {

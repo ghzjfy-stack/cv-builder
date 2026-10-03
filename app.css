@@ -269,6 +269,12 @@
         .preview-accent-strip .custom-accent-input::-webkit-color-swatch {
             border-radius: 999px;
         }
+        .preview-accent-reset {
+            margin-top: 0;
+            margin-inline-start: 0.2rem;
+            font-size: 0.68rem;
+            flex: 0 0 auto;
+        }
         body:not(.qc-studio-step-2) .preview-accent-strip {
             display: none !important;
         }

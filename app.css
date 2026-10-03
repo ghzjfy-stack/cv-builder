@@ -5767,6 +5767,29 @@
             text-overflow: ellipsis;
             max-width: 100%;
         }
+        .accent-reset-btn {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 0.55rem;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #7dd3c7;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.35;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+        .accent-reset-btn[hidden] {
+            display: none !important;
+        }
+        .accent-reset-btn:hover,
+        .accent-reset-btn:focus-visible {
+            color: #99f6e4;
+            outline: none;
+        }
         .density-toggle {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -920,6 +920,7 @@
                         </div>
                     </div>
                     <p id="accent-label" class="text-[11px] text-slate-400 mt-2">פחם</p>
+                    <button type="button" id="accent-reset-btn" class="accent-reset-btn" hidden onclick="resetAccentToTemplate()">חזרה לצבע התבנית</button>
                 </div>
 
                 <div>
@@ -1612,6 +1613,7 @@
                 langOptEn: 'אנגלית – יישור לשמאל',
                 customAccent: 'מותאם',
                 customColor: 'צבע מותאם',
+                accentReset: 'חזרה לצבע התבנית',
                 importHandoff: 'המשיכו במחשב',
                 importSample: 'צפו בדוגמת PDF',
                 tipSummary: '',
@@ -1736,6 +1738,7 @@
                 langOptEn: 'English (LTR)',
                 customAccent: 'Custom',
                 customColor: 'Custom color',
+                accentReset: 'Reset to template color',
                 importHandoff: 'Continue on desktop',
                 importSample: 'View PDF sample',
                 tipSummary: '',
@@ -1909,6 +1912,7 @@
                 el.setAttribute('aria-pressed', on ? 'true' : 'false');
             });
             if (!matched && btn) btn.setAttribute('aria-pressed', 'true');
+            syncAccentResetControl();
             if (window.QCDraft) QCDraft.saveSoon();
         }
 
@@ -1921,8 +1925,41 @@
             const label = document.getElementById('accent-label');
             if (label) label.textContent = (pack && pack.customColor) || (window.QCCvLang === 'en' ? 'Custom color' : 'צבע מותאם');
             document.querySelectorAll('.theme-swatch').forEach((el) => el.setAttribute('aria-pressed', 'false'));
+            syncAccentResetControl();
             if (window.QCDraft) QCDraft.saveSoon();
         }
+
+        function resolveTemplateAccent() {
+            const key = typeof resolveTemplateId === 'function'
+                ? resolveTemplateId(window.QCExample || '')
+                : String(window.QCExample || '').trim();
+            const tpl = key && (window.QCTemplates || {})[key];
+            if (tpl && tpl.accent) return String(tpl.accent).trim().toLowerCase();
+            return '#4c4c4c';
+        }
+
+        function syncAccentResetControl() {
+            const btn = document.getElementById('accent-reset-btn');
+            if (!btn) return;
+            const pack = (window.CV_I18N && CV_I18N[window.QCCvLang === 'en' ? 'en' : 'he']) || {};
+            if (pack.accentReset) btn.textContent = pack.accentReset;
+            const current = String(readCvAccentVar() || '').trim().toLowerCase();
+            const base = resolveTemplateAccent();
+            const changed = !!current && current !== base;
+            btn.hidden = !changed;
+            btn.disabled = !changed;
+            btn.setAttribute('aria-hidden', changed ? 'false' : 'true');
+        }
+
+        function resetAccentToTemplate() {
+            const base = resolveTemplateAccent();
+            if (!base) return;
+            const swatch = document.querySelector('.theme-swatch[data-color="' + base + '"]');
+            setAccent(base, swatch);
+        }
+
+        window.resetAccentToTemplate = resetAccentToTemplate;
+        window.syncAccentResetControl = syncAccentResetControl;
 
         function resolveCvFont(name) {
             const raw = String(name || '').replace(/['"]/g, '').split(',')[0].trim();
@@ -2151,6 +2188,8 @@
             setLabel('design-lang-he', pack.langOptHe);
             setLabel('design-lang-en', pack.langOptEn);
             setLabel('custom-accent-caption', pack.customAccent);
+            setLabel('accent-reset-btn', pack.accentReset);
+            if (typeof syncAccentResetControl === 'function') syncAccentResetControl();
             setLabel('tip-skills', pack.tipSkills);
             setLabel('handoff-banner-title', pack.handoffBanner);
             setLabel('handoff-banner-lead', pack.handoffBannerLead);
@@ -5566,6 +5605,7 @@
             });
             syncPhotoFieldVisibility();
             if (typeof syncCheckoutGate === 'function') syncCheckoutGate();
+            if (typeof syncAccentResetControl === 'function') syncAccentResetControl();
         }
 
         function onPhotoChange(e) {

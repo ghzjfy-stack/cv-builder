@@ -224,11 +224,33 @@ function prepareCaptureRoot(root, view) {
   flattenUnsupportedColors(root, win);
 }
 
+function usablePaint(color: string, fallback: string) {
+  const c = String(color || "").trim();
+  if (!c || c === "transparent" || c === "rgba(0, 0, 0, 0)") return fallback;
+  return c;
+}
+
+/** Resolved Executive Split rail colors (follows the accent picker). */
+function premiumRailColors(sheet: HTMLElement) {
+  const sidebar = sheet.querySelector(".cv-sidebar");
+  const photo = sheet.querySelector(".cv-photo-block");
+  const rail = usablePaint(
+    sidebar instanceof HTMLElement ? getComputedStyle(sidebar).backgroundColor : "",
+    "#454545"
+  );
+  const deep = usablePaint(
+    photo instanceof HTMLElement ? getComputedStyle(photo).backgroundColor : "",
+    rail
+  );
+  return { rail, deep };
+}
+
 /** Keep Executive Split sidebar footer text clear of the A4 edge during capture. */
 function ensurePremiumSidebarFooter(sheet: HTMLElement) {
   if (!sheet.classList.contains("layout-premium")) return;
   const sidebar = sheet.querySelector(".cv-sidebar");
   if (!(sidebar instanceof HTMLElement)) return;
+  const { rail } = premiumRailColors(sheet);
 
   sidebar.style.setProperty("display", "flex", "important");
   sidebar.style.setProperty("flex-direction", "column", "important");
@@ -238,7 +260,7 @@ function ensurePremiumSidebarFooter(sheet: HTMLElement) {
   sidebar.style.setProperty("padding-bottom", "2rem", "important");
   sidebar.style.setProperty("box-sizing", "border-box", "important");
   sidebar.style.setProperty("overflow", "hidden", "important");
-  sidebar.style.setProperty("background", "#454545", "important");
+  sidebar.style.setProperty("background", rail, "important");
 
   const inner = sidebar.querySelector(".cv-sidebar-inner");
   if (inner instanceof HTMLElement) {
@@ -253,7 +275,7 @@ function ensurePremiumSidebarFooter(sheet: HTMLElement) {
     inner.style.setProperty("padding-right", "0.75rem", "important");
     inner.style.setProperty("padding-bottom", "2.25rem", "important");
     inner.style.setProperty("box-sizing", "border-box", "important");
-    inner.style.setProperty("background", "#454545", "important");
+    inner.style.setProperty("background", rail, "important");
   }
 
   let railPad = sidebar.querySelector(".cv-sidebar-rail-pad");
@@ -273,7 +295,7 @@ function ensurePremiumSidebarFooter(sheet: HTMLElement) {
   railPad.style.setProperty("max-height", "5rem", "important");
   railPad.style.setProperty("margin", "0", "important");
   railPad.style.setProperty("padding", "0", "important");
-  railPad.style.setProperty("background", "#454545", "important");
+  railPad.style.setProperty("background", rail, "important");
   railPad.style.setProperty("order", "999", "important");
   railPad.style.setProperty("pointer-events", "none", "important");
 
@@ -781,6 +803,7 @@ function prepareCaptureClone(sourceId = "cv-target") {
       el.style.printColorAdjust = "exact";
     };
     const sidebar = clone.querySelector(".cv-sidebar");
+    const { rail, deep } = premiumRailColors(clone);
     if (sidebar instanceof HTMLElement) {
       Object.assign(sidebar.style, {
         gridArea: "side",
@@ -792,13 +815,13 @@ function prepareCaptureClone(sourceId = "cv-target") {
         maxHeight: "100%",
         paddingBottom: "2rem",
         boxSizing: "border-box",
-        background: "#454545",
+        background: rail,
         color: "#f6f6f6",
         WebkitPrintColorAdjust: "exact",
         printColorAdjust: "exact",
       });
       const inner = sidebar.querySelector(".cv-sidebar-inner");
-      paintRail(inner, "#454545");
+      paintRail(inner, rail);
       if (inner instanceof HTMLElement) {
         Object.assign(inner.style, {
           paddingTop: "0.55rem",
@@ -812,9 +835,9 @@ function prepareCaptureClone(sourceId = "cv-target") {
           flex: "1 1 0",
         });
       }
-      paintRail(sidebar.querySelector(".cv-photo-block"), "#3a3a3a");
+      paintRail(sidebar.querySelector(".cv-photo-block"), deep);
       const railPad = sidebar.querySelector(".cv-sidebar-rail-pad");
-      paintRail(railPad, "#454545");
+      paintRail(railPad, rail);
       if (railPad instanceof HTMLElement) {
         Object.assign(railPad.style, {
           display: "block",

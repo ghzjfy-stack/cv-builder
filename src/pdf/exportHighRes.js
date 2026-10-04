@@ -978,6 +978,23 @@ async function downloadPdfBlob(blob, filename, pdf) {
 
   const url = URL.createObjectURL(blob);
   try {
+    // iPad/iPhone: the download attribute is unreliable — open the PDF viewer instead.
+    if (isIOS()) {
+      const opened = window.open(url, "_blank");
+      if (!opened) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.type = "application/pdf";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      return "ios-viewer";
+    }
+
     const a = document.createElement("a");
     a.href = url;
     a.download = safeName;
@@ -991,7 +1008,7 @@ async function downloadPdfBlob(blob, filename, pdf) {
   } catch {
     throw new Error("pdf-download-failed");
   } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
   }
 }
 
@@ -1000,12 +1017,17 @@ export async function sharePdfFileOnly(blob, filename) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
   const safeName = shareSafeFilename(filename);
   const file = new File([blob], safeName, { type: "application/pdf" });
-  if (!(typeof navigator.canShare === "function" && navigator.canShare({ files: [file] }))) {
-    await downloadPdfBlob(blob, safeName, null);
-    return "download-fallback";
+  if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return "shared";
+    } catch (err) {
+      if (err && err.name === "AbortError") throw err;
+      // NotAllowedError / InvalidStateError → fall through to viewer/download.
+    }
   }
-  await navigator.share({ files: [file] });
-  return "shared";
+  await downloadPdfBlob(blob, safeName, null);
+  return "download-fallback";
 }
 
 /** Immediate save helper for a fresh tap after the PDF was prepared. */
@@ -1018,7 +1040,11 @@ export async function savePdfFileOnly(blob, filename) {
       return await sharePdfFileOnly(blob, safeName);
     } catch (err) {
       if (err && err.name === "AbortError") return "aborted";
-      /* fall through to anchor */
+      try {
+        return await downloadPdfBlob(blob, safeName, null);
+      } catch {
+        throw err;
+      }
     }
   }
   return downloadPdfBlob(blob, safeName, null);
@@ -1284,8 +1310,10 @@ async function captureToCanvas(el) {
           lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
         );
     // ~150–160 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
+    // iPad Safari is especially memory-sensitive — keep scale lower there.
     const mobile = isMobileUa();
-    const scale = Math.min(mobile ? 1.5 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
+    const apple = isAppleTouchDevice();
+    const scale = Math.min(apple ? 1.25 : mobile ? 1.5 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
 
     const canvas = await withTimeout(
       html2canvas(el, {
@@ -1371,18 +1399,9 @@ async function captureToCanvas(el) {
   }
 }
 
-export async function exportHighResPdf(opts = {}) {
-  if (!isUnlocked()) {
-    throw new Error("payment required");
-  }
-  if (window.__qcPdfBusy) {
-    const started = Number(window.__qcPdfBusyAt || 0);
-    const lockMs = isMobileUa() ? 45000 : 90000;
-    if (started && Date.now() - started < lockMs) return;
-    setSpinner(false);
-  }
-  const download = opts.download !== false;
+let exportJob = null;
 
+async function buildHighResPdf() {
   document.getElementById("cv-preview-wrapper")?.classList.add("paid");
   document.body.classList.add("paid");
   document.documentElement.classList.add("qc-paid");
@@ -1452,9 +1471,6 @@ export async function exportHighResPdf(opts = {}) {
     setSpinner(false);
     clearTimeout(hardLimit);
 
-    if (download) {
-      await downloadPdfBlob(blob, filename, pdf);
-    }
     return { blob, filename };
   } catch (err) {
     cleanupCapture();
@@ -1465,6 +1481,26 @@ export async function exportHighResPdf(opts = {}) {
     cleanupCapture();
     setSpinner(false);
   }
+}
+
+export async function exportHighResPdf(opts = {}) {
+  if (!isUnlocked()) {
+    throw new Error("payment required");
+  }
+  const download = opts.download !== false;
+
+  // Coalesce concurrent taps: wait for the in-flight capture instead of returning empty.
+  if (!exportJob) {
+    exportJob = buildHighResPdf().finally(() => {
+      exportJob = null;
+    });
+  }
+
+  const result = await exportJob;
+  if (download && result?.blob) {
+    await downloadPdfBlob(result.blob, result.filename, null);
+  }
+  return result;
 }
 
 window.QCHighResPdf = async function gatedHighResPdf() {

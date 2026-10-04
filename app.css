@@ -510,16 +510,12 @@
         .home-mark {
             width: 2.35rem;
             height: 2.35rem;
-            border-radius: 0.65rem;
-            background: #2dd4bf;
-            color: #071018;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Secular One', 'Heebo', sans-serif;
-            font-weight: 400;
-            font-size: 0.78rem;
-            letter-spacing: 0.02em;
+            border-radius: 50%;
+            background: transparent;
+            object-fit: cover;
+            display: block;
+            flex-shrink: 0;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
         }
         .home-brand-name {
             font-family: 'Secular One', 'Heebo', sans-serif;
@@ -539,18 +535,12 @@
         .studio-mark {
             width: 2.25rem;
             height: 2.25rem;
-            border-radius: 0.65rem;
-            background: #2dd4bf;
-            color: #071018;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Secular One', 'Heebo', sans-serif;
-            font-weight: 400;
-            font-size: 0.78rem;
-            letter-spacing: 0.02em;
+            border-radius: 50%;
+            background: transparent;
+            object-fit: cover;
+            display: block;
             flex-shrink: 0;
-            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.35);
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.35);
         }
         .studio-brand-name {
             display: block;

@@ -17,7 +17,7 @@ import {
   whatsappReferralUrl,
   type PackId,
 } from "./config/checkout.js";
-import { exportHighResPdf, savePdfFileOnly, sharePdfFileOnly } from "./pdf/exportHighRes.js";
+import { exportHighResPdf, savePdfFileOnly, sharePdfFileOnly, isAppleTouchDevice, isMobileUa } from "./pdf/exportHighRes.js";
 import {
   createManualOrderSession,
   isManualOrderApproved,
@@ -753,27 +753,34 @@ function applyPaidUnlock(token, message) {
 
 async function attemptApprovedPdfDownload() {
   const status = document.getElementById("download-status");
-  const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+  const mobile = isMobileClient();
   if (status) {
     status.textContent = mobile
       ? qcT("autoDownloadTryMobile", "מכין PDF… אם לא נפתח שיתוף/הורדה, לחצו על הכפתור הירוק.")
       : qcT("autoDownloadTry", "מנסה להוריד אוטומטית... אם זה לא מתחיל, לחצו על הכפתור הירוק.");
   }
   try {
-    await runHighResExport();
-    if (status) {
-      status.textContent = mobile
-        ? qcT("downloadReadyMobile", "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.")
-        : qcT("downloadStarted", "ההורדה התחילה.");
+    // iPad/iPhone: prepare only, then ask for a fresh tap (gesture required).
+    if (mobile) {
+      await preparePendingPdf();
+      openPdfReadySheet();
+      if (status) {
+        status.textContent = qcT(
+          "downloadReadyMobile",
+          "ה-PDF מוכן. אם לא נשמר — לחצו שוב על הכפתור הירוק.",
+        );
+      }
+      return;
     }
+    await runHighResExport();
+    if (status) status.textContent = qcT("downloadStarted", "ההורדה התחילה.");
   } catch {
     if (status) status.textContent = qcT("clickGreenDownload", "לחצו על הכפתור הירוק להורדת ה-PDF.");
   }
 }
 
 function prefersSameTabCheckout() {
-  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  return /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
+  return isMobileClient();
 }
 
 const PAY_FALLBACK_TOAST = () => qcT("payFallbackToast", "המספר הועתק! שנה לאפליקציית התשלום");
@@ -892,8 +899,7 @@ function readPersonalPhone() {
 function openExternalUrl(url) {
   const href = String(url || "").trim();
   if (!href) return false;
-  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
+  const mobile = isMobileClient();
   // After async work, popups are often blocked — on mobile navigate this tab to WhatsApp.
   if (mobile) {
     location.assign(href);
@@ -972,7 +978,13 @@ async function createCvDownloadShareUrl() {
 let pendingPdf = null; // { blob, filename }
 
 function isMobileClient() {
-  return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+  try {
+    if (typeof isMobileUa === "function") return isMobileUa();
+  } catch {
+    /* ignore */
+  }
+  if (typeof isAppleTouchDevice === "function" && isAppleTouchDevice()) return true;
+  return /Android|Mobile/i.test(navigator.userAgent || "");
 }
 
 function setPdfReadySheet(open) {
@@ -999,7 +1011,7 @@ function openPdfReadySheet() {
   if (lead) {
     lead.textContent = qcT(
       "pdfReadyLead",
-      "באייפון צריך לחיצה נוספת כדי לשמור קובץ או לשלוח בוואטסאפ (בלי קישור לאתר).",
+      "באייפון ובאייפד צריך לחיצה נוספת כדי לשמור קובץ או לשלוח בוואטסאפ (בלי קישור לאתר).",
     );
   }
   if (saveBtn) saveBtn.textContent = qcT("pdfReadySave", "שמור PDF לקבצים");
@@ -1316,6 +1328,66 @@ function onDownloadPdfClick(e) {
   openCheckoutModal();
 }
 
+async function onPaidDownloadCvPdf(e) {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  if (!assertCheckoutReady()) return;
+  if (!isUnlocked()) {
+    openCheckoutModal();
+    setFeedback(qcT("needPayBeforeDl", "יש לאמת תשלום או קוד לפני ההורדה."), false);
+    return;
+  }
+  const status = document.getElementById("download-status");
+  try {
+    // iPad/iPhone: share/save must run in the same user-gesture turn.
+    if (isMobileClient()) {
+      if (!pendingPdf?.blob) {
+        if (status) {
+          status.textContent = qcT("preparingPdfMobile", "מכין PDF באיכות מלאה לתצוגה שלכם…");
+        }
+        await preparePendingPdf();
+        openPdfReadySheet();
+        if (status) {
+          status.textContent = qcT(
+            "pdfReadyHint",
+            "ה-PDF מוכן — לחצו שמירה או שליחה בוואטסאפ.",
+          );
+        }
+        return;
+      }
+      const mode = await savePdfFileOnly(pendingPdf.blob, pendingPdf.filename);
+      if (mode === "aborted") {
+        if (status) status.textContent = "";
+        return;
+      }
+      if (status) {
+        status.textContent = qcT(
+          "downloadReadyMobile",
+          "בחרו «שמירה בקבצים» בחלון שנפתח.",
+        );
+      }
+      return;
+    }
+    downloadFormat("pdf");
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      if (status) status.textContent = "";
+      return;
+    }
+    if (isMobileClient() && pendingPdf?.blob) {
+      openPdfReadySheet();
+      if (status) {
+        status.textContent = qcT(
+          "clickGreenDownload",
+          "לחצו על הכפתור הירוק להורדת ה-PDF.",
+        );
+      }
+      return;
+    }
+    if (status) status.textContent = qcT("downloadFailed", "ההורדה נכשלה. נסו שוב.");
+  }
+}
+
 function downloadFormat(kind) {
   if (!assertCheckoutReady()) return;
   if (kind === "pdf" && window.__qcPdfBusy) {
@@ -1585,9 +1657,7 @@ function bind() {
   document.getElementById("cover-letter-download")?.addEventListener("click", downloadCoverLetter);
   document.getElementById("btn-copy-referral")?.addEventListener("click", copyReferralLink);
   document.getElementById("btn-download-cv-pdf")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    downloadFormat("pdf");
+    void onPaidDownloadCvPdf(e);
   });
 
   document.querySelectorAll("[data-download]").forEach((btn) => {

@@ -1052,10 +1052,16 @@ async function onPdfReadySave(e) {
       return;
     }
     if (status) {
-      status.textContent = qcT(
-        "downloadReadyMobile",
-        "בחרו «שמירה בקבצים» בחלון שנפתח.",
-      );
+      status.textContent =
+        mode === "ios-viewer" || mode === "download-fallback"
+          ? qcT(
+              "downloadOpenedIos",
+              "ה-PDF נפתח. לחצו על שיתוף (□↑) ואז «שמירה בקבצים».",
+            )
+          : qcT(
+              "downloadReadyMobile",
+              "בחרו «שמירה בקבצים» בחלון שנפתח.",
+            );
     }
     closePdfReadySheet();
   } catch (err) {
@@ -1361,10 +1367,16 @@ async function onPaidDownloadCvPdf(e) {
         return;
       }
       if (status) {
-        status.textContent = qcT(
-          "downloadReadyMobile",
-          "בחרו «שמירה בקבצים» בחלון שנפתח.",
-        );
+        status.textContent =
+          mode === "ios-viewer" || mode === "download-fallback"
+            ? qcT(
+                "downloadOpenedIos",
+                "ה-PDF נפתח. לחצו על שיתוף (□↑) ואז «שמירה בקבצים».",
+              )
+            : qcT(
+                "downloadReadyMobile",
+                "בחרו «שמירה בקבצים» בחלון שנפתח.",
+              );
       }
       return;
     }

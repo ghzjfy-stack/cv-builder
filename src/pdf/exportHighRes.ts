@@ -145,7 +145,7 @@ function setSpinner(on) {
   }
   const lead = document.getElementById("pdf-spin-lead");
   if (lead && busy) {
-    const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+    const mobile = isMobileUa();
     lead.textContent = mobile
       ? window.QCCvLang === "en"
         ? "Preparing your PDF — keep this screen open"
@@ -942,12 +942,21 @@ function cleanupCapture() {
   host.removeAttribute("style");
 }
 
+function isAppleTouchDevice() {
+  const ua = navigator.userAgent || "";
+  if (/iP(hone|ad|od)/i.test(ua)) return true;
+  // iPadOS 13+ often reports as Macintosh desktop Safari.
+  if (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1) return true;
+  return false;
+}
+
 function isMobileUa() {
-  return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+  if (isAppleTouchDevice()) return true;
+  return /Android|Mobile/i.test(navigator.userAgent || "");
 }
 
 function isIOS() {
-  return /iP(hone|ad|od)/i.test(navigator.userAgent || "");
+  return isAppleTouchDevice();
 }
 
 /**
@@ -1462,3 +1471,5 @@ window.QCHighResPdf = async function gatedHighResPdf() {
   if (!isUnlocked()) throw new Error("payment required");
   return exportHighResPdf();
 };
+
+export { isAppleTouchDevice, isIOS, isMobileUa };

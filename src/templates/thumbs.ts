@@ -41,7 +41,7 @@ const BADGES: Record<string, BadgeSpec> = {
   intern: { kind: "student", he: "סטודנט", en: "Student" },
   academic: { kind: "academic", he: "אקדמי", en: "Academic" },
   pearl: { kind: "modern", he: "מודרני", en: "Modern" },
-  cobalt: { kind: "tech", he: "הייטק", en: "Tech" },
+  cobalt: { kind: "photo", he: "עם תמונה", en: "Photo" },
   "entry-clean": { kind: "entry", he: "כניסה", en: "Entry" },
   "heebo-ats": { kind: "ats", he: "מותאם ל-ATS", en: "ATS Friendly" },
   "assistant-ats": { kind: "minimal", he: "נקי", en: "Soft" },
@@ -72,6 +72,7 @@ const BADGES: Record<string, BadgeSpec> = {
   forest: { kind: "consulting", he: "ייעוץ", en: "Consulting" },
   sand: { kind: "sidebar", he: "עיצוב פנים", en: "Interior" },
   split: { kind: "split", he: "משפטים", en: "Legal" },
+  premium: { kind: "executive", he: "פרימיום", en: "Premium" },
   "teal-sidebar": { kind: "sidebar", he: "שירות", en: "Service" },
   "ink-exec": { kind: "executive", he: "הנהלה", en: "Executive" },
   "student-modern": { kind: "student", he: "סטודנט", en: "Student" },
@@ -319,6 +320,20 @@ function navyInner(tpl: CvTemplate, paper: string, ink: string, s: number): stri
   );
 }
 
+function cobaltInner(tpl: CvTemplate, paper: string, ink: string, s: number): string {
+  const side = hex(tpl.accent, "#2c4a7c");
+  const sw = 24;
+  return (
+    r(0, 0, W, H, paper) +
+    r(0, 0, sw, H, side) +
+    photoCircle(sw / 2, 13, 6.8, "#d5dbe8") +
+    r(4, 23, sw - 8, 2.1, "#ffffff", `opacity="0.78"`) +
+    lines(4, 29, sw - 8, 7, 6.2, "#ffffff", 0.42, s) +
+    sectionRule(sw + 6, 10, 18, side) +
+    lines(sw + 6, 16, 36, 13, 4.7, ink, 0.2, s + 2)
+  );
+}
+
 function sidebarInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number, rtl: boolean): string {
   const sw = 22;
   const sideX = rtl ? W - sw : 0;
@@ -349,31 +364,22 @@ function splitInner(tpl: CvTemplate, paper: string, ink: string, accent: string,
   );
 }
 
-function bannerInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number): string {
-  const side =
-    tpl.skin === "plum" ? "#f8eef4" :
-    tpl.skin === "noir" ? "#f6f1e6" :
-    tpl.skin === "coral" ? "#fbf1ea" :
-    tpl.skin === "indigo" ? "#eef1f8" :
-    "#e7f3ef";
-  const title =
-    tpl.skin === "plum" ? "#f3b6c8" :
-    tpl.skin === "coral" ? "#f6d2b0" :
-    "#e2b657";
-  const headH = 28;
+function premiumInner(tpl: CvTemplate, paper: string, ink: string, accent: string, s: number): string {
+  const sw = 22;
+  const rail = "#4a4a4a";
   return (
     r(0, 0, W, H, paper) +
-    r(0, 0, W, headH, accent) +
-    r(34, 6.5, 30, 4.4, "#ffffff", `rx="0.4"`) +
-    r(40, 13.2, 24, 1.7, title) +
-    r(6, 8, 16, 1.3, "#ffffff", `opacity="0.9"`) +
-    r(6, 11.4, 13, 1, "#ffffff", `opacity="0.55"`) +
-    r(6, 14.6, 11, 1, "#ffffff", `opacity="0.55"`) +
-    r(0, headH, 22, H - headH, side) +
-    r(3.5, headH + 5, 12, 1.6, accent, `opacity="0.85"`) +
-    lines(3.5, headH + 10, 15, 5, 6.4, ink, 0.32, s) +
-    r(27, headH + 5, 16, 1.7, accent) +
-    lines(27, headH + 10, 38, 9, 5, ink, 0.22, s + 2)
+    r(0, 0, sw, H, rail) +
+    photoCircle(sw / 2, 14, 6.2, "#cfcfcf") +
+    lines(3.5, 26, sw - 7, 4, 5.4, "#ffffff", 0.45, s) +
+    r(3.5, 50, sw - 7, 1.2, "#ffffff", `opacity="0.35"`) +
+    r(3.5, 54, sw - 7, 1.6, "#ffffff", `opacity="0.75"`) +
+    r(3.5, 58, (sw - 7) * 0.72, 1.6, "#ffffff", `opacity="0.75"`) +
+    r(sw + 5, 8, 34, 3.4, ink, `rx="0.4"`) +
+    r(sw + 5, 13, 18, 1.2, ink, `opacity="0.4"`) +
+    sectionRule(sw + 5, 22, 16, rail) +
+    r(sw + 5, 28, 38, 4.2, "#efefef", `rx="0.4"`) +
+    lines(sw + 5, 36, 38, 10, 4.6, ink, 0.2, s + 3)
   );
 }
 
@@ -386,9 +392,10 @@ function innerFor(tpl: CvTemplate, lang: ThumbLang): string {
   const layout = tpl.layout;
   const style = tpl.layoutStyle;
 
-  if (layout === "banner") return bannerInner(tpl, paper, ink, accent, s);
   if (layout === "navy") return navyInner(tpl, paper, ink, s);
+  if (layout === "cobalt") return cobaltInner(tpl, paper, ink, s);
   if (layout === "charcoal") return charcoalInner(tpl, paper, ink, s);
+  if (layout === "premium") return premiumInner(tpl, paper, ink, accent, s);
   if (layout === "sidebar" || style === "two-column-left") return sidebarInner(tpl, paper, ink, accent, s, rtl);
   if (layout === "split" || style === "two-column-right") return splitInner(tpl, paper, ink, accent, s, rtl);
   if (layout === "azure") return azureInner(tpl, paper, ink, accent, s);

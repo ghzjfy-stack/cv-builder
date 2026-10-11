@@ -427,7 +427,7 @@ export function CvEntryItem({
     <div className={`cv-job ${className}`.trim()}>
       <EntryFlexHeader title={title} dates={dates} />
       {subtitle ? (
-        <p className="cv-job-role text-sm text-slate-600 mt-0.5">{subtitle}</p>
+        <p className="cv-job-role cv-job-company text-sm mt-0.5">{subtitle}</p>
       ) : null}
       {descriptions?.length > 0 ? (
         <ul
@@ -452,8 +452,7 @@ export function CvEntryItem({
   );
 }
 
-export const SKILL_BADGE_CLASS =
-  'cv-skill-badge bg-white/10 px-2.5 py-1 rounded text-xs inline-block m-0.5 border border-white/20';
+export const SKILL_BADGE_CLASS = 'cv-skill-badge';
 
 /**
  * Sleek sidebar skill pill. `dir="auto"` keeps mixed Hebrew/English

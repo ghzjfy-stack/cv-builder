@@ -23,9 +23,10 @@ export const ACCENT_COLORS = [
 
 export const FONTS = [
   { value: 'Rubik', label: 'רוביק — מודרני וחד', labelEn: 'Rubik — Modern & Sharp', family: "'Rubik', sans-serif" },
+  { value: 'Alef', label: 'אלף — גיאומטרי ומדויק', labelEn: 'Alef — Geometric & Precise', family: "'Alef', sans-serif" },
   { value: 'Heebo', label: 'היבו — נקי ומקצועי', labelEn: 'Heebo — Clean & Professional', family: "'Heebo', sans-serif" },
-  { value: 'Assistant', label: 'אסיסטנט — אלגנטי ונגיש', labelEn: 'Assistant — Elegant & Accessible', family: "'Assistant', sans-serif" },
-  { value: 'Varela Round', label: 'ורלה — רך וידידותי', labelEn: 'Varela Round — Soft & Friendly', family: "'Varela Round', sans-serif" },
+  { value: 'Assistant', label: 'אסיסטנט — חם וקריא', labelEn: 'Assistant — Warm & Readable', family: "'Assistant', sans-serif" },
+  { value: 'Varela Round', label: 'ורלה — עגול וידידותי', labelEn: 'Varela Round — Round & Friendly', family: "'Varela Round', sans-serif" },
   { value: 'Frank Ruhl Libre', label: 'פרנק רול — קלאסי ומכובד', labelEn: 'Frank Ruhl Libre — Classic Serif', family: "'Frank Ruhl Libre', serif" },
 ];
 

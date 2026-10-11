@@ -21,11 +21,23 @@ function cvCaptureDir() {
 }
 
 function fileBase() {
-  const english = cvCaptureDir() === "ltr";
-  const raw = document.getElementById("in-name")?.value || (english ? "Resume" : "קורות_חיים");
+  const raw = document.getElementById("in-name")?.value || "Resume";
+  // ASCII-only filenames: Hebrew names break iOS/WhatsApp file share and fall back to page links.
   const safe =
-    window.QCSanitize?.filename?.(raw) || String(raw).replace(/[^\w\u0590-\u05FF-]+/g, "_");
-  return (english ? "Resume_" : "קורות_חיים_") + (safe || "resume");
+    window.QCSanitize?.filename?.(raw) ||
+    String(raw)
+      .normalize("NFKD")
+      .replace(/[^\w\-]+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_|_$/g, "")
+      .slice(0, 40);
+  return "QuickCV_" + (safe || "Resume");
+}
+
+function shareSafeFilename(name) {
+  const base = String(name || "QuickCV_Resume.pdf").replace(/\.pdf$/i, "");
+  const ascii = base.replace(/[^\w.\-]+/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
+  return (ascii || "QuickCV_Resume") + ".pdf";
 }
 
 function cvThemeSource() {
@@ -87,23 +99,43 @@ async function waitForCvFonts() {
   const name = selectedCvFontName();
   const loads = [];
   if (document.fonts?.load) {
-    ["400", "500", "600", "700"].forEach((weight) => {
+    ["400", "700"].forEach((weight) => {
       loads.push(document.fonts.load(`${weight} 16px "${name}"`));
     });
   }
   if (document.fonts?.ready) loads.push(document.fonts.ready);
   if (loads.length) {
     try {
-      await Promise.all(loads);
+      await Promise.race([
+        Promise.all(loads),
+        new Promise((resolve) => setTimeout(resolve, 2500)),
+      ]);
     } catch {
       /* fallback glyphs are fine */
     }
   }
 }
 
+function withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(label || "timeout")), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
+
 function setSpinner(on) {
   const busy = !!on;
   window.__qcPdfBusy = busy;
+  window.__qcPdfBusyAt = busy ? Date.now() : 0;
   document.documentElement.classList.toggle("qc-pdf-busy", busy);
 
   const el = document.getElementById("pdf-spinner");
@@ -113,7 +145,7 @@ function setSpinner(on) {
   }
   const lead = document.getElementById("pdf-spin-lead");
   if (lead && busy) {
-    const mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+    const mobile = isMobileUa();
     lead.textContent = mobile
       ? window.QCCvLang === "en"
         ? "Preparing your PDF — keep this screen open"
@@ -145,23 +177,15 @@ function setSpinner(on) {
 
 function flattenUnsupportedColors(root, view) {
   const win = view || window;
-  const nodes = [root, ...root.querySelectorAll("*")];
-  nodes.forEach((node) => {
-    if (!(node instanceof HTMLElement)) return;
+  const nodes = root.querySelectorAll("*");
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (!(node instanceof HTMLElement)) continue;
     const cs = win.getComputedStyle(node);
-    node.style.color = cs.color;
-    if (cs.backgroundColor && cs.backgroundColor !== "rgba(0, 0, 0, 0)") {
-      node.style.backgroundColor = cs.backgroundColor;
-    }
-    node.style.borderTopColor = cs.borderTopColor;
-    node.style.borderRightColor = cs.borderRightColor;
-    node.style.borderBottomColor = cs.borderBottomColor;
-    node.style.borderLeftColor = cs.borderLeftColor;
-    node.style.fontFamily = cs.fontFamily;
-    // html2canvas often drops filter/blur — strip for fidelity.
+    // Strip filters only — full color flatten on every node is too slow for large CVs.
     if (cs.filter && cs.filter !== "none") node.style.filter = "none";
     if (cs.backdropFilter && cs.backdropFilter !== "none") node.style.backdropFilter = "none";
-  });
+  }
 }
 
 function prepareCaptureRoot(root, view) {
@@ -176,20 +200,111 @@ function prepareCaptureRoot(root, view) {
       node.id === "out-photo" ||
       node.id === "out-photo-fallback" ||
       Boolean(node.closest?.(".cv-photo"));
-    if (!keepClip) {
+    // Premium rail must keep overflow clipping so footer pad is not painted off-sheet.
+    const premiumRail =
+      node.classList.contains("cv-sidebar") ||
+      node.classList.contains("cv-sidebar-inner") ||
+      node.classList.contains("cv-sidebar-rail-pad") ||
+      Boolean(node.closest?.(".layout-premium > .cv-sidebar"));
+    if (keepClip || (premiumRail && node.closest?.(".layout-premium"))) {
+      if (keepClip || node.classList.contains("cv-sidebar") || node.classList.contains("cv-sidebar-inner")) {
+        node.style.overflow = "hidden";
+      }
+      if (keepClip) node.style.maxHeight = "";
+    } else {
       node.style.overflow = "visible";
       node.style.overflowX = "visible";
       node.style.overflowY = "visible";
       node.style.maxHeight = "none";
-    } else {
-      node.style.overflow = "hidden";
-      node.style.maxHeight = "";
     }
     node.style.textOverflow = "clip";
     node.style.boxShadow = "none";
     node.style.transform = "none";
   });
   flattenUnsupportedColors(root, win);
+}
+
+function usablePaint(color: string, fallback: string) {
+  const c = String(color || "").trim();
+  if (!c || c === "transparent" || c === "rgba(0, 0, 0, 0)") return fallback;
+  return c;
+}
+
+/** Resolved Executive Split rail colors (follows the accent picker). */
+function premiumRailColors(sheet: HTMLElement) {
+  const sidebar = sheet.querySelector(".cv-sidebar");
+  const photo = sheet.querySelector(".cv-photo-block");
+  const rail = usablePaint(
+    sidebar instanceof HTMLElement ? getComputedStyle(sidebar).backgroundColor : "",
+    "#454545"
+  );
+  const deep = usablePaint(
+    photo instanceof HTMLElement ? getComputedStyle(photo).backgroundColor : "",
+    rail
+  );
+  return { rail, deep };
+}
+
+/** Keep Executive Split sidebar footer text clear of the A4 edge during capture. */
+function ensurePremiumSidebarFooter(sheet: HTMLElement) {
+  if (!sheet.classList.contains("layout-premium")) return;
+  const sidebar = sheet.querySelector(".cv-sidebar");
+  if (!(sidebar instanceof HTMLElement)) return;
+  const { rail } = premiumRailColors(sheet);
+
+  sidebar.style.setProperty("display", "flex", "important");
+  sidebar.style.setProperty("flex-direction", "column", "important");
+  sidebar.style.setProperty("height", "100%", "important");
+  sidebar.style.setProperty("min-height", "100%", "important");
+  sidebar.style.setProperty("max-height", "100%", "important");
+  sidebar.style.setProperty("padding-bottom", "2rem", "important");
+  sidebar.style.setProperty("box-sizing", "border-box", "important");
+  sidebar.style.setProperty("overflow", "hidden", "important");
+  sidebar.style.setProperty("background", rail, "important");
+
+  const inner = sidebar.querySelector(".cv-sidebar-inner");
+  if (inner instanceof HTMLElement) {
+    // MUST stay auto/flex — height:100% eats the rail pad and clips recommendations.
+    inner.style.setProperty("flex", "1 1 0", "important");
+    inner.style.setProperty("height", "auto", "important");
+    inner.style.setProperty("min-height", "0", "important");
+    inner.style.setProperty("max-height", "none", "important");
+    inner.style.setProperty("overflow", "hidden", "important");
+    inner.style.setProperty("padding-top", "0.55rem", "important");
+    inner.style.setProperty("padding-left", "0.75rem", "important");
+    inner.style.setProperty("padding-right", "0.75rem", "important");
+    inner.style.setProperty("padding-bottom", "2.25rem", "important");
+    inner.style.setProperty("box-sizing", "border-box", "important");
+    inner.style.setProperty("background", rail, "important");
+  }
+
+  let railPad = sidebar.querySelector(".cv-sidebar-rail-pad");
+  if (!(railPad instanceof HTMLElement)) {
+    railPad = (sheet.ownerDocument || document).createElement("div");
+    railPad.className = "cv-sidebar-rail-pad";
+    railPad.setAttribute("aria-hidden", "true");
+    sidebar.appendChild(railPad);
+  }
+  railPad.style.setProperty("display", "block", "important");
+  railPad.style.setProperty("flex", "0 0 5rem", "important");
+  railPad.style.setProperty("flex-grow", "0", "important");
+  railPad.style.setProperty("flex-shrink", "0", "important");
+  railPad.style.setProperty("width", "100%", "important");
+  railPad.style.setProperty("height", "5rem", "important");
+  railPad.style.setProperty("min-height", "5rem", "important");
+  railPad.style.setProperty("max-height", "5rem", "important");
+  railPad.style.setProperty("margin", "0", "important");
+  railPad.style.setProperty("padding", "0", "important");
+  railPad.style.setProperty("background", rail, "important");
+  railPad.style.setProperty("order", "999", "important");
+  railPad.style.setProperty("pointer-events", "none", "important");
+
+  const refs = sidebar.querySelector("#sec-references");
+  if (refs instanceof HTMLElement) {
+    refs.style.setProperty("margin-bottom", "0.75rem", "important");
+    refs.style.setProperty("padding-bottom", "0.25rem", "important");
+    refs.style.setProperty("flex-shrink", "0", "important");
+  }
 }
 
 function isSidebarLayout(el) {
@@ -199,7 +314,8 @@ function isSidebarLayout(el) {
     el.classList.contains("layout-charcoal") ||
     el.classList.contains("layout-navy") ||
     el.classList.contains("layout-azure") ||
-    el.classList.contains("layout-banner")
+    el.classList.contains("layout-premium") ||
+    el.classList.contains("layout-cobalt")
   );
 }
 
@@ -208,7 +324,8 @@ function isFullBleedLayout(el) {
     el.classList.contains("layout-charcoal") ||
     el.classList.contains("layout-navy") ||
     el.classList.contains("layout-azure") ||
-    el.classList.contains("layout-banner")
+    el.classList.contains("layout-premium") ||
+    el.classList.contains("layout-cobalt")
   );
 }
 
@@ -217,6 +334,9 @@ function lockCaptureSheetHeight(host) {
   const sheet = host?.querySelector?.(".cv-print-sheet");
   if (!(sheet instanceof HTMLElement)) return;
   const sidebarish = isSidebarLayout(sheet) || isFullBleedLayout(sheet);
+  const premium = sheet.classList.contains("layout-premium");
+  const classic = sheet.classList.contains("layout-classic");
+
   // Measure natural content height first (overflow hidden would clip the measure).
   sheet.style.height = "auto";
   sheet.style.minHeight = "0px";
@@ -228,25 +348,121 @@ function lockCaptureSheetHeight(host) {
     Math.ceil(sheet.scrollHeight || 0),
     Math.ceil(sheet.offsetHeight || 0),
   );
-  // Content that fits on one A4 must stay exactly one page (avoid a stub page 2).
-  const fitsOne = contentH <= A4_CSS_H + 12;
+
+  // Executive Split is always a single A4 sheet. Classic must not clip with slack —
+  // tiny overflow used to chop recommendations at the page edge.
+  // Other sidebar layouts get a small slack so measurement noise does not spawn a blank stub page 2.
+  const slack = premium ? 220 : classic ? 0 : 12;
+  const fitsOne = premium || classic || contentH <= A4_CSS_H + slack;
   const needed = fitsOne ? A4_CSS_H : contentH;
+
   sheet.style.minHeight = `${needed}px`;
   sheet.style.height = `${needed}px`;
+  sheet.style.maxHeight = fitsOne ? `${needed}px` : "none";
   sheet.style.overflow = "hidden";
   host.style.minHeight = `${needed}px`;
   host.style.height = fitsOne ? `${needed}px` : "auto";
+  host.style.maxHeight = fitsOne ? `${needed}px` : "none";
+  host.style.overflow = fitsOne ? "hidden" : "visible";
+
   if (sidebarish) {
     sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner, .cv-main, .cv-columns, .cv-photo-block, #cv-header").forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
       if (el.classList.contains("cv-photo") || el.closest?.(".cv-photo")) return;
       el.style.alignSelf = "stretch";
     });
-    sheet.querySelectorAll(".cv-sidebar, .cv-sidebar-inner").forEach((el) => {
+    sheet.querySelectorAll(".cv-sidebar").forEach((el) => {
       if (!(el instanceof HTMLElement)) return;
       el.style.height = "100%";
       el.style.minHeight = "100%";
+      el.style.maxHeight = "100%";
+      el.style.overflow = "hidden";
     });
+    // Non-premium: stretch inner to fill. Premium must keep flex+auto so rail-pad survives.
+    if (!premium) {
+      sheet.querySelectorAll(".cv-sidebar-inner").forEach((el) => {
+        if (!(el instanceof HTMLElement)) return;
+        el.style.height = "100%";
+        el.style.minHeight = "100%";
+        el.style.maxHeight = "100%";
+        el.style.overflow = "hidden";
+      });
+    }
+  }
+
+  if (premium) {
+    sheet.querySelectorAll(".cv-main").forEach((el) => {
+      if (!(el instanceof HTMLElement)) return;
+      el.style.overflow = "hidden";
+      el.style.maxHeight = "100%";
+    });
+    ensurePremiumSidebarFooter(sheet);
+  }
+}
+
+/**
+ * Express/classic: compress --space-fit (and padding if needed) so the whole CV
+ * fits one A4 sheet — prevents recommendations from being clipped at the bottom.
+ */
+function fitClassicCaptureToOnePage(host) {
+  const sheet = host?.querySelector?.(".cv-print-sheet");
+  if (!(sheet instanceof HTMLElement)) return;
+  if (!sheet.classList.contains("layout-classic")) return;
+
+  const MIN_FIT = 0.56;
+  const measure = () => {
+    sheet.style.height = "auto";
+    sheet.style.minHeight = "0px";
+    sheet.style.maxHeight = "none";
+    sheet.style.overflow = "visible";
+    void sheet.offsetHeight;
+    return Math.max(
+      1,
+      Math.ceil(sheet.scrollHeight || 0),
+      Math.ceil(sheet.offsetHeight || 0),
+    );
+  };
+
+  let fit = parseFloat(sheet.style.getPropertyValue("--space-fit") || "") || 1;
+  if (!Number.isFinite(fit) || fit <= 0) fit = 1;
+  fit = Math.min(1, Math.max(MIN_FIT, fit));
+  sheet.style.setProperty("--space-fit", String(fit));
+  host.style.setProperty("--space-fit", String(fit));
+
+  let h = measure();
+  if (h <= A4_CSS_H) return;
+
+  // Binary search the largest space-fit that still fits one A4.
+  let lo = MIN_FIT;
+  let hi = fit;
+  let best = MIN_FIT;
+  for (let i = 0; i < 10; i++) {
+    const mid = (lo + hi) / 2;
+    sheet.style.setProperty("--space-fit", String(mid));
+    host.style.setProperty("--space-fit", String(mid));
+    h = measure();
+    if (h <= A4_CSS_H) {
+      best = mid;
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  sheet.style.setProperty("--space-fit", String(best));
+  host.style.setProperty("--space-fit", String(best));
+  h = measure();
+  if (h <= A4_CSS_H) return;
+
+  // Still over: tighten classic page padding (design stays the same, just denser).
+  const pads = [
+    [22, 36, 28],
+    [18, 32, 22],
+    [14, 28, 18],
+  ];
+  for (const [pt, px, pb] of pads) {
+    sheet.style.padding = `${pt}px ${px}px ${pb}px`;
+    h = measure();
+    if (h <= A4_CSS_H) return;
   }
 }
 
@@ -272,6 +488,221 @@ function stripPreviewChrome(clone) {
     if (el.classList.contains("cv-print-keep")) return;
     // Keep structurally relevant empty sections out of the way.
   });
+}
+
+/**
+ * Navy / Cobalt use display:contents for .cv-columns / .cv-sidebar.
+ * html2canvas often skips those promoted grid children — flatten the clone so
+ * photo, header, sidebar-inner, and main are direct grid items with painted rails.
+ */
+function promotePhotoRailForCapture(clone, english, theme = "cobalt") {
+  const isNavy = theme === "navy";
+  const probe = clone.querySelector(".cv-photo-block") || clone.querySelector("#cv-header") || clone.querySelector(".cv-sidebar-inner");
+  const rail = usablePaint(
+    probe instanceof HTMLElement ? getComputedStyle(probe).backgroundColor : "",
+    isNavy ? "#12192b" : "#2c4a7c"
+  );
+  const photoPad = isNavy ? "1.55rem 1rem 0.35rem" : "1.35rem 1rem 0.35rem";
+  const headPad = isNavy ? "0.65rem 1.15rem 1.15rem" : "0.45rem 1.05rem 1rem";
+  const sidePad = isNavy ? "0.35rem 1.25rem 1.7rem" : "0.2rem 1.1rem 1.5rem";
+  const mainPad = isNavy ? "1.55rem 1.7rem 1.7rem 1.45rem" : "1.4rem 1.5rem 1.5rem 1.35rem";
+  const avatarBg = isNavy ? "#8d93a3" : "#9aa8c2";
+  const photo = clone.querySelector(".cv-photo-block");
+  const sideInner = clone.querySelector(".cv-sidebar-inner");
+  const main = clone.querySelector(".cv-main");
+  const header = clone.querySelector("#cv-header");
+  const columns = clone.querySelector(".cv-columns");
+  const sidebar = clone.querySelector(".cv-sidebar");
+
+  // Kill the continuous ::before rail — it stacks above contents in html2canvas.
+  clone.classList.add(isNavy ? "qc-navy-capture-flat" : "qc-cobalt-capture-flat");
+  if (isNavy) clone.style.setProperty("--navy", rail);
+  else clone.style.setProperty("--cobalt", rail);
+
+  [photo, header, sideInner, main].forEach((el) => {
+    if (el instanceof HTMLElement) clone.appendChild(el);
+  });
+  sidebar?.remove();
+  columns?.remove();
+  clone.querySelectorAll(".cv-col-rule, .cv-sidebar-rail-pad").forEach((el) => el.remove());
+
+  const paint = (el, extra = {}) => {
+    if (!(el instanceof HTMLElement)) return;
+    Object.assign(el.style, {
+      background: rail,
+      color: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
+      zIndex: "1",
+      ...extra,
+    });
+  };
+
+  if (photo instanceof HTMLElement) {
+    paint(photo, {
+      gridArea: "photo",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "flex-end",
+      padding: photoPad,
+      margin: "0",
+      border: "0",
+      borderRadius: "0",
+      boxShadow: "none",
+    });
+    const avatar = photo.querySelector(".cv-photo");
+    if (avatar instanceof HTMLElement) {
+      Object.assign(avatar.style, {
+        width: isNavy ? "118px" : "112px",
+        height: isNavy ? "118px" : "112px",
+        borderRadius: "999px",
+        overflow: "hidden",
+        border: isNavy ? "3px solid rgba(255, 255, 255, 0.92)" : "4px solid #ffffff",
+        background: avatarBg,
+        flex: "0 0 auto",
+      });
+      avatar.querySelectorAll("svg, img").forEach((node) => {
+        if (!(node instanceof HTMLElement)) return;
+        Object.assign(node.style, {
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        });
+      });
+    }
+  }
+
+  if (header instanceof HTMLElement) {
+    paint(header, {
+      gridArea: "head",
+      textAlign: "center",
+      padding: headPad,
+      margin: "0",
+      border: "0",
+      borderRadius: "0",
+      boxShadow: "none",
+    });
+    header.querySelectorAll("#out-name, #out-title, .dynamic-text").forEach((node) => {
+      if (node instanceof HTMLElement) node.style.color = "#ffffff";
+    });
+  }
+
+  if (sideInner instanceof HTMLElement) {
+    paint(sideInner, {
+      gridArea: "side",
+      display: "flex",
+      flexDirection: "column",
+      gap: isNavy ? "1.15rem" : "0.95rem",
+      padding: sidePad,
+      margin: "0",
+      border: "0",
+      borderRadius: "0",
+      minHeight: "100%",
+      height: "100%",
+      alignSelf: "stretch",
+      direction: english ? "ltr" : "rtl",
+      textAlign: english ? "left" : "right",
+      overflow: "hidden",
+    });
+    sideInner.querySelectorAll(".cv-section-title, .cv-contact-row, .cv-contact-link, .cv-skill-badge, .cv-lang-name, .cv-lang-row, #out-skills, #out-languages").forEach((node) => {
+      if (node instanceof HTMLElement) node.style.color = "#ffffff";
+    });
+    const badges = sideInner.querySelector(".cv-skill-badges");
+    if (badges instanceof HTMLElement) {
+      Object.assign(badges.style, {
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "0.4rem",
+        width: "100%",
+      });
+    }
+    sideInner.querySelectorAll(".cv-skill-badge").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      Object.assign(node.style, {
+        color: "#ffffff",
+        background: "rgba(255,255,255,0.14)",
+        border: "1px solid rgba(255,255,255,0.35)",
+        flex: "0 0 auto",
+        whiteSpace: "nowrap",
+      });
+    });
+    sideInner.querySelectorAll(".cv-lang-row").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      Object.assign(node.style, {
+        display: isNavy ? "grid" : "flex",
+        gridTemplateColumns: isNavy ? "1fr auto" : undefined,
+        flexDirection: isNavy ? undefined : "column",
+        alignItems: isNavy ? "center" : undefined,
+        gap: isNavy ? "0.45rem" : "0.28rem",
+        width: "100%",
+        color: "#ffffff",
+      });
+    });
+    sideInner.querySelectorAll(".cv-lang-track").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      Object.assign(node.style, {
+        display: isNavy ? "none" : "block",
+        width: "100%",
+        height: "6px",
+        background: "rgba(255,255,255,0.22)",
+        borderRadius: "999px",
+        overflow: "hidden",
+      });
+    });
+    const contact = sideInner.querySelector(".cv-contact-sidebar");
+    if (contact instanceof HTMLElement) {
+      Object.assign(contact.style, {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.45rem",
+        color: "#ffffff",
+        width: "100%",
+      });
+      // Drop emoji prefixes — rail templates already paint SVG contact icons.
+      contact.querySelectorAll('[id^="out-"]').forEach((slot) => {
+        if (!(slot instanceof HTMLElement)) return;
+        const cleaned = String(slot.textContent || "")
+          .replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\s📞✉️📍🔗]+/u, "")
+          .trim();
+        if (cleaned) slot.textContent = cleaned;
+        else {
+          slot.textContent = "";
+          slot.style.display = "none";
+        }
+      });
+      // Hide empty LinkedIn/website rows (icon-only) in the PDF capture.
+      contact.querySelectorAll(".cv-contact-row").forEach((row) => {
+        if (!(row instanceof HTMLElement)) return;
+        const slot = row.querySelector('[id^="out-"]');
+        const empty =
+          !slot ||
+          (slot instanceof HTMLElement &&
+            (slot.style.display === "none" || !String(slot.textContent || "").trim()));
+        row.classList.toggle("cv-contact-empty", !!empty);
+        row.style.display = empty ? "none" : "";
+        if (empty) row.setAttribute("aria-hidden", "true");
+      });
+    }
+  }
+
+  if (main instanceof HTMLElement) {
+    Object.assign(main.style, {
+      gridArea: "main",
+      background: "#ffffff",
+      color: isNavy ? "#333333" : "#1f2937",
+      direction: english ? "ltr" : "rtl",
+      textAlign: english ? "left" : "right",
+      padding: mainPad,
+      zIndex: "1",
+      minWidth: "0",
+    });
+  }
+}
+
+/** @deprecated Use promotePhotoRailForCapture(..., "cobalt") */
+function promoteCobaltRailForCapture(clone, english) {
+  promotePhotoRailForCapture(clone, english, "cobalt");
 }
 
 function prepareCaptureClone(sourceId = "cv-target") {
@@ -343,11 +774,161 @@ function prepareCaptureClone(sourceId = "cv-target") {
     transform: "none",
     boxShadow: "none",
   });
+  // Keep grid anatomy LTR; place the rail by language (HE right / EN left).
+  const english = clone.classList.contains("cv-lang-en");
+  if (
+    clone.classList.contains("layout-premium") ||
+    clone.classList.contains("layout-charcoal") ||
+    clone.classList.contains("layout-navy") ||
+    clone.classList.contains("layout-azure") ||
+    clone.classList.contains("layout-cobalt") ||
+    clone.classList.contains("layout-sidebar") ||
+    clone.classList.contains("layout-split")
+  ) {
+    clone.style.direction = "ltr";
+  }
+  if (clone.classList.contains("layout-premium")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "30% 70%" : "70% 30%",
+      gridTemplateRows: "auto minmax(0, 1fr)",
+      gridTemplateAreas: english ? '"side head" "side main"' : '"head side" "main side"',
+      columnGap: "0",
+      rowGap: "0",
+      background: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
+    });
+    const paintRail = (el: Element | null, bg: string) => {
+      if (!(el instanceof HTMLElement)) return;
+      el.style.background = bg;
+      el.style.WebkitPrintColorAdjust = "exact";
+      el.style.printColorAdjust = "exact";
+    };
+    const sidebar = clone.querySelector(".cv-sidebar");
+    const { rail, deep } = premiumRailColors(clone);
+    if (sidebar instanceof HTMLElement) {
+      Object.assign(sidebar.style, {
+        gridArea: "side",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        minHeight: "100%",
+        maxHeight: "100%",
+        paddingBottom: "2rem",
+        boxSizing: "border-box",
+        background: rail,
+        color: "#f6f6f6",
+        WebkitPrintColorAdjust: "exact",
+        printColorAdjust: "exact",
+      });
+      const inner = sidebar.querySelector(".cv-sidebar-inner");
+      paintRail(inner, rail);
+      if (inner instanceof HTMLElement) {
+        Object.assign(inner.style, {
+          paddingTop: "0.55rem",
+          paddingLeft: "0.75rem",
+          paddingRight: "0.75rem",
+          paddingBottom: "2.25rem",
+          boxSizing: "border-box",
+          height: "auto",
+          minHeight: "0",
+          maxHeight: "none",
+          flex: "1 1 0",
+        });
+      }
+      paintRail(sidebar.querySelector(".cv-photo-block"), deep);
+      const railPad = sidebar.querySelector(".cv-sidebar-rail-pad");
+      paintRail(railPad, rail);
+      if (railPad instanceof HTMLElement) {
+        Object.assign(railPad.style, {
+          display: "block",
+          flex: "0 0 5rem",
+          flexShrink: "0",
+          height: "5rem",
+          minHeight: "5rem",
+          maxHeight: "5rem",
+          width: "100%",
+        });
+      }
+    }
+    const header = clone.querySelector("#cv-header");
+    if (header instanceof HTMLElement) header.style.gridArea = "head";
+    const main = clone.querySelector(".cv-main");
+    if (main instanceof HTMLElement) {
+      main.style.gridArea = "main";
+      main.style.background = "#ffffff";
+    }
+  } else if (clone.classList.contains("layout-charcoal")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "minmax(0, 0.34fr) minmax(0, 1fr)" : "minmax(0, 1fr) minmax(0, 0.34fr)",
+      gridTemplateRows: "auto 1fr",
+      gridTemplateAreas: english ? '"side head" "side main"' : '"head side" "main side"',
+    });
+  } else if (clone.classList.contains("layout-navy")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "minmax(0, 0.36fr) minmax(0, 0.64fr)" : "minmax(0, 0.64fr) minmax(0, 0.36fr)",
+      gridTemplateRows: "auto auto 1fr",
+      gridTemplateAreas: english
+        ? '"photo main" "head main" "side main"'
+        : '"main photo" "main head" "main side"',
+      background: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
+    });
+    // Same display:contents pitfall as Cobalt — flatten rail for html2canvas.
+    promotePhotoRailForCapture(clone, english, "navy");
+  } else if (clone.classList.contains("layout-cobalt")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english ? "minmax(0, 0.34fr) minmax(0, 0.66fr)" : "minmax(0, 0.66fr) minmax(0, 0.34fr)",
+      gridTemplateRows: "auto auto 1fr",
+      gridTemplateAreas: english
+        ? '"photo main" "head main" "side main"'
+        : '"main photo" "main head" "main side"',
+      background: "#ffffff",
+      WebkitPrintColorAdjust: "exact",
+      printColorAdjust: "exact",
+    });
+    // html2canvas drops most display:contents descendants — promote rail nodes
+    // so photo + contact/skills actually paint into the PDF.
+    promotePhotoRailForCapture(clone, english, "cobalt");
+  } else if (clone.classList.contains("layout-azure")) {
+    Object.assign(clone.style, {
+      direction: "ltr",
+      display: "grid",
+      gridTemplateColumns: english
+        ? "minmax(0, 0.4fr) 1px minmax(0, 1fr)"
+        : "minmax(0, 1fr) 1px minmax(0, 0.4fr)",
+      gridTemplateRows: "auto 1fr",
+      gridTemplateAreas: english
+        ? '"head head head" "side rule main"'
+        : '"head head head" "main rule side"',
+    });
+  } else if (clone.classList.contains("layout-sidebar") || clone.classList.contains("layout-split")) {
+    const cols = clone.querySelector(".cv-columns");
+    if (cols instanceof HTMLElement) {
+      Object.assign(cols.style, {
+        direction: "ltr",
+        display: "grid",
+        gridTemplateColumns: english ? "minmax(0, 0.34fr) minmax(0, 1fr)" : "minmax(0, 1fr) minmax(0, 0.34fr)",
+        gridTemplateAreas: english ? '"side main"' : '"main side"',
+      });
+    }
+  }
   if (!fullBleed && !isSidebarLayout(clone)) {
     clone.style.display = "block";
   }
 
   prepareCaptureRoot(host, window);
+  fitClassicCaptureToOnePage(host);
   lockCaptureSheetHeight(host);
   return host;
 }
@@ -361,36 +942,34 @@ function cleanupCapture() {
   host.removeAttribute("style");
 }
 
+function isAppleTouchDevice() {
+  const ua = navigator.userAgent || "";
+  if (/iP(hone|ad|od)/i.test(ua)) return true;
+  // iPadOS 13+ often reports as Macintosh desktop Safari.
+  if (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1) return true;
+  return false;
+}
+
 function isMobileUa() {
-  return /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || "");
+  if (isAppleTouchDevice()) return true;
+  return /Android|Mobile/i.test(navigator.userAgent || "");
 }
 
 function isIOS() {
-  return /iP(hone|ad|od)/i.test(navigator.userAgent || "");
+  return isAppleTouchDevice();
 }
 
 /**
- * Best-effort PDF download across desktop, Android, and iOS Safari.
- * Prefer Web Share on mobile (saves to Files / opens share sheet);
- * fall back to <a download> + temporary tab open on iOS.
+ * Save PDF via <a download> in the same user-gesture turn when possible.
+ * Never navigator.share here — and never window.open the site/blob as a page.
  */
 async function downloadPdfBlob(blob, filename, pdf) {
   if (!blob || blob.size < 100) throw new Error("empty pdf");
-
-  const file = new File([blob], filename, { type: "application/pdf" });
-  if (isMobileUa() && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: filename });
-      return "shared";
-    } catch (err) {
-      if (err && err.name === "AbortError") return "aborted";
-      /* fall through to classic download */
-    }
-  }
+  const safeName = shareSafeFilename(filename);
 
   if (pdf && typeof pdf.save === "function" && !isIOS()) {
     try {
-      pdf.save(filename);
+      pdf.save(safeName);
       return "saved";
     } catch {
       /* fall through */
@@ -398,25 +977,77 @@ async function downloadPdfBlob(blob, filename, pdf) {
   }
 
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.rel = "noopener";
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
+  try {
+    // iPad/iPhone: the download attribute is unreliable — open the PDF viewer instead.
+    if (isIOS()) {
+      const opened = window.open(url, "_blank");
+      if (!opened) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.type = "application/pdf";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      return "ios-viewer";
+    }
 
-  if (isIOS()) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = safeName;
+    a.rel = "noopener";
+    a.type = "application/pdf";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return "anchor";
+  } catch {
+    throw new Error("pdf-download-failed");
+  } finally {
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  }
+}
+
+/** Share ONLY the PDF file (no title/text/url — those make iOS attach the page link). */
+export async function sharePdfFileOnly(blob, filename) {
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+  const safeName = shareSafeFilename(filename);
+  const file = new File([blob], safeName, { type: "application/pdf" });
+  if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
     try {
-      window.open(url, "_blank", "noopener");
-    } catch {
-      /* Safari may block without a gesture — green button remains. */
+      await navigator.share({ files: [file] });
+      return "shared";
+    } catch (err) {
+      if (err && err.name === "AbortError") throw err;
+      // NotAllowedError / InvalidStateError → fall through to viewer/download.
     }
   }
+  await downloadPdfBlob(blob, safeName, null);
+  return "download-fallback";
+}
 
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 12000);
-  return "anchor";
+/** Immediate save helper for a fresh tap after the PDF was prepared. */
+export async function savePdfFileOnly(blob, filename) {
+  if (!blob || blob.size < 100) throw new Error("empty pdf");
+  const safeName = shareSafeFilename(filename);
+  // On iOS, Save to Files lives in the share sheet — but still files-only.
+  if (isIOS()) {
+    try {
+      return await sharePdfFileOnly(blob, safeName);
+    } catch (err) {
+      if (err && err.name === "AbortError") return "aborted";
+      try {
+        return await downloadPdfBlob(blob, safeName, null);
+      } catch {
+        throw err;
+      }
+    }
+  }
+  return downloadPdfBlob(blob, safeName, null);
 }
 
 function isMostlyBlankRow(data, width, y) {
@@ -434,6 +1065,8 @@ function isMostlyBlankRow(data, width, y) {
 
 function findSplitY(canvas, idealY, minY) {
   if (idealY >= canvas.height) return canvas.height;
+  // getImageData on large canvases can freeze mobile Safari for tens of seconds.
+  if (isMobileUa()) return idealY;
   const ctx = canvas.getContext("2d");
   const { width } = canvas;
   const search = Math.min(90, Math.max(0, idealY - minY));
@@ -528,8 +1161,9 @@ function clampCanvasToPageBounds(canvas) {
     return canvas;
   }
   const overflow = canvas.height - pagePxH;
-  // Anything under ~10% of a page is almost always capture bleed / sidebar stub.
-  if (overflow <= Math.ceil(pagePxH * 0.1)) {
+  // Crop larger stubs too when the overflow is only a sidebar fragment / blank margin.
+  const softLimit = Math.ceil(pagePxH * 0.22);
+  if (overflow <= softLimit || isCanvasRegionBlank(canvas, pagePxH, overflow) || isSidebarStubSlice(canvas, pagePxH, overflow)) {
     const cropped = document.createElement("canvas");
     cropped.width = canvas.width;
     cropped.height = pagePxH;
@@ -542,6 +1176,32 @@ function clampCanvasToPageBounds(canvas) {
   return canvas;
 }
 
+/** True when leftover pixels are only a dark sidebar strip (blank stub page 2). */
+function isSidebarStubSlice(canvas, y0, height) {
+  const h = Math.min(canvas.height - y0, Math.max(0, Math.ceil(height)));
+  if (h <= 0) return true;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return false;
+  const { width } = canvas;
+  const data = ctx.getImageData(0, Math.max(0, Math.floor(y0)), width, h).data;
+  const sideW = Math.ceil(width * 0.34);
+  let inkSide = 0;
+  let inkMid = 0;
+  for (let row = 0; row < h; row += 2) {
+    for (let x = 0; x < width; x += 3) {
+      const i = (row * width + x) * 4;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      if (r > 245 && g > 245 && b > 245) continue;
+      if (x < sideW || x >= width - sideW) inkSide += 1;
+      else inkMid += 1;
+      if (inkMid > 35) return false;
+    }
+  }
+  return inkMid <= 35 && inkSide >= 0;
+}
+
 function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
   const marginMm = opts.marginMm ?? 0;
   const startNewPage = !!opts.startNewPage;
@@ -552,21 +1212,44 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
   const pagePxH = Math.floor(usableH * pxPerMm);
   const sx = source.width / Math.max(1, hostWidth);
   const sy = source.height / Math.max(1, hostHeight);
+
+  const pushJpeg = (imgCanvas, sliceMm, linkY0, linkY1) => {
+    pdf.addImage(
+      imgCanvas.toDataURL("image/jpeg", 0.9),
+      "JPEG",
+      marginMm,
+      marginMm,
+      usableW,
+      sliceMm,
+      undefined,
+      "FAST",
+    );
+    overlayPdfLinks(pdf, links, linkY0, linkY1, sx, sy, pxPerMm, marginMm);
+  };
+
+  /* Single A4 sheet — skip blank-row scanning and extra canvas copies. */
+  if (!startNewPage && source.height <= pagePxH + 2) {
+    pushJpeg(source, Math.min(usableH, source.height / pxPerMm), 0, source.height);
+    return;
+  }
+
   let y = 0;
   let first = !startNewPage;
   const totalH = source.height;
 
   while (y < totalH - 1) {
     const remaining = totalH - y;
-    // Never create a near-empty trailing page from leftover pixels.
     if (y > 0 && remaining < pagePxH * 0.1) break;
     if (remaining < Math.max(10, pagePxH * 0.03) && isCanvasRegionBlank(source, y, remaining)) {
+      break;
+    }
+    // Drop blank / sidebar-fragment continuation pages.
+    if (y > 0 && (isCanvasRegionBlank(source, y, remaining) || isSidebarStubSlice(source, y, remaining))) {
       break;
     }
     let next = Math.min(totalH, y + pagePxH);
     if (next < totalH) {
       next = findSplitY(source, next, y + Math.floor(pagePxH * 0.55));
-      // If the split would leave only a stub, absorb into this page / stop.
       if (totalH - next < pagePxH * 0.1) next = totalH;
     }
     const sliceH = Math.max(1, next - y);
@@ -580,22 +1263,11 @@ function addCanvasPages(pdf, canvas, links, hostWidth, hostHeight, opts = {}) {
     const ctx = slice.getContext("2d");
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, slice.width, slice.height);
-    ctx.drawImage(source, 0, y, source.width, sliceH, 0, 0, slice.width, sliceH);
+    ctx.drawImage(source, 0, y, source.width, sliceH, 0, 0, source.width, sliceH);
 
     if (!first) pdf.addPage();
     first = false;
-    const sliceMm = Math.min(usableH, sliceH / pxPerMm);
-    pdf.addImage(
-      slice.toDataURL("image/jpeg", 0.995),
-      "JPEG",
-      marginMm,
-      marginMm,
-      usableW,
-      sliceMm,
-      undefined,
-      "SLOW",
-    );
-    overlayPdfLinks(pdf, links, y, y + sliceH, sx, sy, pxPerMm, marginMm);
+    pushJpeg(slice, Math.min(usableH, sliceH / pxPerMm), y, y + sliceH);
     y += sliceH;
   }
 }
@@ -622,81 +1294,103 @@ async function captureToCanvas(el) {
   }
 
   try {
-    await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    fitClassicCaptureToOnePage(el);
     lockCaptureSheetHeight(el);
     let linkMeta = measureLinks(el);
     const sheet = el.querySelector?.(".cv-print-sheet");
+    const premium = sheet instanceof HTMLElement && sheet.classList.contains("layout-premium");
     const lockedH =
       sheet instanceof HTMLElement ? Math.ceil(parseFloat(sheet.style.height) || sheet.offsetHeight || 0) : 0;
     const width = Math.max(A4_CSS_PX, Math.ceil(el.offsetWidth || el.scrollWidth || A4_CSS_PX));
-    // Prefer the locked sheet height so overflow:hidden one-pagers don't grow a stub page.
-    const height = Math.max(
-      A4_CSS_H,
-      lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
-    );
-    // Prefer print-like DPI; keep mobile under memory limits.
-    const dpr = Math.min(window.devicePixelRatio || 1, isMobileUa() ? 2.25 : 3);
-    // Floor scale for crisp text; true vector export would rewrite the pipeline.
-    const scale = Math.min(Math.max(dpr, isMobileUa() ? 2 : 2.75), MAX_CANVAS / width, MAX_CANVAS / height);
+    const height = premium
+      ? A4_CSS_H
+      : Math.max(
+          A4_CSS_H,
+          lockedH || Math.ceil(el.offsetHeight || el.scrollHeight || 1),
+        );
+    // ~150–160 DPI is enough for crisp A4 resumes; higher scale makes export feel stuck.
+    // iPad Safari is especially memory-sensitive — keep scale lower there.
+    const mobile = isMobileUa();
+    const apple = isAppleTouchDevice();
+    const scale = Math.min(apple ? 1.25 : mobile ? 1.5 : 2, MAX_CANVAS / width, MAX_CANVAS / height);
 
-    const canvas = await html2canvas(el, {
-      scale: Math.max(isMobileUa() ? 2 : 2.5, scale),
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: "#ffffff",
-      logging: false,
-      width,
-      height,
-      windowWidth: Math.max(width, A4_CSS_PX),
-      windowHeight: Math.max(height, A4_CSS_H),
-      scrollX: 0,
-      scrollY: 0,
-      imageTimeout: 15000,
-      onclone: (doc) => {
-        doc.documentElement.setAttribute("dir", "ltr");
-        doc.documentElement.style.direction = "ltr";
-        doc.documentElement.classList.add("qc-exporting");
-        copyCssVars(document.documentElement, doc.documentElement);
-        const host = doc.getElementById("qc-print-host");
-        if (host instanceof HTMLElement) {
-          host.classList.add("qc-capturing");
-          host.setAttribute("dir", cvCaptureDir());
-          Object.assign(host.style, {
-            display: "block",
-            position: "static",
-            left: "auto",
-            top: "auto",
-            width: A4_CSS_PX + "px",
-            minWidth: A4_CSS_PX + "px",
-            maxWidth: A4_CSS_PX + "px",
-            height: "auto",
-            minHeight: A4_CSS_H + "px",
-            maxHeight: "none",
-            padding: "0",
-            margin: "0",
-            background: "#ffffff",
-            overflow: "visible",
-            transform: "none",
-            direction: cvCaptureDir(),
-          });
-          const sheet = host.querySelector(".cv-print-sheet");
-          if (sheet instanceof HTMLElement) {
-            const fullBleed = isFullBleedLayout(sheet) || isSidebarLayout(sheet);
-            sheet.style.minHeight = A4_CSS_H + "px";
-            sheet.style.height = A4_CSS_H + "px";
-            sheet.style.maxHeight = "none";
-            sheet.style.overflow = fullBleed ? "hidden" : "visible";
-            sheet.style.transform = "none";
-            if (fullBleed) sheet.style.padding = "0";
+    const canvas = await withTimeout(
+      html2canvas(el, {
+        scale,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#ffffff",
+        logging: false,
+        width,
+        height,
+        windowWidth: Math.max(width, A4_CSS_PX),
+        windowHeight: Math.max(height, A4_CSS_H),
+        scrollX: 0,
+        scrollY: 0,
+        imageTimeout: 6000,
+        onclone: (doc) => {
+          doc.documentElement.setAttribute("dir", "ltr");
+          doc.documentElement.style.direction = "ltr";
+          doc.documentElement.classList.add("qc-exporting");
+          copyCssVars(document.documentElement, doc.documentElement);
+          const host = doc.getElementById("qc-print-host");
+          if (host instanceof HTMLElement) {
+            host.classList.add("qc-capturing");
+            host.setAttribute("dir", cvCaptureDir());
+            Object.assign(host.style, {
+              display: "block",
+              position: "static",
+              left: "auto",
+              top: "auto",
+              width: A4_CSS_PX + "px",
+              minWidth: A4_CSS_PX + "px",
+              maxWidth: A4_CSS_PX + "px",
+              height: "auto",
+              minHeight: A4_CSS_H + "px",
+              maxHeight: "none",
+              padding: "0",
+              margin: "0",
+              background: "#ffffff",
+              overflow: "visible",
+              transform: "none",
+              direction: cvCaptureDir(),
+            });
+            const sheet = host.querySelector(".cv-print-sheet");
+            if (sheet instanceof HTMLElement) {
+              const fullBleed = isFullBleedLayout(sheet) || isSidebarLayout(sheet);
+              const premium = sheet.classList.contains("layout-premium");
+              sheet.style.minHeight = A4_CSS_H + "px";
+              sheet.style.height = A4_CSS_H + "px";
+              sheet.style.maxHeight = premium || fullBleed ? A4_CSS_H + "px" : "none";
+              sheet.style.overflow = fullBleed || premium ? "hidden" : "visible";
+              sheet.style.transform = "none";
+              if (fullBleed || premium) sheet.style.padding = "0";
+              if (premium) {
+                host.style.height = A4_CSS_H + "px";
+                host.style.maxHeight = A4_CSS_H + "px";
+                host.style.overflow = "hidden";
+              }
+            }
+            prepareCaptureRoot(host, doc.defaultView);
+            lockCaptureSheetHeight(host);
+            if (sheet instanceof HTMLElement && sheet.classList.contains("layout-premium")) {
+              sheet.style.height = A4_CSS_H + "px";
+              sheet.style.maxHeight = A4_CSS_H + "px";
+              sheet.style.overflow = "hidden";
+              host.style.height = A4_CSS_H + "px";
+              host.style.maxHeight = A4_CSS_H + "px";
+              host.style.overflow = "hidden";
+              ensurePremiumSidebarFooter(sheet);
+            }
+            const cloned = measureLinks(host);
+            if (cloned.links.length) linkMeta = cloned;
           }
-          prepareCaptureRoot(host, doc.defaultView);
-          lockCaptureSheetHeight(host);
-          const cloned = measureLinks(host);
-          if (cloned.links.length) linkMeta = cloned;
-        }
-      },
-    });
+        },
+      }),
+      40000,
+      "pdf-capture-timeout",
+    );
     return { canvas, ...linkMeta };
   } finally {
     if (prevDir == null) html.removeAttribute("dir");
@@ -705,15 +1399,9 @@ async function captureToCanvas(el) {
   }
 }
 
-export async function exportHighResPdf(opts = {}) {
-  if (!isUnlocked()) {
-    throw new Error("payment required");
-  }
-  if (window.__qcPdfBusy) {
-    return;
-  }
-  const download = opts.download !== false;
+let exportJob = null;
 
+async function buildHighResPdf() {
   document.getElementById("cv-preview-wrapper")?.classList.add("paid");
   document.body.classList.add("paid");
   document.documentElement.classList.add("qc-paid");
@@ -725,20 +1413,23 @@ export async function exportHighResPdf(opts = {}) {
   }
 
   setSpinner(true);
+  const hardLimit = setTimeout(() => {
+    if (window.__qcPdfBusy) setSpinner(false);
+  }, 60000);
   const host = prepareCaptureClone();
   if (!host) {
+    clearTimeout(hardLimit);
     setSpinner(false);
     throw new Error("missing cv-target");
   }
 
   try {
-    if (document.fonts?.ready) await document.fonts.ready;
     await waitForCvFonts();
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    fitClassicCaptureToOnePage(host);
     lockCaptureSheetHeight(host);
 
-    const captured = await captureToCanvas(host);
+    const captured = await withTimeout(captureToCanvas(host), 40000, "pdf-export-timeout");
     const canvas = captured.canvas;
     if (!canvas.width || !canvas.height) throw new Error("empty canvas");
 
@@ -761,7 +1452,7 @@ export async function exportHighResPdf(opts = {}) {
       window.QCCoverLetter.render?.();
       const letterHost = prepareCaptureClone("cl-target");
       if (letterHost) {
-        const letterCap = await captureToCanvas(letterHost);
+        const letterCap = await withTimeout(captureToCanvas(letterHost), 25000, "pdf-letter-timeout");
         if (letterCap.canvas?.width) {
           addCanvasPages(pdf, letterCap.canvas, letterCap.links, letterCap.width, letterCap.height, {
             marginMm: 0,
@@ -774,17 +1465,47 @@ export async function exportHighResPdf(opts = {}) {
     const filename = fileBase() + ".pdf";
     const blob = pdf.output("blob");
     if (!blob || blob.size < 100) throw new Error("empty pdf");
-    if (download) {
-      await downloadPdfBlob(blob, filename, pdf);
-    }
+
+    // Drop overlay BEFORE share/download so the system sheet is usable on phones.
+    cleanupCapture();
+    setSpinner(false);
+    clearTimeout(hardLimit);
+
     return { blob, filename };
+  } catch (err) {
+    cleanupCapture();
+    setSpinner(false);
+    throw err;
   } finally {
+    clearTimeout(hardLimit);
     cleanupCapture();
     setSpinner(false);
   }
+}
+
+export async function exportHighResPdf(opts = {}) {
+  if (!isUnlocked()) {
+    throw new Error("payment required");
+  }
+  const download = opts.download !== false;
+
+  // Coalesce concurrent taps: wait for the in-flight capture instead of returning empty.
+  if (!exportJob) {
+    exportJob = buildHighResPdf().finally(() => {
+      exportJob = null;
+    });
+  }
+
+  const result = await exportJob;
+  if (download && result?.blob) {
+    await downloadPdfBlob(result.blob, result.filename, null);
+  }
+  return result;
 }
 
 window.QCHighResPdf = async function gatedHighResPdf() {
   if (!isUnlocked()) throw new Error("payment required");
   return exportHighResPdf();
 };
+
+export { isAppleTouchDevice, isIOS, isMobileUa };

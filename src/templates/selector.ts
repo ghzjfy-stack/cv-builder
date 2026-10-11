@@ -4,6 +4,7 @@ import {
   TEMPLATES,
   TEMPLATE_ORDER,
   registerQcTemplates,
+  resolveTemplateId,
   type CvTemplate,
 } from "../data/templates";
 import { badgeHtml, badgeOf, homeThumbHtml, thumbHtml } from "./thumbs";
@@ -37,14 +38,7 @@ function subOf(tpl: CvTemplate): string {
   return lang() === "en" ? tpl.subEn || tpl.subHe : tpl.subHe || tpl.subEn;
 }
 
-const RETIRED_LAYOUTS = new Set(["azure", "classic", "minimal", "compact", "modern", "executive"]);
-
-function isListed(tpl: CvTemplate): boolean {
-  return !RETIRED_LAYOUTS.has(tpl.layout);
-}
-
 function matchesFilters(tpl: CvTemplate): boolean {
-  if (!isListed(tpl)) return false;
   if (filters.category === "all") return true;
   if (filters.category === "ats") return !!tpl.atsOptimized;
   if (tpl.category === filters.category) return true;
@@ -94,10 +88,13 @@ function updateCountCopy(_n: number): void {
 }
 
 function markSelected(key: string): void {
+  key = key ? resolveTemplateId(key) : "";
   (window as Window & { QCExample?: string }).QCExample = key || "";
   document.querySelectorAll(".template-card[data-example]").forEach((el) => {
     el.setAttribute("aria-pressed", el.getAttribute("data-example") === key ? "true" : "false");
   });
+  const sync = (window as Window & { syncPhotoFieldVisibility?: () => void }).syncPhotoFieldVisibility;
+  if (typeof sync === "function") sync();
 }
 
 export function renderTemplateGalleries(): void {
@@ -114,16 +111,16 @@ export function renderTemplateGalleries(): void {
     if (isModal) {
       el.innerHTML = list.length ? cards : empty;
     } else {
-      const studioList = TEMPLATE_ORDER.map((id) => TEMPLATES[id]).filter((t): t is CvTemplate => !!t && isListed(t));
+      const studioList = TEMPLATE_ORDER.map((id) => TEMPLATES[id]).filter(Boolean) as CvTemplate[];
       el.innerHTML = studioList.map(cardHtml).join("");
     }
   });
 
   const home = document.querySelector("[data-home-templates]");
   if (home) {
-    const featured = TEMPLATE_ORDER.map((id) => TEMPLATES[id])
-      .filter((t): t is CvTemplate => !!t && isListed(t))
-      .slice(0, 8);
+    const featured = TEMPLATE_ORDER.slice(0, 8)
+      .map((id) => TEMPLATES[id])
+      .filter(Boolean) as CvTemplate[];
     home.innerHTML = featured
       .map(
         (tpl) =>
@@ -228,13 +225,8 @@ function applyDesign(tpl: CvTemplate): void {
 }
 
 function applyTemplate(key: string): void {
-  const aliases = (window as Window & { TEMPLATE_ALIASES?: Record<string, string> }).TEMPLATE_ALIASES || {};
-  if (aliases[key]) key = aliases[key];
-  let tpl = TEMPLATES[key] || ((window as Window & { QCTemplates?: Record<string, CvTemplate> }).QCTemplates || {})[key];
-  if (tpl && RETIRED_LAYOUTS.has(tpl.layout)) {
-    key = "lagoon";
-    tpl = TEMPLATES.lagoon;
-  }
+  key = resolveTemplateId(key);
+  const tpl = TEMPLATES[key] || ((window as Window & { QCTemplates?: Record<string, CvTemplate> }).QCTemplates || {})[key];
   if (!tpl) return;
 
   const fromHome = document.body.classList.contains("on-home");

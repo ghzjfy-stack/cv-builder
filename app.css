@@ -269,6 +269,12 @@
         .preview-accent-strip .custom-accent-input::-webkit-color-swatch {
             border-radius: 999px;
         }
+        .preview-accent-reset {
+            margin-top: 0;
+            margin-inline-start: 0.2rem;
+            font-size: 0.68rem;
+            flex: 0 0 auto;
+        }
         body:not(.qc-studio-step-2) .preview-accent-strip {
             display: none !important;
         }
@@ -323,8 +329,8 @@
             /* One fixed A4 sheet: 210mm × 297mm. */
             aspect-ratio: 1 / 1.414;
             width: 100%;
-            height: 100%;
-            min-height: 297mm;
+            height: auto;
+            min-height: 0;
             max-height: none;
             padding: 0 !important;
             background-color: #fff;
@@ -356,11 +362,9 @@
         #cv-preview-wrapper:has(.layout-charcoal),
         #cv-preview-wrapper:has(.layout-navy),
         #cv-preview-wrapper:has(.layout-azure),
-        #cv-preview-wrapper:has(.layout-banner),
         #cv-preview-page-2:has(.layout-charcoal),
         #cv-preview-page-2:has(.layout-navy),
-        #cv-preview-page-2:has(.layout-azure),
-        #cv-preview-page-2:has(.layout-banner) {
+        #cv-preview-page-2:has(.layout-azure) {
             padding: 0 !important;
         }
         #cv-preview-wrapper #cv-target,
@@ -379,7 +383,9 @@
         #cv-preview-wrapper #cv-target.layout-split,
         #cv-preview-wrapper #cv-target.layout-charcoal,
         #cv-preview-wrapper #cv-target.layout-azure,
-        #cv-preview-wrapper #cv-target.layout-navy {
+        #cv-preview-wrapper #cv-target.layout-navy,
+        #cv-preview-wrapper #cv-target.layout-premium,
+        #cv-preview-wrapper #cv-target.layout-cobalt {
             box-sizing: border-box;
             width: 100%;
             max-width: 100%;
@@ -1439,6 +1445,12 @@
             gap: 1rem;
             direction: rtl;
         }
+        html[lang="en"] .home-steps,
+        html[lang="en"] .home-cards,
+        html[dir="ltr"] .home-steps,
+        html[dir="ltr"] .home-cards {
+            direction: ltr;
+        }
         .home-step,
         .home-card,
         .home-quote {
@@ -1447,6 +1459,7 @@
             border-radius: 0.9rem;
             padding: 1.35rem 1.25rem;
             box-shadow: none;
+            text-align: start;
         }
         .home-step-num {
             display: inline-block;
@@ -1463,11 +1476,15 @@
             font-weight: 700;
             margin-bottom: 0.35rem;
             color: #f4f7fb;
+            text-align: start;
+            unicode-bidi: plaintext;
         }
         .home-step p {
             font-size: 0.9rem;
             line-height: 1.7;
             color: #cbd5e1;
+            text-align: start;
+            unicode-bidi: plaintext;
         }
         .home-card p,
         .home-quote p {
@@ -1648,7 +1665,14 @@
         }
         @media (min-width: 640px) {
             .home-band-row { grid-template-columns: repeat(3, 1fr); }
-            .home-steps { grid-template-columns: repeat(3, 1fr); direction: rtl; }
+            .home-steps {
+                grid-template-columns: repeat(3, 1fr);
+                direction: rtl;
+            }
+            html[lang="en"] .home-steps,
+            html[dir="ltr"] .home-steps {
+                direction: ltr;
+            }
             .home-ats-logos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
             .pay-packs { grid-template-columns: 1fr 1fr; }
             .home-ba-section .ba-compare {
@@ -1743,9 +1767,9 @@
         .dynamic-icon { color: var(--accent); }
 
         /* Candidate name stays classic dark ink — accent is for headers, rules, icons, skills. */
-        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-banner) #out-name,
-        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-banner) #out-name,
-        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-banner) #out-name,
+        #cv-target:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-cobalt) #out-name,
+        #cv-target-page2:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-cobalt) #out-name,
+        #qc-print-host .cv-print-sheet:not(.layout-navy):not(.layout-charcoal):not(.layout-executive):not(.layout-cobalt) #out-name,
         #cl-target #cl-out-name {
             color: #1e293b;
         }
@@ -1831,6 +1855,16 @@
             align-items: flex-start;
             gap: 0.4rem;
         }
+        /* Empty LinkedIn/website must stay hidden even when a layout forces display:flex !important */
+        #cv-target .cv-contact-row.cv-contact-empty,
+        #cv-target-page2 .cv-contact-row.cv-contact-empty,
+        #qc-print-host .cv-print-sheet .cv-contact-row.cv-contact-empty,
+        .layout-navy .cv-contact-row.cv-contact-empty,
+        .layout-charcoal .cv-contact-row.cv-contact-empty,
+        .layout-premium .cv-contact-row.cv-contact-empty,
+        .layout-cobalt .cv-contact-row.cv-contact-empty {
+            display: none !important;
+        }
         #cv-target .cv-contact-row > span:last-child,
         #cv-target .cv-contact-link,
         #cv-target-page2 .cv-contact-row > span:last-child,
@@ -1867,13 +1901,13 @@
         }
         #cv-target .cv-columns,
         #cv-target .cv-main,
-        #cv-target:not(.layout-charcoal) .cv-sidebar,
+        #cv-target:not(.layout-charcoal):not(.layout-premium):not(.layout-cobalt) .cv-sidebar,
         #cv-target-page2 .cv-columns,
         #cv-target-page2 .cv-main,
-        #cv-target-page2:not(.layout-charcoal) .cv-sidebar,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-premium):not(.layout-cobalt) .cv-sidebar,
         #qc-print-host .cv-columns,
         #qc-print-host .cv-main,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal) .cv-sidebar {
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-premium):not(.layout-cobalt) .cv-sidebar {
             gap: calc(var(--section-gap, 0.85rem) * var(--space-fit, 1));
         }
         #cv-target #cv-header,
@@ -1895,18 +1929,18 @@
         #qc-print-host .whitespace-pre-line {
             line-height: var(--line-height, var(--cv-leading));
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > .cv-columns,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > .cv-columns,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > .cv-columns {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > .cv-columns,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > .cv-columns {
             padding-inline: 1.35rem;
             box-sizing: border-box;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) > #cv-header {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) > #cv-header {
             padding-top: 1.15rem;
         }
         #cv-target .cv-job,
@@ -1969,6 +2003,92 @@
             line-height: 1.4;
             color: #475569;
         }
+        /* Experience employer — distinct from title above and bullets below */
+        #cv-target .cv-job > .cv-job-company,
+        #cv-target-page2 .cv-job > .cv-job-company,
+        #qc-print-host .cv-job > .cv-job-company,
+        #cv-target .cv-job-body > .cv-job-company,
+        #cv-target-page2 .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-job-body > .cv-job-company {
+            display: block;
+            margin: 0.14rem 0 0.45rem;
+            padding: 0 0 0.18rem;
+            font-weight: 700;
+            font-size: calc(0.88rem * var(--cv-scale));
+            line-height: 1.35;
+            color: #0f172a;
+            letter-spacing: 0.012em;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.45);
+        }
+
+        /* Per-layout company headings (all templates) */
+        .layout-classic .cv-job > .cv-job-company,
+        .layout-classic .cv-job-body > .cv-job-company,
+        .layout-sidebar .cv-job > .cv-job-company,
+        .layout-sidebar .cv-job-body > .cv-job-company,
+        .layout-split .cv-job > .cv-job-company,
+        .layout-split .cv-job-body > .cv-job-company {
+            font-weight: 700;
+            font-size: calc(0.9rem * var(--cv-scale));
+            color: #0f172a;
+            margin: 0.14rem 0 0.42rem;
+            padding: 0 0 0.16rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+            line-height: 1.35;
+        }
+        .layout-charcoal .cv-job > .cv-job-company,
+        .layout-charcoal .cv-job-body > .cv-job-company,
+        #cv-target.layout-charcoal .cv-job > .cv-job-company,
+        #cv-target.layout-charcoal .cv-job-body > .cv-job-company,
+        #cv-target-page2.layout-charcoal .cv-job > .cv-job-company,
+        #cv-target-page2.layout-charcoal .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-job > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-charcoal .cv-job-body > .cv-job-company {
+            font-weight: 700 !important;
+            font-size: calc(0.82rem * var(--cv-scale)) !important;
+            color: #2f2f2f !important;
+            margin: 0.1rem 0 0.4rem !important;
+            padding: 0 0 0.14rem !important;
+            line-height: 1.35 !important;
+            letter-spacing: 0.01em;
+            border-bottom: 1px solid rgba(80, 80, 80, 0.22);
+        }
+        .layout-navy .cv-job > .cv-job-company,
+        .layout-navy .cv-job-body > .cv-job-company,
+        #cv-target.layout-navy .cv-job > .cv-job-company,
+        #cv-target.layout-navy .cv-job-body > .cv-job-company,
+        #cv-target-page2.layout-navy .cv-job > .cv-job-company,
+        #cv-target-page2.layout-navy .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-navy .cv-job > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-navy .cv-job-body > .cv-job-company {
+            font-weight: 700 !important;
+            font-size: calc(0.84rem * var(--cv-scale)) !important;
+            color: var(--navy, #12192b) !important;
+            margin: 0.12rem 0 0.42rem !important;
+            padding: 0 0 0.16rem !important;
+            line-height: 1.35 !important;
+            letter-spacing: 0.01em;
+            /* rgba — html2canvas cannot parse color-mix()/color(srgb…) and aborts Navy PDF export */
+            border-bottom: 1px solid rgba(18, 25, 43, 0.18);
+        }
+        .layout-azure .cv-job > .cv-job-company,
+        .layout-azure .cv-job-body > .cv-job-company,
+        #cv-target.layout-azure .cv-job > .cv-job-company,
+        #cv-target.layout-azure .cv-job-body > .cv-job-company,
+        #cv-target-page2.layout-azure .cv-job > .cv-job-company,
+        #cv-target-page2.layout-azure .cv-job-body > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-azure .cv-job > .cv-job-company,
+        #qc-print-host .cv-print-sheet.layout-azure .cv-job-body > .cv-job-company {
+            font-weight: 700 !important;
+            font-size: calc(0.86rem * var(--cv-scale)) !important;
+            color: #1e293b !important;
+            margin: 0.12rem 0 0.42rem !important;
+            padding: 0 0 0.16rem !important;
+            line-height: 1.35 !important;
+            border-bottom: 1px solid rgba(90, 90, 90, 0.22);
+        }
         #cv-target .cv-edu-item,
         #cv-target-page2 .cv-edu-item,
         #qc-print-host .cv-edu-item,
@@ -1993,6 +2113,7 @@
         .layout-azure .cv-edu-item .cv-job-head,
         .layout-sidebar .cv-edu-item .cv-job-head,
         .layout-split .cv-edu-item .cv-job-head,
+        .layout-premium .cv-edu-item .cv-job-head,
         .layout-classic .cv-edu-item .cv-job-head,
         .layout-minimal .cv-edu-item .cv-job-head,
         .layout-modern .cv-edu-item .cv-job-head,
@@ -2389,21 +2510,23 @@
             text-align: left !important;
             unicode-bidi: isolate;
         }
-        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner),
-        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) {
+        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt),
+        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) {
             display: flex;
             flex-direction: column;
         }
-        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) .cv-columns,
-        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-banner) .cv-columns {
+        #cv-preview-wrapper #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) .cv-columns,
+        #cv-preview-page-2 #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-azure):not(.layout-premium):not(.layout-cobalt) .cv-columns {
             flex: 1 1 auto;
             min-height: 0;
             align-items: stretch;
         }
         #cv-preview-wrapper .layout-sidebar .cv-sidebar,
         #cv-preview-wrapper .layout-split .cv-sidebar,
+        #cv-preview-wrapper .layout-premium .cv-sidebar,
         #cv-preview-page-2 .layout-sidebar .cv-sidebar,
-        #cv-preview-page-2 .layout-split .cv-sidebar {
+        #cv-preview-page-2 .layout-split .cv-sidebar,
+        #cv-preview-page-2 .layout-premium .cv-sidebar {
             align-self: stretch;
             height: 100%;
             min-height: 100%;
@@ -2589,6 +2712,92 @@
             opacity: 0 !important;
             pointer-events: none !important;
         }
+        #skill-picker {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .skill-picker-controls {
+            display: flex;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        .skill-pick-input,
+        #skill-pick-input {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .skill-pick-add-btn,
+        #skill-pick-add {
+            flex: 0 0 auto;
+            white-space: nowrap;
+            min-height: 2.75rem;
+            padding: 0.55rem 1.1rem;
+            border-radius: 0.7rem;
+            border: 1px solid #0284c7;
+            background: #0284c7;
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .skill-pick-add-btn:hover,
+        #skill-pick-add:hover {
+            background: #0369a1;
+            border-color: #0369a1;
+        }
+        .skill-pick-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+            min-height: 0.25rem;
+        }
+        .skill-pick-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            max-width: 100%;
+            padding: 0.28rem 0.35rem 0.28rem 0.55rem;
+            border-radius: 999px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+        }
+        .skill-pick-chip-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .skill-pick-remove {
+            flex: 0 0 auto;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 0;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.18);
+            color: #e2e8f0;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .skill-pick-remove:hover {
+            background: rgba(248, 113, 113, 0.28);
+            color: #fecaca;
+        }
+        @media (max-width: 420px) {
+            .skill-picker-controls {
+                flex-wrap: wrap;
+            }
+            .skill-pick-add-btn,
+            #skill-pick-add {
+                width: 100%;
+            }
+        }
+
         .lang-pick-add-btn,
         #lang-pick-add {
             flex: 0 0 auto;
@@ -2731,25 +2940,32 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+            gap: 0.35rem;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
         }
         .cv-skill-badge {
             display: inline-block;
-            padding: 0.25rem 0.625rem;
-            margin: 0.125rem;
-            border-radius: 0.25rem;
-            font-size: calc(0.75rem * var(--cv-scale));
+            padding: 0.22rem 0.55rem;
+            margin: 0;
+            border-radius: 0.3rem;
+            font-size: calc(0.72rem * var(--cv-scale));
+            font-weight: 500;
             line-height: 1.35;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             unicode-bidi: isolate;
             overflow-wrap: anywhere;
             word-break: break-word;
+            max-width: 100%;
         }
-        #cv-target:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge,
-        #cv-target-page2:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge,
-        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy) .cv-skill-badge {
+        #cv-target:not(.layout-charcoal):not(.layout-navy):not(.layout-premium):not(.layout-cobalt) .cv-skill-badge,
+        #cv-target-page2:not(.layout-charcoal):not(.layout-navy):not(.layout-premium):not(.layout-cobalt) .cv-skill-badge,
+        #qc-print-host .cv-print-sheet:not(.layout-charcoal):not(.layout-navy):not(.layout-premium):not(.layout-cobalt) .cv-skill-badge {
             background: rgba(15, 23, 42, 0.06);
-            border-color: rgba(148, 163, 184, 0.35);
+            border-color: rgba(148, 163, 184, 0.4);
+            color: #1e293b;
         }
 
         .cv-ref-item {
@@ -2772,7 +2988,6 @@
         .cv-columns { display: flex; flex-direction: column; gap: calc(1rem * var(--cv-scale)); }
         .cv-sidebar, .cv-main { display: flex; flex-direction: column; gap: calc(0.9rem * var(--cv-scale)); }
         .cv-contact-sidebar { display: none; }
-        .layout-classic .cv-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
         .layout-sidebar .cv-columns {
             display: grid;
@@ -2808,14 +3023,96 @@
 
         .layout-classic #cv-header { text-align: center; }
         .layout-classic .cv-contact-header { justify-content: center; }
-        .layout-classic .cv-job { margin-bottom: 1rem; }
+        .layout-classic .cv-col-rule { display: none !important; }
+        .layout-classic .cv-sidebar {
+            display: none !important;
+        }
+        .layout-classic .cv-main {
+            display: flex;
+            flex-direction: column;
+            gap: calc(0.85rem * var(--cv-scale) * var(--space-fit, 1));
+            width: 100%;
+            max-width: 100%;
+        }
+        .layout-classic #sec-skills,
+        .layout-classic #sec-languages,
+        .layout-classic #sec-references,
+        .layout-classic #sec-summary,
+        .layout-classic #sec-experience,
+        .layout-classic #sec-education,
+        .layout-classic #sec-military {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+        .layout-classic .cv-ats-plain,
+        .layout-classic #out-languages,
+        .layout-classic #out-references {
+            color: #334155;
+            font-size: calc(0.8rem * var(--cv-scale));
+            line-height: 1.5;
+            margin: 0;
+        }
+        .layout-classic #out-skills .cv-skill-badges,
+        .layout-classic .cv-ats-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin: 0.1rem 0 0;
+        }
+        .layout-classic #out-skills .cv-skill-badge,
+        .layout-classic .cv-ats-skills .cv-skill-badge {
+            background: rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            color: #0f172a;
+            font-size: calc(0.76rem * var(--cv-scale));
+            font-weight: 500;
+        }
+        .layout-classic .cv-ats-lang-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .layout-classic .cv-ats-lang-item {
+            margin: 0 0 0.2rem;
+            line-height: 1.45;
+            color: #334155;
+            font-size: calc(0.8rem * var(--cv-scale));
+        }
+        .layout-classic .cv-ats-lang-item:last-child { margin-bottom: 0; }
+        .layout-classic .cv-ref-item { margin: 0 0 0.55rem; }
+        .layout-classic .cv-ref-item:last-child { margin-bottom: 0; }
+        .layout-classic .cv-ref-name {
+            margin: 0;
+            font-weight: 700;
+            color: #0f172a;
+            font-size: calc(0.84rem * var(--cv-scale));
+        }
+        .layout-classic .cv-ref-role,
+        .layout-classic .cv-ref-line {
+            margin: 0.12rem 0 0;
+            color: #475569;
+            font-size: calc(0.78rem * var(--cv-scale));
+            line-height: 1.4;
+        }
+        .layout-classic .cv-job { margin-bottom: calc(1rem * var(--space-fit, 1)); }
         .layout-classic .cv-job-title {
             font-weight: 700;
             font-size: calc(1.05rem * var(--cv-scale));
             color: #0f172a;
             line-height: 1.35;
         }
-        .layout-classic .cv-job-role,
+        .layout-classic .cv-job > .cv-job-company,
+        .layout-classic .cv-job-body > .cv-job-company {
+            font-weight: 700;
+            font-size: calc(0.9rem * var(--cv-scale));
+            color: #0f172a;
+            margin: calc(0.14rem * var(--space-fit, 1)) 0 calc(0.42rem * var(--space-fit, 1));
+            padding: 0 0 calc(0.16rem * var(--space-fit, 1));
+            line-height: 1.35;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+        }
+        .layout-classic .cv-job-role:not(.cv-job-company),
         .layout-classic .cv-job-date,
         .layout-classic .cv-job-desc {
             font-size: calc(0.78rem * var(--cv-scale));
@@ -2824,13 +3121,14 @@
             line-height: 1.4;
         }
         .layout-classic .cv-job-list {
-            margin: 0.25rem 0 0;
+            margin: calc(0.15rem * var(--space-fit, 1)) 0 0;
             padding: 0;
             font-size: calc(0.78rem * var(--cv-scale));
-            color: #334155;
+            color: #475569;
+            font-weight: 400;
             list-style: none;
         }
-        .layout-classic .cv-job-list li { margin-bottom: 0.2rem; line-height: 1.45; }
+        .layout-classic .cv-job-list li { margin-bottom: calc(0.2rem * var(--space-fit, 1)); line-height: 1.45; }
 
         .layout-split .cv-columns {
             display: grid;
@@ -2848,6 +3146,1149 @@
             border-radius: 0.75rem;
             padding: calc(0.9rem * var(--cv-scale));
             border-inline-end: 4px solid var(--accent);
+        }
+
+        /*
+         * Global CV direction lock:
+         * Grid anatomy stays LTR so named areas are stable; language class places the rail.
+         * Hebrew (RTL / not .cv-lang-en): sidebar RIGHT. English (.cv-lang-en): sidebar LEFT.
+         */
+        #cv-target.layout-sidebar,
+        #cv-target.layout-split,
+        #cv-target.layout-charcoal,
+        #cv-target.layout-navy,
+        #cv-target.layout-azure,
+        #cv-target.layout-premium,
+        #cv-target.layout-cobalt,
+        #cv-target-page2.layout-sidebar,
+        #cv-target-page2.layout-split,
+        #cv-target-page2.layout-charcoal,
+        #cv-target-page2.layout-navy,
+        #cv-target-page2.layout-azure,
+        #cv-target-page2.layout-premium,
+        #cv-target-page2.layout-cobalt,
+        #qc-print-host .cv-print-sheet.layout-sidebar,
+        #qc-print-host .cv-print-sheet.layout-split,
+        #qc-print-host .cv-print-sheet.layout-charcoal,
+        #qc-print-host .cv-print-sheet.layout-navy,
+        #qc-print-host .cv-print-sheet.layout-azure,
+        #qc-print-host .cv-print-sheet.layout-premium,
+        #qc-print-host .cv-print-sheet.layout-cobalt {
+            direction: ltr !important;
+        }
+
+        /* Sidebar layout — HE: main | side ; EN: side | main */
+        #cv-target:not(.cv-lang-en).layout-sidebar .cv-columns,
+        #cv-target-page2:not(.cv-lang-en).layout-sidebar .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-sidebar .cv-columns {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr) !important;
+            grid-template-areas: "main side" !important;
+            direction: ltr !important;
+        }
+        #cv-target.cv-lang-en.layout-sidebar .cv-columns,
+        #cv-target-page2.cv-lang-en.layout-sidebar .cv-columns,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-sidebar .cv-columns {
+            grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
+            grid-template-areas: "side main" !important;
+            direction: ltr !important;
+        }
+
+        /* Split layout — same rail placement contract as sidebar */
+        #cv-target:not(.cv-lang-en).layout-split .cv-columns,
+        #cv-target-page2:not(.cv-lang-en).layout-split .cv-columns,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-split .cv-columns {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr) !important;
+            grid-template-areas: "main side" !important;
+            direction: ltr !important;
+        }
+        #cv-target.cv-lang-en.layout-split .cv-columns,
+        #cv-target-page2.cv-lang-en.layout-split .cv-columns,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-split .cv-columns {
+            grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
+            grid-template-areas: "side main" !important;
+            direction: ltr !important;
+        }
+
+        /* Charcoal — HE: rail right ; EN: rail left */
+        #cv-target:not(.cv-lang-en).layout-charcoal,
+        #cv-target-page2:not(.cv-lang-en).layout-charcoal,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr) !important;
+            grid-template-areas: "head side" "main side" !important;
+        }
+        #cv-target.cv-lang-en.layout-charcoal,
+        #cv-target-page2.cv-lang-en.layout-charcoal,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal {
+            grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
+            grid-template-areas: "side head" "side main" !important;
+        }
+
+        /* Navy — HE: rail right ; EN: rail left */
+        #cv-target:not(.cv-lang-en).layout-navy,
+        #cv-target-page2:not(.cv-lang-en).layout-navy,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-navy {
+            grid-template-columns: minmax(0, 0.64fr) minmax(0, 0.36fr) !important;
+            grid-template-areas:
+                "main photo"
+                "main head"
+                "main side" !important;
+        }
+        #cv-target.cv-lang-en.layout-navy,
+        #cv-target-page2.cv-lang-en.layout-navy,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy {
+            grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr) !important;
+            grid-template-areas:
+                "photo main"
+                "head main"
+                "side main" !important;
+        }
+
+        /* Premium / Executive Split — dark rail + serif main, ATS-friendly */
+        #cv-preview-wrapper:has(.layout-premium),
+        #cv-preview-page-2:has(.layout-premium) {
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        #cv-target.layout-premium,
+        #cv-target-page2.layout-premium,
+        #qc-print-host .cv-print-sheet.layout-premium,
+        .layout-premium.exs-root {
+            --premium-ink: #161616;
+            --premium-muted: #555555;
+            --premium-rail: var(--accent, #454545);
+            --premium-rail-deep: color-mix(in srgb, var(--accent, #454545) 72%, #111111);
+            --premium-line: rgba(22, 22, 22, 0.12);
+            --premium-band: #f2f2f2;
+            --premium-serif: 'Playfair Display', 'Frank Ruhl Libre', 'Times New Roman', serif;
+            --premium-sans: Inter, Heebo, 'Segoe UI', sans-serif;
+            --premium-pad-x: calc(1.15rem * var(--cv-scale));
+            --premium-side: minmax(0, 3fr);
+            --premium-main: minmax(0, 7fr);
+            display: grid !important;
+            /* Keep grid writing mode LTR so column placement is explicit (not flipped by dir=rtl). */
+            direction: ltr !important;
+            grid-template-columns: var(--premium-side) var(--premium-main);
+            grid-template-rows: auto minmax(0, 1fr);
+            grid-template-areas: "side head" "side main";
+            column-gap: 0;
+            row-gap: 0;
+            min-height: 0;
+            height: 100%;
+            max-height: 100%;
+            padding: 0 !important;
+            margin: 0;
+            background: #fff;
+            text-align: start;
+            font-family: var(--cv-font), var(--premium-sans);
+            font-size: calc(0.74rem * var(--cv-scale));
+            line-height: var(--cv-leading, 1.45);
+            overflow: hidden;
+            color: var(--premium-ink);
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        /* Hebrew (RTL): sidebar 30% on the right, main 70% on the left */
+        #cv-target:not(.cv-lang-en).layout-premium,
+        #cv-target-page2:not(.cv-lang-en).layout-premium,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium,
+        .layout-premium.exs-root:not(.cv-lang-en) {
+            grid-template-columns: var(--premium-main) var(--premium-side) !important;
+            grid-template-areas: "head side" "main side" !important;
+        }
+        /* English (LTR): sidebar 30% on the left, main 70% on the right */
+        #cv-target.cv-lang-en.layout-premium,
+        #cv-target-page2.cv-lang-en.layout-premium,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium,
+        .layout-premium.exs-root.cv-lang-en {
+            grid-template-columns: var(--premium-side) var(--premium-main) !important;
+            grid-template-areas: "side head" "side main" !important;
+        }
+        #qc-print-host .cv-print-sheet.layout-premium {
+            min-height: 297mm;
+            height: 297mm;
+            max-height: 297mm;
+            overflow: hidden;
+        }
+        .layout-premium .cv-columns { display: contents !important; }
+        .layout-premium .cv-col-rule { display: none !important; }
+        .layout-premium .cv-contact-header { display: none !important; }
+        .layout-premium .cv-sec-ico { display: none !important; }
+
+        .layout-premium > #cv-header,
+        .layout-premium > .cv-sidebar,
+        .layout-premium > .cv-main,
+        .layout-premium .cv-sidebar,
+        .layout-premium .cv-main,
+        .layout-premium #cv-header {
+            position: relative !important;
+            float: none !important;
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+            inset: auto !important;
+        }
+
+        .layout-premium .cv-sidebar {
+            grid-area: side !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: flex-start !important;
+            gap: 0;
+            background: var(--premium-rail);
+            color: #f6f6f6;
+            border: 0;
+            border-radius: 0;
+            padding: 0 0 2rem !important;
+            margin: 0 !important;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            min-height: 100%;
+            height: 100%;
+            max-height: 100%;
+            align-self: stretch;
+            justify-self: stretch;
+            box-sizing: border-box;
+            overflow: hidden !important;
+            z-index: 2;
+            isolation: isolate;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        /* Real DOM footer pad — keeps languages/recommendations clear of the sheet edge in PDF. */
+        #cv-preview-wrapper #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        #cv-preview-page-2 #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad {
+            display: block !important;
+            flex: 0 0 5rem !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
+            width: 100% !important;
+            height: 5rem !important;
+            min-height: 5rem !important;
+            max-height: 5rem !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: var(--premium-rail, #454545) !important;
+            pointer-events: none !important;
+            order: 999 !important;
+            box-sizing: border-box !important;
+        }
+        /* Never let the military block stretch or pin years to the rail floor. */
+        #cv-target.layout-premium #sec-extras-side,
+        #cv-target.layout-premium #out-extras-side,
+        #cv-target.layout-premium #sec-extras-side .cv-extra-list,
+        #cv-target-page2.layout-premium #sec-extras-side,
+        #cv-target-page2.layout-premium #out-extras-side,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side,
+        #qc-print-host .cv-print-sheet.layout-premium #out-extras-side {
+            display: block !important;
+            flex: 0 0 auto !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
+            justify-content: flex-start !important;
+            align-content: flex-start !important;
+            align-items: stretch !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            align-self: flex-start !important;
+        }
+        #cv-target.layout-premium .cv-military-years,
+        #cv-target-page2.layout-premium .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-military-years {
+            position: static !important;
+            top: auto !important;
+            bottom: auto !important;
+            margin-top: 0.12rem !important;
+            margin-bottom: 0 !important;
+        }
+        .layout-premium .cv-sidebar::after {
+            content: none !important;
+            display: none !important;
+        }
+        .layout-premium .cv-photo-block {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            flex: 0 0 auto;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: calc(1.05rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(0.95rem * var(--cv-scale));
+            margin: 0;
+            background: var(--premium-rail-deep);
+            position: relative;
+            left: auto;
+            right: auto;
+            top: auto;
+            bottom: auto;
+            height: auto;
+            min-height: 0;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        .layout-premium .cv-photo-block::after { display: none !important; content: none !important; }
+        .layout-premium .cv-photo {
+            position: relative !important;
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
+            transform: none !important;
+            width: clamp(72px, 8.5vw, 96px);
+            height: clamp(72px, 8.5vw, 96px);
+            max-width: calc(100% - 0.5rem);
+            aspect-ratio: 1;
+            border-radius: 999px;
+            border: 3px solid rgba(255, 255, 255, 0.94);
+            overflow: hidden;
+            background: #8a8a8a;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+            flex: 0 0 auto;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .layout-premium .cv-photo svg,
+        .layout-premium .cv-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .layout-premium .cv-sidebar-inner {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 0 !important;
+            justify-content: flex-start !important;
+            align-content: flex-start !important;
+            gap: calc(0.68rem * var(--cv-scale));
+            /* Safe bottom padding so last sections never kiss the rail floor / PDF edge. */
+            padding: calc(0.55rem * var(--cv-scale)) calc(0.75rem * var(--cv-scale)) calc(2.25rem * var(--cv-scale)) !important;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            min-height: 0 !important;
+            max-height: none !important;
+            height: auto !important;
+            overflow: hidden !important;
+            background: var(--premium-rail);
+        }
+        #cv-preview-wrapper #cv-target.layout-premium .cv-sidebar-inner,
+        #cv-preview-page-2 #cv-target-page2.layout-premium .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar-inner {
+            display: flex !important;
+            flex: 1 1 0 !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            padding-bottom: calc(2.25rem * var(--cv-scale)) !important;
+        }
+        .layout-premium .cv-sidebar-inner > :last-child {
+            margin-bottom: 0.65rem !important;
+            padding-bottom: 0 !important;
+            flex-grow: 0 !important;
+            flex-shrink: 0 !important;
+        }
+        .layout-premium #sec-extras-side {
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: 0 0 auto !important;
+            flex-grow: 0 !important;
+            margin-top: 0 !important;
+            height: auto !important;
+            min-height: 0 !important;
+        }
+        .layout-premium #sec-extras-side .cv-military-item:last-child,
+        .layout-premium #sec-extras-side .cv-job:last-child,
+        .layout-premium .cv-sidebar .cv-military-item:last-child {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .layout-premium #sec-extras-side .cv-job-date,
+        .layout-premium #sec-extras-side .cv-military-years,
+        .layout-premium .cv-sidebar .cv-military-years {
+            margin: 0.12rem 0 0 !important;
+            line-height: 1.35;
+        }
+        #cv-target.layout-premium .cv-sidebar,
+        #cv-target-page2.layout-premium .cv-sidebar,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar {
+            gap: 0 !important;
+        }
+        .layout-premium .cv-contact-sidebar {
+            display: flex !important;
+            flex-direction: column;
+            gap: 0.48rem;
+            margin: 0 0 calc(0.12rem * var(--cv-scale));
+            order: 1;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .layout-premium #sec-languages { order: 2; min-width: 0; max-width: 100%; }
+        .layout-premium #sec-skills { order: 3; min-width: 0; max-width: 100%; }
+        .layout-premium #sec-education-side {
+            order: 4;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .layout-premium #sec-extras-side {
+            order: 5;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .layout-premium #sec-references {
+            order: 6;
+            min-width: 0;
+            max-width: 100%;
+            margin-bottom: 0.65rem !important;
+            padding-bottom: 0.15rem !important;
+        }
+        .layout-premium #sec-education,
+        .layout-premium #sec-military {
+            display: none !important;
+        }
+
+        #cv-target.layout-premium > #cv-header,
+        #cv-target-page2.layout-premium > #cv-header,
+        #qc-print-host .cv-print-sheet.layout-premium > #cv-header,
+        .layout-premium.exs-root > #cv-header {
+            grid-area: head !important;
+            border: none;
+            border-bottom: 1px solid var(--premium-line);
+            padding: calc(1.15rem * var(--cv-scale)) var(--premium-pad-x) calc(0.9rem * var(--cv-scale));
+            margin: 0 !important;
+            background: #fff;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .layout-premium .cv-main {
+            grid-area: main !important;
+            display: flex;
+            flex-direction: column;
+            gap: calc(1.1rem * var(--cv-scale));
+            padding: calc(0.95rem * var(--cv-scale)) var(--premium-pad-x) calc(1.35rem * var(--cv-scale));
+            box-sizing: border-box;
+            background: #fff;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            min-height: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .layout-premium .cv-main > div,
+        .layout-premium .cv-main > section,
+        .layout-premium .cv-main .exs-sec,
+        .layout-premium #sec-summary,
+        .layout-premium #sec-experience {
+            margin: 0;
+            padding: 0;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .layout-premium #sec-experience,
+        .layout-premium .exs-sec {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .layout-premium #out-name {
+            font-family: var(--premium-serif);
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            color: var(--premium-ink);
+            font-size: calc(1.72rem * var(--cv-scale));
+            line-height: 1.18;
+            margin: 0;
+            max-width: 100%;
+        }
+        .layout-premium #out-title {
+            font-family: var(--premium-sans);
+            color: var(--premium-muted);
+            font-weight: 500;
+            font-size: calc(0.86rem * var(--cv-scale));
+            letter-spacing: 0.01em;
+            margin: 0.28rem 0 0;
+            max-width: 100%;
+        }
+        .layout-premium .cv-section-title {
+            display: block;
+            font-family: var(--premium-serif);
+            text-transform: none !important;
+            letter-spacing: 0.01em !important;
+            font-size: calc(0.95rem * var(--cv-scale));
+            font-weight: 700;
+            color: var(--accent, var(--premium-ink));
+            border-bottom: 1px solid color-mix(in srgb, var(--accent, var(--premium-ink)) 28%, transparent);
+            padding: 0 0 0.35rem;
+            margin: 0 0 0.55rem;
+            line-height: 1.25;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .layout-premium .cv-sidebar .cv-section-title {
+            color: #fff;
+            border-bottom-color: rgba(255, 255, 255, 0.26);
+            font-size: calc(0.72rem * var(--cv-scale));
+            margin-bottom: 0.4rem;
+            padding-bottom: 0.28rem;
+        }
+        .layout-premium .cv-contact-ico {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 0.9rem;
+            height: 0.9rem;
+            margin-top: 0.12rem;
+            color: rgba(255, 255, 255, 0.9);
+            flex: 0 0 auto;
+            opacity: 1;
+        }
+        .layout-premium .cv-contact-ico svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.6;
+        }
+        .layout-premium .cv-contact-row {
+            color: rgba(255, 255, 255, 0.92);
+            font-size: calc(0.66rem * var(--cv-scale));
+            line-height: 1.45;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            margin: 0;
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .layout-premium .cv-contact-row > span:last-child,
+        .layout-premium .cv-contact-link {
+            flex: 1 1 auto;
+            min-width: 0;
+            color: inherit;
+        }
+        .layout-premium .exs-skill-list,
+        .layout-premium .exs-lang-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.38rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .layout-premium .exs-skill-list.cv-skill-badges,
+        .layout-premium #out-skills .cv-skill-badges {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 0.35rem;
+        }
+        .layout-premium .exs-skill-row {
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .layout-premium .exs-skill-item,
+        .layout-premium .exs-skill-name,
+        .layout-premium .exs-lang-name {
+            font-size: calc(0.66rem * var(--cv-scale));
+            color: rgba(255, 255, 255, 0.94);
+            line-height: 1.35;
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .layout-premium .exs-skill-item.cv-skill-badge,
+        .layout-premium #out-skills .cv-skill-badge {
+            display: inline-block;
+            margin: 0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.28rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            font-size: calc(0.64rem * var(--cv-scale));
+        }
+        .layout-premium .exs-skill-track,
+        .layout-premium .exs-skill-fill {
+            display: none !important;
+        }
+        .layout-premium .exs-lang-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.12rem;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .layout-premium .exs-lang-level {
+            display: block;
+            font-size: calc(0.58rem * var(--cv-scale));
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            line-height: 1.35;
+            color: rgba(255, 255, 255, 0.62);
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .layout-premium #out-languages,
+        .layout-premium #out-skills,
+        .layout-premium #out-references {
+            color: rgba(255, 255, 255, 0.92);
+        }
+        .layout-premium .exs-ref-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            min-width: 0;
+            max-width: 100%;
+            width: 100%;
+        }
+        .layout-premium .exs-ref-item,
+        .layout-premium .exs-ref-plain {
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .layout-premium .exs-ref-name {
+            margin: 0;
+            font-size: calc(0.66rem * var(--cv-scale));
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.35;
+        }
+        .layout-premium .exs-ref-role,
+        .layout-premium .exs-ref-line,
+        .layout-premium .exs-ref-plain {
+            margin: 0.1rem 0 0;
+            font-size: calc(0.58rem * var(--cv-scale));
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.68);
+            line-height: 1.4;
+        }
+        .layout-premium #out-summary {
+            color: var(--premium-muted);
+            font-family: var(--premium-sans);
+            font-weight: 400;
+            font-size: calc(0.78rem * var(--cv-scale));
+            line-height: 1.58;
+            margin: 0;
+        }
+        .layout-premium .exs-job {
+            margin: 0 0 calc(1.05rem * var(--cv-scale));
+            padding: 0;
+            min-width: 0;
+        }
+        .layout-premium .exs-job:last-child { margin-bottom: 0; }
+        .layout-premium .exs-job-band {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.25rem 0.65rem;
+            background: var(--premium-band);
+            border-radius: 0.2rem;
+            padding: 0.34rem 0.55rem;
+            margin: 0 0 0.35rem;
+            border: 0;
+            border-bottom: 1px solid var(--premium-line);
+            min-width: 0;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .layout-premium .exs-job-title {
+            font-family: var(--premium-serif);
+            font-weight: 700;
+            color: var(--premium-ink);
+            font-size: calc(0.92rem * var(--cv-scale));
+            margin: 0;
+            line-height: 1.3;
+            flex: 1 1 10rem;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        .layout-premium .exs-job-date {
+            color: var(--premium-muted);
+            font-family: var(--premium-sans);
+            font-size: calc(0.64rem * var(--cv-scale));
+            white-space: nowrap;
+            flex: 0 0 auto;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+        }
+        .layout-premium .exs-job-company,
+        .layout-premium .cv-job > .cv-job-company,
+        .layout-premium .cv-job-body > .cv-job-company {
+            font-family: var(--premium-sans);
+            font-weight: 700;
+            font-size: calc(0.82rem * var(--cv-scale));
+            color: var(--premium-ink, #1a1a1a);
+            letter-spacing: 0.02em;
+            margin: 0 0 0.5rem;
+            padding: 0 0 0.22rem;
+            max-width: 100%;
+            line-height: 1.35;
+            border-bottom: 1px solid color-mix(in srgb, var(--premium-line, #d4d4d4) 90%, transparent);
+        }
+        .layout-premium .exs-job-list,
+        .layout-premium .exs-achievements-list {
+            margin: 0.2rem 0 0;
+            padding: 0;
+            list-style: none;
+            color: var(--premium-muted);
+            font-family: var(--premium-sans);
+            font-size: calc(0.72rem * var(--cv-scale));
+            font-weight: 400;
+            line-height: 1.5;
+            min-width: 0;
+        }
+        .layout-premium .exs-job-list li,
+        .layout-premium .exs-achievements-list li {
+            margin: 0 0 0.2rem;
+            padding: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+        .layout-premium .exs-achievements {
+            margin-top: 0.5rem;
+            padding: 0.35rem 0 0;
+            background: transparent;
+            border: 0;
+            border-top: 1px solid var(--premium-line);
+            border-radius: 0;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+        .layout-premium .exs-achievements-title {
+            display: none !important;
+        }
+        #cv-target:not(.cv-lang-en).layout-premium .exs-achievements-title,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .exs-achievements-title,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .exs-achievements-title,
+        .layout-premium.exs-root:not(.cv-lang-en) .exs-achievements-title {
+            display: none !important;
+        }
+        .layout-premium .exs-achievements-ico { display: none !important; }
+        .layout-premium .exs-metric {
+            font-weight: 700;
+            color: var(--premium-ink);
+        }
+        .layout-premium .cv-edu-item .cv-job-head,
+        .layout-premium #sec-education .cv-job-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.2rem 0.75rem;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            margin: 0 0 0.15rem;
+        }
+        .layout-premium .cv-military-item .cv-job-head,
+        .layout-premium #sec-military .cv-job-head,
+        .layout-premium #sec-extras-side .cv-job-head,
+        .layout-premium .cv-sidebar .cv-military-head {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            gap: 0.12rem !important;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            height: auto !important;
+            min-height: 0 !important;
+            flex: 0 0 auto !important;
+            box-sizing: border-box;
+            margin: 0 !important;
+        }
+        .layout-premium .cv-edu-item .cv-job-title,
+        .layout-premium .cv-edu-item .cv-edu-school,
+        .layout-premium #sec-military .cv-job-title {
+            font-family: var(--premium-serif);
+            font-weight: 700;
+            color: var(--premium-ink);
+            font-size: calc(0.88rem * var(--cv-scale));
+            line-height: 1.3;
+            margin: 0;
+            min-width: 0;
+            flex: 1 1 10rem;
+            overflow-wrap: anywhere;
+        }
+        .layout-premium .cv-sidebar .cv-military-role,
+        .layout-premium .cv-sidebar .cv-military-item .cv-job-title,
+        .layout-premium #sec-extras-side .cv-military-role {
+            font-family: var(--premium-sans);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95) !important;
+            font-size: calc(0.66rem * var(--cv-scale));
+            line-height: 1.35;
+            margin: 0 !important;
+            min-width: 0;
+            flex: none !important;
+            overflow-wrap: anywhere;
+        }
+        .layout-premium .cv-edu-item .cv-job-date,
+        .layout-premium .cv-edu-item .cv-edu-date,
+        .layout-premium #sec-military .cv-job-date {
+            color: var(--premium-muted);
+            font-size: calc(0.64rem * var(--cv-scale));
+            white-space: nowrap;
+            flex: 0 0 auto;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+        }
+        .layout-premium .cv-edu-item,
+        .layout-premium .cv-military-item {
+            margin: 0 0 calc(0.7rem * var(--cv-scale));
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .layout-premium .cv-edu-item .cv-job-role,
+        .layout-premium .cv-edu-item .cv-edu-meta,
+        .layout-premium .cv-military-item .cv-job-role,
+        .layout-premium .cv-military-sub {
+            color: var(--premium-muted);
+            font-size: calc(0.72rem * var(--cv-scale));
+            margin: 0.1rem 0 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+        }
+
+        /* Hide rail pad outside premium (other layouts use different sidebars). */
+        .cv-sidebar-rail-pad { display: none !important; }
+        .layout-premium .cv-sidebar > .cv-sidebar-rail-pad { display: block !important; }
+
+        /* Sidebar education / military — stack & wrap inside the rail */
+        #cv-target.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target.layout-premium #sec-extras-side .cv-job-head,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-item .cv-job-head,
+        #cv-target.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #cv-target-page2.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
+        #cv-target-page2.layout-premium #sec-extras-side .cv-job-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-item .cv-job-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-education-side .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-item .cv-job-head,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item .cv-job-head {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            flex-wrap: nowrap !important;
+            gap: 0.14rem !important;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            min-height: 0 !important;
+            height: auto !important;
+            flex: 0 0 auto !important;
+            box-sizing: border-box;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-job,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-item,
+        #cv-target.layout-premium .cv-sidebar .cv-military-item,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-item,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-item,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item,
+        .layout-premium.exs-root .cv-sidebar .cv-job,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-item,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin: 0 0 0.55rem;
+            box-sizing: border-box;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-job-title,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-school,
+        #cv-target.layout-premium .cv-sidebar .cv-military-role,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job-title,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-school,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-role,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job-title,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-school,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-role,
+        .layout-premium.exs-root .cv-sidebar .cv-job-title,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-school,
+        .layout-premium.exs-root .cv-sidebar .cv-military-role {
+            color: rgba(255, 255, 255, 0.95) !important;
+            font-family: var(--premium-sans);
+            font-weight: 600;
+            font-size: calc(0.66rem * var(--cv-scale));
+            line-height: 1.35;
+            max-width: 100%;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-job-date,
+        #cv-target.layout-premium .cv-sidebar .cv-edu-date,
+        #cv-target.layout-premium .cv-sidebar .cv-military-years,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job-date,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-date,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job-date,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-date,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-years,
+        .layout-premium.exs-root .cv-sidebar .cv-job-date,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-date,
+        .layout-premium.exs-root .cv-sidebar .cv-military-years {
+            color: rgba(255, 255, 255, 0.58) !important;
+            font-size: calc(0.56rem * var(--cv-scale));
+            font-weight: 500;
+            white-space: nowrap !important;
+            max-width: 100%;
+            width: fit-content !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+            direction: ltr !important;
+            unicode-bidi: isolate;
+            align-self: flex-start !important;
+            flex: 0 0 auto !important;
+            margin: 0.08rem 0 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            text-align: left !important;
+            line-height: 1.35;
+        }
+        /* Keep military block compact — role then years stacked, never stretched */
+        #cv-target.layout-premium .cv-sidebar .cv-military-item,
+        #cv-target.layout-premium #sec-extras-side,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item,
+        #cv-target-page2.layout-premium #sec-extras-side,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item,
+        #qc-print-host .cv-print-sheet.layout-premium #sec-extras-side,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item {
+            display: block !important;
+            flex: 0 0 auto !important;
+            flex-grow: 0 !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            margin-top: 0 !important;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #cv-target.layout-premium .cv-sidebar .cv-military-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-item .cv-job-head,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-head,
+        .layout-premium.exs-root .cv-sidebar .cv-military-item .cv-job-head,
+        .layout-premium.exs-root .cv-sidebar .cv-military-head {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            gap: 0.12rem !important;
+            flex: 0 0 auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            width: 100%;
+            max-width: 100%;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-military-role,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-role,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-role,
+        .layout-premium.exs-root .cv-sidebar .cv-military-role {
+            display: block !important;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 !important;
+            float: none !important;
+            position: static !important;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-military-years,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-years,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-years,
+        .layout-premium.exs-root .cv-sidebar .cv-military-years {
+            display: block !important;
+            position: static !important;
+            float: none !important;
+            width: fit-content !important;
+            margin: 0.12rem 0 0 !important;
+            padding: 0 !important;
+            align-self: flex-start !important;
+            flex: none !important;
+        }
+        #cv-target.layout-premium .cv-sidebar .cv-edu-meta,
+        #cv-target.layout-premium .cv-sidebar .cv-job-role,
+        #cv-target.layout-premium .cv-sidebar .cv-military-sub,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-edu-meta,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-job-role,
+        #cv-target-page2.layout-premium .cv-sidebar .cv-military-sub,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-edu-meta,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-job-role,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-sidebar .cv-military-sub,
+        .layout-premium.exs-root .cv-sidebar .cv-edu-meta,
+        .layout-premium.exs-root .cv-sidebar .cv-job-role,
+        .layout-premium.exs-root .cv-sidebar .cv-military-sub {
+            color: rgba(255, 255, 255, 0.72) !important;
+            font-size: calc(0.58rem * var(--cv-scale));
+            line-height: 1.35;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            margin: 0.1rem 0 0;
+        }
+        .layout-premium .cv-sidebar .cv-extra-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+        .layout-premium .cv-sidebar .cv-extra-list li {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: calc(0.64rem * var(--cv-scale));
+            line-height: 1.4;
+            margin: 0 0 0.3rem;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        /* Text direction: panels follow CV language; grid column order mirrored above */
+        #cv-target:not(.cv-lang-en).layout-premium #cv-header,
+        #cv-target:not(.cv-lang-en).layout-premium .cv-main,
+        #cv-target:not(.cv-lang-en).layout-premium .cv-sidebar,
+        #cv-target:not(.cv-lang-en).layout-premium .cv-sidebar-inner,
+        #cv-target-page2:not(.cv-lang-en).layout-premium #cv-header,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .cv-main,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .cv-sidebar,
+        #cv-target-page2:not(.cv-lang-en).layout-premium .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium #cv-header,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-main,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-sidebar,
+        #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium .cv-sidebar-inner,
+        .layout-premium.exs-root:not(.cv-lang-en) > #cv-header,
+        .layout-premium.exs-root:not(.cv-lang-en) .cv-main,
+        .layout-premium.exs-root:not(.cv-lang-en) .cv-sidebar,
+        .layout-premium.exs-root:not(.cv-lang-en) .cv-sidebar-inner {
+            direction: rtl !important;
+            text-align: right !important;
+            unicode-bidi: isolate;
+        }
+        #cv-target.cv-lang-en.layout-premium #cv-header,
+        #cv-target.cv-lang-en.layout-premium .cv-main,
+        #cv-target.cv-lang-en.layout-premium .cv-sidebar,
+        #cv-target.cv-lang-en.layout-premium .cv-sidebar-inner,
+        #cv-target-page2.cv-lang-en.layout-premium #cv-header,
+        #cv-target-page2.cv-lang-en.layout-premium .cv-main,
+        #cv-target-page2.cv-lang-en.layout-premium .cv-sidebar,
+        #cv-target-page2.cv-lang-en.layout-premium .cv-sidebar-inner,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium #cv-header,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-main,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-sidebar,
+        #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium .cv-sidebar-inner,
+        .layout-premium.exs-root.cv-lang-en > #cv-header,
+        .layout-premium.exs-root.cv-lang-en .cv-main,
+        .layout-premium.exs-root.cv-lang-en .cv-sidebar,
+        .layout-premium.exs-root.cv-lang-en .cv-sidebar-inner {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: isolate;
+        }
+        /* Sidebar internals stay tidy in both directions */
+        .layout-premium .cv-photo-block {
+            direction: ltr;
+        }
+        .layout-premium .cv-sidebar > *,
+        .layout-premium .cv-sidebar-inner > *,
+        .layout-premium .cv-contact-sidebar,
+        .layout-premium .cv-contact-sidebar > *,
+        .layout-premium #sec-skills,
+        .layout-premium #sec-languages,
+        .layout-premium #sec-education-side,
+        .layout-premium #sec-extras-side,
+        .layout-premium #sec-references,
+        .layout-premium .exs-side-sec {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            overflow-wrap: anywhere;
+        }
+        .layout-premium .cv-sidebar .cv-section-title {
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .layout-premium .exs-name {
+            font-family: var(--premium-serif);
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            color: var(--premium-ink);
+            font-size: calc(1.72rem * var(--cv-scale));
+            line-height: 1.18;
+            margin: 0;
+        }
+        .layout-premium .exs-title {
+            font-family: var(--premium-sans);
+            color: var(--premium-muted);
+            font-weight: 500;
+            font-size: calc(0.86rem * var(--cv-scale));
+            margin: 0.28rem 0 0;
+        }
+        .layout-premium .exs-photo-fallback {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg, #9a9a9a, #6e6e6e);
+        }
+        .layout-premium .exs-side-sec {
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* Prevent density header spacing from crushing premium header */
+        #cv-target.layout-premium > #cv-header,
+        #cv-target-page2.layout-premium > #cv-header,
+        #qc-print-host .cv-print-sheet.layout-premium > #cv-header {
+            margin-bottom: 0 !important;
+            padding-bottom: calc(0.9rem * var(--cv-scale)) !important;
+        }
+        #cv-target.layout-premium .cv-section-title,
+        #cv-target-page2.layout-premium .cv-section-title,
+        #qc-print-host .cv-print-sheet.layout-premium .cv-section-title {
+            margin-bottom: 0.55rem !important;
         }
 
         .layout-executive #cv-header {
@@ -2924,8 +4365,8 @@
 
         #cv-target.layout-charcoal,
         #cv-target-page2.layout-charcoal {
-            --charcoal: #4c4c4c;
-            --charcoal-deep: #3f3f3f;
+            --charcoal: var(--accent, #4c4c4c);
+            --charcoal-deep: color-mix(in srgb, var(--accent, #4c4c4c) 82%, #111111);
             --charcoal-line: rgba(255, 255, 255, 0.55);
             display: grid;
             grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
@@ -2943,8 +4384,8 @@
             overflow: hidden;
         }
         #qc-print-host .cv-print-sheet.layout-charcoal {
-            --charcoal: #4c4c4c;
-            --charcoal-deep: #3f3f3f;
+            --charcoal: var(--accent, #4c4c4c);
+            --charcoal-deep: color-mix(in srgb, var(--accent, #4c4c4c) 82%, #111111);
             --charcoal-line: rgba(255, 255, 255, 0.55);
             display: grid;
             grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr);
@@ -3211,12 +4652,14 @@
         .layout-charcoal .cv-skill-badges {
             display: flex;
             flex-wrap: wrap;
-            margin: 0.1rem -0.125rem;
+            gap: 0.35rem;
+            margin: 0.1rem 0 0;
         }
         .layout-charcoal .cv-skill-badge {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            margin: 0;
         }
         .layout-charcoal .cv-skill-list {
             list-style: none;
@@ -3426,12 +4869,14 @@
             line-height: 1.35;
             margin: 0;
         }
-        .layout-charcoal .cv-job-role {
+        .layout-charcoal .cv-job-role:not(.cv-job-company) {
             color: #5a5a5a;
             font-size: calc(0.68rem * var(--cv-scale));
             font-weight: 500;
             margin: 0;
             line-height: 1.4;
+            border-bottom: 0;
+            padding: 0;
         }
         .layout-charcoal .cv-job-list {
             margin: 0.18rem 0 0;
@@ -3673,7 +5118,7 @@
         }
         #cv-target.layout-navy,
         #cv-target-page2.layout-navy {
-            --navy: #12192b;
+            --navy: var(--accent, #12192b);
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
             display: grid;
@@ -3683,6 +5128,9 @@
                 "photo main"
                 "head main"
                 "side main";
+            column-gap: 0 !important;
+            row-gap: 0 !important;
+            gap: 0 !important;
             min-height: 0;
             height: 100%;
             max-height: 100%;
@@ -3694,8 +5142,21 @@
             line-height: var(--cv-leading);
             overflow: hidden;
         }
+        /* Continuous dark rail behind photo + header + sidebar (kills white hairlines). */
+        #cv-target.layout-navy::before,
+        #cv-target-page2.layout-navy::before,
+        #qc-print-host .cv-print-sheet.layout-navy::before {
+            content: "";
+            grid-column: photo;
+            grid-row: 1 / -1;
+            background: var(--navy, #12192b);
+            z-index: 0;
+            pointer-events: none;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
         #qc-print-host .cv-print-sheet.layout-navy {
-            --navy: #12192b;
+            --navy: var(--accent, #12192b);
             --navy-muted: #333333;
             --navy-line: rgba(255, 255, 255, 0.62);
             display: grid;
@@ -3705,6 +5166,9 @@
                 "photo main"
                 "head main"
                 "side main";
+            column-gap: 0 !important;
+            row-gap: 0 !important;
+            gap: 0 !important;
             min-height: 297mm;
             height: auto;
             background: #fff;
@@ -3727,6 +5191,10 @@
             align-items: flex-end;
             background: var(--navy);
             padding: 1.55rem 1rem 0.35rem;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             z-index: 1;
         }
         .layout-navy .cv-photo {
@@ -3749,14 +5217,22 @@
             object-fit: cover;
             display: block;
         }
+        #cv-target.layout-navy #cv-header,
+        #cv-target-page2.layout-navy #cv-header,
+        #qc-print-host .cv-print-sheet.layout-navy #cv-header,
         .layout-navy #cv-header {
             grid-area: head;
             background: var(--navy);
             color: #fff;
-            border: 0;
-            border-radius: 0;
-            margin: 0;
-            padding: 0.65rem 1.15rem 1.15rem;
+            border: 0 !important;
+            border-bottom: 0 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+            padding: 0.65rem 1.15rem 1.15rem !important;
+            box-shadow: none !important;
+            outline: none !important;
             text-align: center;
             z-index: 1;
         }
@@ -3790,6 +5266,10 @@
             background: var(--navy);
             color: #fff;
             padding: 0.35rem 1.25rem 1.7rem;
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             min-height: 100%;
             height: 100%;
             align-self: stretch;
@@ -3884,12 +5364,14 @@
         .layout-navy .cv-skill-badges {
             display: flex;
             flex-wrap: wrap;
-            margin: 0.1rem -0.125rem;
+            gap: 0.35rem;
+            margin: 0.1rem 0 0;
         }
         .layout-navy .cv-skill-badge {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            margin: 0;
         }
         .layout-navy .cv-skill-list {
             list-style: none;
@@ -3994,7 +5476,7 @@
             line-height: 1.35;
             margin: 0;
         }
-        .layout-navy .cv-job-role,
+        .layout-navy .cv-job-role:not(.cv-job-company),
         .layout-navy .cv-job-date {
             color: var(--navy);
             font-size: calc(0.72rem * var(--cv-scale));
@@ -4002,6 +5484,8 @@
             line-height: 1.4;
             font-weight: 500;
             margin: 0;
+            border-bottom: 0;
+            padding: 0;
         }
         .layout-navy .cv-job-date {
             white-space: normal;
@@ -4279,6 +5763,29 @@
             text-overflow: ellipsis;
             max-width: 100%;
         }
+        .accent-reset-btn {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 0.55rem;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #7dd3c7;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.35;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+        .accent-reset-btn[hidden] {
+            display: none !important;
+        }
+        .accent-reset-btn:hover,
+        .accent-reset-btn:focus-visible {
+            color: #99f6e4;
+            outline: none;
+        }
         .density-toggle {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4430,6 +5937,10 @@
         }
         .photo-upload {
             position: relative;
+        }
+        .photo-upload[hidden],
+        .photo-upload.is-photo-disabled {
+            display: none !important;
         }
         .photo-upload-row {
             display: flex;
@@ -4865,8 +6376,8 @@
             #preview-column #cl-preview-wrapper {
                 width: 100%;
                 max-width: 100%;
-                height: 100%;
-                min-height: 297mm;
+                height: auto;
+                min-height: 0;
                 aspect-ratio: 1 / 1.414;
                 overflow: hidden !important;
                 flex: 0 0 auto;
@@ -6701,38 +8212,151 @@
         #qc-print-host.qc-capturing .cv-print-sheet.layout-azure,
         #qc-print-host.qc-capturing .cv-print-sheet.layout-sidebar,
         #qc-print-host.qc-capturing .cv-print-sheet.layout-split,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-premium,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-charcoal,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-azure,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-sidebar,
-        html.qc-exporting #qc-print-host .cv-print-sheet.layout-split {
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-split,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-premium {
             padding: 0 !important;
             overflow: hidden !important;
             min-height: 1123px !important;
         }
+        /* Premium: hard-lock capture to one A4 — prevents blank page-2 sidebar stubs */
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-premium,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-premium {
+            display: grid !important;
+            direction: ltr !important;
+            height: 1123px !important;
+            max-height: 1123px !important;
+            grid-template-rows: auto minmax(0, 1fr) !important;
+            column-gap: 0 !important;
+            row-gap: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .cv-print-sheet:not(.cv-lang-en).layout-premium,
+        html.qc-exporting #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium {
+            grid-template-columns: 70% 30% !important;
+            grid-template-areas: "head side" "main side" !important;
+        }
+        #qc-print-host.qc-capturing .cv-print-sheet.cv-lang-en.layout-premium,
+        html.qc-exporting #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium {
+            grid-template-columns: 30% 70% !important;
+            grid-template-areas: "side head" "side main" !important;
+        }
+        #qc-print-host.qc-capturing:has(.layout-premium),
+        html.qc-exporting #qc-print-host:has(.layout-premium) {
+            height: 1123px !important;
+            max-height: 1123px !important;
+            overflow: hidden !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
+            overflow: hidden !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar {
+            grid-area: side !important;
+            height: 100% !important;
+            min-height: 100% !important;
+            max-height: 100% !important;
+            padding-bottom: 2rem !important;
+            box-sizing: border-box !important;
+            background: var(--premium-rail, #454545) !important;
+            color: #f6f6f6 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium #cv-header,
+        html.qc-exporting #qc-print-host .layout-premium #cv-header {
+            grid-area: head !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-main,
+        html.qc-exporting #qc-print-host .layout-premium .cv-main {
+            grid-area: main !important;
+            background: #ffffff !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar::after,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar::after {
+            content: none !important;
+            display: none !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
+            display: block !important;
+            flex: 0 0 5rem !important;
+            flex-shrink: 0 !important;
+            height: 5rem !important;
+            min-height: 5rem !important;
+            max-height: 5rem !important;
+            background: var(--premium-rail, #454545) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar-inner,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar-inner {
+            flex: 1 1 0 !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            height: auto !important;
+            padding-top: calc(0.55rem * var(--cv-scale, 1)) !important;
+            padding-inline: calc(0.75rem * var(--cv-scale, 1)) !important;
+            padding-bottom: 2.25rem !important;
+            background: var(--premium-rail, #454545) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        /* Flattened navy capture paints rail backgrounds on real nodes — hide ::before. */
+        #qc-print-host .cv-print-sheet.layout-navy.qc-navy-capture-flat::before,
+        .layout-navy.qc-navy-capture-flat::before,
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-navy.qc-navy-capture-flat::before,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy.qc-navy-capture-flat::before {
+            content: none !important;
+            display: none !important;
+        }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-navy::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-navy::before {
             content: "";
-            grid-column: 1;
-            grid-row: 1 / -1;
+            grid-area: side;
             background: var(--navy, #12192b);
             z-index: 0;
         }
         #qc-print-host.qc-capturing .cv-print-sheet.layout-charcoal::before,
         html.qc-exporting #qc-print-host .cv-print-sheet.layout-charcoal::before {
             content: "";
-            grid-column: 1;
-            grid-row: 1 / -1;
+            grid-area: side;
             background: var(--charcoal, #4c4c4c);
             z-index: 0;
         }
-        #qc-print-host.qc-capturing .layout-charcoal .cv-sidebar,
-        #qc-print-host.qc-capturing .layout-charcoal #cv-header,
-        html.qc-exporting #qc-print-host .layout-charcoal .cv-sidebar,
-        html.qc-exporting #qc-print-host .layout-charcoal #cv-header {
-            background: var(--charcoal, #4c4c4c) !important;
-            color: #fff !important;
+        #qc-print-host.qc-capturing .cv-print-sheet.layout-premium::before,
+        html.qc-exporting #qc-print-host .cv-print-sheet.layout-premium::before {
+            content: "";
+            grid-area: side;
+            background: var(--premium-rail, #454545);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            z-index: 0;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-premium .cv-photo-block,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-photo-block {
+            background: var(--premium-rail, #454545) !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
             z-index: 1;
+        }
+        #qc-print-host.qc-capturing .layout-premium .cv-photo-block,
+        html.qc-exporting #qc-print-host .layout-premium .cv-photo-block {
+            background: var(--premium-rail-deep, #3a3a3a) !important;
         }
         #qc-print-host.qc-capturing .layout-navy .cv-photo-block,
         #qc-print-host.qc-capturing .layout-navy #cv-header,
@@ -6749,11 +8373,13 @@
         #qc-print-host.qc-capturing .layout-azure .cv-sidebar,
         #qc-print-host.qc-capturing .layout-sidebar .cv-sidebar,
         #qc-print-host.qc-capturing .layout-split .cv-sidebar,
+        #qc-print-host.qc-capturing .layout-premium .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-navy .cv-sidebar-inner,
         html.qc-exporting #qc-print-host .layout-charcoal .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-azure .cv-sidebar,
         html.qc-exporting #qc-print-host .layout-sidebar .cv-sidebar,
-        html.qc-exporting #qc-print-host .layout-split .cv-sidebar {
+        html.qc-exporting #qc-print-host .layout-split .cv-sidebar,
+        html.qc-exporting #qc-print-host .layout-premium .cv-sidebar {
             height: 100% !important;
             min-height: 100% !important;
             align-self: stretch !important;
@@ -6796,8 +8422,8 @@
             html, body {
                 background: #ffffff !important;
                 color: #0f172a !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             .no-print,
@@ -6832,6 +8458,14 @@
                 display: none !important;
             }
 
+            html.qc-print-mode #qc-print-host,
+            #cv-preview-wrapper,
+            #cv-preview-wrapper.cv-page,
+            #cv-preview-wrapper.a4-page {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
             html.qc-print-mode #qc-print-host {
                 display: block !important;
                 position: static !important;
@@ -6848,8 +8482,9 @@
                 overflow: hidden !important;
             }
 
-            html.qc-print-mode #qc-print-host .cv-print-sheet,
-            html.qc-print-mode #qc-print-host #cv-target {
+            /* Non-premium sheets stay block; Executive Split keeps its grid (see below). */
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.layout-premium),
+            html.qc-print-mode #qc-print-host #cv-target:not(.layout-premium) {
                 display: block !important;
                 width: 210mm !important;
                 min-width: 210mm !important;
@@ -6877,15 +8512,199 @@
                 display: flex !important;
             }
 
-            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns {
+            /* —— Executive Split (layout-premium): print / PDF must match screen —— */
+            #cv-preview-wrapper:has(.layout-premium),
+            #cv-target.layout-premium,
+            #cv-target-page2.layout-premium,
+            .layout-premium.exs-root,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target.layout-premium {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium,
+            #cv-target-page2.layout-premium,
+            .layout-premium.exs-root,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target.layout-premium {
                 display: grid !important;
+                direction: ltr !important;
+                grid-template-rows: auto minmax(0, 1fr) !important;
+                column-gap: 0 !important;
+                row-gap: 0 !important;
+                width: 210mm !important;
+                min-width: 210mm !important;
+                max-width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+                box-sizing: border-box !important;
+                background: #ffffff !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            html.qc-print-mode #qc-print-host .layout-premium .cv-columns,
+            .layout-premium .cv-columns {
+                display: contents !important;
+            }
+            /* Hebrew RTL: dark rail on the right (30%), white main on the left (70%) */
+            #cv-target:not(.cv-lang-en).layout-premium,
+            #cv-target-page2:not(.cv-lang-en).layout-premium,
+            .layout-premium.exs-root:not(.cv-lang-en),
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target:not(.cv-lang-en).layout-premium {
+                grid-template-columns: 70% 30% !important;
+                grid-template-areas: "head side" "main side" !important;
+            }
+            /* English LTR: dark rail on the left (30%), white main on the right (70%) */
+            #cv-target.cv-lang-en.layout-premium,
+            #cv-target-page2.cv-lang-en.layout-premium,
+            .layout-premium.exs-root.cv-lang-en,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-premium,
+            html.qc-print-mode #qc-print-host #cv-target.cv-lang-en.layout-premium {
+                grid-template-columns: 30% 70% !important;
+                grid-template-areas: "side head" "side main" !important;
+            }
+            #cv-target.layout-premium .cv-sidebar,
+            #cv-target.layout-premium .cv-main,
+            #cv-target.layout-premium #cv-header,
+            #cv-target-page2.layout-premium .cv-sidebar,
+            #cv-target-page2.layout-premium .cv-main,
+            #cv-target-page2.layout-premium #cv-header,
+            .layout-premium.exs-root .cv-sidebar,
+            .layout-premium.exs-root .cv-main,
+            .layout-premium.exs-root #cv-header,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-main,
+            html.qc-print-mode #qc-print-host .layout-premium #cv-header {
+                position: relative !important;
+                float: none !important;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
+                transform: none !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium .cv-sidebar,
+            #cv-target-page2.layout-premium .cv-sidebar,
+            .layout-premium.exs-root .cv-sidebar,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar {
+                grid-area: side !important;
+                display: flex !important;
+                flex-direction: column !important;
+                flex-wrap: nowrap !important;
+                align-self: stretch !important;
+                justify-self: stretch !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                margin: 0 !important;
+                padding: 0 0 2rem !important;
+                overflow: hidden !important;
+                background: var(--premium-rail, #454545) !important;
+                color: #f6f6f6 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium .cv-sidebar *,
+            #cv-target-page2.layout-premium .cv-sidebar *,
+            .layout-premium.exs-root .cv-sidebar *,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #cv-target.layout-premium .cv-sidebar-inner,
+            #cv-target.layout-premium .cv-photo-block,
+            #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            #cv-target-page2.layout-premium .cv-sidebar-inner,
+            #cv-target-page2.layout-premium .cv-photo-block,
+            #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            .layout-premium.exs-root .cv-sidebar-inner,
+            .layout-premium.exs-root .cv-photo-block,
+            .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar-inner,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-photo-block,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
+                background: var(--premium-rail, #454545) !important;
+                color: #f6f6f6 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            /* Keep sidebar footer text clear of the A4 edge when printing / PDF. */
+            #cv-target.layout-premium .cv-sidebar,
+            #cv-target-page2.layout-premium .cv-sidebar,
+            .layout-premium.exs-root .cv-sidebar,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar {
+                padding-bottom: 2rem !important;
+                box-sizing: border-box !important;
+            }
+            #cv-target.layout-premium .cv-sidebar-inner,
+            #cv-target-page2.layout-premium .cv-sidebar-inner,
+            .layout-premium.exs-root .cv-sidebar-inner,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar-inner {
+                padding-top: 0.55rem !important;
+                padding-inline: 0.75rem !important;
+                padding-bottom: 2.25rem !important;
+                box-sizing: border-box !important;
+            }
+            #cv-target.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            #cv-target-page2.layout-premium .cv-sidebar > .cv-sidebar-rail-pad,
+            .layout-premium.exs-root .cv-sidebar > .cv-sidebar-rail-pad,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-sidebar > .cv-sidebar-rail-pad {
+                display: block !important;
+                flex: 0 0 5rem !important;
+                flex-shrink: 0 !important;
+                height: 5rem !important;
+                min-height: 5rem !important;
+                max-height: 5rem !important;
+            }
+            #cv-target.layout-premium .cv-photo-block,
+            #cv-target-page2.layout-premium .cv-photo-block,
+            .layout-premium.exs-root .cv-photo-block,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-photo-block {
+                background: var(--premium-rail-deep, #3a3a3a) !important;
+            }
+            #cv-target.layout-premium #cv-header,
+            #cv-target-page2.layout-premium #cv-header,
+            .layout-premium.exs-root #cv-header,
+            html.qc-print-mode #qc-print-host .layout-premium #cv-header {
+                grid-area: head !important;
+                background: #ffffff !important;
+            }
+            #cv-target.layout-premium .cv-main,
+            #cv-target-page2.layout-premium .cv-main,
+            .layout-premium.exs-root .cv-main,
+            html.qc-print-mode #qc-print-host .layout-premium .cv-main {
+                grid-area: main !important;
+                background: #ffffff !important;
+                overflow: hidden !important;
+            }
+            #cv-target.layout-premium::before,
+            #cv-target-page2.layout-premium::before,
+            .layout-premium.exs-root::before,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.layout-premium::before {
+                content: "" !important;
+                display: block !important;
+                grid-area: side !important;
+                background: var(--premium-rail, #454545) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                z-index: 0 !important;
             }
 
             html.qc-print-mode #qc-print-host .layout-charcoal {
                 display: grid !important;
-                grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
                 grid-template-rows: auto 1fr !important;
-                grid-template-areas: "side head" "side main" !important;
                 direction: ltr !important;
                 text-align: start !important;
                 background: #ffffff !important;
@@ -6893,8 +8712,31 @@
                 height: 297mm !important;
                 overflow: hidden !important;
             }
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-charcoal {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr) !important;
+                grid-template-areas: "head side" "main side" !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-charcoal {
+                grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
+                grid-template-areas: "side head" "side main" !important;
+            }
             html.qc-print-mode #qc-print-host .layout-charcoal .cv-columns {
                 display: contents !important;
+            }
+            html.qc-print-mode #qc-print-host .layout-sidebar .cv-columns,
+            html.qc-print-mode #qc-print-host .layout-split .cv-columns {
+                display: grid !important;
+                direction: ltr !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-sidebar .cv-columns,
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-split .cv-columns {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr) !important;
+                grid-template-areas: "main side" !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-sidebar .cv-columns,
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-split .cv-columns {
+                grid-template-columns: minmax(0, 0.34fr) minmax(0, 1fr) !important;
+                grid-template-areas: "side main" !important;
             }
             html.qc-print-mode #qc-print-host[dir="ltr"],
             html.qc-print-mode #qc-print-host[dir="ltr"] .cv-print-sheet,
@@ -6924,16 +8766,25 @@
 
             html.qc-print-mode #qc-print-host .layout-navy {
                 display: grid !important;
-                grid-template-columns: 0.36fr 0.64fr !important;
                 grid-template-rows: auto auto 1fr !important;
-                grid-template-areas:
-                    "photo main"
-                    "head main"
-                    "side main" !important;
                 direction: ltr !important;
                 text-align: start !important;
                 background: #fff !important;
                 min-height: 277mm !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet:not(.cv-lang-en).layout-navy {
+                grid-template-columns: 0.64fr 0.36fr !important;
+                grid-template-areas:
+                    "main photo"
+                    "main head"
+                    "main side" !important;
+            }
+            html.qc-print-mode #qc-print-host .cv-print-sheet.cv-lang-en.layout-navy {
+                grid-template-columns: 0.36fr 0.64fr !important;
+                grid-template-areas:
+                    "photo main"
+                    "head main"
+                    "side main" !important;
             }
             html.qc-print-mode #qc-print-host .layout-navy .cv-columns,
             html.qc-print-mode #qc-print-host .layout-navy .cv-sidebar {
@@ -6968,11 +8819,13 @@
         #cv-preview-wrapper #cv-target.layout-azure,
         #cv-preview-wrapper #cv-target.layout-sidebar,
         #cv-preview-wrapper #cv-target.layout-split,
+        #cv-preview-wrapper #cv-target.layout-premium,
         #cv-preview-page-2 #cv-target-page2.layout-charcoal,
         #cv-preview-page-2 #cv-target-page2.layout-navy,
         #cv-preview-page-2 #cv-target-page2.layout-azure,
         #cv-preview-page-2 #cv-target-page2.layout-sidebar,
-        #cv-preview-page-2 #cv-target-page2.layout-split {
+        #cv-preview-page-2 #cv-target-page2.layout-split,
+        #cv-preview-page-2 #cv-target-page2.layout-premium {
             height: 100% !important;
             min-height: 100% !important;
             max-height: 100% !important;
@@ -6985,11 +8838,13 @@
         #cv-preview-wrapper .layout-azure .cv-sidebar,
         #cv-preview-wrapper .layout-sidebar .cv-sidebar,
         #cv-preview-wrapper .layout-split .cv-sidebar,
+        #cv-preview-wrapper .layout-premium .cv-sidebar,
         #cv-preview-page-2 .layout-charcoal .cv-sidebar,
         #cv-preview-page-2 .layout-navy .cv-sidebar-inner,
         #cv-preview-page-2 .layout-azure .cv-sidebar,
         #cv-preview-page-2 .layout-sidebar .cv-sidebar,
-        #cv-preview-page-2 .layout-split .cv-sidebar {
+        #cv-preview-page-2 .layout-split .cv-sidebar,
+        #cv-preview-page-2 .layout-premium .cv-sidebar {
             height: 100% !important;
             min-height: 100% !important;
             align-self: stretch;

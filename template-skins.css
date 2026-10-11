@@ -2,7 +2,7 @@
 
 #cv-target.layout-charcoal,
 #qc-print-host .cv-print-sheet.layout-charcoal {
-    --charcoal: #4c4c4c;
+    --charcoal: var(--accent, #4c4c4c);
     --charcoal-deep: #3f3f3f;
     --charcoal-paper: #ffffff;
     --charcoal-ink: #333333;
@@ -119,14 +119,14 @@
 
 #cv-target.layout-navy.skin-midnight,
 #qc-print-host .cv-print-sheet.layout-navy.skin-midnight {
-    --navy: #0b1020;
+    --navy: var(--accent, #0b1020);
     --navy-muted: #2a3144;
     --navy-line: rgba(255, 255, 255, 0.58);
 }
 
 #cv-target.layout-navy.skin-emerald,
 #qc-print-host .cv-print-sheet.layout-navy.skin-emerald {
-    --navy: #1a3c34;
+    --navy: var(--accent, #1a3c34);
     --navy-muted: #334f48;
     --navy-line: rgba(255, 255, 255, 0.58);
 }

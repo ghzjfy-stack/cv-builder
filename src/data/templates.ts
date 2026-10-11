@@ -32,7 +32,8 @@ export type LayoutStyle =
   | "charcoal"
   | "azure"
   | "navy"
-  | "banner";
+  | "premium"
+  | "cobalt";
 
 export type SamplePack = {
   name: string;
@@ -81,6 +82,8 @@ export type CvTemplate = {
   field: string;
   preferredLang: "he" | "en";
   atsOptimized: boolean;
+  /** Whether the live CV layout renders a user profile photo. */
+  supportsPhoto: boolean;
   he: SamplePack;
   en: SamplePack;
 };
@@ -104,8 +107,8 @@ type Seed = {
   field: string;
   preferredLang?: "he" | "en";
   atsOptimized: boolean;
+  supportsPhoto?: boolean;
   pack: "tech" | "sales" | "mgmt" | "creative" | "student" | "entry" | "academic" | "cs" | "finance" | "health" | "ops" | "legal";
-  categories?: TemplateCategory[];
   subHe: string;
   subEn: string;
 };
@@ -498,16 +501,158 @@ const PACKS: Record<Seed["pack"], { he: SamplePack; en: SamplePack }> = {
 };
 
 const SEEDS: Seed[] = [
-  { id: "lagoon", titleHe: "לגונה", titleEn: "Lagoon", category: "creative", styleTags: ["colorful", "modern"], layout: "banner", layoutStyle: "header-accent", accent: "#0e3b3a", skin: "lagoon", font: "Heebo", thumb: "lay-lagoon", field: "marketing", atsOptimized: true, pack: "creative", subHe: "מאיה • שיווק דיגיטלי", subEn: "Maya • Digital Marketing" },
-  { id: "plum", titleHe: "שזיף", titleEn: "Plum", category: "creative", styleTags: ["creative", "colorful"], layout: "banner", layoutStyle: "header-accent", accent: "#4a2158", skin: "plum", font: "Assistant", thumb: "lay-plum", field: "marketing", atsOptimized: false, pack: "creative", subHe: "שירה • עיצוב ומיתוג", subEn: "Shira • Brand Design" },
-  { id: "noir", titleHe: "פוסטר", titleEn: "Poster", category: "management", styleTags: ["executive", "modern"], layout: "banner", layoutStyle: "header-accent", accent: "#141414", skin: "noir", font: "Frank Ruhl Libre", thumb: "lay-noir", field: "ops", atsOptimized: false, pack: "mgmt", subHe: "יונתן • ניהול", subEn: "Yonatan • Leadership" },
-  { id: "coral", titleHe: "קורל", titleEn: "Coral", category: "creative", styleTags: ["colorful", "creative"], layout: "banner", layoutStyle: "header-accent", accent: "#9c3d2e", skin: "coral", font: "Heebo", thumb: "lay-coral", field: "marketing", atsOptimized: false, pack: "creative", subHe: "הילה • מיתוג", subEn: "Hila • Brand" },
-  { id: "indigo", titleHe: "אינדיגו", titleEn: "Indigo", category: "hi-tech", categories: ["students"], styleTags: ["modern", "professional"], layout: "banner", layoutStyle: "header-accent", accent: "#1c2f6e", skin: "indigo", font: "Rubik", thumb: "lay-indigo", field: "tech", atsOptimized: true, pack: "tech", subHe: "דניאל • פיתוח", subEn: "Daniel • Engineering" },
-  { id: "emerald", titleHe: "מודרנית עם תמונה", titleEn: "Modern with Photo", category: "management", styleTags: ["colorful", "professional"], layout: "navy", layoutStyle: "two-column-left", accent: "#31443b", skin: "emerald", font: "Montserrat", thumb: "lay-emerald", field: "ops", atsOptimized: false, pack: "mgmt", subHe: "נועה • שיווק ודיגיטל", subEn: "Noa • Marketing & Digital" },
-  { id: "navy", titleHe: "עסקי ורשמי", titleEn: "Business Formal", category: "finance", styleTags: ["professional", "executive"], layout: "navy", layoutStyle: "two-column-left", accent: "#12192b", font: "Montserrat", thumb: "lay-navy", field: "sales", atsOptimized: false, pack: "finance", subHe: "תמר • מנהלת כספים", subEn: "Tamar • Finance Manager" },
-  { id: "sage", titleHe: "מכירות", titleEn: "Sales", category: "sales", styleTags: ["professional", "colorful"], layout: "charcoal", layoutStyle: "two-column-left", accent: "#4d5d52", skin: "sage", font: "Lato", bg: "bg-preview-linen", thumb: "lay-sage", field: "sales", atsOptimized: false, pack: "sales", subHe: "נועה • מנהלת מכירות", subEn: "Noa • Sales Manager" },
-  { id: "wine", titleHe: "שיווק דיגיטלי", titleEn: "Digital Marketing", category: "creative", styleTags: ["colorful", "creative"], layout: "charcoal", layoutStyle: "two-column-left", accent: "#5a3640", skin: "wine", font: "Heebo", bg: "bg-preview-cream", thumb: "lay-wine", field: "marketing", atsOptimized: false, pack: "creative", subHe: "מאיה • מנהלת שיווק דיגיטלי", subEn: "Maya • Digital Marketing" },
+  {
+    id: "premium",
+    titleHe: "פרימיום",
+    titleEn: "Executive Split",
+    category: "management",
+    styleTags: ["executive", "professional", "minimal"],
+    layout: "premium",
+    layoutStyle: "two-column-left",
+    accent: "#4a4a4a",
+    font: "Frank Ruhl Libre",
+    thumb: "lay-premium",
+    field: "ops",
+    atsOptimized: true,
+    supportsPhoto: true,
+    pack: "ops",
+    subHe: "יונתן • סמנכ״ל תפעול",
+    subEn: "Jonathan • VP Operations",
+  },
+  {
+    id: "charcoal",
+    titleHe: "קלאסית נקייה",
+    titleEn: "Clean Classic",
+    category: "management",
+    styleTags: ["professional", "executive"],
+    layout: "charcoal",
+    layoutStyle: "two-column-left",
+    accent: "#4c4c4c",
+    font: "Lato",
+    thumb: "lay-charcoal",
+    field: "marketing",
+    preferredLang: "en",
+    atsOptimized: false,
+    supportsPhoto: false,
+    pack: "sales",
+    subHe: "רועי • מנהל מוצר",
+    subEn: "Roy • Product Manager",
+  },
+  {
+    id: "emerald",
+    titleHe: "מודרנית עם תמונה",
+    titleEn: "Modern with Photo",
+    category: "modern",
+    styleTags: ["colorful", "professional"],
+    layout: "navy",
+    layoutStyle: "two-column-left",
+    accent: "#31443b",
+    skin: "emerald",
+    font: "Montserrat",
+    thumb: "lay-emerald",
+    field: "ops",
+    atsOptimized: false,
+    supportsPhoto: true,
+    pack: "mgmt",
+    subHe: "נועה • שיווק ודיגיטל",
+    subEn: "Noa • Marketing & Digital",
+  },
+  {
+    id: "simple",
+    titleHe: "אקספרס",
+    titleEn: "ATS-Friendly",
+    category: "minimal",
+    styleTags: ["minimal", "professional"],
+    layout: "classic",
+    layoutStyle: "single-column",
+    accent: "#1c1917",
+    font: "Heebo",
+    thumb: "lay-simple",
+    field: "edu",
+    atsOptimized: true,
+    supportsPhoto: false,
+    pack: "academic",
+    subHe: "יעל • מורה",
+    subEn: "Yael • Teacher",
+  },
+  {
+    id: "cobalt",
+    titleHe: "פרופיל כחול",
+    titleEn: "Blue Profile",
+    category: "modern",
+    styleTags: ["professional", "modern"],
+    layout: "cobalt",
+    layoutStyle: "two-column-left",
+    accent: "#2c4a7c",
+    font: "Heebo",
+    thumb: "lay-cobalt",
+    field: "sales",
+    preferredLang: "he",
+    atsOptimized: false,
+    supportsPhoto: true,
+    pack: "sales",
+    subHe: "דנה • מנהלת לקוחות",
+    subEn: "Dana • Account Manager",
+  },
 ];
+
+/** Legacy template IDs → core IDs (keeps drafts / SEO / bookmarks working). */
+export const TEMPLATE_ALIASES: Record<string, string> = {
+  midnight: "emerald",
+  navy: "emerald",
+  petra: "emerald",
+  "dev-navy": "emerald",
+  "ops-midnight": "emerald",
+  espresso: "charcoal",
+  sage: "charcoal",
+  slate: "charcoal",
+  wine: "charcoal",
+  forest: "charcoal",
+  "product-slate": "charcoal",
+  "consult-forest": "charcoal",
+  "marketing-wine": "charcoal",
+  azure: "charcoal",
+  mint: "charcoal",
+  blush: "charcoal",
+  terracotta: "charcoal",
+  cream: "charcoal",
+  clinic: "charcoal",
+  europass: "charcoal",
+  "sales-azure": "charcoal",
+  "entry-mint": "charcoal",
+  "hr-blush": "charcoal",
+  "designer-terra": "charcoal",
+  sand: "charcoal",
+  split: "charcoal",
+  "teal-sidebar": "charcoal",
+  "creative-split": "charcoal",
+  sales: "charcoal",
+  tech: "charcoal",
+  marketing: "charcoal",
+  ink: "simple",
+  harvard: "simple",
+  compact: "simple",
+  intern: "simple",
+  academic: "simple",
+  pearl: "simple",
+  swiss: "simple",
+  ivory: "simple",
+  gold: "simple",
+  "ink-exec": "simple",
+  "student-modern": "simple",
+  "entry-clean": "simple",
+  "heebo-ats": "simple",
+  "assistant-ats": "simple",
+  "rubik-pro": "simple",
+  "finance-ats": "simple",
+  "legal-ats": "simple",
+  "health-ats": "simple",
+  "student-ats": "simple",
+  "mgmt-ats": "simple",
+  "nurse-clean": "simple",
+  "grad-compact": "simple",
+  "bank-gold": "simple",
+};
 
 function buildTemplate(seed: Seed): CvTemplate {
   const packs = PACKS[seed.pack];
@@ -539,7 +684,9 @@ function buildTemplate(seed: Seed): CvTemplate {
     field: seed.field,
     preferredLang: seed.preferredLang || "he",
     atsOptimized: seed.atsOptimized,
-    categories: seed.categories,
+    supportsPhoto: typeof seed.supportsPhoto === "boolean"
+      ? seed.supportsPhoto
+      : seed.layout === "premium" || seed.layout === "navy",
     he: packs.he,
     en: packs.en,
   };
@@ -553,18 +700,20 @@ export const TEMPLATES: Record<string, CvTemplate> = Object.fromEntries(
 
 export const TEMPLATE_ORDER: string[] = TEMPLATE_LIST.map((t) => t.id);
 
+export function resolveTemplateId(id: string | null | undefined): string {
+  let key = String(id || "").trim();
+  if (TEMPLATE_ALIASES[key]) key = TEMPLATE_ALIASES[key];
+  if (TEMPLATES[key]) return key;
+  return TEMPLATE_ORDER[0] || "premium";
+}
+
 export const CATEGORY_FILTERS = [
   { id: "all", labelHe: "הכל", labelEn: "All" },
-  { id: "hi-tech", labelHe: "הייטק", labelEn: "High-Tech" },
-  { id: "management", labelHe: "ניהול", labelEn: "Management" },
-  { id: "creative", labelHe: "יצירתי", labelEn: "Creative" },
-  { id: "students", labelHe: "סטודנטים", labelEn: "Students" },
   { id: "ats", labelHe: "ATS", labelEn: "ATS-Friendly" },
 ] as const;
 
 export const STYLE_FILTERS = [
   { id: "minimal", labelHe: "נקי ומינימליסטי", labelEn: "Minimal" },
-  { id: "colorful", labelHe: "צבעוני", labelEn: "Colorful" },
   { id: "professional", labelHe: "מקצועי", labelEn: "Professional" },
   { id: "ats", labelHe: "ATS", labelEn: "ATS" },
 ] as const;
@@ -576,7 +725,11 @@ export function registerQcTemplates(globalObj: Window & typeof globalThis = wind
   const g = globalObj as Window & {
     QCTemplates?: Record<string, CvTemplate>;
     QCTemplateOrder?: string[];
+    QCTemplateAliases?: Record<string, string>;
+    QCResolveTemplateId?: (id: string | null | undefined) => string;
   };
   g.QCTemplates = TEMPLATES;
   g.QCTemplateOrder = TEMPLATE_ORDER;
+  g.QCTemplateAliases = TEMPLATE_ALIASES;
+  g.QCResolveTemplateId = resolveTemplateId;
 }

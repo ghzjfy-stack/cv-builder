@@ -1,0 +1,318 @@
+import React from 'react';
+import {
+  ContactRow,
+  normalizeJobItem,
+  normalizeEducationItem,
+  normalizeMilitaryItem,
+  normalizeReferenceItem,
+  formatCleanDates,
+} from './common';
+
+function splitList(value) {
+  if (Array.isArray(value)) return value.map((s) => String(s || '').trim()).filter(Boolean);
+  return String(value || '')
+    .split(/[\n,،;؛]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function parseLang(entry) {
+  const raw = String(entry || '').trim();
+  const dash = raw.match(/^(.*?)\s+[—–]\s+(.+)$/);
+  if (dash) return { name: dash[1].trim(), level: dash[2].trim() };
+  const m = raw.match(/^(.*?)(?:\((.*)\))?$/);
+  return { name: (m?.[1] || entry).trim(), level: (m?.[2] || '').trim() };
+}
+
+function langLevelLabel(level, isEnglish) {
+  const raw = String(level || '').trim();
+  const low = raw.toLowerCase();
+  if (!low) return '';
+  let id = '';
+  if (/אם נוספת|bilingual|אם|native|mother/.test(low)) id = 'native';
+  else if (/מקצוע|professional|c2|full professional|טכני|technical/.test(low)) id = 'professional';
+  else if (/שוטפ|fluent|גבוה|advanced|high|c1/.test(low)) id = 'fluent';
+  else if (/בינונ|intermediate|b1|b2|טוב|good/.test(low)) id = 'intermediate';
+  else if (/בסיס|basic|a1|a2|beginner/.test(low)) id = 'basic';
+  else return raw;
+  const labels = {
+    native: { he: 'שפת אם', en: 'Native' },
+    professional: { he: 'שליטה מקצועית', en: 'Professional' },
+    fluent: { he: 'שליטה גבוהה', en: 'Fluent' },
+    intermediate: { he: 'שליטה בינונית', en: 'Intermediate' },
+    basic: { he: 'שליטה בסיסית', en: 'Basic' },
+  };
+  return isEnglish ? labels[id].en : labels[id].he;
+}
+
+function boldMetrics(line) {
+  const parts = [];
+  const re = /(\d+(?:[.,]\d+)?\s*%|\d[\d,]{0,6})/g;
+  let last = 0;
+  let m;
+  const str = String(line);
+  while ((m = re.exec(str))) {
+    if (m.index > last) parts.push(str.slice(last, m.index));
+    parts.push(
+      <strong key={`${m.index}-${m[0]}`} className="exs-metric">
+        {m[0]}
+      </strong>
+    );
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) parts.push(str.slice(last));
+  return parts.length ? parts : str;
+}
+
+function jobLines(job) {
+  if (Array.isArray(job.bullets) && job.bullets.length) {
+    return job.bullets.map((b) => String(b || '').replace(/^[•\-*\u2022·]+\s*/, '').trim()).filter(Boolean);
+  }
+  return String(job.description || '')
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map((line) => line.replace(/^[•\-*\u2022·]+\s*/, '').trim())
+    .filter(Boolean);
+}
+
+/**
+ * Executive Split — premium two-column CV.
+ * Dark-grey left rail (contact / languages / skills) + spacious white main column.
+ */
+export default function ExecutiveSplitTemplate({
+  data = {},
+  isEnglish = false,
+  className = '',
+  ...props
+}) {
+  const dir = isEnglish ? 'ltr' : 'rtl';
+  const jobs = (Array.isArray(data.jobs || data.experience) ? data.jobs || data.experience : [])
+    .map((j) => normalizeJobItem(j, isEnglish))
+    .filter(Boolean);
+  const education = (Array.isArray(data.education) ? data.education : data.education ? [data.education] : [])
+    .map((e) => normalizeEducationItem(e, isEnglish))
+    .filter(Boolean);
+  const military = (Array.isArray(data.military || data.militaryService)
+    ? data.military || data.militaryService
+    : data.military
+      ? [data.military]
+      : []
+  )
+    .map((m) => normalizeMilitaryItem(m, isEnglish))
+    .filter(Boolean);
+  const references = (Array.isArray(data.references || data.recommendations)
+    ? data.references || data.recommendations
+    : data.references
+      ? [data.references]
+      : []
+  )
+    .map((r) => normalizeReferenceItem(r))
+    .filter(Boolean);
+
+  const skills = splitList(data.skills);
+  const languages = splitList(data.languages).map(parseLang);
+  const photo = data.photo || data.photoUrl || '';
+
+  return (
+    <div
+      className={`layout-premium exs-root ${isEnglish ? 'cv-lang-en' : ''} ${className}`.trim()}
+      dir={dir}
+      {...props}
+    >
+      <aside className="cv-sidebar exs-sidebar" aria-label={isEnglish ? 'Profile sidebar' : 'סרגל פרופיל'}>
+        <div className="cv-photo-block exs-photo-block">
+          <div className="cv-photo exs-photo">
+            {photo ? (
+              <img src={photo} alt="" />
+            ) : (
+              <div className="exs-photo-fallback" aria-hidden="true" />
+            )}
+          </div>
+        </div>
+
+        <div className="cv-sidebar-inner exs-sidebar-inner">
+          <section className="exs-side-sec">
+            <h3 className="cv-section-title">{isEnglish ? 'Contact' : 'פרטי קשר'}</h3>
+            <div className="cv-contact-sidebar">
+              {data.phone ? <ContactRow isSidebar icon="☎" value={data.phone} /> : null}
+              {data.email ? (
+                <ContactRow
+                  isSidebar
+                  icon="✉"
+                  value={data.email}
+                  href={data.email ? `mailto:${data.email}` : undefined}
+                />
+              ) : null}
+              {data.location ? <ContactRow isSidebar icon="⌖" value={data.location} /> : null}
+              {data.linkedin ? (
+                <ContactRow
+                  isSidebar
+                  icon="in"
+                  value={data.linkedin}
+                  href={
+                    data.linkedin
+                      ? `https://${String(data.linkedin).replace(/^https?:\/\//, '')}`
+                      : undefined
+                  }
+                />
+              ) : null}
+            </div>
+          </section>
+
+          {languages.length ? (
+            <section className="exs-side-sec">
+              <h3 className="cv-section-title">{isEnglish ? 'Languages' : 'שפות'}</h3>
+              <div className="exs-lang-list">
+                {languages.map((lang) => {
+                  const levelText = langLevelLabel(lang.level, isEnglish);
+                  return (
+                    <div key={lang.name} className="exs-lang-row">
+                      <span className="exs-lang-name" dir="auto">
+                        {lang.name}
+                      </span>
+                      {levelText ? (
+                        <span className="exs-lang-level" dir="auto">
+                          {levelText}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+
+          {skills.length ? (
+            <section className="exs-side-sec">
+              <h3 className="cv-section-title">{isEnglish ? 'Skills' : 'מיומנויות'}</h3>
+              <div className="exs-skill-list cv-skill-badges">
+                {skills.map((skill) => (
+                  <span key={skill} className="exs-skill-item cv-skill-badge" dir="auto">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {education.length ? (
+            <section className="exs-side-sec" id="sec-education-side">
+              <h3 className="cv-section-title">{isEnglish ? 'Education' : 'השכלה'}</h3>
+              {education.map((edu, idx) => (
+                <div key={`${edu.school}-${idx}`} className="cv-job cv-edu-item">
+                  <div className="cv-job-head">
+                    <p className="cv-job-title cv-edu-school font-bold">{edu.school || edu.title}</p>
+                    {edu.dates ? (
+                      <span className="cv-job-date cv-edu-date" dir="ltr">
+                        {formatCleanDates(edu.dates, isEnglish)}
+                      </span>
+                    ) : null}
+                  </div>
+                  {edu.degree || edu.meta ? (
+                    <p className="cv-job-role cv-edu-meta">{edu.degree || edu.meta}</p>
+                  ) : null}
+                </div>
+              ))}
+            </section>
+          ) : null}
+
+          {military.length ? (
+            <section className="exs-side-sec" id="sec-extras-side">
+              <h3 className="cv-section-title">
+                {isEnglish ? 'Military / National Service' : 'שירות צבאי / לאומי'}
+              </h3>
+              {military.map((m, idx) => (
+                <div
+                  key={`${m.role}-${idx}`}
+                  className="cv-job cv-military-item"
+                  dir={dir}
+                  style={{ display: 'block', flex: '0 0 auto', height: 'auto', margin: '0 0 0.35rem' }}
+                >
+                  <div className="cv-job-title cv-military-role" style={{ display: 'block', width: '100%', margin: 0 }}>
+                    {m.role || m.title}
+                  </div>
+                  {m.dates || m.years ? (
+                    <div
+                      className="cv-job-date cv-military-years"
+                      dir="ltr"
+                      style={{
+                        display: 'block',
+                        width: 'fit-content',
+                        margin: '0.12rem 0 0',
+                        whiteSpace: 'nowrap',
+                        direction: 'ltr',
+                        unicodeBidi: 'isolate',
+                        textAlign: 'left',
+                      }}
+                    >
+                      {formatCleanDates(m.dates || m.years, isEnglish)}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </section>
+          ) : null}
+        </div>
+        <div className="cv-sidebar-rail-pad" aria-hidden="true" />
+      </aside>
+
+      <header className="exs-header" id="cv-header">
+        <h1 className="exs-name" id="out-name">
+          {data.name || (isEnglish ? 'Jonathan Cohen' : 'יונתן כהן')}
+        </h1>
+        <p className="exs-title" id="out-title">
+          {data.title || ''}
+        </p>
+      </header>
+
+      <div className="cv-main exs-main">
+        {data.summary ? (
+          <section className="exs-sec">
+            <h3 className="cv-section-title">{isEnglish ? 'Professional Summary' : 'תקציר מקצועי'}</h3>
+            <p className="exs-summary whitespace-pre-line">{data.summary}</p>
+          </section>
+        ) : null}
+
+        {jobs.length ? (
+          <section className="exs-sec">
+            <h3 className="cv-section-title">{isEnglish ? 'Work Experience' : 'ניסיון תעסוקתי'}</h3>
+            {jobs.map((job, idx) => {
+              const lines = jobLines(job);
+              return (
+                <article key={`${job.company}-${job.position}-${idx}`} className="cv-job exs-job">
+                  <div className="exs-job-band">
+                    <h4 className="cv-job-title exs-job-title">{job.position || job.title}</h4>
+                    {job.dates ? (
+                      <span className="cv-job-date exs-job-date" dir="ltr">
+                        {formatCleanDates(job.dates, isEnglish)}
+                      </span>
+                    ) : null}
+                  </div>
+                  {job.company ? <p className="cv-job-role cv-job-company exs-job-company">{job.company}</p> : null}
+                  {lines.length ? (
+                    <ul className="cv-job-list exs-job-list" dir={dir}>
+                      {lines.map((line) => (
+                        <li key={line}>•&nbsp;{boldMetrics(line)}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </article>
+              );
+            })}
+          </section>
+        ) : null}
+
+        {references.length ? (
+          <section className="exs-sec">
+            <h3 className="cv-section-title">{isEnglish ? 'References' : 'המלצות'}</h3>
+            {references.map((ref, idx) => (
+              <p key={idx} className="whitespace-pre-line">
+                {[ref.name, ref.title, ref.contact].filter(Boolean).join(' · ')}
+              </p>
+            ))}
+          </section>
+        ) : null}
+      </div>
+    </div>
+  );
+}

@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0b1220">
     <title>QuickCV - מחולל קורות חיים</title>
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta property="og:site_name" content="QuickCV">
+    <link rel="canonical" id="canonical-url" href="https://www.quickcv.co.il/">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "QuickCV",
+          "url": "https://www.quickcv.co.il/",
+          "logo": "https://www.quickcv.co.il/logo.png",
+          "description": "מחולל קורות חיים בעברית: תבניות מוכנות, תצוגה חיה, והורדת PDF אחרי תשלום ב-Bit."
+        },
+        {
+          "@type": "WebSite",
+          "name": "QuickCV",
+          "alternateName": "quickcv.co.il",
+          "url": "https://www.quickcv.co.il/"
+        }
+      ]
+    }
+    </script>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -154,7 +179,7 @@
         <div class="home-inner">
             <header class="home-nav">
                 <button type="button" class="home-brand min-w-0 shrink" onclick="showHome()" aria-current="page">
-                    <span class="home-mark shrink-0" aria-hidden="true">QC</span>
+                    <img class="home-mark shrink-0" src="/icon-192.png" alt="" width="38" height="38">
                     <span class="home-brand-name truncate">QuickCV</span>
                 </button>
                 <div class="home-nav-actions shrink-0">
@@ -518,7 +543,7 @@
         <div class="home-inner">
             <header class="home-nav">
                 <button type="button" class="home-brand min-w-0 shrink" onclick="showHome()">
-                    <span class="home-mark shrink-0" aria-hidden="true">QC</span>
+                    <img class="home-mark shrink-0" src="/icon-192.png" alt="" width="38" height="38">
                     <span class="min-w-0">
                         <span class="home-brand-name truncate">QuickCV</span>
                         <span class="home-brand-sub hidden sm:block">Templates</span>
@@ -584,7 +609,7 @@
         </div>
         <div class="studio-toolbar max-w-7xl mx-auto px-4 min-h-16 py-3 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onclick="showHome()" class="studio-brand flex items-center gap-3 text-right">
-                <span class="studio-mark" aria-hidden="true">QC</span>
+                <img class="studio-mark" src="/icon-192.png" alt="" width="36" height="36">
                 <span>
                     <span class="studio-brand-name">QuickCV</span>
                     <span class="block text-[10px] text-slate-300 hidden sm:block" id="studio-back-home">חזרה לדף הבית</span>

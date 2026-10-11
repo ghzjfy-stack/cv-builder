@@ -85,7 +85,7 @@ export default function TemplateCategoryPage({ params }: PageProps) {
       <div className="seo-inner">
         <header className="seo-nav">
           <Link href="/" className="seo-brand">
-            <span className="seo-mark" aria-hidden="true">QC</span>
+            <img className="seo-mark" src="/icon-192.png" alt="" width="38" height="38" />
             <span>
               <span className="seo-brand-name">QuickCV</span>
               <span className="seo-brand-sub">תבניות לפי תחום</span>

@@ -1299,6 +1299,9 @@ function openCheckoutModal() {
     applyPackUi();
     showDownloadStep();
     startPaidSessionTimer();
+    // "הורד PDF" CTAs call openPaymentModal → here. Without this, paid users only saw
+    // the success panel and had to find the green button — felt like download was broken.
+    void attemptApprovedPdfDownload();
     return;
   }
   openModal();
@@ -1329,8 +1332,7 @@ function openCheckoutModal() {
 function onDownloadPdfClick(e) {
   e?.preventDefault?.();
   e?.stopPropagation?.();
-  if (!assertCheckoutReady()) return;
-  // Paid or unpaid: open checkout/success UI (Bit only when unpaid).
+  // Paid sessions auto-start the PDF inside openCheckoutModal; unpaid opens Bit checkout.
   openCheckoutModal();
 }
 

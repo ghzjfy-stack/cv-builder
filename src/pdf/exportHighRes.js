@@ -175,6 +175,118 @@ function setSpinner(on) {
   });
 }
 
+function sliceCssFunction(value, start) {
+  let i = start;
+  while (i < value.length && value[i] !== "(") i += 1;
+  if (value[i] !== "(") return "";
+  let depth = 0;
+  for (let j = i; j < value.length; j += 1) {
+    if (value[j] === "(") depth += 1;
+    else if (value[j] === ")") {
+      depth -= 1;
+      if (depth === 0) return value.slice(start, j + 1);
+    }
+  }
+  return "";
+}
+
+function replaceModernColorFns(value, resolve) {
+  const re = /color-mix\(|oklch\(|oklab\(|\blab\(|\blch\(|color\(/gi;
+  let out = "";
+  let last = 0;
+  let match;
+  while ((match = re.exec(value))) {
+    const fn = sliceCssFunction(value, match.index);
+    if (!fn) break;
+    out += value.slice(last, match.index) + resolve(fn);
+    last = match.index + fn.length;
+    re.lastIndex = last;
+  }
+  return out + value.slice(last);
+}
+
+function classicColor(color) {
+  const raw = String(color || "").trim();
+  const modern = raw.match(/^color\(\s*srgb\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)(?:\s*\/\s*([0-9.]+))?\s*\)$/i);
+  if (!modern) {
+    if (/^rgba?\(/i.test(raw) || /^#[0-9a-f]{3,8}$/i.test(raw)) return raw;
+    return "";
+  }
+  const channel = (n) => Math.max(0, Math.min(255, Math.round(parseFloat(n) * 255)));
+  const r = channel(modern[1]);
+  const g = channel(modern[2]);
+  const b = channel(modern[3]);
+  const alpha = modern[4] == null ? 1 : parseFloat(modern[4]);
+  if (!Number.isFinite(alpha) || alpha >= 0.999) return `rgb(${r}, ${g}, ${b})`;
+  return `rgba(${r}, ${g}, ${b}, ${Math.round(alpha * 1000) / 1000})`;
+}
+
+function resolvedPaint(doc, ref, value) {
+  const probe = doc.createElement("span");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.cssText =
+    "position:absolute;left:-9999px;top:0;width:4px;height:4px;background-color:" +
+    value +
+    " !important;color:" +
+    value +
+    " !important;";
+  (ref || doc.body).appendChild(probe);
+  const view = doc.defaultView || window;
+  const cs = view.getComputedStyle(probe);
+  const bg = classicColor(cs.backgroundColor);
+  const fg = classicColor(cs.color);
+  probe.remove();
+  const usable = (color) => color && color !== "rgba(0, 0, 0, 0)" && color !== "transparent";
+  if (usable(bg)) return bg;
+  if (usable(fg)) return fg;
+  return "transparent";
+}
+
+/**
+ * html2canvas 1.4 throws on color-mix()/color().
+ * Swap those values for computed rgb, then restore so the live preview keeps accent mixing.
+ */
+function rewriteModernColors(doc, ref) {
+  const backups = [];
+  const seen = new Set();
+  const visit = (rules) => {
+    if (!rules || seen.has(rules)) return;
+    seen.add(rules);
+    for (let i = 0; i < rules.length; i += 1) {
+      const rule = rules[i];
+      if (rule.cssRules) visit(rule.cssRules);
+      if (!rule.style) continue;
+      for (let j = 0; j < rule.style.length; j += 1) {
+        const prop = rule.style[j];
+        const val = rule.style.getPropertyValue(prop);
+        if (!/color-mix\(|oklch\(|oklab\(|\blab\(|\blch\(|color\(/i.test(val)) continue;
+        const priority = rule.style.getPropertyPriority(prop);
+        const next = replaceModernColorFns(val, (fn) => resolvedPaint(doc, ref, fn));
+        if (!next || next === val) continue;
+        backups.push({ rule, prop, val, priority });
+        rule.style.setProperty(prop, next, priority);
+      }
+    }
+  };
+  for (const sheet of Array.from(doc.styleSheets || [])) {
+    try {
+      visit(sheet.cssRules);
+    } catch {
+      /* cross-origin sheet */
+    }
+  }
+  return () => {
+    for (let i = backups.length - 1; i >= 0; i -= 1) {
+      const item = backups[i];
+      try {
+        item.rule.style.setProperty(item.prop, item.val, item.priority);
+      } catch {
+        /* sheet may already be gone */
+      }
+    }
+  };
+}
+
 function flattenUnsupportedColors(root, view) {
   const win = view || window;
   const nodes = root.querySelectorAll("*");
@@ -1293,6 +1405,7 @@ async function captureToCanvas(el) {
     };
   }
 
+  const restoreColors = rewriteModernColors(document, document.getElementById("cv-target") || document.body);
   try {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     fitClassicCaptureToOnePage(el);
@@ -1386,6 +1499,7 @@ async function captureToCanvas(el) {
             const cloned = measureLinks(host);
             if (cloned.links.length) linkMeta = cloned;
           }
+          rewriteModernColors(doc, host instanceof HTMLElement ? host : doc.body);
         },
       }),
       40000,
@@ -1393,6 +1507,7 @@ async function captureToCanvas(el) {
     );
     return { canvas, ...linkMeta };
   } finally {
+    restoreColors();
     if (prevDir == null) html.removeAttribute("dir");
     else html.setAttribute("dir", prevDir);
     html.style.direction = prevDirStyle;
